@@ -13,6 +13,9 @@ Hackathon de AI Agents (**tema aberto**), 07 e 08/11/2026, Porto Digital, Recife
 | Gerar e escolher a ideia | [docs/ideacao/como-ideiar.md](docs/ideacao/como-ideiar.md) |
 | Entender como a ideia é julgada | [docs/ideacao/criterios.md](docs/ideacao/criterios.md) |
 | Ver ou registrar ideias | [docs/ideacao/backlog-ideias.md](docs/ideacao/backlog-ideias.md) · [template](docs/ideacao/_template-ideia.md) |
+| Ver o que o produto precisa fazer e provar | [docs/requisitos.md](docs/requisitos.md) |
+| Ver o produto definido (features, agente e humano) | [docs/produto.md](docs/produto.md) |
+| Ver a arquitetura técnica (Gate 3, aguardando aprovação) | [docs/arquitetura.md](docs/arquitetura.md) |
 | Ver o que já foi decidido | [docs/decisoes.md](docs/decisoes.md) |
 | Conferir as regras do evento | [docs/regras-e-integridade.md](docs/regras-e-integridade.md) · [docs/contexto-hackathon.md](docs/contexto-hackathon.md) · [guia oficial](docs/guia-converge-challenge.md) |
 | Planejar as horas | [docs/plano-de-horas.md](docs/plano-de-horas.md) |
@@ -38,6 +41,9 @@ Hackathon de AI Agents (**tema aberto**), 07 e 08/11/2026, Porto Digital, Recife
    encerrar um turno em que o código mudou e a doc não, bloqueia uma vez e pede a atualização.
 
 ### Ativando o hook
+
+> Neste repositório o hook **já está registrado** em `.claude/settings.json` ([DEC-004](docs/decisoes.md)). O texto abaixo vale
+> para quem copiar o modelo para outro projeto.
 
 O script já está em [.claude/hooks/docs_sync.py](.claude/hooks/docs_sync.py), mas **só vale depois de registrado**. Crie
 `.claude/settings.json` com:

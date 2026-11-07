@@ -108,6 +108,7 @@ docs/
   plano-de-horas.md                cronograma com gates de decisão
   requisitos.md                    requisitos funcionais, de exceção, não funcionais e de aceite
   produto.md                       definição do produto: features, fluxos, agente x humano, generalização
+  arquitetura.md                   arquitetura técnica: agentes, solver, contratos, rastro, riscos (Gate 3)
   decisoes.md                      registro de decisões (DEC-NNN)
   declaracao-ferramentas.md        lista de ferramentas, modelos e APIs de terceiros (vai para a submissão)
   entrega.md                       submissão, pitch de 3 min e roteiro de demo

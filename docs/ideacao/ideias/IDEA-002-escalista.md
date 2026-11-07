@@ -4,14 +4,14 @@
 > trabalho de 07/11/2026, versão 2), com os fatos corrigidos na Etapa 0 de 07/11/2026. Status e pontuação ficam em
 > [backlog-ideias.md](../backlog-ideias.md), não aqui. Rótulos: **[FATO]** (com fonte), **[INFERÊNCIA]**, **[HIPÓTESE]**. O PDF é base, não a fonte da verdade ([DEC-010](../../decisoes.md)).
 
-Última atualização: 2026-11-07 13:18 · Autoria: time (proposta); registro por Claude
+Última atualização: 2026-11-07 14:42 · Autoria: time (proposta); registro por Claude
 
-**Escolhida como direção (provisória)** em [DEC-003](../../decisoes.md); concorre ao Desafio Tako (frente DP). Filtros e rubrica aplicados em 2026-11-07 13:18: **14/20, risco alto** (proposta do agente, a confirmar pelo time). Pontuação no [backlog](../backlog-ideias.md).
+**Escolhida como direção (provisória)** em [DEC-003](../../decisoes.md); concorre ao Desafio Tako (frente DP). Filtros e rubrica aplicados em 2026-11-07 13:18 e **refeitos às 14:47** com o produto definido: **14/20, risco alto** (proposta do agente, a confirmar pelo time). Pontuação no [backlog](../backlog-ideias.md).
 
 ## Em uma frase
 
 Um digital worker que monta, otimiza, mantém e audita a escala de trabalho de uma operação com turnos, dentro da CLT, da
-convenção coletiva e da EC 141, e cobre faltas conversando com a equipe pelo WhatsApp; o gerente aprova a escala e decide só
+convenção coletiva e da EC 141, e cobre faltas conversando com a equipe pelo WhatsApp; o gerente aprova a escala, valida cada cobertura e decide só
 as exceções. Quem paga (hipótese): diretoria de operações ou de RH/DP.
 
 ## Problema
@@ -118,8 +118,8 @@ as exceções. Quem paga (hipótese): diretoria de operações ou de RH/DP.
 
 Atos que **exigem aprovação humana**: publicação da escala (gerente); mudança de regra (DP); advertência, desconto, recusa
 de atestado e qualquer decisão sobre pessoas (humano, sempre).
-Autonomia do agente: o PDF deixa o agente cobrir um turno sem o gerente. **Padrão adotado até decisão contrária: só sem
-hora extra e dentro de todas as regras; qualquer hora extra vai ao gerente.** [PREENCHER: confirmar com o time.]
+Autonomia do agente: o PDF deixava o agente cobrir um turno sem o gerente. **Decidido na entrevista
+([DEC-014](../../decisoes.md)): o colega confirma e o gerente valida sempre a cobertura.**
 
 ## Dados sintéticos e integrações simuladas
 
@@ -154,48 +154,61 @@ hora extra e dentro de todas as regras; qualquer hora extra vai ao gerente.** [P
   rápido; OCR barato basta para a maioria dos atestados.
 - **Se o tempo apertar, cortamos** (ordem do PDF): atraso proativo, lembretes e consulta; atestado por imagem; leitura da
   convenção em PDF (usar YAML); WhatsApp real (só simulador); polimento. **Não cortamos:** exceções, rastro, evals.
+- **Atualização da entrevista de produto ([DEC-013](../../decisoes.md), [DEC-014](../../decisoes.md) e [DEC-015](../../decisoes.md),
+  14:13 a 14:39):** o v1 passou a incluir os 3 gatilhos ativos, a leitura da escala em XLSX, CSV e PDF, a foto do atestado, a
+  convenção lida em PDF e a reotimização semanal, itens que o PDF punha no corte. O escopo cresce; a avaliação foi refeita às
+  14:47 (ver "Avaliação") e a ordem de corte vigente é a da DEC-015.
 
 ## Avaliação (filtros e rubrica de [criterios.md](../criterios.md))
 
-Proposta do agente em 2026-11-07 13:18; o time pontua junto e confirma. Só a IDEA-002 foi avaliada (IDEA-001 está descartada).
+Primeira avaliação em 2026-11-07 13:18; **refeita às 14:47** com o produto definido na entrevista
+([DEC-013](../../decisoes.md), [DEC-014](../../decisoes.md), [DEC-015](../../decisoes.md)). Proposta do agente; o time pontua junto e
+confirma. Só a IDEA-002 foi avaliada (IDEA-001 está descartada).
 
-**Filtros eliminatórios: nenhum reprova, três passam com condição.**
+**Filtros eliminatórios (refeitos às 14:47): nenhum reprova, três passam com condição (G2, G4 e G7).**
 
 | # | Filtro | Resultado | Por quê |
 |---|---|---|---|
-| G1 | IA central, agente que entrega trabalho | Passa, com cuidado | O agente conduz o processo (regras, escala, cobertura de falta, exceções) **[INFERÊNCIA]**. Risco de "IA decorativa": se o solver faz tudo e o modelo só explica. O modelo precisa fazer trabalho real: entender o evento da conversa, montar as opções de uma exceção e extrair regra de uma cláusula |
-| G2 | Cabe em ~11 h | **Passa, condicionado** | Restam cerca de 6,5 h de construção (13h30 às 17h de sábado e 8h30 às 12h de domingo) **[INFERÊNCIA]**. Cabe só no recorte do PDF: solver parametrizável, grade, fila de exceções, simulador e trace. Depende do tamanho do time, ainda não registrado **[HIPÓTESE]** |
-| G3 | Dados sintéticos honestos | Passa | O guia permite dados sintéticos e integrações simuladas no Desafio Tako **[FATO, guia §3]** |
+| G1 | IA central, agente que entrega trabalho | Passa | O agente conduz o processo (regras, escala, cobertura de falta, exceções) **[INFERÊNCIA]**. Risco de "IA decorativa": se o solver faz tudo e o modelo só explica. Com o produto definido, o modelo tem trabalho real: ler a escala (XLSX, CSV, PDF), a convenção em PDF e o atestado (PDF ou foto), conversar com o colaborador, montar as opções de uma exceção e interpretar o pedido de edição em texto **[INFERÊNCIA]**; o solver calcula. Risco que resta: a leitura de arquivo virar parsing fixo e o modelo só explicar |
+| G2 | Cabe em ~11 h | **Passa, condicionado (mais frágil que às 13:18)** | O critério pede o fluxo mínimo ponta a ponta em cerca de 6 h; esse recorte (FT-02 com um formato, solver, verificador, aprovação e falta com cobertura) cabe **[INFERÊNCIA]**. O v1 aprovado é bem maior: 5 features, a simulação de vigência e 3 cortes do PDF dentro. O usuário diz que o time pode trabalhar depois das 17h; o guia não diz isso e os organizadores não confirmaram **[FATO, guia e estado, pergunta 3]**. Das 14h47 ao congelamento de domingo às 12h passam 21h13 de relógio **[FATO, conta]**, mas as horas úteis dependem do tamanho do time e da disponibilidade à noite, que não estão registrados **[HIPÓTESE]**. Sem horas à noite, só cabe com os cortes da [DEC-015](../../decisoes.md) |
+| G3 | Dados sintéticos honestos | Passa | O guia permite dados sintéticos e integrações simuladas no Desafio Tako **[FATO, guia §3]**. Há mais para gerar agora: escala em 3 formatos, convenção em PDF, atestados em PDF e foto e ponto simulado **[INFERÊNCIA]** |
 | G4 | Jurado testa sozinho | **Passa, condicionado** | O link precisa de hospedagem, que o time não tem **[FATO, estado, pergunta 6]**. Ponte real do WhatsApp fica cortável; o simulador é o caminho |
 | G5 | Clean room | Passa | Histórico recriado ([DEC-007](../../decisoes.md)); dados e regras são nossos ou públicos. Sem apoio em material de empregador ou cliente **[FATO, declaração do time]** |
-| G6 | Humano nos atos de consequência | Passa | RH-01 a RH-06 em [requisitos.md](../../requisitos.md); a premissa de autonomia (RH-05) ainda é provisória |
-| G7 | Custo mensurável | **Passa, condicionado** | Ninguém resgatou os US$ 25 da Featherless; o código vence em 08/11 **[FATO, guia §11]**. Custo sai do trace |
+| G6 | Humano nos atos de consequência | Passa | RH-01 a RH-06 em [requisitos.md](../../requisitos.md); o RH-05 foi substituído ([DEC-014](../../decisoes.md)): o gerente valida sempre |
+| G7 | Custo mensurável | **Passa, condicionado** | Ninguém resgatou os US$ 25 da Featherless; o código vence em 08/11 **[FATO, guia §11]**. Custo sai do trace. Ler PDF e foto aumenta os tokens por execução **[INFERÊNCIA]**, e **não verificamos** se a Featherless hospeda um modelo com visão para a foto do atestado (toda a inferência passa por ela, [DEC-005](../../decisoes.md)); se não houver, a foto cai, que já é o 3º corte. **Atualização das 15h14 ([DEC-020](../../decisoes.md)): a dúvida da visão está resolvida, a Featherless hospeda modelos com visão [FATO, featherless.ai/docs/vision, 07/11/2026]; ainda sem teste por nós, e o crédito segue não resgatado** |
 
 **Rubrica (1 a 5):**
 
 | Critério | Nota | Justificativa |
 |---|---|---|
-| A. Protótipo e aderência | **4** | O desenho fecha o processo, trata exceções com contexto, tem rastro e custo medido **[INFERÊNCIA]**; nada foi construído nem medido, e o teto 5 exige custo e ganho medidos |
-| B. Viabilidade como startup | **3** | Dor frequente e why now com fonte **[FATO]**, concorrência mapeada **[FATO]**, âncoras de mercado sem TAM; quem paga e quanto são **[HIPÓTESE]** e não há preço publicado de escala **[não encontrado]** |
-| C. Criatividade e originalidade | **3** | Escala automática com CLT já existe **[FATO, Escala Jornadas]**; o ângulo novo (convenção citada por cláusula, política parametrizável, canal WhatsApp) é **[HIPÓTESE]** de diferencial |
-| D. Pitch | **4** | Problema conhecido pela banca e demo visual (troca de 44h para 42h muda a escala) **[INFERÊNCIA]**; números medidos só existirão se trace e evals rodarem |
-| **Total** | **14 / 20** | **Risco de execução: alto** (ponte não oficial, hospedagem sem solução, muitas peças em ~6,5 h) |
+| A. Protótipo e aderência | **4** | O desenho fecha o processo, trata exceções com contexto, tem rastro e custo medido **[INFERÊNCIA]**; nada foi construído nem medido, e o teto 5 exige custo e ganho medidos. **Mantida:** o produto definido cobre processo, exceções com cartão, tela de auditoria e economia medida pelo solver; sobe o risco, não a nota. Cai para 3 se o fluxo ponta a ponta não fechar **[INFERÊNCIA]** |
+| B. Viabilidade como startup | **3** | Dor frequente e why now com fonte **[FATO]**, concorrência mapeada **[FATO]**, âncoras de mercado sem TAM; quem paga e quanto são **[HIPÓTESE]** e não há preço publicado de escala **[não encontrado]**. **Mantida:** nenhum fato de mercado novo desde as 13:18, e a entrevista não validou comprador nem preço; falta conversa com cliente |
+| C. Criatividade e originalidade | **3** | Escala automática com CLT já existe **[FATO, Escala Jornadas]**; o ângulo novo (convenção citada por cláusula, política parametrizável, canal WhatsApp) é **[HIPÓTESE]** de diferencial. **Mantida:** ler escala e convenção em vários formatos é recurso que outras ferramentas podem ter (não lemos Ahgora, Sólides, Tangerino e Convenia) **[INFERÊNCIA]**; o ângulo segue hipótese |
+| D. Pitch | **4** | Problema conhecido pela banca e demo visual (troca de 44h para 42h muda a escala) **[INFERÊNCIA]**; números medidos só existirão se trace e evals rodarem. **Mantida:** a demo agora tem mais cenas que 85 s (leitura e antes e depois, 44h para 42h, cobertura de falta, exceção), então é preciso escolher; vai a 3 se faltarem números medidos **[INFERÊNCIA]** |
+| **Total** | **14 / 20** | **Risco de execução: alto** (escopo do v1 maior que o do PDF, hospedagem sem solução, modelo de visão não verificado, horas à noite sem registro). Total igual ao de 13:18: as mudanças de escopo não alteram o que a rubrica mede, só o risco |
 
 **Pré-mortem, a pergunta mais dura.** "O Escala Jornadas já promete gerar escala automática com a CLT, e o Pontotel vende
 'IA sugere ajustes' e já faz campanha da EC 141. Por que um gerente trocaria, e o que impede um fornecedor de ponto de copiar
-em um mês?" **Resposta hoje:** o único diferencial candidato é a política parametrizável com origem em cada cláusula e o
-replanejamento pelo canal do trabalhador, que não achamos em nenhum fornecedor. Isso é ausência de evidência, não prova, e a
+em um mês?" **Resposta hoje (refeita às 14:47):** os diferenciais candidatos são a política parametrizável lida da convenção pelo
+agente, com a cláusula de origem em cada regra, a validação do gerente em cada cobertura e o replanejamento pelo canal do
+trabalhador, que não achamos em nenhum fornecedor. Isso é ausência de evidência, não prova, e a
 cópia é plausível. Sem conversa com cliente, a resposta é **[HIPÓTESE]**.
 
 **Melhor argumento contra seguir com a IDEA-002:**
-1. Execução: muitas peças em ~6,5 h, com hospedagem, créditos e ponte ainda em aberto.
+1. Execução: o v1 tem 5 features e a simulação, com 3 cortes do PDF dentro; hospedagem, créditos e modelo de visão seguem em
+   aberto. A salvaguarda é a ordem de corte da [DEC-015](../../decisoes.md).
 2. Concorrência: já há produto de escala automática com CLT e fornecedores de ponto entrando no tema.
 3. Sem validação com cliente: comprador, preço e tempo do gerente são todos hipótese.
 4. A onda da 6x1 é pontual; o que fica é a necessidade semanal de escala **[INFERÊNCIA]**.
+5. O escopo que cresceu na entrevista (leitura de 3 formatos, convenção em PDF, foto, 3 gatilhos) **não sobe nenhuma nota** da
+   rubrica (A já era 4; B e C não dependem dele) e só aumenta o risco: serve ao filtro G1, o modelo com trabalho real, e não à
+   pontuação **[INFERÊNCIA]**.
 
 **Recomendação do agente:** seguir com a IDEA-002. Não há outra candidata avaliada, e trocar de ideia depois das 14h custa mais do
 que seguir com uma ideia razoável ([como-ideiar.md](../como-ideiar.md)). A decisão é do time. Para defender melhor, o produto
-precisa mostrar na demo o que a concorrência não mostra: política parametrizável e regra com origem.
+precisa mostrar na demo o que a concorrência não mostra: política parametrizável e regra com origem. Sugestão **[PROPOSTA]**:
+fechar primeiro o recorte mínimo (FT-02 com um formato, solver, verificador e aprovação, mais a falta com cobertura) e só depois
+as extensões, na ordem inversa da de corte.
 
 **O núcleo é o solver ou o WhatsApp?** O solver e a política parametrizável ([requisitos.md](../../requisitos.md), RF-05,
 RF-07, RF-22). O WhatsApp (simulado) é a segunda cena e mostra o agente agindo. A demo de 3 min mostra o núcleo nos primeiros

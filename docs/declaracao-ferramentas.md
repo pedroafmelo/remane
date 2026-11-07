@@ -1,6 +1,6 @@
 # Declaração de ferramentas, modelos e APIs de terceiros
 
-Última atualização: 2026-11-07 12:44. **A submissão exige esta lista** (guia, seção 7) e a regra de uso de IA pede que APIs,
+Última atualização: 2026-11-07 15:14 (Gate 3: modelos, bibliotecas e infraestrutura). **A submissão exige esta lista** (guia, seção 7) e a regra de uso de IA pede que APIs,
 modelos e plataformas sejam declarados (seção 5). Atualize **no mesmo turno** em que algo entrar ou sair do projeto.
 Status: `planejado`, `em uso`, `removido`. Não remova linhas: marque `removido`.
 
@@ -9,8 +9,8 @@ Status: `planejado`, `em uso`, `removido`. Não remova linhas: marque `removido`
 | Item | Tipo | Uso no projeto | Status |
 |---|---|---|---|
 | Claude Code (Anthropic) | Ferramenta de código com IA | Desenvolvimento e documentação; liberada pelo guia. Não faz parte do produto ([DEC-003](decisoes.md), provisória) | em uso |
-| Langfuse docs MCP (`https://langfuse.com/api/mcp`, oficial, sem autenticação) | Servidor MCP de documentação | Consulta de documentação durante o desenvolvimento; configurado em `.mcp.json` | planejado (aprovar ao reabrir a sessão) |
-| LangChain docs MCP (`https://docs.langchain.com/mcp`, oficial, sem autenticação) | Servidor MCP de documentação | Consulta de documentação do LangGraph durante o desenvolvimento; configurado em `.mcp.json` | planejado (aprovar ao reabrir a sessão) |
+| Langfuse docs MCP (`https://langfuse.com/api/mcp`, oficial, sem autenticação) | Servidor MCP de documentação | Consulta de documentação durante o desenvolvimento; configurado em `.mcp.json` | em uso (conectado desde a [DEC-009](decisoes.md)) |
+| LangChain docs MCP (`https://docs.langchain.com/mcp`, oficial, sem autenticação) | Servidor MCP de documentação | Consulta de documentação do LangGraph durante o desenvolvimento; configurado em `.mcp.json` | em uso (conectado desde a [DEC-009](decisoes.md)) |
 
 ## Modelos e APIs de inferência
 
@@ -18,21 +18,29 @@ Status: `planejado`, `em uso`, `removido`. Não remova linhas: marque `removido`
 |---|---|---|---|
 | Featherless (API compatível com OpenAI, `https://api.featherless.ai/v1`) | Inferência de modelos open source | Inferência de todo o agente do produto (US$ 25 por pessoa, benefício do evento), via SDK da OpenAI com `base_url` da Featherless | planejado ([DEC-003](decisoes.md), provisória) |
 
-Quando decidir, liste **cada modelo** (nome exato, provedor, para qual etapa, tamanho pequeno ou grande).
+**Modelos escolhidos ([DEC-020](decisoes.md)).** Nomes e preços das fichas em featherless.ai/models, lidas por subagente em 07/11/2026.
+**Nenhum foi testado por nós** (nem em português, nem em tool calling, nem em visão); o teste de fumaça decide antes de adotar.
 
-**Modelos ainda não escolhidos.** A documentação da Featherless diz que, hoje, a chamada de ferramentas nativa existe em
-`moonshotai/Kimi-K2-Instruct` e na família Qwen3; outros modelos podem devolver a chamada como texto
-([featherless.ai/docs/tool-calling](https://featherless.ai/docs/tool-calling), lida por subagente em 07/11/2026; conferir em
-[featherless.ai/models](https://featherless.ai/models) no dia). Para o agente de ferramentas, escolher entre esses.
+| Modelo | Provedor | Tamanho | Etapa | Status |
+|---|---|---|---|---|
+| `Qwen/Qwen3.5-9B` | Featherless | Pequeno (1 unidade de concorrência; US$ 0,17 entrada e US$ 0,25 saída por 1M tokens) | Agente do colaborador, assistente do gestor, justificativas, **visão da foto do atestado** | planejado, aguardando teste de fumaça |
+| `google/gemma-4-31B-it` | Featherless | Grande (2 unidades; US$ 0,12 e US$ 0,36 por 1M tokens) | Leitura da escala e da convenção em regras | planejado, aguardando teste de fumaça |
+| Modelo reserva por papel | Featherless | `[PREENCHER]` | Troca se o teste de fumaça falhar | a decidir no teste |
+
+A foto do atestado trafega, com o CID dentro, pela Featherless (terceiro). Dado 100% sintético; **declarar na submissão**.
+Tool calling nativo documentado só em `moonshotai/Kimi-K2-Instruct` e na família Qwen3
+([featherless.ai/docs/tool-calling](https://featherless.ai/docs/tool-calling), doc de 07/08/2025, defasada em relação às fichas do catálogo).
 
 ## Observabilidade e infraestrutura
 
 | Item | Tipo | Uso no projeto | Status |
 |---|---|---|---|
-| Langfuse (self-hosted, Docker Compose; núcleo MIT) | Tracing de agentes | Rastro auditável e custo por execução, desde a primeira hora | planejado ([DEC-005](decisoes.md)) |
-| Postgres, ClickHouse, Redis e MinIO (contêineres do Langfuse self-hosted) | Armazenamento do Langfuse | Dependências do Langfuse v4 (docker compose do projeto deles) | planejado |
-| whatsapp-web.js (Node.js, Apache-2.0, **não oficial**, contrário aos termos do WhatsApp) | Ponte de canal | Receber e enviar mensagens do WhatsApp no evento, com chip dedicado. Produção usaria a API oficial do WhatsApp Business. Declarar na submissão | planejado, spike de 1 h ([DEC-003](decisoes.md), provisória) |
-| [PREENCHER: hospedagem do link público] | Deploy | Link estável exigido na submissão | a decidir |
+| Langfuse (self-hosted, Docker Compose; núcleo MIT) | Tracing de agentes | Rastro e custo por execução, **só no notebook do time** (a doc recomenda 4 CPU e 16 GiB; não cabe em hospedagem grátis). O link público lê a tabela de rastro do app, não o Langfuse ([DEC-021](decisoes.md)) | planejado ([DEC-005](decisoes.md), [DEC-021](decisoes.md)) |
+| Postgres, ClickHouse, Redis e MinIO (contêineres do Langfuse self-hosted) | Armazenamento do Langfuse | Dependências do Langfuse v4 (docker compose do projeto deles); só no notebook | planejado |
+| whatsapp-web.js (Node.js, Apache-2.0, **não oficial**, contrário aos termos do WhatsApp) | Ponte de canal | Receber e enviar mensagens do WhatsApp no evento, com chip dedicado, **só no notebook**. Produção usaria a API oficial do WhatsApp Business. Declarar na submissão | planejado, spike de 1 h com critério de abandono ([DEC-019](decisoes.md)) |
+| [PREENCHER: hospedagem do link público] | Deploy | Link estável exigido na submissão. O usuário disse "vamos ver isso depois" ([DEC-021](decisoes.md)); opções pesquisadas em [arquitetura.md](arquitetura.md), seção 12 | **a decidir** |
+| SQLite (stdlib do Python) | Banco do app | Estado, rastro e dados sintéticos; portável a Postgres via SQLAlchemy `[PROPOSTA]` | planejado |
+| Node.js e npm (build do React + Vite) | Build do front-end | Apenas no build do contêiner ([DEC-018](decisoes.md)) | planejado |
 
 ## Bibliotecas e frameworks
 
@@ -47,11 +55,19 @@ langfuse e openai entram na implementação. Antes da submissão, deixe aqui só
 | python-bcb | `pyproject.toml` (scaffold) | removido do `pyproject.toml` ([DEC-005](decisoes.md)) |
 | pytest, pytest-cov, ruff | `pyproject.toml` (grupo dev) | planejado |
 | taskipy, typos, isort | `pyproject.toml` (scaffold) | removido ([DEC-007](decisoes.md)) |
-| Google OR-Tools (CP-SAT) | Solver de escala (núcleo) | planejado, ainda não está no `pyproject.toml` |
-| LangGraph | Grafo do agente | planejado, ainda não está no `pyproject.toml` |
-| langfuse (SDK Python) | Tracing | planejado, ainda não está no `pyproject.toml` |
-| openai (SDK Python) | Cliente da API compatível da Featherless | planejado, ainda não está no `pyproject.toml` |
-| Node.js, whatsapp-web.js e Puppeteer (Chromium) | Microserviço da ponte do WhatsApp | planejado, serviço ainda não existe |
+| Google OR-Tools (CP-SAT) 9.15.6755, Apache-2.0 | Solver de escala (núcleo) | planejado, ainda não está no `pyproject.toml` (entra com `uv add` depois do "aprovado" do Gate 3) |
+| LangGraph | Grafo dos três agentes ([DEC-018](decisoes.md)) | planejado; versão e licença `[PREENCHER: conferir]` |
+| langfuse (SDK Python) | Tracing | planejado; versão e licença `[PREENCHER: conferir]` (a doc cita o SDK v5) |
+| openai (SDK Python) | Cliente da API compatível da Featherless | planejado; versão e licença `[PREENCHER: conferir]` |
+| Node.js, whatsapp-web.js e Puppeteer (Chromium) | Microserviço da ponte do WhatsApp | planejado como spike de 1 h; serviço ainda não existe |
+| openpyxl 3.1.5 (MIT) e defusedxml 0.7.1 (PSF) | Leitura de XLSX | planejado (versões e licenças pelo PyPI, 07/11/2026) |
+| pdfplumber 0.11.10 (MIT), com pdfminer.six (MIT) e pypdfium2 (**licença não confirmada**) | Leitura de PDF digital: escala, convenção e atestado | planejado |
+| React e Vite | SPA do front-end ([DEC-018](decisoes.md)) | planejado; versões e licenças `[PREENCHER: conferir]` |
+| SQLAlchemy e itsdangerous | Banco e sessão por cookie assinado `[PROPOSTA]` | planejado; versões e licenças `[PREENCHER: conferir]` |
+| Pillow 13.0.0 (MIT-CMU) e reportlab 5.1.0 (BSD) | Geração de dados sintéticos (grupo dev) | planejado |
+| pandas, numpy | Dependências transitivas do OR-Tools; não importadas por nós | planejado como transitivas |
+| PyMuPDF (AGPL-3.0) e fpdf2 (LGPL-3.0) | Descartados por licença | removido (nunca entrou) |
+| Tesseract e pytesseract | OCR local da foto do atestado | removido: a foto usa o modelo de visão ([DEC-020](decisoes.md)) |
 
 ## Origem do repositório (clean room)
 
@@ -65,7 +81,7 @@ entra na regra de clean room. O commit inicial (`16e1a5c`, 31 arquivos) tem 10 a
 privado e só tem esse commit. Remediação ([DEC-007](decisoes.md), opção A): histórico recriado em um branch novo, sem o commit inicial; `uv.lock`
 regenerado; `LICENSE` vazio e `.vscode/settings.json` removidos; `pyproject.toml` reescrito. Restam, por serem genéricos,
 `.gitignore` (modelo de gitignore para Python, com exceções nossas) e `.python-version`; declarar na submissão. **Execução
-parcial:** faltam commit e push (ver DEC-007).
+concluída ([DEC-009](decisoes.md)):** o histórico recriado foi publicado no `main` do remoto e o histórico antigo saiu do repositório local.
 
 ## Dados e simulações
 
@@ -76,8 +92,10 @@ gerada, para a declaração honesta exigida na submissão.
 |---|---|---|
 | Rede fictícia (≈3 lojas, ≈60 colaboradores, telefones fictícios) | Gerada por script no evento; 100% fictícia | planejado |
 | Demanda por faixa de 30 minutos com sazonalidade semanal | Gerada por script; parâmetros inventados | planejado |
+| Escala atual da rede fictícia em XLSX, CSV e PDF | Gerada por script, com layouts diferentes; um arquivo com defeito plantado e uma escala com violações plantadas; 100% fictícia | planejado ([DEC-014](decisoes.md)) |
 | Convenção coletiva fictícia (PDF) | Escrita por nós; não reproduz convenção real | planejado |
-| Atestados sintéticos com ruído de digitalização | Gerados por script; médicos, CRM e CID fictícios | planejado |
+| Atestados sintéticos em PDF e em foto, com ruído de digitalização ([DEC-014](decisoes.md)) | Gerados por script (Pillow e reportlab), com marca "SINTÉTICO"; médicos, CRM e CID fictícios. A foto vai ao modelo de visão da Featherless ([DEC-020](decisoes.md)) | planejado |
+| Relógio de demo e ponto simulado ([DEC-019](decisoes.md)) | Relógio gravado no banco, avançado por botões; batidas geradas por script com falta, atraso e hora extra plantados. **O tempo é simulado e a tela rotula** | planejado |
 | Ponto realizado e HRIS (mocks) | Simulados por nós, com desvios plantados; o agente chama de verdade a API simulada | planejado |
 | Celular simulado no app | Mesmo adapter da ponte do WhatsApp; mensagens simuladas | planejado |
 | EC 141 e CLT como fonte das regras | Texto público real; **as regras codificadas são interpretação do time**, a validar com o DP | planejado |
