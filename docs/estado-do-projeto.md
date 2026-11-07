@@ -1,8 +1,8 @@
 # Estado do projeto
 
 > **Fonte da verdade do momento.** Atualize ao fim de cada bloco de trabalho (ver "Documentação viva" no
-> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 13:13** (Recife), por Claude, ao fechar o gate de requisitos
-> (DEC-011).
+> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 13:18** (Recife), por Claude, ao avaliar a IDEA-002
+> (negócio, aguardando o Gate 2).
 
 ## Fase atual
 
@@ -14,8 +14,7 @@ criados depois do gate de negócio. Gates fechados: ambiente ([DEC-009](decisoes
 ## Ideia escolhida
 
 **IDEA-002 · Escalista** (digital worker de escala e jornada, Desafio Tako, frente DP), **provisória**, por
-[DEC-003](decisoes.md). Ficha: [IDEA-002](ideacao/ideias/IDEA-002-escalista.md). Foi escolhida sem comparação com outras
-candidatas e sem filtros nem rubrica aplicados; o Gate 2 faz isso. Backlog em [ideacao/backlog-ideias.md](ideacao/backlog-ideias.md).
+[DEC-003](decisoes.md). Ficha: [IDEA-002](ideacao/ideias/IDEA-002-escalista.md). Foi escolhida sem comparação com outras candidatas. Filtros e rubrica aplicados em 2026-11-07 13:18: 14/20, risco alto (proposta do agente; o time confirma). Backlog em [ideacao/backlog-ideias.md](ideacao/backlog-ideias.md).
 
 ## Time
 
@@ -37,7 +36,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
 - [ ] Time confirmar as premissas (a) e (e) da DEC-003 (as demais foram resolvidas ou viraram pergunta) e preencher a tabela do time.
 - [x] Remediação do histórico concluída ([DEC-007](decisoes.md)): remoto e repositório local limpos.
 - [x] Requisitos aprovados ([DEC-011](decisoes.md)). Pendências para a etapa técnica: hospedagem (Q3), mínimo de evals (Q5) e conflito 2.
-- [ ] Etapa de negócio (40 min): quem paga, concorrência, filtros eliminatórios e rubrica, pitch. Gate 2 com o usuário.
+- [ ] **Gate 2 (negócio) com o usuário:** ver a [ficha](ideacao/ideias/IDEA-002-escalista.md) (avaliação, pré-mortem, hipóteses) e o rascunho do pitch em [entrega.md](entrega.md) (seção 3.1).
 - [ ] Confirmar no WhatsApp os pontos em aberto abaixo.
 - [ ] Decidir se o time concorre aos créditos AWS (exige domínio próprio e e-mail corporativo; ver
       [contexto-hackathon.md](contexto-hackathon.md)).
@@ -84,6 +83,7 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 
 | Data e hora | O quê | Por |
 |---|---|---|
+| 2026-11-07 13:18 | Etapa de negócio: pesquisa de concorrência, preço e mercado e dor/custo (subagentes, com fonte); IDEA-002 avaliada (G1 a G7 passam, G2, G4 e G7 com condição; A4 B3 C3 D4 = 14/20; risco alto); ficha, backlog e `entrega.md` (pitch, seção 3.1) atualizados; 11 hipóteses listadas | Claude |
 | 2026-11-07 13:13 | [DEC-011](decisoes.md): requisitos aprovados; rótulo de vigência simulada (RN-11); JEV descartado; Q3 e Q5 e conflito 2 encaminhados à etapa técnica; etapa de negócio aberta | Claude |
 | 2026-11-07 13:10 | [DEC-010](decisoes.md): o PDF é base, não a verdade; política da empresa define as regras (RF-22 novo); tela de auditoria incluída (RN-02); exceções derivadas da política; conflitos 2 e 3 e Q3, Q4, Q5, Q7, Q8 em aberto; `requisitos.md` com seção 9 | Claude |
 | 2026-11-07 13:01 | [DEC-009](decisoes.md): Gate 1 fechado (MCPs conectados); IDEA-001 descartada; [requisitos.md](requisitos.md) criado (11 de elegibilidade, 21 funcionais, 12 de exceção, 6 de atos humanos, 10 não funcionais; 9 conflitos entre fontes; 8 perguntas); histórico antigo removido do repositório local | Claude |
