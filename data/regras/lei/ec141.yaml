@@ -1,0 +1,146 @@
+# Regras da EC 141/2026 para o agente de adequação de jornada.
+# Fonte: texto do Planalto (cópia em github.com/ctresb/leis, fonte/emc141.htm).
+# Conferido contra o Planalto em 2026-11-07 por Claude (campos status e verificacao; RN-09).
+# Nenhuma regra está "conferida": isso exige leitura de alguém do time (ver data/regras/README.md).
+# Publicação: DOU 16/10/2026, edição extra. Não substitui o DOU.
+# Cálculos derivados (divisor, salário-hora, custo) ficam no código, não aqui.
+
+norma: EC 141/2026
+publicacao: 2026-10-16
+
+marcos:
+  etapa_42h: 2026-12-16      # "decorridos 2 meses da publicação" (art. 6º, I; art. 10, I)
+  etapa_40h: 2027-12-16      # "1 ano após o decurso" do prazo anterior (art. 6º, II)
+  ambiguo: true              # há notícias citando 15/12; a contagem exata do prazo não está no texto
+  status: pendente
+  verificacao: >
+    art. 6º, I e II, e art. 10, I, lidos no Planalto em 2026-11-07 por Claude: confere ("2 meses após a
+    publicação"; "1 ano após o decurso do prazo"). As datas de calendário são conta nossa; o texto não diz
+    se o prazo termina em 15 ou 16/12. Toda data abaixo que deriva destes marcos herda a pendência (RN-11).
+
+regras:
+  - id: jornada_semanal_max
+    valores:
+      - {ate: 2026-12-15, horas: 44}   # regra anterior, implícita no art. 6º
+      - {de: 2026-12-16, horas: 42}
+      - {de: 2027-12-16, horas: 40}
+    fonte: "art. 6º, I e II; art. 7º, XIII CF"
+    status: interpretacao
+    verificacao: >
+      art. 6º e art. 7º, XIII (redação do art. 1º), lidos no Planalto em 2026-11-07 por Claude: confere
+      (42h e depois 40h, de forma progressiva). Interpretação nossa: o novo XIII já diz 40h e vale desde a
+      publicação (art. 10, II), e lemos o art. 6º como transição que prevalece; as 44h até 15/12 são a regra
+      anterior, que o texto não repete. As datas herdam a pendência dos marcos.
+
+  - id: jornada_diaria_max
+    horas: 8
+    fonte: "art. 7º, XIII CF (redação da EC 141)"
+    nota: >
+      42h em 5 dias exige mais de 8h/dia. Até 2027-12-16, só CCT ou acordo
+      coletivo pode ampliar a jornada diária para distribuir as 42h (art. 7º da EC).
+      Sem cláusula na CCT, o limite diário de 8h vale.
+    status: interpretacao
+    verificacao: >
+      art. 7º, XIII CF e art. 7º da EC lidos no Planalto em 2026-11-07 por Claude: confere (8h diárias; a
+      CCT ou o acordo pode ampliar a jornada diária "no prazo previsto no inciso II do caput do art. 6º",
+      respeitado o XV). O XIII também mantém a compensação de horários por acordo ou convenção, sem prazo.
+      Decisão sobre a convenção fictícia: pergunta 17 de docs/estado-do-projeto.md.
+
+  - id: repouso_semanal
+    dias: 2
+    preferencia: "um deles preferencialmente aos domingos"
+    vigencia: 2026-12-16
+    fonte: "art. 7º, XV CF; art. 10, I"
+    status: interpretacao
+    verificacao: >
+      art. 7º, XV CF e art. 10, I, lidos no Planalto em 2026-11-07 por Claude: confere (2 dias, "um dos quais
+      preferencialmente aos domingos"; vigência após 2 meses da publicação). A data herda a pendência dos marcos.
+
+  - id: irredutibilidade_salarial
+    reducao_permitida: false
+    inclui: ["salário nominal", "redução proporcional", "pisos salariais"]
+    aplica_a_contratos_vigentes: true
+    fonte: "art. 2º e parágrafo único"
+    status: interpretacao
+    verificacao: >
+      art. 2º e parágrafo único lidos no Planalto em 2026-11-07 por Claude: confere. O texto proíbe redução
+      "nominal, proporcional ou de qualquer outra espécie"; a lista "inclui" não traz "de qualquer outra espécie".
+
+  - id: jornadas_ja_reduzidas
+    regra: "jornadas ≤ 40h não são reduzidas proporcionalmente, mas os 2 repousos valem"
+    fonte: "art. 4º"
+    status: interpretacao
+    verificacao: >
+      art. 4º lido no Planalto em 2026-11-07 por Claude: confere ("igual ou inferior a 40 horas semanais", "sem
+      prejuízo" do inciso XV).
+
+  - id: clausulas_cct_incompativeis
+    efeito: "ficam sem efeito"
+    a_partir_de: 2026-12-16
+    abrange: "cláusulas sobre duração do trabalho e repouso semanal"
+    fonte: "art. 3º"
+    uso_no_agente: "marcar cláusulas da CCT lida que conflitam com a EC"
+    status: interpretacao
+    verificacao: >
+      art. 3º lido no Planalto em 2026-11-07 por Claude: confere ("decorridos 2 meses da publicação"; vale para
+      convenções e para acordos coletivos). O que é "incompatível" é interpretação. No conflito, o agente aplica
+      a regra mais restritiva de forma provisória e abre exceção ao DP (conflito 2 de docs/requisitos.md; P1 de
+      docs/produto.md). A data herda a pendência dos marcos.
+
+excecoes:   # o agente não decide sozinho; valores de acao em data/regras/README.md
+  - id: regime_compensatorio_cct
+    descricao: >
+      CCT ou acordo pode prever média de 2 repousos por mês-calendário,
+      com pelo menos 1 repouso dentro de no máximo 1 semana de trabalho.
+    fonte: "art. 7º, § 2º CF"
+    acao: verificar_convencao
+    nota: "validar se a CCT prevê; se não prever, aplicar 2 repousos semanais"
+    status: interpretacao
+    verificacao: >
+      art. 7º, § 2º CF lido no Planalto em 2026-11-07 por Claude: confere. O texto diz "excepcionalmente" e vale
+      também para regimes diferenciados.
+
+  - id: regimes_diferenciados_lei
+    descricao: "lei futura pode prever regimes diferenciados (ex.: 12x36), respeitados XIII, XIV e XV"
+    fonte: "art. 7º, § 3º CF"
+    acao: escalar
+    status: interpretacao
+    verificacao: >
+      art. 7º, § 3º CF lido no Planalto em 2026-11-07 por Claude: confere. O exemplo 12x36 é nosso; o texto não
+      cita regimes.
+
+  - id: me_epp_mei
+    descricao: "lei complementar pode criar medidas transitórias para MEI, ME e EPP, condicionadas à manutenção de empregos"
+    fonte: "art. 5º"
+    acao: escalar
+    nota: "regra ainda não existe"
+    status: interpretacao
+    verificacao: >
+      art. 5º lido no Planalto em 2026-11-07 por Claude: confere ("condicionadas à manutenção de níveis de emprego").
+
+  - id: hipersuficiente
+    descricao: >
+      diploma de nível superior + remuneração ≥ 2,5x o teto do RGPS:
+      regras de duração e controle de jornada não se aplicam,
+      salvo CCT/acordo ou liberalidade; o repouso (XV e § 2º) continua valendo.
+    criterio_salarial: {multiplicador_teto_rgps: 2.5, teto_rgps: null}  # preencher com o valor oficial vigente
+    nao_se_aplica_a: "empregados públicos da administração direta e indireta"
+    fonte: "art. 8º, caput e § 1º"
+    acao: escalar
+    nota: "teto do RGPS vigente não preenchido; fora do escopo da demo; preencher com a portaria oficial se entrar"
+    status: pendente
+    verificacao: >
+      art. 8º, caput e § 1º, lidos no Planalto em 2026-11-07 por Claude: confere ("duas vezes e meia o limite
+      máximo dos benefícios do RGPS"). Fica pendente porque teto_rgps está vazio.
+
+  - id: contratos_administracao_publica
+    descricao: >
+      terceirizados em contratos com a administração pública: redução da jornada
+      após aditamento para reequilíbrio, em até 1 ano da publicação (2027-10-16).
+    fonte: "art. 9º"
+    acao: escalar
+    status: interpretacao
+    verificacao: >
+      art. 9º lido no Planalto em 2026-11-07 por Claude: confere no caput. "Terceirizados" é leitura nossa; o texto
+      diz contratos "cuja execução envolva emprego direto de mão de obra". A descrição não cobre o § 2º (a
+      redução vale no fim do prazo mesmo sem aditamento) nem o § 3º. A data 2027-10-16 é conta nossa.
