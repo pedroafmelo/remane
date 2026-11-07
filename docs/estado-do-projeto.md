@@ -1,8 +1,8 @@
 # Estado do projeto
 
 > **Fonte da verdade do momento.** Atualize ao fim de cada bloco de trabalho (ver "Documentação viva" no
-> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 15:49** (Recife), por Claude, ao sincronizar depois do merge do PR #1 por Pedro Veloso
-> (regras legais em `data/regras/`, DEC-023 e DEC-024) e do pool de chaves da Featherless (DEC-025, ainda sem commit).
+> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 15:54** (Recife), por Claude, ao registrar a confirmação da DEC-023 (DEC-026) depois do commit
+> do pool de chaves da Featherless (DEC-025, `e77ce4c`).
 
 ## Fase atual
 
@@ -41,7 +41,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
       `arquitetura.md` criado até 15h14 ([DEC-018](decisoes.md) a [DEC-021](decisoes.md)). As três pesquisas com fonte foram refeitas e concluídas (modelos e limites da Featherless, com visão;
       hospedagem e Langfuse; solver e leitura de arquivos). Q5 (evals) resolvida. **Hospedagem (Q3) segue `[PREENCHER]`**: o usuário disse
       "vamos ver isso depois". Pendências do negócio em [produto.md](produto.md), seções 12 e 13.
-- [ ] **Featherless:** 3 das 4 pessoas resgataram e criaram chaves (palavra do usuário, 15h46; **nenhuma chave foi testada**). Falta a 4ª pessoa resgatar hoje (o código vence em 08/11), mover as chaves do `APIs.yaml` para o `.env` e apagar o arquivo, e testar cada chave ([DEC-025](decisoes.md)).
+- [ ] **Featherless:** 3 das 4 pessoas resgataram e criaram chaves (palavra do usuário, 15h46; **nenhuma chave foi testada**). **A chave 1 do `.env` apareceu vazia ou ausente (conferir; o `APIs.yaml` já foi apagado, e se a chave se perdeu é preciso criar outra em API Keys).** Falta a 4ª pessoa resgatar hoje (o código vence em 08/11), mover as chaves do `APIs.yaml` para o `.env` e apagar o arquivo, e testar cada chave ([DEC-025](decisoes.md)).
 - [ ] **Aguardando o comando do usuário para começar a implementar** (ele disse "não implemente ainda"). Depois dele: `uv add` das dependências ([arquitetura.md](arquitetura.md), seção 19), teste de fumaça dos
       modelos, primeiro benchmark do solver (60 × 7), e decidir a hospedagem com um deploy de teste.
 - [x] Regras legais em YAML: [ec141.yaml](../data/regras/lei/ec141.yaml) e [clt.yaml](../data/regras/lei/clt.yaml),
@@ -105,6 +105,7 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 
 | Data e hora | O quê | Por |
 |---|---|---|
+| 2026-11-07 15:54 | [DEC-026](decisoes.md): o usuário confirmou a DEC-023 (art. 386); o status da regra no YAML segue `interpretacao`. Commit `e77ce4c` (DEC-025) enviado à `main`; branch local `merge/legal-rules-data` apagada; `APIs.yaml` já não existe (o usuário o apagou). **Chave 1 do `.env` apareceu vazia ou ausente** na conferência (só se checou preenchida ou vazia, sem ler valores; a 2 e a 3 estão preenchidas, a 4 vazia como esperado); uma segunda conferência foi negada pelo sistema e não foi repetida | Claude |
 | 2026-11-07 15:49 | PR #1 aceito por Pedro Veloso às ~15h49 (18h49 UTC) como merge commit `19ef74f`, que contém o meu merge `f904ef2`; `main` local atualizada por `git pull --ff-only` e as alterações da DEC-025 reaplicadas por cima, sem conflito. Sincronia: a DEC-023 (art. 386) e a DEC-024 (Q13) agora estão no `main`; **a DEC-023 segue sem confirmação do time**; README aponta para `data/regras/`. Alterações da DEC-025 **ainda sem commit**; branch local `merge/legal-rules-data` já está contida no `main` | Claude |
 | 2026-11-07 15:46 | [DEC-025](decisoes.md): as chaves da Featherless das 4 pessoas formam um pool com failover (3 de 4 resgataram, **sem teste**); `.env.example` com `FEATHERLESS_API_KEY_1` a `_4` (só nomes); [arquitetura.md](arquitetura.md) seção 7 e riscos com o desenho do failover (`[PROPOSTA]`); `APIs.yaml` no `.gitignore` por proteção; pergunta 8 e próximas ações com o resgate. Alterações **sem commit** (depois movidas para a `main` local, ver a linha seguinte); nenhum código | Claude |
 | 2026-11-07 15:41 | Integração do PR #1 (`chore/legal-rules-data`, Pedro Veloso) numa branch de merge, sem push: conflitos em `decisoes.md`, `estado-do-projeto.md` e `declaracao-ferramentas.md` resolvidos com o conteúdo do `main` por cima; a decisão do art. 386 virou [DEC-023](decisoes.md) (o `main` já tinha DEC-013 a DEC-022) e a pergunta 13 do PR virou a 17; [DEC-024](decisoes.md) registra a resposta do usuário à Q13; referências nos YAMLs e no README de `data/regras/` atualizadas. **Atenção:** os carimbos dos registros do branch (15:20, 15:35, 15:50) não batem com os commits dele (14:57 e 15:30); mantidos como estavam | Claude |

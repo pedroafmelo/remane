@@ -1,6 +1,6 @@
 # Registro de decisões
 
-Última atualização: 2026-11-07 15:46. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
+Última atualização: 2026-11-07 15:54. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
 entrada:** se a decisão mudar, crie outra e marque a antiga como `substituída por DEC-NNN`. Use `/decisao` para registrar e
 propagar o efeito para as outras docs.
 
@@ -321,7 +321,7 @@ Formato:
 
 ## DEC-023 · Art. 386 da CLT (domingo quinzenal para empregadas) entra como regra dura
 
-- 2026-11-07 15:35 · Decidido por: Claude, a pedido de Pedro Veloso ("revise o domingo mulher e tome uma decisão") · Status: aceita; revisável pelo time
+- 2026-11-07 15:35 · Decidido por: Claude, a pedido de Pedro Veloso ("revise o domingo mulher e tome uma decisão") · Status: aceita; revisável pelo time; **confirmada pelo usuário na [DEC-026](#dec-026--confirmação-da-dec-023-art-386-como-regra-dura)**
 - **Numeração:** registrada como DEC-012 no branch `chore/legal-rules-data`; renumerada para DEC-013 no merge de `main` feito no branch e, na integração com o `main` atual, **renumerada de novo para DEC-023**, porque o `main` já tinha DEC-012 a DEC-022 (outras decisões).
 - **Contexto:** o `clt.yaml` tinha `domingo_mulher` como `pendente`, porque não se sabia como o art. 386 convive com o art. 6º da Lei 10.101/2000 (domingo 1 vez a cada 3 semanas no comércio).
 - **Decisão:** aplicar o art. 386 como regra dura do solver para empregadas, também no comércio (domingo de folga ao menos a cada 2 semanas), prevalecendo sobre a regra de 3 semanas da Lei 10.101. A política da empresa não pode afrouxá-la. Status da regra: `interpretacao`.
@@ -347,3 +347,12 @@ Formato:
 - **Motivo: [motivo não informado].**
 - **Alternativas consideradas (as oferecidas pelo agente):** rodízio entre as chaves em vez de failover; usar uma só chave; manter todas as chaves em todas as máquinas, em vez de só onde precisa.
 - **Consequências:** `.env.example` passa a ter `FEATHERLESS_API_KEY_1` a `FEATHERLESS_API_KEY_4` (só nomes), no lugar de `FEATHERLESS_API_KEY`; o cliente lerá todas as variáveis `FEATHERLESS_API_KEY_*`, em ordem de prioridade. `[PROPOSTA]` do agente, em [arquitetura.md](arquitetura.md), seção 7: failover em ordem; 401, 429 e erro de saldo trocam de chave; modelo frio e 503 não trocam; "Unlock Model" é por conta; só o índice da chave vai ao rastro, nunca o valor; teto de gasto por chave; as 4 chaves juntas só na hospedagem e em quem roda os evals, cada pessoa com a própria chave nas outras máquinas. **Segue `[PREENCHER]`:** a 4ª chave; qual erro a Featherless devolve com saldo zero **[NÃO ENCONTRADO]**. As chaves estavam num arquivo solto na raiz do repositório; ele passou a ser ignorado pelo git e o usuário deve movê-las para o `.env` e apagá-lo. Nenhum código foi escrito.
+
+## DEC-026 · Confirmação da DEC-023 (art. 386 como regra dura)
+
+- 2026-11-07 15:54 · Decidido por: usuário da sessão; a confirmação dos demais integrantes não foi dita · Status: aceita
+- **Contexto:** a [DEC-023](#dec-023--art-386-da-clt-domingo-quinzenal-para-empregadas-entra-como-regra-dura) foi registrada por Claude a pedido de Pedro Veloso, e o agente a listou como pendente de confirmação do time.
+- **Decisão (o que o usuário disse):** "Confirmo." (sobre a DEC-023: o art. 386 da CLT entra como regra dura do solver para empregadas, também no comércio).
+- **Motivo: [motivo não informado].**
+- **Alternativas consideradas:** nenhuma registrada (as da DEC-023: deixar pendente para o DP, ou aplicar só a Lei 10.101/2000).
+- **Consequências:** a DEC-023 passa a confirmada. **Não muda:** o status da regra `domingo_mulher` em `data/regras/lei/clt.yaml`, que segue `interpretacao` (RN-09): a confirmação é da decisão de produto, e a leitura do acórdão do TST, que a DEC-023 cita por notícia, **continua não verificada**; na demo a regra aparece com a fonte e o status. O campo de sexo no quadro sintético segue pendente da definição do RN-13.
