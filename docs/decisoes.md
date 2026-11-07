@@ -1,6 +1,6 @@
 # Registro de decisões
 
-Última atualização: 2026-11-07 13:13. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
+Última atualização: 2026-11-07 13:24. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
 entrada:** se a decisão mudar, crie outra e marque a antiga como `substituída por DEC-NNN`. Use `/decisao` para registrar e
 propagar o efeito para as outras docs.
 
@@ -160,3 +160,10 @@ Formato:
 - **Decisão (o que o usuário disse):** (1) aprova o [requisitos.md](requisitos.md), com as pendências marcadas; (2) a tela mostra o rótulo "vigência simulada a partir de ≈16/12/2026" (conflito 3: "Sim"); (3) "esqueça o JEV": o JEV está descartado.
 - **Motivo: [motivo não informado]** para descartar o JEV. Pelo texto do usuário, a prioridade é fechar o gate logo.
 - **Consequências:** gate de ambiente já fechado ([DEC-009](#dec-009--gate-1-fechado-idea-001-descartada-e-início-dos-requisitos)) e gate de requisitos fechado agora; RN-11 criado (rótulo de vigência simulada); RN-07 mantém "toda a inferência via Featherless", sem JEV; a Q4 e o conflito 5 estão resolvidos. A Q7 fica como escrito no documento (RF-13 desejável). **Pendências encaminhadas:** hospedagem (Q3) e mínimo de evals (Q5) vão para a etapa técnica; o conflito 2 (convenção em conflito com a emenda) segue "a definir". Próxima etapa: negócio.
+
+## DEC-012 · A etapa de negócio passa a ser a definição do produto
+
+- 2026-11-07 13:24 · Decidido por: usuário da sessão · Status: aceita
+- **Decisão (o que o usuário disse):** em negócio, o usuário quer definir: as features do produto; a capacidade de cada feature; como o produto se generaliza; o que fica com o agente; o que fica com o humano; como o agente interage com o humano; quais as entradas e as saídas; os fluxos de cada feature, "etc.".
+- **Motivo:** o que foi entregue antes (pesquisa de mercado, rubrica e pitch) não cobria a definição do produto.
+- **Consequências:** [produto.md](produto.md) foi criado agora, em rascunho, com F1 a F10, quem decide o quê, interação agente e humano, generalização, entradas e saídas, capacidade e 7 decisões (P1 a P7). Isso **supera a espera** registrada na [DEC-003](#dec-003--escalista-idea-002-como-direção-do-projeto-e-participação-no-desafio-tako) para criar `produto.md`; `arquitetura.md` continua para a etapa técnica. A pesquisa de mercado, a rubrica (14/20) e o pitch ficam como apoio na [ficha](ideacao/ideias/IDEA-002-escalista.md) e em [entrega.md](entrega.md). O Gate 2 passa a incluir a aprovação do `produto.md`.

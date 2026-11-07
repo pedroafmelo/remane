@@ -1,15 +1,14 @@
 # Estado do projeto
 
 > **Fonte da verdade do momento.** Atualize ao fim de cada bloco de trabalho (ver "Documentação viva" no
-> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 13:18** (Recife), por Claude, ao avaliar a IDEA-002
-> (negócio, aguardando o Gate 2).
+> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 13:24** (Recife), por Claude, ao escrever o `produto.md`
+> (DEC-012, negócio aguardando o Gate 2).
 
 ## Fase atual
 
 **2 · Definição (em andamento).** Fases: 1 Ideação → 2 Definição → 3 Construção → 4 Medição e polimento → 5 Submissão →
 6 Demo Day. A ideia foi escolhida às 12h16 de sábado, de forma provisória ([DEC-003](decisoes.md)). Nesta fase, o usuário
-aprova em gates: ambiente, requisitos, negócio e técnica ([DEC-005](decisoes.md)). `produto.md` e `arquitetura.md` só são
-criados depois do gate de negócio. Gates fechados: ambiente ([DEC-009](decisoes.md)) e requisitos ([DEC-011](decisoes.md)).
+aprova em gates: ambiente, requisitos, negócio e técnica ([DEC-005](decisoes.md)). `produto.md` foi criado na etapa de negócio ([DEC-012](decisoes.md)); `arquitetura.md` só depois do gate de negócio. Gates fechados: ambiente ([DEC-009](decisoes.md)) e requisitos ([DEC-011](decisoes.md)).
 
 ## Ideia escolhida
 
@@ -36,7 +35,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
 - [ ] Time confirmar as premissas (a) e (e) da DEC-003 (as demais foram resolvidas ou viraram pergunta) e preencher a tabela do time.
 - [x] Remediação do histórico concluída ([DEC-007](decisoes.md)): remoto e repositório local limpos.
 - [x] Requisitos aprovados ([DEC-011](decisoes.md)). Pendências para a etapa técnica: hospedagem (Q3), mínimo de evals (Q5) e conflito 2.
-- [ ] **Gate 2 (negócio) com o usuário:** ver a [ficha](ideacao/ideias/IDEA-002-escalista.md) (avaliação, pré-mortem, hipóteses) e o rascunho do pitch em [entrega.md](entrega.md) (seção 3.1).
+- [ ] **Gate 2 (negócio) com o usuário:** definir o produto em [produto.md](produto.md) (decisões P1 a P7) e rever a [ficha](ideacao/ideias/IDEA-002-escalista.md) (avaliação, hipóteses) e o pitch em [entrega.md](entrega.md) (seção 3.1).
 - [ ] Confirmar no WhatsApp os pontos em aberto abaixo.
 - [ ] Decidir se o time concorre aos créditos AWS (exige domínio próprio e e-mail corporativo; ver
       [contexto-hackathon.md](contexto-hackathon.md)).
@@ -83,6 +82,7 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 
 | Data e hora | O quê | Por |
 |---|---|---|
+| 2026-11-07 13:24 | [DEC-012](decisoes.md): a etapa de negócio passa a ser a definição do produto; [produto.md](produto.md) criado (F1 a F10, quem decide o quê, interação, generalização, entradas e saídas, capacidade; decisões P1 a P7); CLAUDE.md lista o arquivo | Claude |
 | 2026-11-07 13:18 | Etapa de negócio: pesquisa de concorrência, preço e mercado e dor/custo (subagentes, com fonte); IDEA-002 avaliada (G1 a G7 passam, G2, G4 e G7 com condição; A4 B3 C3 D4 = 14/20; risco alto); ficha, backlog e `entrega.md` (pitch, seção 3.1) atualizados; 11 hipóteses listadas | Claude |
 | 2026-11-07 13:13 | [DEC-011](decisoes.md): requisitos aprovados; rótulo de vigência simulada (RN-11); JEV descartado; Q3 e Q5 e conflito 2 encaminhados à etapa técnica; etapa de negócio aberta | Claude |
 | 2026-11-07 13:10 | [DEC-010](decisoes.md): o PDF é base, não a verdade; política da empresa define as regras (RF-22 novo); tela de auditoria incluída (RN-02); exceções derivadas da política; conflitos 2 e 3 e Q3, Q4, Q5, Q7, Q8 em aberto; `requisitos.md` com seção 9 | Claude |
