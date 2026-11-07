@@ -84,7 +84,7 @@ regras:
     aplica_a: "atividades do comércio em geral"
     condicao: "observada a legislação municipal"
     fonte: "Lei 10.101/2000, art. 6º e parágrafo único"
-    nota: "Para empregadas, vale a regra mais restritiva de domingo_mulher (DEC-012)."
+    nota: "Para empregadas, vale a regra mais restritiva de domingo_mulher (DEC-013)."
     status: interpretacao
     verificacao: >
       Lei 10.101/2000, art. 6º e parágrafo único (redação da Lei 11.603/2007), lidos no Planalto em 2026-11-07
@@ -98,7 +98,7 @@ regras:
     regra: "havendo trabalho aos domingos, escala de revezamento quinzenal que favoreça o repouso dominical"
     fonte: "CLT, art. 386"
     nota: >
-      Regra dura do solver para empregadas, também no comércio (DEC-012). A política da empresa não pode
+      Regra dura do solver para empregadas, também no comércio (DEC-013). A política da empresa não pode
       afrouxá-la. Exige o campo de sexo no quadro de pessoal sintético.
     status: interpretacao
     verificacao: >

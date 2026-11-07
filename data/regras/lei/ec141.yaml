@@ -83,8 +83,9 @@ regras:
     status: interpretacao
     verificacao: >
       art. 3º lido no Planalto em 2026-11-07 por Claude: confere ("decorridos 2 meses da publicação"; vale para
-      convenções e para acordos coletivos). O que é "incompatível" é interpretação, e a regra fica para o DP
-      (conflito 2 de docs/requisitos.md). A data herda a pendência dos marcos.
+      convenções e para acordos coletivos). O que é "incompatível" é interpretação. No conflito, o agente aplica
+      a regra mais restritiva de forma provisória e abre exceção ao DP (conflito 2 de docs/requisitos.md; P1 de
+      docs/produto.md). A data herda a pendência dos marcos.
 
 excecoes:   # o agente não decide sozinho; valores de acao em data/regras/README.md
   - id: regime_compensatorio_cct

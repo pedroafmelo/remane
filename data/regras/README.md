@@ -1,6 +1,6 @@
 # Regras de jornada (entrada do cartão de regras)
 
-Última atualização: 2026-11-07 15:20. Entrada do cartão de regras ([RF-01](../../docs/requisitos.md)) e da política
+Última atualização: 2026-11-07 15:50. Entrada do cartão de regras ([RF-01](../../docs/requisitos.md)) e da política
 parametrizável ([RF-22](../../docs/requisitos.md)). Enquanto a leitura de PDF (RF-20, cortável) não existir, as regras entram
 por estes arquivos YAML.
 
@@ -12,8 +12,9 @@ por estes arquivos YAML.
 | [convencao/](convencao/) | Convenção coletiva **fictícia** da demo | Escrita pelo time | vazia |
 | [politica/](politica/) | Política **fictícia** da empresa da demo: o que a lei e a convenção deixam em aberto | Escrita pelo time | vazia |
 
-Ordem entre as camadas: a política nunca afrouxa a lei. **Conflito entre convenção e emenda: em aberto** (conflito 2 em
-[requisitos.md](../../docs/requisitos.md)). Até lá, a regra fica pendente para o DP e não é decidida no código.
+Ordem entre as camadas: a política só restringe a lei e a convenção, nunca afrouxa. **Quando duas camadas conflitam, o
+agente aplica a mais restritiva de forma provisória e abre exceção ao DP** (P1 de [produto.md](../../docs/produto.md);
+conflito 2 de [requisitos.md](../../docs/requisitos.md)).
 
 ## Convenções dos arquivos
 
