@@ -1,6 +1,6 @@
 # Registro de decisões
 
-Última atualização: 2026-11-07 13:13. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
+Última atualização: 2026-11-07 15:35. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
 entrada:** se a decisão mudar, crie outra e marque a antiga como `substituída por DEC-NNN`. Use `/decisao` para registrar e
 propagar o efeito para as outras docs.
 
@@ -160,3 +160,12 @@ Formato:
 - **Decisão (o que o usuário disse):** (1) aprova o [requisitos.md](requisitos.md), com as pendências marcadas; (2) a tela mostra o rótulo "vigência simulada a partir de ≈16/12/2026" (conflito 3: "Sim"); (3) "esqueça o JEV": o JEV está descartado.
 - **Motivo: [motivo não informado]** para descartar o JEV. Pelo texto do usuário, a prioridade é fechar o gate logo.
 - **Consequências:** gate de ambiente já fechado ([DEC-009](#dec-009--gate-1-fechado-idea-001-descartada-e-início-dos-requisitos)) e gate de requisitos fechado agora; RN-11 criado (rótulo de vigência simulada); RN-07 mantém "toda a inferência via Featherless", sem JEV; a Q4 e o conflito 5 estão resolvidos. A Q7 fica como escrito no documento (RF-13 desejável). **Pendências encaminhadas:** hospedagem (Q3) e mínimo de evals (Q5) vão para a etapa técnica; o conflito 2 (convenção em conflito com a emenda) segue "a definir". Próxima etapa: negócio.
+
+## DEC-012 · Art. 386 da CLT (domingo quinzenal para empregadas) entra como regra dura
+
+- 2026-11-07 15:35 · Decidido por: Claude, a pedido de Pedro Veloso ("revise o domingo mulher e tome uma decisão") · Status: aceita; revisável pelo time
+- **Contexto:** o `clt.yaml` tinha `domingo_mulher` como `pendente`, porque não se sabia como o art. 386 convive com o art. 6º da Lei 10.101/2000 (domingo 1 vez a cada 3 semanas no comércio).
+- **Decisão:** aplicar o art. 386 como regra dura do solver para empregadas, também no comércio (domingo de folga ao menos a cada 2 semanas), prevalecendo sobre a regra de 3 semanas da Lei 10.101. A política da empresa não pode afrouxá-la. Status da regra: `interpretacao`.
+- **Motivo:** segundo notícias (o acórdão não foi lido), a SDI-1 do TST, que uniformiza a jurisprudência, decidiu em out/2024 (RR-1749-42.2016.5.12.0031) que o art. 386 prevalece no comércio, com pagamento em dobro dos domingos sem a escala. A regra mais restritiva não gera risco para o cliente, e o solver já precisa tratar domingo. Ressalvas: turmas do TST divergiram em 2020, e o TRT-3 tem IRDR aberto (Tema 42).
+- **Alternativas consideradas:** (a) deixar pendente para o DP, que adia a decisão sem informação nova; (b) aplicar só a Lei 10.101 no comércio, contrária à posição da SDI-1 e de maior risco de passivo.
+- **Consequências:** `domingo_mulher` passa a `interpretacao` em `data/regras/lei/clt.yaml`. O quadro de pessoal sintético (RF-03) precisa de um campo de sexo. Na demo, a regra aparece com a fonte e o status (RN-09), sem afirmar que a questão está pacificada.

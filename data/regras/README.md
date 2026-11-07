@@ -1,6 +1,6 @@
 # Regras de jornada (entrada do cartão de regras)
 
-Última atualização: 2026-11-07 14:45. Entrada do cartão de regras ([RF-01](../../docs/requisitos.md)) e da política
+Última atualização: 2026-11-07 15:20. Entrada do cartão de regras ([RF-01](../../docs/requisitos.md)) e da política
 parametrizável ([RF-22](../../docs/requisitos.md)). Enquanto a leitura de PDF (RF-20, cortável) não existir, as regras entram
 por estes arquivos YAML.
 
@@ -8,7 +8,7 @@ por estes arquivos YAML.
 
 | Pasta | O que contém | Origem | Situação |
 |---|---|---|---|
-| [lei/](lei/) | Normas públicas: EC 141 ([ec141.yaml](lei/ec141.yaml)); CLT e ECA depois | Texto oficial (Planalto) | `ec141.yaml` conferido por Claude contra o Planalto em 07/11; falta leitura do time |
+| [lei/](lei/) | Normas públicas: EC 141 ([ec141.yaml](lei/ec141.yaml)); CLT, Lei 10.101/2000 e incisos do art. 7º da CF ([clt.yaml](lei/clt.yaml)) | Texto oficial (Planalto) | Os dois conferidos por Claude contra o Planalto em 07/11; falta leitura do time |
 | [convencao/](convencao/) | Convenção coletiva **fictícia** da demo | Escrita pelo time | vazia |
 | [politica/](politica/) | Política **fictícia** da empresa da demo: o que a lei e a convenção deixam em aberto | Escrita pelo time | vazia |
 

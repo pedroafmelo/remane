@@ -1,8 +1,8 @@
 # Estado do projeto
 
 > **Fonte da verdade do momento.** Atualize ao fim de cada bloco de trabalho (ver "Documentação viva" no
-> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 14:45** (Recife), por Claude, ao conferir o `ec141.yaml` contra o
-> Planalto (branch `chore/legal-rules-data`).
+> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 15:35** (Recife), por Claude, ao criar o `clt.yaml` e registrar a
+> DEC-012 (branch `chore/legal-rules-data`).
 
 ## Fase atual
 
@@ -84,6 +84,8 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 
 | Data e hora | O quê | Por |
 |---|---|---|
+| 2026-11-07 15:35 | [DEC-012](decisoes.md): o art. 386 da CLT (domingo quinzenal para empregadas) entra como regra dura e prevalece sobre a Lei 10.101 no comércio; `domingo_mulher` passa a `interpretacao`, e o `clt.yaml` fica com 17 itens `interpretacao` e nenhum `pendente`; o quadro sintético precisa de um campo de sexo | Claude |
+| 2026-11-07 15:20 | `data/regras/lei/clt.yaml` criado a partir do texto compilado do Planalto (CLT, Lei 10.101/2000 e art. 7º da CF): 12 regras e 5 exceções; 16 itens `interpretacao` e 1 `pendente` (`domingo_mulher`, art. 386); nenhum `conferida` | Claude |
 | 2026-11-07 14:45 | `ec141.yaml` conferido contra o Planalto, artigo por artigo: 10 itens `interpretacao` e 2 `pendente` (marcos, pela data exata, e hipersuficiente, sem teto do RGPS); nenhum `conferida` (falta leitura do time); `acao` padronizado (`escalar` ou `verificar_convencao`); pergunta 13 aberta (42h contra 8h por dia) | Claude |
 | 2026-11-07 14:15 | Branch `chore/legal-rules-data`: `data/regras/` com as camadas `lei/`, `convencao/` e `politica/` ([README](../data/regras/README.md)); `lei/ec141.yaml` (enviado por Pedro Veloso, YAML válido, 6 regras e 5 exceções; ainda sem status por regra, RN-09); origem declarada em `declaracao-ferramentas.md` | Claude |
 | 2026-11-07 13:18 | Etapa de negócio: pesquisa de concorrência, preço e mercado e dor/custo (subagentes, com fonte); IDEA-002 avaliada (G1 a G7 passam, G2, G4 e G7 com condição; A4 B3 C3 D4 = 14/20; risco alto); ficha, backlog e `entrega.md` (pitch, seção 3.1) atualizados; 11 hipóteses listadas | Claude |

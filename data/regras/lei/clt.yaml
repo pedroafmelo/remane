@@ -1,0 +1,199 @@
+# Regras da CLT e de normas complementares que o solver precisa e que a EC 141 não traz.
+# Fontes (texto compilado do Planalto, lido em 2026-11-07 por Claude):
+#   CLT, Decreto-Lei 5.452/1943: https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm
+#   Lei 10.101/2000 (comércio aos domingos e feriados): https://www.planalto.gov.br/ccivil_03/leis/l10101.htm
+#   CF, art. 7º: https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm
+# A página compilada da CLT mistura redações antigas, revogadas e de vigência encerrada (ex.: MP 808/2017).
+# Só foi usada a redação em vigor. Nenhuma regra está "conferida": isso exige leitura de alguém do time.
+# Jornada semanal, limite diário de 8h e repouso de 2 dias estão em ec141.yaml; aqui não se repetem.
+# Cálculos derivados (custo da hora extra, hora noturna reduzida) ficam no código, não aqui.
+
+normas: [CLT (Decreto-Lei 5.452/1943), Lei 10.101/2000, CF art. 7º]
+
+regras:
+  - id: interjornada_min
+    horas: 11
+    consecutivas: true
+    fonte: "CLT, art. 66"
+    status: interpretacao
+    verificacao: >
+      CLT, art. 66, lido no Planalto em 2026-11-07 por Claude: confere ("período mínimo de 11 horas consecutivas
+      para descanso" entre 2 jornadas).
+
+  - id: intervalo_intrajornada
+    faixas:
+      - {jornada_acima_de_horas: 6, minimo_min: 60, maximo_min: 120}   # o máximo pode passar de 2h por acordo escrito ou CCT
+      - {jornada_acima_de_horas: 4, ate_horas: 6, minimo_min: 15}
+    computa_na_jornada: false
+    fonte: "CLT, art. 71, caput, §§ 1º e 2º"
+    nota: >
+      A CCT pode reduzir o intervalo para no mínimo 30 minutos em jornadas acima de 6h (ver a exceção
+      intervalo_reduzido_cct). Se o intervalo não for concedido, paga-se o período suprimido com acréscimo de
+      50% (§ 4º).
+    status: interpretacao
+    verificacao: >
+      CLT, art. 71, caput e §§ 1º, 2º e 4º, lidos no Planalto em 2026-11-07 por Claude: confere.
+
+  - id: hora_extra_limite_diario
+    horas: 2
+    instrumento: ["acordo individual", "convenção coletiva", "acordo coletivo"]
+    fonte: "CLT, art. 59, caput"
+    status: interpretacao
+    verificacao: >
+      CLT, art. 59, caput (redação da Lei 13.467/2017), lido no Planalto em 2026-11-07 por Claude: confere
+      ("em número não excedente de duas").
+
+  - id: adicional_hora_extra
+    percentual_min: 50
+    fonte: "CF, art. 7º, XVI; CLT, art. 59, § 1º"
+    nota: "A convenção pode fixar percentual maior; o valor da demo vem da convenção fictícia."
+    status: interpretacao
+    verificacao: >
+      CF, art. 7º, XVI, e CLT, art. 59, § 1º, lidos no Planalto em 2026-11-07 por Claude: confere ("no mínimo,
+      em cinquenta por cento").
+
+  - id: compensacao_jornada
+    modalidades:
+      - {instrumento: "convenção ou acordo coletivo", periodo_max: "1 ano", limite_diario_horas: 10}   # § 2º
+      - {instrumento: "acordo individual escrito", periodo_max: "6 meses"}                              # § 5º
+      - {instrumento: "acordo individual, tácito ou escrito", periodo_max: "mesmo mês"}                 # § 6º
+    fonte: "CLT, art. 59, §§ 2º, 5º e 6º; art. 59-B"
+    nota: >
+      Na compensação, não há adicional de hora extra. Pelo art. 59-B, a compensação irregular não obriga a pagar
+      de novo as horas se não passar da duração máxima semanal: é devido só o adicional. Como isso convive com
+      as 42h e o art. 7º da EC é a pergunta 13 de docs/estado-do-projeto.md.
+    status: interpretacao
+    verificacao: >
+      CLT, art. 59, §§ 2º, 5º e 6º, e art. 59-B, lidos no Planalto em 2026-11-07 por Claude: confere.
+
+  - id: descanso_semanal_clt
+    horas_consecutivas: 24
+    coincidir_com_domingo: "no todo ou em parte, salvo conveniência pública ou necessidade imperiosa do serviço"
+    escala_revezamento_domingo: "mensal, em quadro sujeito à fiscalização"
+    fonte: "CLT, art. 67 e parágrafo único"
+    nota: >
+      A CLT ainda fala em 24h, mas a EC 141 passa a exigir 2 dias de repouso a partir dos marcos
+      (ver repouso_semanal em ec141.yaml). O que fica valendo daqui é a escala de revezamento mensal para o domingo.
+    status: interpretacao
+    verificacao: >
+      CLT, art. 67 e parágrafo único, lidos no Planalto em 2026-11-07 por Claude: confere. Que a EC prevalece
+      sobre as 24h é leitura nossa (norma constitucional posterior); o texto da CLT não foi alterado.
+
+  - id: domingo_comercio
+    repouso_no_domingo_min: "1 vez a cada 3 semanas"
+    aplica_a: "atividades do comércio em geral"
+    condicao: "observada a legislação municipal"
+    fonte: "Lei 10.101/2000, art. 6º e parágrafo único"
+    nota: "Para empregadas, vale a regra mais restritiva de domingo_mulher (DEC-012)."
+    status: interpretacao
+    verificacao: >
+      Lei 10.101/2000, art. 6º e parágrafo único (redação da Lei 11.603/2007), lidos no Planalto em 2026-11-07
+      por Claude: confere ("pelo menos uma vez no período máximo de três semanas, com o domingo").
+
+  - id: domingo_mulher
+    escala_revezamento: quinzenal
+    repouso_no_domingo_min: "1 vez a cada 2 semanas"
+    aplica_a: "empregadas"
+    prevalece_sobre: domingo_comercio
+    regra: "havendo trabalho aos domingos, escala de revezamento quinzenal que favoreça o repouso dominical"
+    fonte: "CLT, art. 386"
+    nota: >
+      Regra dura do solver para empregadas, também no comércio (DEC-012). A política da empresa não pode
+      afrouxá-la. Exige o campo de sexo no quadro de pessoal sintético.
+    status: interpretacao
+    verificacao: >
+      CLT, art. 386, lido no Planalto em 2026-11-07 por Claude: confere e está em vigor. Aplicação: segundo
+      notícias (não lemos o acórdão), a SDI-1 do TST decidiu em out/2024 (RR-1749-42.2016.5.12.0031) que o
+      art. 386 prevalece sobre o art. 6º da Lei 10.101/2000 no comércio, com pagamento em dobro dos domingos
+      sem a escala. Turmas do TST já divergiram (2020), e o TRT-3 tem IRDR aberto (Tema 42). Fica
+      interpretacao até alguém do time ler o acórdão.
+
+  - id: trabalho_noturno
+    janela: {inicio: "22:00", fim: "05:00"}
+    hora_noturna_reduzida: "52min30s"
+    adicional_min_percentual: 20
+    fonte: "CLT, art. 73, caput, §§ 1º e 2º; CF, art. 7º, IX"
+    nota: "O caput ressalva os casos de revezamento semanal ou quinzenal; nos horários mistos, o adicional vale para as horas noturnas (§ 4º)."
+    status: interpretacao
+    verificacao: >
+      CLT, art. 73, caput e §§ 1º, 2º e 4º, e CF, art. 7º, IX, lidos no Planalto em 2026-11-07 por Claude: confere.
+
+  - id: menor_trabalho_noturno
+    idade_max: 17          # menor de 18 anos
+    proibido: true
+    janela: {inicio: "22:00", fim: "05:00"}
+    fonte: "CLT, art. 404; CF, art. 7º, XXXIII"
+    status: interpretacao
+    verificacao: >
+      CLT, art. 404, e CF, art. 7º, XXXIII, lidos no Planalto em 2026-11-07 por Claude: confere ("ao menor de 18
+      anos é vedado o trabalho noturno", entre 22h e 5h).
+
+  - id: menor_prorrogacao
+    regra: "vedado prorrogar a jornada diária do menor"
+    salvo:
+      - "até mais 2 horas, sem acréscimo, por convenção ou acordo coletivo, com compensação em outro dia"
+      - "força maior, até 12 horas, com acréscimo de pelo menos 25%"
+    fonte: "CLT, art. 413, I e II"
+    nota: "O texto cita o limite de 48h semanais, anterior à CF de 1988; vale o limite constitucional (ec141.yaml)."
+    status: interpretacao
+    verificacao: >
+      CLT, art. 413, I e II, lidos no Planalto em 2026-11-07 por Claude: confere. Que o limite de 48h foi superado
+      pelo limite constitucional é leitura nossa.
+
+  - id: aprendiz_jornada
+    horas_diarias_max: 6
+    prorrogacao: false
+    compensacao: false
+    excecao: "até 8h diárias se o aprendiz já completou o ensino fundamental e as horas incluem a aprendizagem teórica"
+    fonte: "CLT, art. 432, caput e § 1º"
+    status: interpretacao
+    verificacao: >
+      CLT, art. 432, caput e § 1º (redação da Lei 10.097/2000), lidos no Planalto em 2026-11-07 por Claude: confere.
+
+excecoes:   # o agente não decide sozinho; valores de acao em data/regras/README.md
+  - id: regime_12x36
+    descricao: "12 horas seguidas por 36 de descanso, por acordo individual escrito, convenção ou acordo coletivo"
+    fonte: "CLT, art. 59-A"
+    acao: escalar
+    nota: "Regime diferenciado; fora do solver padrão da demo."
+    status: interpretacao
+    verificacao: >
+      CLT, art. 59-A (redação da Lei 13.467/2017), lido no Planalto em 2026-11-07 por Claude: confere. A redação da
+      MP 808/2017, que exigia norma coletiva, tem vigência encerrada.
+
+  - id: intervalo_reduzido_cct
+    descricao: "a convenção ou o acordo coletivo pode reduzir o intervalo intrajornada para no mínimo 30 minutos em jornadas acima de 6h"
+    fonte: "CLT, art. 611-A, III"
+    acao: verificar_convencao
+    nota: "Se a CCT não prever, vale o mínimo de 1 hora (intervalo_intrajornada)."
+    status: interpretacao
+    verificacao: >
+      CLT, art. 611-A, III, lido no Planalto em 2026-11-07 por Claude: confere ("respeitado o limite mínimo de
+      trinta minutos para jornadas superiores a seis horas").
+
+  - id: feriado_comercio
+    descricao: "trabalho em feriados no comércio em geral só se autorizado em convenção coletiva, observada a legislação municipal"
+    fonte: "Lei 10.101/2000, art. 6º-A"
+    acao: verificar_convencao
+    nota: "Se a CCT não autorizar, não escalar ninguém em feriado."
+    status: interpretacao
+    verificacao: >
+      Lei 10.101/2000, art. 6º-A, lido no Planalto em 2026-11-07 por Claude: confere.
+
+  - id: necessidade_imperiosa
+    descricao: "força maior ou serviço inadiável permite exceder o limite legal ou convencionado, sem norma coletiva"
+    fonte: "CLT, art. 61, caput e § 1º"
+    acao: escalar
+    nota: "O agente nunca alega força maior; quem decide é o humano."
+    status: interpretacao
+    verificacao: >
+      CLT, art. 61, caput e § 1º, lidos no Planalto em 2026-11-07 por Claude: confere. O § 2º (remuneração do
+      excesso e teto de 12h) não entrou: fora do escopo da demo.
+
+  - id: turnos_ininterruptos
+    descricao: "turnos ininterruptos de revezamento têm jornada de 6 horas, salvo negociação coletiva"
+    fonte: "CF, art. 7º, XIV"
+    acao: escalar
+    status: interpretacao
+    verificacao: >
+      CF, art. 7º, XIV, lido no Planalto em 2026-11-07 por Claude: confere.
