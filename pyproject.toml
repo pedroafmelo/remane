@@ -1,0 +1,28 @@
+[project]
+name = "escalista"
+version = "0.1.0"
+description = "Escalista: digital worker de escala e jornada (Converge Challenge 2026)"
+readme = "README.md"
+requires-python = ">=3.12"
+# Só a base já decidida (backend FastAPI). OR-Tools, LangGraph, Langfuse e openai entram na implementação,
+# depois da definição técnica (ver docs/declaracao-ferramentas.md).
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "pydantic-settings",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "ruff",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
