@@ -67,6 +67,7 @@ decidir nesse momento; SPA React com login e botões de demo; spike de 1 h do Wh
 | Gate 2: negócio (`produto.md` aprovado) | 2026-11-07 14:47 (DEC-016) |
 | `arquitetura.md` criado | 2026-11-07 15:14 (DEC-018 a DEC-021) |
 | Gate 3: técnica (`arquitetura.md` aprovada) | 2026-11-07 ~15:19 (DEC-022) |
+| C0a e G0 (esqueleto, contratos v0, teste de fronteiras, `/health`) | 2026-11-07 16:41 (plano da C0) |
 | Modelo e tracing funcionando | |
 | Plano macro de implementação | 2026-11-07 16:11 (aprovado, DEC-029) |
 | Primeiro fluxo ponta a ponta | |

@@ -403,3 +403,43 @@ Formato:
 - **Motivo: [motivo não informado].**
 - **Alternativas consideradas:** nenhuma registrada.
 - **Consequências:** os itens `[PROPOSTA]` do plano (frente D, caminho crítico, horas, comandos de pronto, modelos por camada) entram na aprovação e seguem rotulados; qualquer um muda por nova DEC. Próximo passo: planejar a Camada 0 em detalhe.
+
+## DEC-030 · Plano da C0, rodada 1: data de corte nas versões, Fly.io, C0b com a frente C e `web/` em TypeScript
+
+- 2026-11-07 16:22 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** planejamento da Camada 0 ([camada-00-fundacao.md](planos/camada-00-fundacao.md)); 8 pacotes com menos de 14 dias.
+- **Decisão (o que o usuário escolheu entre as opções oferecidas):**
+  - **Versões:** data de corte 2026-10-23 (`exclude-newer` no uv e `before` no npm), que vale também para as dependências indiretas.
+  - **Hospedagem (resolve a pergunta 6 e a DEC-021):** Fly.io, com 1 máquina sempre ligada e 1 volume para o SQLite.
+  - **C0b:** feita pela frente C depois do G0.
+  - **`web/`:** TypeScript (template `react-ts`), com a checagem de tipos separada do build.
+- **Motivo: [motivo não informado]** nas quatro escolhas.
+- **Alternativas consideradas (as oferecidas):** fixar a anterior pacote a pacote, ou usar as mais novas; Render pago, túnel como ponte ou Render grátis; quem fez a C0a ou o dono do cartão na C0b; JavaScript.
+- **Consequências:** a hospedagem deixa de ser `[PREENCHER]`; o nome do app, quem tem o cartão e o preço do volume seguem em aberto. O `uv.lock` atual é rebaixado pela data de corte (fastapi, pydantic, ruff etc.).
+
+## DEC-031 · Plano da C0, rodada 2: todas as dependências entram na C0a
+
+- 2026-11-07 16:24 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** as 3 frentes começam em paralelo depois do G0 e não devem editar o `uv.lock` ao mesmo tempo.
+- **Decisão (o que o usuário escolheu):** todas as dependências da arquitetura, seção 19, entram com `uv add` na C0a.
+- **Motivo: [motivo não informado].**
+- **Alternativas consideradas (as oferecidas):** só o que a C0 usa, e cada frente adiciona o seu.
+- **Consequências:** um único lock; imagem Docker maior desde o início. pyyaml, httpx e uv_build são `[PROPOSTA]` do agente (ver DEC-032).
+
+## DEC-032 · Plano da C0 aprovado e execução da C0a
+
+- 2026-11-07 16:37 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** o agente entregou o plano da C0 e pediu o "aprovado"; o usuário rejeitou a saída do modo plano, trocou o modelo para o Sonnet 5.5 e pediu: "Execute o plano".
+- **Decisão (o que o usuário disse):** "Execute o plano".
+- **Motivo: [motivo não informado].**
+- **Alternativas consideradas:** nenhuma registrada.
+- **Consequências:** os itens `[PROPOSTA]` do plano entram na aprovação e seguem rotulados: só 3 portas na C0a (`Repository` na C2 e `Channel` na C7, o que diverge da seção 5.0 do plano macro), pyyaml, httpx e uv_build, as regras do teste de fronteiras e os detalhes de configuração. O G0 das ~17h15 não cabe (estimativa de 75 a 110 min até o G0); o gate das 21h30 não foi alterado. Execução da C0a pelo Sonnet 5.5, sem commit até o usuário pedir.
+
+## DEC-033 · Deploy adiado: decidir mais para frente
+
+- 2026-11-07 16:50 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** a C0a está pronta e o Dockerfile e o `fly.toml` também; faltava a conta no Fly.io e o deploy de teste (C0b, G1).
+- **Decisão (o que o usuário disse):** "Ainda não vamos deployar, vamos decidir isso mais para frente." Pediu também o commit do que foi feito e que o plano da próxima camada **não** seja preparado agora.
+- **Motivo: [motivo não informado].**
+- **Alternativas consideradas:** nenhuma registrada.
+- **Consequências:** o G1 fica **pendente sem data** (`[PREENCHER]`) e o deploy de teste não ocorre na C0. **A escolha do Fly.io da [DEC-030](#dec-030--plano-da-c0-rodada-1-data-de-corte-nas-versões-flyio-c0b-com-a-frente-c-e-web-em-typescript) não foi desfeita nem reconfirmada:** o usuário não disse se a hospedagem em si volta a ser aberta (`[PREENCHER]`); `Dockerfile` e `fly.toml` ficam no repositório prontos, sem uso. Sem link público, RE-07 e RN-10 seguem em risco ([arquitetura.md](arquitetura.md), seção 17); a ponte do túnel do notebook continua sendo o plano B.

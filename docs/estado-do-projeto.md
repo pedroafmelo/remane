@@ -1,12 +1,11 @@
 # Estado do projeto
 
 > **Fonte da verdade do momento.** Atualize ao fim de cada bloco de trabalho (ver "Documentação viva" no
-> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 16:11** (Recife), por Claude, ao criar o plano macro de implementação ([plano-implementacao.md](plano-implementacao.md),
-> [DEC-027](decisoes.md) e [DEC-028](decisoes.md)), que foi aprovado pelo usuário ([DEC-029](decisoes.md)).
+> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 16:47** (Recife), por Claude (Sonnet 5.5), ao planejar e executar a C0a e auditar as docs ([plano da C0](planos/camada-00-fundacao.md), [DEC-030](decisoes.md) a [DEC-032](decisoes.md)): **G0 atingido às 16h41**. Antes: plano macro ([plano-implementacao.md](plano-implementacao.md), [DEC-027](decisoes.md) a [DEC-029](decisoes.md)).
 
 ## Fase atual
 
-**2 · Definição (concluída às ~15h19; a 3 · Construção ainda não começou).** Fases: 1 Ideação → 2 Definição → 3 Construção → 4 Medição e polimento → 5 Submissão →
+**3 · Construção (começou às 16h37 com a C0a; a 2 · Definição concluiu às ~15h19).** Fases: 1 Ideação → 2 Definição → 3 Construção → 4 Medição e polimento → 5 Submissão →
 6 Demo Day. A ideia foi escolhida às 12h16 de sábado, de forma provisória ([DEC-003](decisoes.md)). Nesta fase, o usuário
 aprova em gates: ambiente, requisitos, negócio e técnica ([DEC-005](decisoes.md)). `produto.md` foi criado na etapa de negócio ([DEC-012](decisoes.md)); `arquitetura.md` foi criado na etapa técnica. Gates fechados: ambiente ([DEC-009](decisoes.md)), requisitos ([DEC-011](decisoes.md)) e negócio ([DEC-016](decisoes.md), [DEC-017](decisoes.md)); a técnica foi aprovada ([DEC-018](decisoes.md) a [DEC-022](decisoes.md)).
 
@@ -33,7 +32,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
 - [x] Decidir a ideia e registrar (`/decisao`): Escalista, [DEC-003](decisoes.md), provisória.
 - [ ] Fluxo com o usuário, com gate em cada etapa ([DEC-005](decisoes.md)): ambiente fechado ([DEC-009](decisoes.md)) →
       requisitos fechados ([DEC-011](decisoes.md)) → negócio fechado ([DEC-016](decisoes.md), [DEC-017](decisoes.md)) → técnica
-      fechada ([DEC-022](decisoes.md)) → implementação (ainda não começou).
+      fechada ([DEC-022](decisoes.md)) → implementação (começou às 16h37 com a C0a; [DEC-032](decisoes.md)).
 - [ ] Time confirmar a premissa (e) da DEC-003 (a escolha do usuário na [DEC-019](decisoes.md), spike de 1 h do WhatsApp, coincide com ela, mas o time não confirmou) (a (a) foi substituída pela [DEC-014](decisoes.md); as demais foram resolvidas ou viraram pergunta) e preencher a tabela do time.
 - [x] Remediação do histórico concluída ([DEC-007](decisoes.md)): remoto e repositório local limpos.
 - [x] Requisitos aprovados ([DEC-011](decisoes.md)). Das pendências para a etapa técnica: Q5 (evals) foi resolvida ([DEC-019](decisoes.md)), o conflito 2 foi resolvido ([DEC-014](decisoes.md)) e a hospedagem (Q3) segue em aberto ([DEC-021](decisoes.md)).
@@ -45,7 +44,8 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
 - [ ] **Featherless:** 3 das 4 pessoas resgataram e criaram chaves (palavra do usuário, 15h46; **nenhuma chave foi testada**). **A chave 1 do `.env` apareceu vazia ou ausente (conferir; o `APIs.yaml` já foi apagado, e se a chave se perdeu é preciso criar outra em API Keys).** Falta a 4ª pessoa resgatar hoje (o código vence em 08/11), mover as chaves do `APIs.yaml` para o `.env` e apagar o arquivo, e testar cada chave ([DEC-025](decisoes.md)).
 - [x] **Plano macro de implementação: aprovado** ([DEC-029](decisoes.md)) ([plano-implementacao.md](plano-implementacao.md)). Depois dele, planejar a
       **Camada 0** em detalhe (`docs/planos/camada-00-fundacao.md`), com o Opus 5.5 ([DEC-028](decisoes.md)).
-- [ ] **Hospedagem: decidir no fim da C0, com deploy de teste hoje** ([DEC-027](decisoes.md)).
+- [ ] **Hospedagem e deploy de teste: adiados, a decidir mais para frente** ([DEC-033](decisoes.md)). O Fly.io da [DEC-030](decisoes.md) não foi desfeito nem reconfirmado (`[PREENCHER]`); G1 pendente sem data.
+- [x] **C0a concluída, G0 às 16h41** ([plano da C0](planos/camada-00-fundacao.md)): 84 testes verdes, ruff limpo, teste de fronteiras provado. `web/` (T9, T10), `Dockerfile` e `fly.toml` também prontos (90 testes; imagem testada localmente). **Falta:** o deploy e o G1 (adiados, [DEC-033](decisoes.md)) e avisar as frentes A, B e C de que o G0 passou. Commitado a pedido do usuário às 16h51.
 - [ ] **Pedro Veloso: política e convenção fictícias até 19h** ([DEC-028](decisoes.md)); gate G2 do plano macro.
 - [ ] **Primeira fatia vertical até 21h30** ([DEC-028](decisoes.md)): seção 2 do [plano macro](plano-implementacao.md).
 - [ ] Responder antes dos planos das camadas: "gestor de RH" (antes da C4), dados do RN-13 (antes da C1), RF-25 e RF-28 (antes da C7);
@@ -73,7 +73,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
 | 3 | Pode-se continuar trabalhando fora do local depois das 17h de sábado? O guia não diz | WhatsApp dos organizadores | Em aberto. O usuário afirma que o time pode continuar depois das 17h ([DEC-016](decisoes.md)); o guia não diz e os organizadores não confirmaram |
 | 4 | O repositório nasceu de um scaffold (commit inicial às 10h55 de 07/11). Qual a origem e há algo que não seja nosso? | Time | Respondida ([DEC-006](decisoes.md)): template de um amigo do usuário que trabalha em uma empresa; o usuário confirma que entra na regra de clean room. 10 arquivos do commit inicial citam "[termo de terceiro omitido por clean room]". Remediação na pergunta 11. Ver [declaracao-ferramentas.md](declaracao-ferramentas.md) |
 | 5 | Concorrer ou não ao Desafio Tako (RH)? | Time | Resolvida em 07/11 12h16: concorre ([DEC-003](decisoes.md), provisória); sinalizar na submissão |
-| 6 | Hospedagem do link público e da ponte: o time não tem servidor nem conta hoje | Time | **Em aberto, `[PREENCHER]`:** pesquisada em 07/11 ([arquitetura.md](arquitetura.md), seção 12); o usuário disse "vamos ver isso depois" ([DEC-021](decisoes.md)) e marcou a decisão para o **fim da C0, com deploy de teste hoje** ([DEC-027](decisoes.md)). Sem ela o link estável (RE-07, RN-10) não existe. A ponte do WhatsApp roda só no notebook |
+| 6 | Hospedagem do link público e da ponte: o time não tem servidor nem conta hoje | Time | **Resolvida ([DEC-030](decisoes.md)): Fly.io** (faltam conta, cartão e deploy). Histórico: era `[PREENCHER]`: pesquisada em 07/11 ([arquitetura.md](arquitetura.md), seção 12); o usuário disse "vamos ver isso depois" ([DEC-021](decisoes.md)) e marcou a decisão para o **fim da C0, com deploy de teste hoje** ([DEC-027](decisoes.md)). Sem ela o link estável (RE-07, RN-10) não existe. A ponte do WhatsApp roda só no notebook |
 | 7 | Chip dedicado e aparelho para a ponte real do WhatsApp | Time | "Vamos ver"; sem chip, só o simulador de celular |
 | 8 | Resgate dos US$ 25 da Featherless por integrante | Time | **3 de 4 resgataram** (palavra do usuário, 15h46; sem teste ainda); falta 1 pessoa. Link e código estão só no guia original (redigidos na cópia local). O código vence em 08/11 e tem limite de resgates. As chaves formam um pool com failover ([DEC-025](decisoes.md)) |
 | 9 | Domínio próprio (créditos AWS) | Time | O time não tem; só importa se ficar no pódio |
@@ -105,7 +105,9 @@ rotuladas como premissa.
 
 | Métrica | Valor | Como foi medido | Data |
 |---|---|---|---|
-| | | | |
+| C0a: tempo de T1 a T8 (G0) | ~4 min de relógio (16h37 a 16h41), sem contar a leitura prévia; o plano estimava 75 a 110 min | `date` entre os comandos, na execução da C0a ([plano da C0](planos/camada-00-fundacao.md)) | 07/11/2026 |
+| Testes automatizados | 90 passed (0,22 s) | `uv run pytest -q` | 07/11/2026 |
+| Imagem Docker (arm64, local) | 1,36 GB; build de 45 s com cache frio de camadas do app | `docker images` e `time docker build` | 07/11/2026 |
 
 ## Registro de atualizações
 
@@ -113,6 +115,10 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 
 | Data e hora | O quê | Por |
 |---|---|---|
+| 2026-11-07 16:51 | [DEC-033](decisoes.md): o usuário adiou o deploy e a decisão de hospedagem; pediu o commit (feito em partes, em inglês, Conventional Commits) e que o plano da próxima camada não seja preparado agora. `.gitignore` ganhou exceção para os HTML de `web/` | Claude |
+| 2026-11-07 16:47 | Auditoria `/sync-docs` depois da C0a: 25 arquivos `.md`, 0 links quebrados; `src/`, `tests/`, `web/`, `pyproject.toml` e `.env.example` (18 nomes: os 16 de antes mais `DATABASE_URL` e `WEB_DIST_DIR`, agora citados na [arquitetura](arquitetura.md), seção 12) conferidos contra as docs. **Corrigido:** nota errada sobre `.claude/hooks/docs_sync.py` (foi o meu `ruff format`; arquivo revertido, `.claude` excluído do ruff); item "implementação (ainda não começou)"; métricas medidas preenchidas; estrutura do CLAUDE.md (`web/`, `Dockerfile`, `fly.toml`); notas de 3 portas no plano macro e na arquitetura (seção 2.1). **Pendente de decisão humana:** ver a resposta desta auditoria | Claude |
+| 2026-11-07 16:46 | **T9, T10 e C0b até o Docker:** `web/` em React + TypeScript (versões exatas sob `before=2026-10-23`), FastAPI servindo o build, `Dockerfile` multi-stage, `.dockerignore`, `docker-entrypoint.sh` e `fly.toml`. **90 testes verdes**; imagem de 1,36 GB construída em 45 s e testada (sem `.env`, usuário sem root, volume, restart). **Não feito:** conta e deploy no Fly.io (G1), validação do `fly.toml`, commit | Claude |
+| 2026-11-07 16:42 | **C0a executada (T1 a T8) e G0 atingido às 16h41** pelo Sonnet 5.5, a pedido do usuário ("Execute o plano", [DEC-032](decisoes.md)): `pyproject.toml` com `uv_build`, data de corte 2026-10-23 e todas as dependências ([DEC-030](decisoes.md), [DEC-031](decisoes.md)); `src/escalista/` com os pacotes da arquitetura; contratos v0 e 3 portas; teste de fronteiras (`tests/architecture/`); `config.py` sem vazamento de chave; `db.py`; `api/app.py` com `/health`; `.env.example` com `DATABASE_URL` e `WEB_DIST_DIR`. **84 testes verdes**, ruff limpo, `/health` 200. Docs: plano da C0 criado, DEC-030 a DEC-032, declaração, arquitetura (seções 12 e 19), plano macro e plano de horas. **Sem commit** | Claude |
 | 2026-11-07 16:13 | Plano macro aprovado ([DEC-029](decisoes.md)); commit e push para a `main` a pedido do usuário. Próximo: plano detalhado da C0 | Claude |
 | 2026-11-07 16:11 | Auditoria `/sync-docs` depois do plano macro: `src/` e `tests/` vazios e `pyproject.toml` sem mudança, o que bate com as docs (dependências só `planejado`); os 16 nomes do `.env.example` batem com a arquitetura; 0 links quebrados em 24 arquivos `.md`; backlog (IDEA-002 `escolhida`) e marcos coerentes. **Corrigido:** o item do deploy de teste em [plano-de-horas.md](plano-de-horas.md) ("antes de dom 08h30" → fim da C0, [DEC-027](decisoes.md)). Alterações de docs **sem commit** | Claude |
 | 2026-11-07 16:11 | Plano macro de implementação criado ([plano-implementacao.md](plano-implementacao.md)), em 2 rodadas de perguntas: [DEC-027](decisoes.md) (3 frentes depois da C0, que substitui o "sem paralelo" da DEC-005; ~9 camadas; hospedagem decidida no fim da C0 com deploy de teste; 4 pessoas até a madrugada) e [DEC-028](decisoes.md) (fatia mínima com gate às 21h30; Opus planeja e Sonnet executa; spike do WhatsApp depois da C7; política fictícia por Pedro Veloso até 19h). Versões e licenças de langgraph, langfuse, openai, sqlalchemy, itsdangerous, pypdfium2, React e Vite conferidas por subagente (só leitura) e gravadas na [declaração](declaracao-ferramentas.md); nada instalado. [plano-de-horas.md](plano-de-horas.md) com o gate novo; CLAUDE.md e README com o arquivo novo. **Sem código, sem `uv add`, sem commit** | Claude |

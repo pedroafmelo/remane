@@ -79,7 +79,7 @@ antes de abrir C6 a C8. A fatia tem prioridade sobre qualquer camada nova.
 
 | Pendência | Bloqueia | Dono | Prazo sugerido `[PROPOSTA]` |
 |---|---|---|---|
-| Hospedagem do link público ([DEC-021](decisoes.md)) | C0b, deploy de todas as camadas, RE-07, RN-10 | Usuário (decide no fim da C0, [DEC-027](decisoes.md)) | Fim da C0, ~17h30 |
+| Hospedagem do link público: Fly.io na [DEC-030](decisoes.md), mas o **deploy foi adiado, a decidir** ([DEC-033](decisoes.md)); faltam conta, cartão e nome do app | C0b (G1), RE-07, RN-10 | Usuário | `[PREENCHER]` |
 | Chave 1 da Featherless vazia ou ausente no `.env` | C3 (teste de fumaça, failover) | Dono da chave 1 `[PREENCHER]` | Antes da C3, ~17h30 |
 | 4ª pessoa resgatar os US$ 25 (o código vence em 08/11) | C3 (pool completo), orçamento dos evals e da demo | 4ª pessoa `[PREENCHER: nome]` | Hoje, antes das 23h |
 | Testar cada chave (validade, saldo, "Unlock Model") | C3, C5 | Frente B | 1ª hora da C3 |
@@ -99,7 +99,7 @@ As janelas fixas do evento e o cronograma estão no [plano de horas](plano-de-ho
 
 | Gate | Quando | Passa se | Se falhar |
 |---|---|---|---|
-| G0 · C0a pronta | ~17h15 `[PROPOSTA]` | `pytest` e `ruff` verdes; teste de fronteiras ativo; contratos v0 no `main` | As frentes não abrem; a C0 continua com prioridade |
+| G0 · C0a pronta | ~17h15 `[PROPOSTA]`; **atingido às 16h41** (plano da C0) | `pytest` e `ruff` verdes; teste de fronteiras ativo; contratos v0 no `main` | As frentes não abrem; a C0 continua com prioridade |
 | G1 · Hospedagem e deploy de teste | Fim da C0 ([DEC-027](decisoes.md)) | `/health` responde 200 na URL pública | Plano B: túnel do notebook ([arquitetura, seção 12](arquitetura.md)) até a decisão; registrar o risco |
 | G2 · Política fictícia | 19h ([DEC-028](decisoes.md)) | YAMLs em `data/regras/politica/` e `convencao/` | C1 segue só com `lei/`; C7 e C8 esperam |
 | **G3 · Primeira fatia vertical** | **21h30** ([DEC-028](decisoes.md)) | Seção 2, no deploy | Ordem de corte; nada de camada nova antes da fatia |
@@ -120,7 +120,7 @@ verdes.** Os comandos abaixo são `[PROPOSTA]`: o plano de cada camada os fixa.
 - **Escopo:** RE-01, RE-09, RN-08; [arquitetura](arquitetura.md), seções 2.1, 16 e 19. Fora: qualquer lógica de produto.
 - **Entregáveis:**
   - **C0a:** `uv add` com versões e licenças conferidas (tabela abaixo); `src/escalista/` com os pacotes da seção 16 vazios;
-    `domain/ports.py` (`Channel`, `Clock`, `LLMClient`, `TraceSink`, `Repository`); contratos v0 da seção 8 em `domain/`; configuração por
+    `domain/ports.py` (`Clock`, `LLMClient`, `TraceSink`; **`Channel` entra na C7 e `Repository` na C2**, [DEC-032](decisoes.md)); contratos v0 da seção 8 em `domain/`; configuração por
     pydantic-settings, que lê `FEATHERLESS_API_KEY_1` a `_4` sem nunca imprimir o valor; motor SQLAlchemy sobre SQLite, com `create_all`;
     pytest e ruff; **teste de importação das fronteiras** (`ast`, seção 2.1); `web/` com React e Vite; FastAPI servindo o build.
   - **C0b:** Dockerfile multi-stage (Node para o build, Python para rodar); a hospedagem decidida; o deploy de teste.
@@ -135,8 +135,7 @@ verdes.** Os comandos abaixo são `[PROPOSTA]`: o plano de cada camada os fixa.
 em [declaracao-ferramentas.md](declaracao-ferramentas.md)): langgraph 1.2.20 (MIT), langfuse 5.2.0 (MIT), openai 3.46.0 (Apache-2.0),
 sqlalchemy 2.1.8 (MIT), itsdangerous 2.2.0 (BSD-3-Clause), pypdfium2 5.15.1 (BSD-3-Clause e Apache-2.0, com licenças permissivas no
 binário), react e react-dom 19.3.1 (MIT), vite 8.3.6 (MIT), @vitejs/plugin-react 6.2.1 (MIT). Nenhuma é copyleft. **Sete delas saíram
-há menos de 14 dias.** `[PROPOSTA]` fixar a anterior com mais de 14 dias (langgraph 1.2.16, langfuse 5.0.4, openai 3.37.0, sqlalchemy 2.1.6,
-vite 8.3.5, plugin-react 6.1.2); a decisão fica para o plano da C0. [NÃO ENCONTRADO] compatibilidade do `langfuse.openai` com o openai 3.x
+há menos de 14 dias.** **Decidido na [DEC-030](decisoes.md):** data de corte 2026-10-23 em tudo (uv e npm), o que resolveu langgraph 1.2.17, langfuse 5.0.4, openai 3.37.0 e sqlalchemy 2.1.6 (vite e plugin-react ainda não instalados); ver o [plano da C0](planos/camada-00-fundacao.md). [NÃO ENCONTRADO] compatibilidade do `langfuse.openai` com o openai 3.x
 (testar na C3). O Vite 8 exige Node 20.19 ou mais, ou 22.12 ou mais.
 
 ### 5.1 C1 · Domínio, regras e rede sintética (frente A)
@@ -313,7 +312,7 @@ puxado. Não há sessão própria.
 
 | Camada | Frente | Status | Plano |
 |---|---|---|---|
-| C0 Fundação e deploy de teste | 1 pessoa, depois C | a planejar | — |
+| C0 Fundação e deploy de teste | 1 pessoa, depois C | C0a concluída (G0 às 16h41); C0b parada: Docker pronto, deploy adiado ([DEC-033](decisoes.md)) | [camada-00-fundacao.md](planos/camada-00-fundacao.md) |
 | C1 Domínio, regras e rede sintética | A | a planejar | — |
 | C2 Solver, verificador e custo | A | a planejar | — |
 | C3 Cliente LLM, pool de chaves e rastro | B | a planejar | — |
@@ -362,6 +361,6 @@ foram consultados `[NÃO ENCONTRADO]`. A distribuição por camada é **[PROPOST
 
 ## 9. Pendências deste plano
 
-`[PREENCHER]`: quem fica em cada frente (tabela do time); a decisão de fixar as versões anteriores com mais de 14 dias (plano da C0); todos os itens da
+`[PREENCHER]`: quem fica em cada frente (tabela do time); (a política de versões foi decidida na [DEC-030](decisoes.md)); todos os itens da
 seção 3. **A frente D, o caminho crítico, as horas, os comandos e a distribuição de modelos por camada são `[PROPOSTA]`** e entram no
 "aprovado" deste plano ou mudam por nova DEC.

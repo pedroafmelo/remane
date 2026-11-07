@@ -61,7 +61,7 @@ responsabilidade, sem microsserviços e sem a cerimônia da Clean Architecture c
 **Bordas (efeitos):** `api/`, `ingest/` (a leitura do arquivo é borda; a validação dos dados extraídos é pura e fica em `rules/`), `llm/`,
 `channel/`, `clock/`, `audit/`, `synth/`, `evals/`. **`agents/`** orquestra: usa o núcleo e as portas, nunca uma borda concreta.
 
-**Portas** (interfaces `Protocol` em `domain/ports.py`): `Channel` (`send_message`, `on_message`), `Clock`, `LLMClient`, `TraceSink` e
+**Portas** (interfaces `Protocol` em `domain/ports.py`; **na C0a existem só `Clock`, `LLMClient` e `TraceSink`; `Repository` entra na C2 e `Channel` na C7**, [DEC-032](decisoes.md)): `Channel` (`send_message`, `on_message`), `Clock`, `LLMClient`, `TraceSink` e
 `Repository`. Cada borda implementa uma porta; os testes usam implementações falsas.
 
 **Regras de dependência (a seta aponta para quem é importado):**
@@ -314,7 +314,7 @@ API oficial do WhatsApp Business. **Não pesquisei a política de bloqueio do Wh
 
 ## 12. Hospedagem do link público (Q3, requisito RE-07 e RN-10)
 
-**`[PREENCHER]`: o usuário disse "vamos ver isso depois" ([DEC-021](decisoes.md)). Não adotei padrão.** Restrições que a
+**Escolhido na [DEC-030](decisoes.md) (07/11 16h22): Fly.io; o deploy foi adiado, a decidir mais para frente ([DEC-033](decisoes.md)).** Desenho: 1 máquina sempre ligada e 1 volume (`fly.toml` e deploy na C0b, [plano da C0](planos/camada-00-fundacao.md)). Antes, o usuário tinha dito "vamos ver isso depois" ([DEC-021](decisoes.md)). Restrições que a
 escolha precisa cumprir: no ar de dom 08/11 13h00 a 17h30; sem dormir; pelo menos 1 GB de RAM `[INFERÊNCIA]`; um contêiner com
 Dockerfile multi-stage (build do React e FastAPI); estado pequeno que sobreviva a reinício e a reset da demo.
 
@@ -328,6 +328,8 @@ sempre ligada e 1 volume (a primeira opção oferecida), com o melhor argumento 
 **Risco (explícito):** sem hospedagem decidida, o "link público estável" (RE-07, RN-10) é a peça com mais risco do v1 (filtro G2). Sugestão
 `[PROPOSTA]`: decidir até o fim do primeiro núcleo ponta a ponta e **fazer um deploy de teste antes de dom 08h30**; o plano de horas
 já prevê o gate de domingo 11h30.
+
+**Variáveis de ambiente da C0a:** `DATABASE_URL` (padrão `sqlite:///./var/escalista.db`; no Fly, `sqlite:////data/escalista.db` no volume) e `WEB_DIST_DIR` (padrão `web/dist`), definidas no [plano da C0](planos/camada-00-fundacao.md), seção 6.
 
 **Plano B comum a qualquer hospedagem:** vídeo gravado da demo (PDF§10) e túnel do notebook como reserva.
 
@@ -440,7 +442,7 @@ trace público. **Não se corta:** exceções, rastro e evals.
 | pillow, reportlab (grupo dev) | 13.0.0, 5.1.0 | MIT-CMU, BSD | Dados sintéticos |
 
 Fontes: PyPI JSON de cada pacote, 07/11/2026 (subagente). **Evitados:** PyMuPDF (AGPL-3.0), fpdf2 (LGPL-3.0). O `pandas` vem como
-dependência transitiva do ortools; não importamos. `pypdfium2` (via pdfplumber): BSD-3-Clause e Apache-2.0, conferida em 07/11. Versões das linhas acima conferidas em 07/11; várias saíram há menos de 14 dias: detalhe e versões anteriores em [declaracao-ferramentas.md](declaracao-ferramentas.md) e a escolha no plano da C0 ([plano-implementacao.md](plano-implementacao.md)).
+dependência transitiva do ortools; não importamos. `pypdfium2` (via pdfplumber): BSD-3-Clause e Apache-2.0, conferida em 07/11. **Instalação (C0a, [DEC-030](decisoes.md) e [DEC-031](decisoes.md)):** todas entraram com `uv add` sob a data de corte 2026-10-23, então valem as versões do `uv.lock` (langgraph 1.2.17, langfuse 5.0.4, openai 3.37.0, sqlalchemy 2.1.6), mais pyyaml, httpx e uv_build `[PROPOSTA]`. Versões das linhas acima conferidas em 07/11; várias saíram há menos de 14 dias: detalhe e versões anteriores em [declaracao-ferramentas.md](declaracao-ferramentas.md) e a escolha no plano da C0 ([plano-implementacao.md](plano-implementacao.md)).
 
 ## 20. Pendências (resumo)
 
