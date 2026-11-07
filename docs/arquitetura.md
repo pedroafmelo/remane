@@ -1,6 +1,6 @@
 # Arquitetura do Escalista (IDEA-002)
 
-Última atualização: 2026-11-07 15:19 · Etapa: definição técnica, Gate 3 ([DEC-005](decisoes.md)) · **Aprovado pelo usuário ([DEC-022](decisoes.md)), sem comentário item a item: os itens `[PROPOSTA]` seguem rotulados.**
+Última atualização: 2026-11-07 15:41 (seção 5 e pastas: `data/regras/`) · Etapa: definição técnica, Gate 3 ([DEC-005](decisoes.md)) · **Aprovado pelo usuário ([DEC-022](decisoes.md)), sem comentário item a item: os itens `[PROPOSTA]` seguem rotulados.**
 Decisões desta etapa: [DEC-018](decisoes.md) a [DEC-021](decisoes.md). Produto e requisitos não foram reabertos: ver
 [produto.md](produto.md) e [requisitos.md](requisitos.md).
 
@@ -137,6 +137,17 @@ verificador tem uma implementação **separada** do mesmo tipo (código distinto
 | `restricao_perfil` | perfil (aprendiz) × tipo de turno (noturno) | RF-02, RX-04 |
 | `hora_extra` | adicional, limite, ordem de preferência | RF-05, RF-22 |
 | `indisponibilidade` | férias, afastamentos, disponibilidade | RF-03 |
+
+**Dados de regra no repositório ([PR #1](https://github.com/pedroafmelo/converge-challenge-61/pull/1), `data/regras/`) `[PROPOSTA]`.**
+Três camadas em YAML: `lei/` (`ec141.yaml`, `clt.yaml`, texto público lido por Claude e **ainda sem leitura de alguém do time**; todas as
+regras `interpretacao` ou `pendente`), `convencao/` e `politica/` (fictícias da demo, **vazias**). O carregador fica em `rules/`: lê as
+camadas, valida o schema (`id`, `fonte`, `status`, vigência `de`/`ate`, `acao`) e funde pela regra "a política só restringe". Os YAMLs
+trazem mais regras do que as 7 primitivas da tabela acima. Para o v1, `[PROPOSTA]`, o solver e o verificador implementam um subconjunto
+(jornada semanal e diária, repouso semanal, interjornada, domingo, restrição de menor e aprendiz à noite, adicional de hora extra); as
+demais regras aparecem como dado com fonte e status, ou viram exceção a um humano (`acao: escalar` ou `verificar_convencao`). Quem
+escrever o solver confirma o formato dos YAMLs antes de a regra nova entrar. **`jornada_diaria_max` e a ampliação por convenção são
+parâmetros** ([DEC-024](decisoes.md)): o produto não fixa a resposta da Q13. A regra do domingo quinzenal para empregadas
+([DEC-023](decisoes.md), art. 386) exige o campo de sexo no quadro e o inclui na pendência do RN-13.
 
 **Tensão com o RF-22 (avisar).** O aceite do RF-22 é "trocar a política por outra muda a escala **sem alterar o código**". Isso se
 cumpre para valores, ativação e combinação das primitivas. **Um tipo de regra novo exige código** (nova primitiva no solver e no
@@ -376,6 +387,7 @@ src/escalista/
   synth/          geradores de dados sintéticos
   evals/          cenários e relatório
 web/              SPA React + Vite
+data/regras/      regras em YAML: lei/ (EC 141, CLT), convencao/ e politica/ (fictícias da demo); lidas por rules/
 tests/            núcleo com TDD; fumaça no resto
 ```
 

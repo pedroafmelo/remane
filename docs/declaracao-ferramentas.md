@@ -1,6 +1,6 @@
 # Declaração de ferramentas, modelos e APIs de terceiros
 
-Última atualização: 2026-11-07 15:14 (Gate 3: modelos, bibliotecas e infraestrutura). **A submissão exige esta lista** (guia, seção 7) e a regra de uso de IA pede que APIs,
+Última atualização: 2026-11-07 15:41 (Gate 3: modelos, bibliotecas e infraestrutura; regras legais em `data/regras/`). **A submissão exige esta lista** (guia, seção 7) e a regra de uso de IA pede que APIs,
 modelos e plataformas sejam declarados (seção 5). Atualize **no mesmo turno** em que algo entrar ou sair do projeto.
 Status: `planejado`, `em uso`, `removido`. Não remova linhas: marque `removido`.
 
@@ -99,3 +99,5 @@ gerada, para a declaração honesta exigida na submissão.
 | Ponto realizado e HRIS (mocks) | Simulados por nós, com desvios plantados; o agente chama de verdade a API simulada | planejado |
 | Celular simulado no app | Mesmo adapter da ponte do WhatsApp; mensagens simuladas | planejado |
 | EC 141 e CLT como fonte das regras | Texto público real; **as regras codificadas são interpretação do time**, a validar com o DP | planejado |
+| [data/regras/lei/ec141.yaml](../data/regras/lei/ec141.yaml) | Escrito pelo time a partir do texto do Planalto, lido pela cópia do repositório público `github.com/ctresb/leis` (`fonte/emc141.htm`; texto de norma, sem código copiado). Conferido por Claude contra o Planalto em 07/11 (status `interpretacao` ou `pendente` em cada regra); falta a leitura de alguém do time e declarar se alguma IA ajudou a escrever | em uso (entrada do cartão de regras) |
+| [data/regras/lei/clt.yaml](../data/regras/lei/clt.yaml) | Escrito por Claude a partir do texto compilado do Planalto (CLT, Lei 10.101/2000 e art. 7º da CF), lido em 07/11; status `interpretacao` ou `pendente` em cada regra; falta a leitura de alguém do time | em uso (entrada do cartão de regras) |

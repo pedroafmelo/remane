@@ -1,6 +1,6 @@
 # Registro de decisões
 
-Última atualização: 2026-11-07 15:19. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
+Última atualização: 2026-11-07 15:41. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
 entrada:** se a decisão mudar, crie outra e marque a antiga como `substituída por DEC-NNN`. Use `/decisao` para registrar e
 propagar o efeito para as outras docs.
 
@@ -318,3 +318,23 @@ Formato:
 - **Motivo: [motivo não informado].**
 - **Alternativas consideradas:** nenhuma registrada.
 - **Consequências:** Gate 3 fechado. **O usuário não comentou item a item:** os itens que o agente rotulou `[PROPOSTA]` na arquitetura (D12 a D17: login com `scrypt` e cookie assinado, segurança mínima contra injeção de prompt, estado dos fluxos sem checkpointer, catálogo de turnos, regras como primitivas, estilo e regra de dependência) **seguem rotulados `[PROPOSTA]`** e são a base de trabalho; qualquer um pode mudar por nova DEC. **Segue `[PREENCHER]`:** hospedagem (Q3), os quatro pontos de negócio (prioridade do FT-08, "gestor de RH", "consulta" do RF-40, dados do RN-13), o critério da reotimização semanal, o que dispara o RF-28, a política fictícia da demo, quando fazer o spike do WhatsApp e a tabela do time. **Nada foi implementado:** `src/`, `tests/` e `pyproject.toml` seguem como estavam (as dependências da seção 19 da arquitetura ainda não entraram com `uv add`).
+
+## DEC-023 · Art. 386 da CLT (domingo quinzenal para empregadas) entra como regra dura
+
+- 2026-11-07 15:35 · Decidido por: Claude, a pedido de Pedro Veloso ("revise o domingo mulher e tome uma decisão") · Status: aceita; revisável pelo time
+- **Numeração:** registrada como DEC-012 no branch `chore/legal-rules-data`; renumerada para DEC-013 no merge de `main` feito no branch e, na integração com o `main` atual, **renumerada de novo para DEC-023**, porque o `main` já tinha DEC-012 a DEC-022 (outras decisões).
+- **Contexto:** o `clt.yaml` tinha `domingo_mulher` como `pendente`, porque não se sabia como o art. 386 convive com o art. 6º da Lei 10.101/2000 (domingo 1 vez a cada 3 semanas no comércio).
+- **Decisão:** aplicar o art. 386 como regra dura do solver para empregadas, também no comércio (domingo de folga ao menos a cada 2 semanas), prevalecendo sobre a regra de 3 semanas da Lei 10.101. A política da empresa não pode afrouxá-la. Status da regra: `interpretacao`.
+- **Motivo:** segundo notícias (o acórdão não foi lido), a SDI-1 do TST, que uniformiza a jurisprudência, decidiu em out/2024 (RR-1749-42.2016.5.12.0031) que o art. 386 prevalece no comércio, com pagamento em dobro dos domingos sem a escala. A regra mais restritiva não gera risco para o cliente, e o solver já precisa tratar domingo. Ressalvas: turmas do TST divergiram em 2020, e o TRT-3 tem IRDR aberto (Tema 42).
+- **Alternativas consideradas:** (a) deixar pendente para o DP, que adia a decisão sem informação nova; (b) aplicar só a Lei 10.101 no comércio, contrária à posição da SDI-1 e de maior risco de passivo.
+- **Consequências:** `domingo_mulher` passa a `interpretacao` em `data/regras/lei/clt.yaml`. O quadro de pessoal sintético (RF-03) precisa de um campo de sexo. Na demo, a regra aparece com a fonte e o status (RN-09), sem afirmar que a questão está pacificada.
+- **Nota da integração (agente, não é decisão do usuário):** esta decisão foi tomada por Claude a pedido de Pedro Veloso; o CLAUDE.md diz que a decisão é do time. Segue `aceita`, como escrita, mas **o time ainda não a confirmou**, e a citação do TST vem de notícia e **não foi verificada** por quem integrou. O campo de sexo no quadro entra na pendência do RN-13 (quais dados o sistema protege).
+
+## DEC-024 · Q13 (42h contra 8h por dia): é parâmetro da política e da legislação, não regra fixa
+
+- 2026-11-07 15:41 · Decidido por: usuário da sessão · Status: aceita nesta parte; **o que a convenção fictícia da demo diz segue `[PREENCHER]`**
+- **Contexto:** a revisão do PR #1 (Pedro Veloso, branch `chore/legal-rules-data`) apontou que, com 2 repousos por semana, 5 dias de 8h dão 40h e as 42h não fecham, a menos que a convenção permita mais de 8h por dia (pergunta 17 do [estado](estado-do-projeto.md); no PR, pergunta 13). O agente perguntou quem decide.
+- **Decisão (o que o usuário disse):** "É o que eu falei, o produto deve ser generalizável por empresa e por legislação trabalhista." Ou seja, a resposta não é fixada no produto: vale a [DEC-010](#dec-010--o-pdf-é-base-a-política-da-empresa-define-as-regras-e-respostas-aos-requisitos).
+- **Motivo:** o produto deve ser generalizável por empresa e por legislação trabalhista (palavras do usuário).
+- **Alternativas consideradas (as do PR):** (a) a convenção permite passar de 8h por dia e a demo usa as 42h inteiras; (b) o teto prático é 40h e o agente leva isso ao DP como exceção. **O usuário não escolheu nenhuma das duas.**
+- **Consequências:** o limite diário (`jornada_diaria_max`), a possibilidade de ampliá-lo por convenção ou acordo e a compensação são **parâmetros do cartão de regras e da política** (RF-22), lidos pelo solver e pelo verificador, sem valor fixo no código. A camada `lei/` de `data/regras/` é dado trocável. **`[INFERÊNCIA]` do agente:** com 8h por dia e 2 repousos o solver não achará escala de 42h; o produto precisa tratar isso como exceção (RX-02, recomendação de contratação) e não travar. **`[PREENCHER]`:** o valor da convenção fictícia da demo (decide se a demo 44h → 42h gera nova escala ou exceção de contratação) e se "por legislação" inclui outros países; `[PROPOSTA]`: o v1 cobre só CLT e EC 141 (Brasil).

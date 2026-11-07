@@ -1,8 +1,7 @@
 # Estado do projeto
 
 > **Fonte da verdade do momento.** Atualize ao fim de cada bloco de trabalho (ver "Documentação viva" no
-> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 15:19** (Recife), por Claude, ao registrar a aprovação do Gate 3
-> (DEC-022); implementação aguardando o comando do usuário.
+> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 15:41** (Recife), por Claude, ao integrar o branch `chore/legal-rules-data` (PR #1) numa branch de merge (regras legais em `data/regras/`, DEC-023 e DEC-024); ainda sem push.
 
 ## Fase atual
 
@@ -35,7 +34,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
       fechada ([DEC-022](decisoes.md)) → implementação (ainda não começou).
 - [ ] Time confirmar a premissa (e) da DEC-003 (a escolha do usuário na [DEC-019](decisoes.md), spike de 1 h do WhatsApp, coincide com ela, mas o time não confirmou) (a (a) foi substituída pela [DEC-014](decisoes.md); as demais foram resolvidas ou viraram pergunta) e preencher a tabela do time.
 - [x] Remediação do histórico concluída ([DEC-007](decisoes.md)): remoto e repositório local limpos.
-- [x] Requisitos aprovados ([DEC-011](decisoes.md)). Pendências para a etapa técnica: hospedagem (Q3), mínimo de evals (Q5) e conflito 2.
+- [x] Requisitos aprovados ([DEC-011](decisoes.md)). Das pendências para a etapa técnica: Q5 (evals) foi resolvida ([DEC-019](decisoes.md)), o conflito 2 foi resolvido ([DEC-014](decisoes.md)) e a hospedagem (Q3) segue em aberto ([DEC-021](decisoes.md)).
 - [x] **Gate 2 (negócio) aprovado pelo usuário em 07/11 às 14h47** ([DEC-016](decisoes.md)) e fechado de novo às 14h57 com os requisitos adicionais ([DEC-017](decisoes.md)): entrevista de 13h28 a 14h39 ([DEC-013](decisoes.md) a [DEC-015](decisoes.md)) e `produto.md` aprovado, com as pendências da seção 12 (inclusive o P3 do DP). Rever depois, sem bloquear: a [ficha](ideacao/ideias/IDEA-002-escalista.md) (avaliação, hipóteses) e o pitch em [entrega.md](entrega.md) (seção 3.1).
 - [x] **Gate 3 (técnica) aprovado pelo usuário às ~15h19** ([DEC-022](decisoes.md); o usuário pediu "não implemente ainda").
       `arquitetura.md` criado até 15h14 ([DEC-018](decisoes.md) a [DEC-021](decisoes.md)). As três pesquisas com fonte foram refeitas e concluídas (modelos e limites da Featherless, com visão;
@@ -44,6 +43,14 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
 - [ ] **Resgatar os US$ 25 da Featherless hoje** (pergunta 8): o código vence em 08/11 e, sem ele, não há teste de fumaça dos modelos.
 - [ ] **Aguardando o comando do usuário para começar a implementar** (ele disse "não implemente ainda"). Depois dele: `uv add` das dependências ([arquitetura.md](arquitetura.md), seção 19), teste de fumaça dos
       modelos, primeiro benchmark do solver (60 × 7), e decidir a hospedagem com um deploy de teste.
+- [x] Regras legais em YAML: [ec141.yaml](../data/regras/lei/ec141.yaml) e [clt.yaml](../data/regras/lei/clt.yaml),
+      conferidas por Claude contra o Planalto (status `interpretacao` ou `pendente`; formato no [README](../data/regras/README.md)).
+- [ ] **Quem escreve o solver e o verificador:** confirmar que o formato dos YAMLs de `data/regras/` serve (campos `de`,
+      `ate`, `horas`, `status` e `acao`), antes de escrever mais regras.
+- [ ] **Quadro sintético com campo de sexo**, para aplicar o domingo quinzenal das empregadas ([DEC-023](decisoes.md)).
+- [ ] Escrever a convenção e a política fictícias da demo em `data/regras/convencao/` e `data/regras/politica/`. Depende da
+      pergunta 17 e define as 3 exceções da demo (Q6 de `requisitos.md`).
+- [ ] Opcional: alguém do time lê os artigos no Planalto e troca `interpretacao` por `conferida` (RN-09).
 - [ ] Confirmar no WhatsApp os pontos em aberto abaixo.
 - [ ] Decidir se o time concorre aos créditos AWS (exige domínio próprio e e-mail corporativo; ver
       [contexto-hackathon.md](contexto-hackathon.md)).
@@ -68,6 +75,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
 | 15 | "Gestor de RH" nos requisitos do usuário: é o gerente, o DP ou um papel novo? | Usuário | Em aberto ([requisitos.md](requisitos.md), seção 10) |
 | 16 | Como lidar com bloqueio do número do WhatsApp (Q9)? | Etapa técnica | Em aberto: o spike de 1 h foi mantido ([DEC-019](decisoes.md)); mitigações `[PROPOSTA]` e `[INFERÊNCIA]`, sem fonte pesquisada, em [arquitetura.md](arquitetura.md), seção 10 |
 | 14 | O cronograma do [plano de horas](plano-de-horas.md) está atrasado frente à Definição e o v1 cresceu: reescrever as janelas? | Time | Resolvida em 14:47: janelas reescritas como `[PROPOSTA]` ([DEC-016](decisoes.md)); o time confirma e informa a disponibilidade à noite |
+| 17 | As 42h não cabem em 5 dias de 8h (com 2 repousos, 5 × 8h = 40h). A convenção fictícia da demo permite passar de 8h por dia? (a) Sim: cláusula com base no art. 7º da EC, e a demo usa as 42h inteiras. (b) Não: o teto prático é 40h, e o agente leva isso ao DP como exceção | Time | **Parcialmente respondida ([DEC-024](decisoes.md)):** é parâmetro da política e da legislação, não regra fixa; o valor da convenção fictícia da demo segue `[PREENCHER]`. Antes: Pedro Veloso disse "decido depois". Ver `jornada_diaria_max` em [ec141.yaml](../data/regras/lei/ec141.yaml) |
 
 ## Riscos atuais
 
@@ -96,6 +104,10 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 
 | Data e hora | O quê | Por |
 |---|---|---|
+| 2026-11-07 15:41 | Integração do PR #1 (`chore/legal-rules-data`, Pedro Veloso) numa branch de merge, sem push: conflitos em `decisoes.md`, `estado-do-projeto.md` e `declaracao-ferramentas.md` resolvidos com o conteúdo do `main` por cima; a decisão do art. 386 virou [DEC-023](decisoes.md) (o `main` já tinha DEC-013 a DEC-022) e a pergunta 13 do PR virou a 17; [DEC-024](decisoes.md) registra a resposta do usuário à Q13; referências nos YAMLs e no README de `data/regras/` atualizadas. **Atenção:** os carimbos dos registros do branch (15:20, 15:35, 15:50) não batem com os commits dele (14:57 e 15:30); mantidos como estavam | Claude |
+| 2026-11-07 15:50 | Merge do `main` no branch `chore/legal-rules-data`: a DEC do art. 386 virou [DEC-023](decisoes.md), porque o `main` já tinha a DEC-012; o conflito 2 de `requisitos.md` passa a ter regra (a mais restritiva, provisória, com exceção ao DP; resumo do time das 15h20 e P1 de `produto.md`) e os YAMLs apontam para ela; novas ações para os dados de regras | Claude |
+| 2026-11-07 15:35 | [DEC-023](decisoes.md) (registrada como DEC-012 no branch): o art. 386 da CLT (domingo quinzenal para empregadas) entra como regra dura e prevalece sobre a Lei 10.101 no comércio; `domingo_mulher` passa a `interpretacao`, e o `clt.yaml` fica com 17 itens `interpretacao` e nenhum `pendente`; o quadro sintético precisa de um campo de sexo | Claude |
+| 2026-11-07 15:20 | `data/regras/lei/clt.yaml` criado a partir do texto compilado do Planalto (CLT, Lei 10.101/2000 e art. 7º da CF): 12 regras e 5 exceções; 16 itens `interpretacao` e 1 `pendente` (`domingo_mulher`, art. 386); nenhum `conferida` | Claude |
 | 2026-11-07 15:19 | [DEC-022](decisoes.md): o usuário aprovou o Gate 3 e pediu para não implementar ainda; `arquitetura.md`, plano de horas e estado atualizados; os itens `[PROPOSTA]` seguem rotulados (a aprovação não os comentou); nenhum código nem dependência | Claude |
 | 2026-11-07 15:17 | A pedido do usuário, [arquitetura.md](arquitetura.md) ganha a seção 2.1 (estilo: monolito modular, hexagonal leve e núcleo funcional; regras de dependência e teste de importação) e a linha D17, ambas `[PROPOSTA]` até o "aprovado" do Gate 3; sem DEC nova, porque o usuário só autorizou escrever a seção | Claude |
 | 2026-11-07 15:15 | Auditoria `/sync-docs` (relógio do `date`: 15h15; sem código: `src/` e `tests/` vazios; `pyproject.toml` sem mudança, o que bate com a declaração; `.env.example` com 13 nomes, todos citados em [arquitetura.md](arquitetura.md); 0 links quebrados em 22 arquivos `.md`). **Corrigido:** carimbos de hora que eu tinha gravado à frente do relógio (15h18 a 15h25) nas docs, e as horas das DEC-018 a DEC-021, agora marcadas como aproximadas (não foram registradas); `arquitetura.md` incluído no índice do README e na estrutura do CLAUDE.md; seção 12 do [produto.md](produto.md) aponta para o que a técnica já tratou; premissa (e) da DEC-003 anotada com a DEC-019. **Pendente de decisão humana:** ver a resposta desta auditoria | Claude |
@@ -103,9 +115,11 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 | 2026-11-07 14:59 | A pedido do usuário, o Gate 3 não segue nesta sessão: 3 pesquisas técnicas em subagentes interrompidas sem resultado; nenhum arquivo de código ou de docs técnico foi criado; `arquitetura.md` não existe | Claude |
 | 2026-11-07 14:57 | [DEC-017](decisoes.md): requisitos adicionais do usuário registrados ([requisitos.md](requisitos.md), seção 10: RF-29 a RF-42, RN-12 a RN-14) e [produto.md](produto.md) (seção 13, FT-08, papéis, ordem de corte); login com botões de demo, FT-08 como agente separado, número fora do quadro recusado no canal real; Gate de negócio fechado; começa o Gate 3 (técnica); pendente: prioridade do FT-08, RN-12, RN-13, "gestor de RH", "consulta" do RF-40 | Claude |
 | 2026-11-07 14:47 | [DEC-016](decisoes.md): `produto.md` aprovado (Gate 2 fechado); `plano-de-horas.md` reescrito como `[PROPOSTA]` (Definição técnica até 15h30, núcleo até 19h, noite condicionada à disponibilidade, 17h deixa de ser gate duro por informação do usuário); avaliação da IDEA-002 refeita com `/avaliar-ideias` (14/20 iguais, risco alto, G2 mais frágil, G7 com a dúvida do modelo de visão); backlog, ficha e perguntas 3, 13 e 14 atualizados | Claude |
+| 2026-11-07 14:45 | `ec141.yaml` conferido contra o Planalto, artigo por artigo: 10 itens `interpretacao` e 2 `pendente` (marcos, pela data exata, e hipersuficiente, sem teto do RGPS); nenhum `conferida` (falta leitura do time); `acao` padronizado (`escalar` ou `verificar_convencao`); pergunta 17 aberta (42h contra 8h por dia) | Claude |
 | 2026-11-07 14:42 | Auditoria `/sync-docs` (sem código: `src/` e `tests/` vazios; `pyproject.toml` e `.env.example` batem com a declaração; 0 links quebrados em 21 arquivos `.md`, incluindo CLAUDE.md e README). **Corrigido:** próximas ações do estado (itens de ideação e Gate 1 já fechados), 2 perguntas novas (13 e 14); `declaracao-ferramentas.md` (MCPs conectados, execução da remediação concluída, dados da escala em XLSX, CSV e PDF, atestado em PDF e foto, leitura de documentos a decidir); `plano-de-horas.md` (situação, atraso e marcos); `backlog-ideias.md` e ficha da IDEA-002 (autonomia e descrição); `entrega.md` (pitch); `decisoes.md` (notas de substituição em DEC-003 e DEC-011); README (hook já registrado, links de requisitos e produto). **Pendente de decisão humana:** perguntas 13 e 14, tabela do time, status e pontuação da IDEA-002 | Claude |
 | 2026-11-07 14:39 | [DEC-015](decisoes.md): Fase 3 (ordem de corte, abono provisório, edição bloqueada se viola regra, persona sem login); [produto.md](produto.md) reescrito (Fase 4, seções 1 a 12); [requisitos.md](requisitos.md): ordem de corte substituída, RF-26, demo e painel ajustados; aguardando o "aprovado" do Gate 2 | Claude |
 | 2026-11-07 14:36 | [DEC-014](decisoes.md): Fase 2 da entrevista; FT-01 a FT-05 detalhados em [produto.md](produto.md) (seção 1.2), FT-06 e FT-07 em esboço; [requisitos.md](requisitos.md): RH-05 substituído, RF-09, RF-14, RF-16, RF-19 e RF-20 mudam, RF-25 a RF-28 e RX-13 novos, conflitos 2 e 6 resolvidos; P1, P4, P6 e P7 respondidas | Claude |
+| 2026-11-07 14:15 | Branch `chore/legal-rules-data`: `data/regras/` com as camadas `lei/`, `convencao/` e `politica/` ([README](../data/regras/README.md)); `lei/ec141.yaml` (enviado por Pedro Veloso, YAML válido, 6 regras e 5 exceções; ainda sem status por regra, RN-09); origem declarada em `declaracao-ferramentas.md` | Claude |
 | 2026-11-07 14:13 | [DEC-013](decisoes.md): Fase 1 da entrevista de produto; lista FT-01 a FT-06 e prioridade em [produto.md](produto.md) (seção 1.1, P6 respondida); [requisitos.md](requisitos.md): RF-03 ampliado, RF-16 sai de C1 e vira obrigatório só no gatilho, RF-23 e RF-24 novos; nota de risco na ficha da IDEA-002 | Claude |
 | 2026-11-07 13:24 | [DEC-012](decisoes.md): a etapa de negócio passa a ser a definição do produto; [produto.md](produto.md) criado (F1 a F10, quem decide o quê, interação, generalização, entradas e saídas, capacidade; decisões P1 a P7); CLAUDE.md lista o arquivo | Claude |
 | 2026-11-07 13:18 | Etapa de negócio: pesquisa de concorrência, preço e mercado e dor/custo (subagentes, com fonte); IDEA-002 avaliada (G1 a G7 passam, G2, G4 e G7 com condição; A4 B3 C3 D4 = 14/20; risco alto); ficha, backlog e `entrega.md` (pitch, seção 3.1) atualizados; 11 hipóteses listadas | Claude |
