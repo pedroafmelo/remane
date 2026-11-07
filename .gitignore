@@ -12,6 +12,7 @@
 !data/**/*.pdf
 !data/**/*.html
 !src/**/*.html
+!web/*.html
 # Ideia arquivada: o PDF original fica fora do git (decisão do usuário, DEC-008)
 docs/arquivo/**/*.pdf
 
