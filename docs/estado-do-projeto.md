@@ -1,8 +1,8 @@
 # Estado do projeto
 
 > **Fonte da verdade do momento.** Atualize ao fim de cada bloco de trabalho (ver "Documentação viva" no
-> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 14:15** (Recife), por Claude, ao criar `data/regras/` com a EC 141 em
-> YAML (branch `chore/legal-rules-data`).
+> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 14:45** (Recife), por Claude, ao conferir o `ec141.yaml` contra o
+> Planalto (branch `chore/legal-rules-data`).
 
 ## Fase atual
 
@@ -57,6 +57,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
 | 10 | Onde roda o Langfuse self-hosted, sem servidor | Time | Em aberto; sem servidor, só na máquina local ([DEC-005](decisoes.md)) |
 | 11 | Como remediar o histórico do scaffold (commit inicial `16e1a5c`, remoto privado) | Time | Resolvida ([DEC-007](decisoes.md), [DEC-008](decisoes.md)): histórico recriado e publicado no `main` do remoto; branch antigo e commit `16e1a5c` removidos do repositório local. Os outros 3 colaboradores precisam atualizar o clone |
 | 12 | Onde usar o JEV (TypeSafe), se for usar | Time | Resolvida: JEV descartado ([DEC-011](decisoes.md)) |
+| 13 | As 42h não cabem em 5 dias de 8h (com 2 repousos, 5 × 8h = 40h). A convenção fictícia da demo permite passar de 8h por dia? (a) Sim: cláusula com base no art. 7º da EC, e a demo usa as 42h inteiras. (b) Não: o teto prático é 40h, e o agente leva isso ao DP como exceção | Time | Em aberto (Pedro Veloso: "decido depois"). Ver `jornada_diaria_max` em [ec141.yaml](../data/regras/lei/ec141.yaml) |
 
 ## Riscos atuais
 
@@ -83,6 +84,7 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 
 | Data e hora | O quê | Por |
 |---|---|---|
+| 2026-11-07 14:45 | `ec141.yaml` conferido contra o Planalto, artigo por artigo: 10 itens `interpretacao` e 2 `pendente` (marcos, pela data exata, e hipersuficiente, sem teto do RGPS); nenhum `conferida` (falta leitura do time); `acao` padronizado (`escalar` ou `verificar_convencao`); pergunta 13 aberta (42h contra 8h por dia) | Claude |
 | 2026-11-07 14:15 | Branch `chore/legal-rules-data`: `data/regras/` com as camadas `lei/`, `convencao/` e `politica/` ([README](../data/regras/README.md)); `lei/ec141.yaml` (enviado por Pedro Veloso, YAML válido, 6 regras e 5 exceções; ainda sem status por regra, RN-09); origem declarada em `declaracao-ferramentas.md` | Claude |
 | 2026-11-07 13:18 | Etapa de negócio: pesquisa de concorrência, preço e mercado e dor/custo (subagentes, com fonte); IDEA-002 avaliada (G1 a G7 passam, G2, G4 e G7 com condição; A4 B3 C3 D4 = 14/20; risco alto); ficha, backlog e `entrega.md` (pitch, seção 3.1) atualizados; 11 hipóteses listadas | Claude |
 | 2026-11-07 13:13 | [DEC-011](decisoes.md): requisitos aprovados; rótulo de vigência simulada (RN-11); JEV descartado; Q3 e Q5 e conflito 2 encaminhados à etapa técnica; etapa de negócio aberta | Claude |
