@@ -109,6 +109,8 @@ docs/
   requisitos.md                    requisitos funcionais, de exceção, não funcionais e de aceite
   produto.md                       definição do produto: features, fluxos, agente x humano, generalização
   arquitetura.md                   arquitetura técnica: agentes, solver, contratos, rastro, riscos (Gate 3)
+  plano-implementacao.md           plano macro: camadas C0 a C9, frentes, gates, modelos de desenvolvimento
+  planos/                          plano detalhado de cada camada (camada-NN-nome.md), criado camada a camada
   decisoes.md                      registro de decisões (DEC-NNN)
   declaracao-ferramentas.md        lista de ferramentas, modelos e APIs de terceiros (vai para a submissão)
   entrega.md                       submissão, pitch de 3 min e roteiro de demo

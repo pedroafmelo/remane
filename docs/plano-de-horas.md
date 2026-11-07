@@ -1,6 +1,6 @@
 # Plano de horas
 
-Última atualização: 2026-11-07 15:14 (Gate 3: marco, linha da definição técnica e itens técnicos a encaixar). **Sugestão**, não compromisso: ajuste ao decidir a ideia e registre em
+Última atualização: 2026-11-07 16:11 (gate da primeira fatia às 21h30 e noite com 4 pessoas, [DEC-027](decisoes.md) e [DEC-028](decisoes.md); camadas em [plano-implementacao.md](plano-implementacao.md)). **Sugestão**, não compromisso: ajuste ao decidir a ideia e registre em
 [estado-do-projeto.md](estado-do-projeto.md). Horário de Brasília. Prazo duro: **dom 13h00**.
 
 ## Linha do tempo com gates
@@ -9,8 +9,8 @@
 |---|---|---|---|
 | Sáb 10h30 - 13h00 | 1 · Ideação | Ideia decidida (`DEC-NNN`) | **13h00:** sem consenso, aplicar a contingência de [como-ideiar.md](ideacao/como-ideiar.md) |
 | Sáb 14h57 - 15h30 | 2 · Definição (Gate 3, técnica) | `arquitetura.md` (**criado até 15h14 e aprovada às ~15h19**, [DEC-022](decisoes.md)): stack, solver, contratos, evals mínimos (Q5, resolvido). **Ficaram para depois:** hospedagem (Q3, `[PREENCHER]`), divisão de tarefas, esqueleto do repositório, teste de fumaça do modelo e tracing | Sem modelo respondendo e sem tracing: resolver antes de escrever lógica |
-| Sáb 15h30 - 19h00 | 3 · Construção | Recorte mínimo: FT-02 (leitura de um formato, solver, verificador, antes e depois) e FT-04 (aprovação), com dados sintéticos e trace desde o início | **19h00 `[PROPOSTA]`:** primeiro fluxo ponta a ponta; sem ele, aplicar a ordem de corte |
-| Sáb 19h00 - Dom 08h30 | 3 · Construção (noite) | Extensões e as outras features (FT-03, FT-01, FT-05, FT-07), na ordem inversa à de corte | Depende da disponibilidade do time à noite: `[PREENCHER]` |
+| Sáb 15h30 - 19h00 | 3 · Construção | Recorte mínimo: FT-02 (leitura de um formato, solver, verificador, antes e depois) e FT-04 (aprovação), com dados sintéticos e trace desde o início | ~~19h00~~ **21h30 ([DEC-028](decisoes.md)):** primeira fatia vertical no deploy de teste (seção 2 do [plano macro](plano-implementacao.md)); sem ela, aplicar a ordem de corte. **19h:** política fictícia (Pedro Veloso) |
+| Sáb 19h00 - Dom 08h30 | 3 · Construção (noite) | Extensões e as outras features (FT-03, FT-01, FT-05, FT-07), na ordem inversa à de corte | 4 pessoas até a madrugada ([DEC-027](decisoes.md)); camadas C6 a C8 em paralelo ([plano macro](plano-implementacao.md)) |
 | Dom 08h30 - 10h30 | 3/4 · Construção e medição | Exceções, evals pequenos, rastro, custo por execução | |
 | Dom 10h30 - 11h30 | 4 · Polimento | Link público estável com dados pré-carregados; teste como jurado | **11h30:** sem link público funcionando, parar de adicionar funções |
 | Dom 11h30 - 13h00 | 5 · Submissão | Vídeo, descrição, material do pitch, declaração de ferramentas, envio | **12h00:** congelar código; só correção de bug crítico depois disso |
@@ -52,8 +52,8 @@ de hora extra, foto do atestado, convenção em PDF, reotimização semanal.
 
 Não mudei as janelas acima (o time ainda não confirmou o cronograma). Itens novos da [arquitetura](arquitetura.md) que precisam de hora:
 resgatar o crédito da Featherless (hoje, ação humana); `uv add` e esqueleto; **teste de fumaça dos 2 modelos** e **primeiro benchmark do
-solver (60 × 7)**, ambos antes de escrever lógica sobre eles; **deploy de teste da hospedagem** antes de dom 08h30, com a hospedagem a
-decidir; SPA React com login e botões de demo; spike de 1 h do WhatsApp só se sobrar horário e houver chip. Cortes técnicos extras em
+solver (60 × 7)**, ambos antes de escrever lógica sobre eles; **deploy de teste da hospedagem** no fim da C0, ainda no sábado ([DEC-027](decisoes.md); antes era "antes de dom 08h30"), com a hospedagem a
+decidir nesse momento; SPA React com login e botões de demo; spike de 1 h do WhatsApp só se sobrar horário e houver chip. Cortes técnicos extras em
 [arquitetura.md](arquitetura.md), seção 18.
 
 ## Marcos concluídos
@@ -68,6 +68,7 @@ decidir; SPA React com login e botões de demo; spike de 1 h do WhatsApp só se 
 | `arquitetura.md` criado | 2026-11-07 15:14 (DEC-018 a DEC-021) |
 | Gate 3: técnica (`arquitetura.md` aprovada) | 2026-11-07 ~15:19 (DEC-022) |
 | Modelo e tracing funcionando | |
+| Plano macro de implementação | 2026-11-07 16:11 (aprovado, DEC-029) |
 | Primeiro fluxo ponta a ponta | |
 | Evals rodando | |
 | Link público estável | |

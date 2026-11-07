@@ -16,6 +16,7 @@ Hackathon de AI Agents (**tema aberto**), 07 e 08/11/2026, Porto Digital, Recife
 | Ver o que o produto precisa fazer e provar | [docs/requisitos.md](docs/requisitos.md) |
 | Ver o produto definido (features, agente e humano) | [docs/produto.md](docs/produto.md) |
 | Ver a arquitetura técnica (Gate 3, aprovada em [DEC-022](docs/decisoes.md)) | [docs/arquitetura.md](docs/arquitetura.md) |
+| Ver o plano de implementação em camadas (e o status de cada uma) | [docs/plano-implementacao.md](docs/plano-implementacao.md) |
 | Ver as regras legais em YAML (lei, convenção e política fictícias) | [data/regras/README.md](data/regras/README.md) |
 | Ver o que já foi decidido | [docs/decisoes.md](docs/decisoes.md) |
 | Conferir as regras do evento | [docs/regras-e-integridade.md](docs/regras-e-integridade.md) · [docs/contexto-hackathon.md](docs/contexto-hackathon.md) · [guia oficial](docs/guia-converge-challenge.md) |

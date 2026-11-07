@@ -1,8 +1,8 @@
 # Estado do projeto
 
 > **Fonte da verdade do momento.** Atualize ao fim de cada bloco de trabalho (ver "Documentação viva" no
-> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 15:54** (Recife), por Claude, ao registrar a confirmação da DEC-023 (DEC-026) depois do commit
-> do pool de chaves da Featherless (DEC-025, `e77ce4c`).
+> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 16:11** (Recife), por Claude, ao criar o plano macro de implementação ([plano-implementacao.md](plano-implementacao.md),
+> [DEC-027](decisoes.md) e [DEC-028](decisoes.md)), que foi aprovado pelo usuário ([DEC-029](decisoes.md)).
 
 ## Fase atual
 
@@ -19,7 +19,8 @@ aprova em gates: ambiente, requisitos, negócio e técnica ([DEC-005](decisoes.m
 
 | Pessoa | Perfil / foco | Disponibilidade |
 |---|---|---|
-| [PREENCHER] | | |
+| Pedro Veloso | Política e convenção fictícias da demo até 19h ([DEC-028](decisoes.md)); frente D `[PROPOSTA]` | Até a madrugada ([DEC-027](decisoes.md)) |
+| [PREENCHER] (3 pessoas) | [PREENCHER: frentes A, B e C do [plano macro](plano-implementacao.md)] | Até a madrugada ([DEC-027](decisoes.md)) |
 
 Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil técnico forte.
 
@@ -42,8 +43,15 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
       hospedagem e Langfuse; solver e leitura de arquivos). Q5 (evals) resolvida. **Hospedagem (Q3) segue `[PREENCHER]`**: o usuário disse
       "vamos ver isso depois". Pendências do negócio em [produto.md](produto.md), seções 12 e 13.
 - [ ] **Featherless:** 3 das 4 pessoas resgataram e criaram chaves (palavra do usuário, 15h46; **nenhuma chave foi testada**). **A chave 1 do `.env` apareceu vazia ou ausente (conferir; o `APIs.yaml` já foi apagado, e se a chave se perdeu é preciso criar outra em API Keys).** Falta a 4ª pessoa resgatar hoje (o código vence em 08/11), mover as chaves do `APIs.yaml` para o `.env` e apagar o arquivo, e testar cada chave ([DEC-025](decisoes.md)).
-- [ ] **Aguardando o comando do usuário para começar a implementar** (ele disse "não implemente ainda"). Depois dele: `uv add` das dependências ([arquitetura.md](arquitetura.md), seção 19), teste de fumaça dos
-      modelos, primeiro benchmark do solver (60 × 7), e decidir a hospedagem com um deploy de teste.
+- [x] **Plano macro de implementação: aprovado** ([DEC-029](decisoes.md)) ([plano-implementacao.md](plano-implementacao.md)). Depois dele, planejar a
+      **Camada 0** em detalhe (`docs/planos/camada-00-fundacao.md`), com o Opus 5.5 ([DEC-028](decisoes.md)).
+- [ ] **Hospedagem: decidir no fim da C0, com deploy de teste hoje** ([DEC-027](decisoes.md)).
+- [ ] **Pedro Veloso: política e convenção fictícias até 19h** ([DEC-028](decisoes.md)); gate G2 do plano macro.
+- [ ] **Primeira fatia vertical até 21h30** ([DEC-028](decisoes.md)): seção 2 do [plano macro](plano-implementacao.md).
+- [ ] Responder antes dos planos das camadas: "gestor de RH" (antes da C4), dados do RN-13 (antes da C1), RF-25 e RF-28 (antes da C7);
+      tabela do time com a frente de cada pessoa. Lista completa na seção 3 do [plano macro](plano-implementacao.md).
+- [x] ~~**Aguardando o comando do usuário para começar a implementar** ("não implemente ainda")~~: substituída pelo plano macro (16h11); `uv add`, teste
+      de fumaça, benchmark do solver e hospedagem estão nas camadas C0, C2 e C3 do [plano macro](plano-implementacao.md).
 - [x] Regras legais em YAML: [ec141.yaml](../data/regras/lei/ec141.yaml) e [clt.yaml](../data/regras/lei/clt.yaml),
       conferidas por Claude contra o Planalto (status `interpretacao` ou `pendente`; formato no [README](../data/regras/README.md)).
 - [ ] **Quem escreve o solver e o verificador:** confirmar que o formato dos YAMLs de `data/regras/` serve (campos `de`,
@@ -65,7 +73,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
 | 3 | Pode-se continuar trabalhando fora do local depois das 17h de sábado? O guia não diz | WhatsApp dos organizadores | Em aberto. O usuário afirma que o time pode continuar depois das 17h ([DEC-016](decisoes.md)); o guia não diz e os organizadores não confirmaram |
 | 4 | O repositório nasceu de um scaffold (commit inicial às 10h55 de 07/11). Qual a origem e há algo que não seja nosso? | Time | Respondida ([DEC-006](decisoes.md)): template de um amigo do usuário que trabalha em uma empresa; o usuário confirma que entra na regra de clean room. 10 arquivos do commit inicial citam "[termo de terceiro omitido por clean room]". Remediação na pergunta 11. Ver [declaracao-ferramentas.md](declaracao-ferramentas.md) |
 | 5 | Concorrer ou não ao Desafio Tako (RH)? | Time | Resolvida em 07/11 12h16: concorre ([DEC-003](decisoes.md), provisória); sinalizar na submissão |
-| 6 | Hospedagem do link público e da ponte: o time não tem servidor nem conta hoje | Time | **Em aberto, `[PREENCHER]`:** pesquisada em 07/11 ([arquitetura.md](arquitetura.md), seção 12); o usuário disse "vamos ver isso depois" ([DEC-021](decisoes.md)). Sem ela o link estável (RE-07, RN-10) não existe. A ponte do WhatsApp roda só no notebook |
+| 6 | Hospedagem do link público e da ponte: o time não tem servidor nem conta hoje | Time | **Em aberto, `[PREENCHER]`:** pesquisada em 07/11 ([arquitetura.md](arquitetura.md), seção 12); o usuário disse "vamos ver isso depois" ([DEC-021](decisoes.md)) e marcou a decisão para o **fim da C0, com deploy de teste hoje** ([DEC-027](decisoes.md)). Sem ela o link estável (RE-07, RN-10) não existe. A ponte do WhatsApp roda só no notebook |
 | 7 | Chip dedicado e aparelho para a ponte real do WhatsApp | Time | "Vamos ver"; sem chip, só o simulador de celular |
 | 8 | Resgate dos US$ 25 da Featherless por integrante | Time | **3 de 4 resgataram** (palavra do usuário, 15h46; sem teste ainda); falta 1 pessoa. Link e código estão só no guia original (redigidos na cópia local). O código vence em 08/11 e tem limite de resgates. As chaves formam um pool com failover ([DEC-025](decisoes.md)) |
 | 9 | Domínio próprio (créditos AWS) | Time | O time não tem; só importa se ficar no pódio |
@@ -105,6 +113,9 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 
 | Data e hora | O quê | Por |
 |---|---|---|
+| 2026-11-07 16:13 | Plano macro aprovado ([DEC-029](decisoes.md)); commit e push para a `main` a pedido do usuário. Próximo: plano detalhado da C0 | Claude |
+| 2026-11-07 16:11 | Auditoria `/sync-docs` depois do plano macro: `src/` e `tests/` vazios e `pyproject.toml` sem mudança, o que bate com as docs (dependências só `planejado`); os 16 nomes do `.env.example` batem com a arquitetura; 0 links quebrados em 24 arquivos `.md`; backlog (IDEA-002 `escolhida`) e marcos coerentes. **Corrigido:** o item do deploy de teste em [plano-de-horas.md](plano-de-horas.md) ("antes de dom 08h30" → fim da C0, [DEC-027](decisoes.md)). Alterações de docs **sem commit** | Claude |
+| 2026-11-07 16:11 | Plano macro de implementação criado ([plano-implementacao.md](plano-implementacao.md)), em 2 rodadas de perguntas: [DEC-027](decisoes.md) (3 frentes depois da C0, que substitui o "sem paralelo" da DEC-005; ~9 camadas; hospedagem decidida no fim da C0 com deploy de teste; 4 pessoas até a madrugada) e [DEC-028](decisoes.md) (fatia mínima com gate às 21h30; Opus planeja e Sonnet executa; spike do WhatsApp depois da C7; política fictícia por Pedro Veloso até 19h). Versões e licenças de langgraph, langfuse, openai, sqlalchemy, itsdangerous, pypdfium2, React e Vite conferidas por subagente (só leitura) e gravadas na [declaração](declaracao-ferramentas.md); nada instalado. [plano-de-horas.md](plano-de-horas.md) com o gate novo; CLAUDE.md e README com o arquivo novo. **Sem código, sem `uv add`, sem commit** | Claude |
 | 2026-11-07 15:54 | [DEC-026](decisoes.md): o usuário confirmou a DEC-023 (art. 386); o status da regra no YAML segue `interpretacao`. Commit `e77ce4c` (DEC-025) enviado à `main`; branch local `merge/legal-rules-data` apagada; `APIs.yaml` já não existe (o usuário o apagou). **Chave 1 do `.env` apareceu vazia ou ausente** na conferência (só se checou preenchida ou vazia, sem ler valores; a 2 e a 3 estão preenchidas, a 4 vazia como esperado); uma segunda conferência foi negada pelo sistema e não foi repetida | Claude |
 | 2026-11-07 15:49 | PR #1 aceito por Pedro Veloso às ~15h49 (18h49 UTC) como merge commit `19ef74f`, que contém o meu merge `f904ef2`; `main` local atualizada por `git pull --ff-only` e as alterações da DEC-025 reaplicadas por cima, sem conflito. Sincronia: a DEC-023 (art. 386) e a DEC-024 (Q13) agora estão no `main`; **a DEC-023 segue sem confirmação do time**; README aponta para `data/regras/`. Alterações da DEC-025 **ainda sem commit**; branch local `merge/legal-rules-data` já está contida no `main` | Claude |
 | 2026-11-07 15:46 | [DEC-025](decisoes.md): as chaves da Featherless das 4 pessoas formam um pool com failover (3 de 4 resgataram, **sem teste**); `.env.example` com `FEATHERLESS_API_KEY_1` a `_4` (só nomes); [arquitetura.md](arquitetura.md) seção 7 e riscos com o desenho do failover (`[PROPOSTA]`); `APIs.yaml` no `.gitignore` por proteção; pergunta 8 e próximas ações com o resgate. Alterações **sem commit** (depois movidas para a `main` local, ver a linha seguinte); nenhum código | Claude |

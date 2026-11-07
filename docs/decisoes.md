@@ -1,6 +1,6 @@
 # Registro de decisões
 
-Última atualização: 2026-11-07 15:54. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
+Última atualização: 2026-11-07 16:11. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
 entrada:** se a decisão mudar, crie outra e marque a antiga como `substituída por DEC-NNN`. Use `/decisao` para registrar e
 propagar o efeito para as outras docs.
 
@@ -83,7 +83,7 @@ Formato:
 - **Decisão (o que o usuário disse):**
   - **Fluxo:** preparação de ambiente → definição de requisitos → definição de negócio (lapidar a ideia e definir regras,
     fluxos etc.) → definição técnica → implementação. A etapa de requisitos é nova em relação ao plano inicial da sessão.
-  - **Sem trabalho em paralelo ainda** (pergunta 5): nada de solver nem de dados antes das definições.
+  - **Sem trabalho em paralelo ainda** (pergunta 5): nada de solver nem de dados antes das definições. **[Substituído pela DEC-027: 3 frentes em paralelo depois da C0.]**
   - **Langfuse self-hosted** (pergunta 9). Substitui a premissa (c) da [DEC-003](#dec-003--escalista-idea-002-como-direção-do-projeto-e-participação-no-desafio-tako).
   - **Toda a inferência via Featherless** (pergunta 10). Confirma a premissa (b) da DEC-003.
   - **Chip dedicado:** "vamos ver" (pergunta 6). **Servidor:** o time não tem (pergunta 7). **Domínio próprio:** o time
@@ -356,3 +356,50 @@ Formato:
 - **Motivo: [motivo não informado].**
 - **Alternativas consideradas:** nenhuma registrada (as da DEC-023: deixar pendente para o DP, ou aplicar só a Lei 10.101/2000).
 - **Consequências:** a DEC-023 passa a confirmada. **Não muda:** o status da regra `domingo_mulher` em `data/regras/lei/clt.yaml`, que segue `interpretacao` (RN-09): a confirmação é da decisão de produto, e a leitura do acórdão do TST, que a DEC-023 cita por notícia, **continua não verificada**; na demo a regra aparece com a fonte e o status. O campo de sexo no quadro sintético segue pendente da definição do RN-13.
+
+## DEC-027 · Plano macro, rodada 1: 3 frentes depois da C0, ~9 camadas, hospedagem no fim da C0 e time até a madrugada
+
+- 2026-11-07 16:05 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** etapa do plano macro de implementação ([plano-implementacao.md](plano-implementacao.md)); rodada 1 de perguntas.
+- **Decisão (o que o usuário escolheu entre as opções oferecidas):**
+  - **Paralelismo:** 1 pessoa faz a C0 sozinha; depois, **3 frentes em paralelo** sobre contratos fixados cedo (núcleo; LLM, leitura e
+    rastro; API, SPA e deploy). **Substitui, nesse ponto, o "sem trabalho em paralelo ainda" da [DEC-005](#dec-005--respostas-da-etapa-0-novo-fluxo-de-definição-langfuse-self-hosted-e-limites-de-infraestrutura).**
+  - **Granularidade:** ~9 camadas, com evals e deploy como trilhas transversais (o plano ficou com 9 de construção, C0 a C8, mais a entrega, C9).
+  - **Hospedagem:** decidir **ao fim da C0**, com um deploy de teste do esqueleto ainda hoje. Dá prazo à pendência da [DEC-021](#dec-021--gate-3-rodada-4-hospedagem-fica-para-depois-e-rastro-em-tabela-do-app-com-langfuse-local); a escolha em si segue `[PREENCHER]`.
+  - **Time à noite:** 4 pessoas até a madrugada.
+- **Motivo: [motivo não informado].**
+- **Alternativas consideradas (as oferecidas):** paralelo só depois da fatia, paralelo desde a C0, sequencial; 13 camadas, 5 a 6 marcos;
+  decidir a hospedagem agora, no gate da fatia ou domingo cedo; 2 a 3 pessoas, só 1, não sei.
+- **Consequências:** [plano-implementacao.md](plano-implementacao.md) criado com as frentes A, B e C; a frente D (dados, evals e negócio) é
+  `[PROPOSTA]` do agente. Quem fica em cada frente segue `[PREENCHER]` (tabela do time). [plano-de-horas.md](plano-de-horas.md): a janela da noite deixa de depender da disponibilidade.
+
+## DEC-028 · Plano macro, rodada 2: fatia mínima com gate às 21h30, modelos de desenvolvimento, spike do WhatsApp e política fictícia
+
+- 2026-11-07 16:07 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** rodada 2 do plano macro.
+- **Decisão (o que o usuário escolheu entre as opções oferecidas):**
+  - **Primeira fatia vertical mínima, gate às 21h30** (substitui o gate `[PROPOSTA]` das 19h do plano de horas): escala em CSV sintético →
+    validação → solver → verificador → antes e depois → justificativa pelo modelo pequeno → aprovação do gerente na SPA → `trace_event`,
+    no deploy de teste.
+  - **Modelos de desenvolvimento (Claude Code, não o produto):** Opus 5.5 planeja todas as camadas; Sonnet 5.5 executa a maior parte; Opus 5.5
+    executa as partes de alto custo de erro (solver, verificador, RN-06, controle de acesso, RN-12); Haiku 5.5 só em tarefas mecânicas.
+    Escolha sem benchmark; as razões são `[INFERÊNCIA]`.
+  - **Spike do WhatsApp:** só depois que o FT-03 rodar no celular simulado (C7), em 1 hora e só se houver chip. Preenche o "quando" da
+    [DEC-019](#dec-019--gate-3-rodada-2-spike-do-whatsapp-relógio-simulado-e-30-evals).
+  - **Política fictícia da demo** (opções de exceção, prazos, os 3 tipos de exceção, valor do limite diário da convenção): **Pedro Veloso
+    escreve, até 19h**.
+- **Motivo: [motivo não informado].**
+- **Alternativas consideradas (as oferecidas):** fatia com gate às 19h, fatia com leitura pelo modelo, fatia sem SPA às 20h; Fable 5.1 no
+  alto risco, Sonnet em tudo, Opus em tudo; spike domingo cedo, cortar o spike, spike em paralelo hoje; o usuário, a frente de negócio ou
+  o agente escrevendo a política.
+- **Consequências:** [plano-implementacao.md](plano-implementacao.md), seções 2, 4 e 7; [plano-de-horas.md](plano-de-horas.md) com o gate das 21h30; [estado](estado-do-projeto.md)
+  com as ações. A distribuição de modelos por camada (seção 7 do plano) é `[PROPOSTA]` dentro da política escolhida.
+
+## DEC-029 · Plano macro de implementação aprovado
+
+- 2026-11-07 16:13 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** o agente entregou [plano-implementacao.md](plano-implementacao.md) e pediu o "aprovado".
+- **Decisão (o que o usuário disse):** "Aprovo o plano macro", e pediu commit e push para a `main`.
+- **Motivo: [motivo não informado].**
+- **Alternativas consideradas:** nenhuma registrada.
+- **Consequências:** os itens `[PROPOSTA]` do plano (frente D, caminho crítico, horas, comandos de pronto, modelos por camada) entram na aprovação e seguem rotulados; qualquer um muda por nova DEC. Próximo passo: planejar a Camada 0 em detalhe.

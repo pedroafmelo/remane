@@ -1,6 +1,6 @@
 # Arquitetura do Escalista (IDEA-002)
 
-Última atualização: 2026-11-07 15:41 (seção 5 e pastas: `data/regras/`) · Etapa: definição técnica, Gate 3 ([DEC-005](decisoes.md)) · **Aprovado pelo usuário ([DEC-022](decisoes.md)), sem comentário item a item: os itens `[PROPOSTA]` seguem rotulados.**
+Última atualização: 2026-11-07 16:11 (seção 19: versões conferidas; seção 10: quando fazer o spike, [DEC-028](decisoes.md)) · Etapa: definição técnica, Gate 3 ([DEC-005](decisoes.md)) · **Aprovado pelo usuário ([DEC-022](decisoes.md)), sem comentário item a item: os itens `[PROPOSTA]` seguem rotulados.**
 Decisões desta etapa: [DEC-018](decisoes.md) a [DEC-021](decisoes.md). Produto e requisitos não foram reabertos: ver
 [produto.md](produto.md) e [requisitos.md](requisitos.md).
 
@@ -290,8 +290,7 @@ Adaptador com dois métodos, `send_message(destino, texto, anexos)` e `on_messag
   dedicado, **só no notebook, nunca no servidor público** (`[PROPOSTA]`: o plano de hospedagem não promete Chromium).
 
 **Critério de abandono do spike `[PROPOSTA]`, a confirmar:** em 1 hora, a ponte recebe uma mensagem e responde a um número de teste de
-forma estável; senão, abandona e fica só o simulador. **Quando começa o spike:** `[PREENCHER]` (depende de aparelho, chip e de a
-construção do núcleo existir).
+forma estável; senão, abandona e fica só o simulador. **Quando começa o spike:** depois que o FT-03 rodar no celular simulado (C7), em 1 hora e só com chip ([DEC-028](decisoes.md)).
 
 **Número fora do quadro (RF-42, RX-10).** O adaptador real consulta o quadro antes de entregar a mensagem ao agente; número fora é
 **recusado e registrado**, sem resposta ao remetente `[PROPOSTA]` (não confirma a existência do bot). Testado no adaptador, também sem
@@ -434,17 +433,16 @@ trace público. **Não se corta:** exceções, rastro e evals.
 | ortools | 9.15.6755 | Apache-2.0 | Solver |
 | openpyxl, defusedxml | 3.1.5, 0.7.1 | MIT, PSF | XLSX |
 | pdfplumber | 0.11.10 | MIT | PDF digital |
-| langgraph | `[PREENCHER: conferir versão e licença]` | `[PREENCHER]` | Agentes |
-| langfuse | `[PREENCHER: conferir versão]` (a doc cita o SDK v5) | `[PREENCHER]` | Rastro local |
-| openai | `[PREENCHER: conferir versão]` | `[PREENCHER]` | Cliente da Featherless |
-| sqlalchemy, itsdangerous | `[PREENCHER]` | `[PREENCHER]` | Banco, sessão |
+| langgraph | 1.2.20 | MIT | Agentes |
+| langfuse | 5.2.0 | MIT | Rastro local |
+| openai | 3.46.0 | Apache-2.0 | Cliente da Featherless |
+| sqlalchemy, itsdangerous | 2.1.8, 2.2.0 | MIT, BSD-3-Clause | Banco, sessão |
 | pillow, reportlab (grupo dev) | 13.0.0, 5.1.0 | MIT-CMU, BSD | Dados sintéticos |
 
 Fontes: PyPI JSON de cada pacote, 07/11/2026 (subagente). **Evitados:** PyMuPDF (AGPL-3.0), fpdf2 (LGPL-3.0). O `pandas` vem como
-dependência transitiva do ortools; não importamos. `pypdfium2` (via pdfplumber): licença **não confirmada**.
+dependência transitiva do ortools; não importamos. `pypdfium2` (via pdfplumber): BSD-3-Clause e Apache-2.0, conferida em 07/11. Versões das linhas acima conferidas em 07/11; várias saíram há menos de 14 dias: detalhe e versões anteriores em [declaracao-ferramentas.md](declaracao-ferramentas.md) e a escolha no plano da C0 ([plano-implementacao.md](plano-implementacao.md)).
 
 ## 20. Pendências (resumo)
 
 `[PREENCHER]`: hospedagem (D11); prioridade do FT-08 e ordem dos desejáveis; "gestor de RH"; o que é a "consulta" do RF-40; dados do RN-13;
-critério da reotimização semanal; o que dispara o RF-28; política fictícia da demo; tempo do solver (a medir); quando fazer o spike do WhatsApp;
-licenças e versões de langgraph, langfuse, openai, sqlalchemy e itsdangerous; tabela do time e disponibilidade à noite.
+critério da reotimização semanal; o que dispara o RF-28; política fictícia da demo; tempo do solver (a medir); tabela do time (a disponibilidade à noite foi respondida na [DEC-027](decisoes.md)). Versões e licenças: conferidas em 07/11.

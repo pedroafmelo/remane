@@ -1,6 +1,6 @@
 # Declaração de ferramentas, modelos e APIs de terceiros
 
-Última atualização: 2026-11-07 15:41 (Gate 3: modelos, bibliotecas e infraestrutura; regras legais em `data/regras/`). **A submissão exige esta lista** (guia, seção 7) e a regra de uso de IA pede que APIs,
+Última atualização: 2026-11-07 16:11 (versões e licenças conferidas para o plano macro: langgraph, langfuse, openai, sqlalchemy, itsdangerous, pypdfium2, React e Vite; nada instalado). **A submissão exige esta lista** (guia, seção 7) e a regra de uso de IA pede que APIs,
 modelos e plataformas sejam declarados (seção 5). Atualize **no mesmo turno** em que algo entrar ou sair do projeto.
 Status: `planejado`, `em uso`, `removido`. Não remova linhas: marque `removido`.
 
@@ -56,14 +56,14 @@ langfuse e openai entram na implementação. Antes da submissão, deixe aqui só
 | pytest, pytest-cov, ruff | `pyproject.toml` (grupo dev) | planejado |
 | taskipy, typos, isort | `pyproject.toml` (scaffold) | removido ([DEC-007](decisoes.md)) |
 | Google OR-Tools (CP-SAT) 9.15.6755, Apache-2.0 | Solver de escala (núcleo) | planejado, ainda não está no `pyproject.toml` (entra com `uv add` depois do "aprovado" do Gate 3) |
-| LangGraph | Grafo dos três agentes ([DEC-018](decisoes.md)) | planejado; versão e licença `[PREENCHER: conferir]` |
-| langfuse (SDK Python) | Tracing | planejado; versão e licença `[PREENCHER: conferir]` (a doc cita o SDK v5) |
-| openai (SDK Python) | Cliente da API compatível da Featherless | planejado; versão e licença `[PREENCHER: conferir]` |
+| LangGraph 1.2.20 (MIT; Python >= 3.10; exige langchain-core >= 1.4.7, < 2, hoje 1.7.6, MIT) | Grafo dos três agentes ([DEC-018](decisoes.md)) | planejado ([FATO] PyPI JSON e registro do npm, subagente só leitura, 07/11/2026; saiu há menos de 14 dias, anterior 1.2.16) |
+| langfuse 5.2.0 (SDK Python, MIT; Python >= 3.11) | Tracing; `langfuse.openai` existe nesta versão, compatibilidade com o openai 3.x **[NÃO ENCONTRADO]**, testar | planejado ([FATO] PyPI JSON e registro do npm, subagente só leitura, 07/11/2026; menos de 14 dias, anterior 5.0.4) |
+| openai 3.46.0 (SDK Python, Apache-2.0; Python >= 3.10) | Cliente da API compatível da Featherless | planejado ([FATO] PyPI JSON e registro do npm, subagente só leitura, 07/11/2026; menos de 14 dias, anterior 3.37.0) |
 | Node.js, whatsapp-web.js e Puppeteer (Chromium) | Microserviço da ponte do WhatsApp | planejado como spike de 1 h; serviço ainda não existe |
 | openpyxl 3.1.5 (MIT) e defusedxml 0.7.1 (PSF) | Leitura de XLSX | planejado (versões e licenças pelo PyPI, 07/11/2026) |
-| pdfplumber 0.11.10 (MIT), com pdfminer.six (MIT) e pypdfium2 (**licença não confirmada**) | Leitura de PDF digital: escala, convenção e atestado | planejado |
-| React e Vite | SPA do front-end ([DEC-018](decisoes.md)) | planejado; versões e licenças `[PREENCHER: conferir]` |
-| SQLAlchemy e itsdangerous | Banco e sessão por cookie assinado `[PROPOSTA]` | planejado; versões e licenças `[PREENCHER: conferir]` |
+| pdfplumber 0.11.10 (MIT), com pdfminer.six (MIT) e pypdfium2 5.15.1 (BSD-3-Clause e Apache-2.0, com licenças permissivas de terceiros no binário do PDFium; nenhuma copyleft fora dos builds musl, que trazem a GCC Runtime Library Exception; [FATO] PyPI JSON e registro do npm, subagente só leitura, 07/11/2026) | Leitura de PDF digital: escala, convenção e atestado | planejado |
+| React e react-dom 19.3.1 (MIT), Vite 8.3.6 (MIT; Node ^20.19 ou >= 22.12), @vitejs/plugin-react 6.2.1 (MIT) | SPA do front-end ([DEC-018](decisoes.md)) | planejado ([FATO] PyPI JSON e registro do npm, subagente só leitura, 07/11/2026; Vite e o plugin com menos de 14 dias, anteriores 8.3.5 e 6.1.2) |
+| SQLAlchemy 2.1.8 (MIT; Python >= 3.11) e itsdangerous 2.2.0 (BSD-3-Clause) | Banco e sessão por cookie assinado `[PROPOSTA]` | planejado ([FATO] PyPI JSON e registro do npm, subagente só leitura, 07/11/2026; SQLAlchemy com menos de 14 dias, anterior 2.1.6) |
 | Pillow 13.0.0 (MIT-CMU) e reportlab 5.1.0 (BSD) | Geração de dados sintéticos (grupo dev) | planejado |
 | pandas, numpy | Dependências transitivas do OR-Tools; não importadas por nós | planejado como transitivas |
 | PyMuPDF (AGPL-3.0) e fpdf2 (LGPL-3.0) | Descartados por licença | removido (nunca entrou) |
