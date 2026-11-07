@@ -1,13 +1,26 @@
 {
   "hooks": {
     "SessionStart": [
-      { "hooks": [ { "type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/docs_sync.py\" session-start" } ] }
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/docs_sync.py\" session-start"
+          }
+        ]
+      }
     ],
     "Stop": [
-      { "hooks": [ { "type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/docs_sync.py\" stop" } ] }
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/docs_sync.py\" stop"
+          }
+        ]
+      }
     ]
   },
-  "enabledMcpjsonServers": ["langfuse-docs", "docs-langchain"],
   "permissions": {
     "allow": [
       "Bash(uv run:*)",
