@@ -79,7 +79,7 @@ antes de abrir C6 a C8. A fatia tem prioridade sobre qualquer camada nova.
 
 | Pendência | Bloqueia | Dono | Prazo sugerido `[PROPOSTA]` |
 |---|---|---|---|
-| Hospedagem do link público: Fly.io na [DEC-030](decisoes.md), mas o **deploy foi adiado, a decidir** ([DEC-033](decisoes.md)); faltam conta, cartão e nome do app | C0b (G1), RE-07, RN-10 | Usuário | `[PREENCHER]` |
+| Hospedagem do link público: **`[PREENCHER]`**; o Fly.io da [DEC-030](decisoes.md) está em suspenso e tudo do deploy foi adiado, só local por enquanto ([DEC-033](decisoes.md), [DEC-034](decisoes.md)) | C0b (G1), RE-07, RN-10 | Usuário | `[PREENCHER]` |
 | Chave 1 da Featherless vazia ou ausente no `.env` | C3 (teste de fumaça, failover) | Dono da chave 1 `[PREENCHER]` | Antes da C3, ~17h30 |
 | 4ª pessoa resgatar os US$ 25 (o código vence em 08/11) | C3 (pool completo), orçamento dos evals e da demo | 4ª pessoa `[PREENCHER: nome]` | Hoje, antes das 23h |
 | Testar cada chave (validade, saldo, "Unlock Model") | C3, C5 | Frente B | 1ª hora da C3 |
@@ -312,7 +312,7 @@ puxado. Não há sessão própria.
 
 | Camada | Frente | Status | Plano |
 |---|---|---|---|
-| C0 Fundação e deploy de teste | 1 pessoa, depois C | C0a concluída (G0 às 16h41); C0b parada: Docker pronto, deploy adiado ([DEC-033](decisoes.md)) | [camada-00-fundacao.md](planos/camada-00-fundacao.md) |
+| C0 Fundação e deploy de teste | 1 pessoa, depois C | C0a concluída (G0 às 16h41); C0b parada: Docker pronto, deploy adiado ([DEC-033](decisoes.md), [DEC-034](decisoes.md)) | [camada-00-fundacao.md](planos/camada-00-fundacao.md) |
 | C1 Domínio, regras e rede sintética | A | a planejar | — |
 | C2 Solver, verificador e custo | A | a planejar | — |
 | C3 Cliente LLM, pool de chaves e rastro | B | a planejar | — |

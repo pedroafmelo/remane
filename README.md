@@ -25,6 +25,22 @@ Hackathon de AI Agents (**tema aberto**), 07 e 08/11/2026, Porto Digital, Recife
 | Listar ferramentas e modelos usados | [docs/declaracao-ferramentas.md](docs/declaracao-ferramentas.md) |
 | Consultar a ideia anterior (arquivada) | [docs/ideacao/ideias/IDEA-001-recuperacao-depositos.md](docs/ideacao/ideias/IDEA-001-recuperacao-depositos.md) |
 
+## Rodar e testar localmente
+
+Requisitos: uv, Node 22.12 ou mais. Copie `.env.example` para `.env` (ignorado pelo git) e preencha só o que for usar. O deploy está adiado
+([DEC-034](docs/decisoes.md)); por enquanto tudo roda na máquina.
+
+```
+uv sync                                    # dependências Python (travadas pela data de corte, DEC-030)
+uv run pytest && uv run ruff check .       # testes e lint
+npm --prefix web ci                        # dependências do front-end
+npm --prefix web run build                 # gera web/dist
+uv run uvicorn escalista.api.app:create_app --factory --port 8000   # API + SPA em http://localhost:8000
+npm --prefix web run dev                   # opcional: SPA com recarga em http://localhost:5173 (proxy para a API)
+```
+
+`GET /health` confirma que o app e o banco (SQLite em `var/`, ignorado pelo git) estão de pé. Docker é opcional: `docker build .`.
+
 ## Comandos do Claude Code (`.claude/commands/`)
 
 | Comando | Para quê |

@@ -1,6 +1,6 @@
 # Camada 0 · Fundação e deploy de teste
 
-Última atualização: 2026-11-07 16:51 (Recife) · Situação: **C0a inteira concluída (T1 a T10; G0 às 16h41). C0b parada por decisão do usuário: Dockerfile e `fly.toml` prontos e testados localmente; o deploy (B1 a B4) e o G1 ficam para depois, sem data ([DEC-033](../decisoes.md))** (DEC-032) · Decisões: DEC-030 e DEC-031.
+Última atualização: 2026-11-07 16:51 (Recife) · Situação: **C0a inteira concluída (T1 a T10; G0 às 16h41). C0b parada por decisão do usuário: Dockerfile e `fly.toml` prontos e testados localmente; o deploy (B1 a B4) e o G1 ficam para depois, sem data, e a hospedagem voltou a `[PREENCHER]` ([DEC-033](../decisoes.md), [DEC-034](../decisoes.md)); por enquanto tudo roda localmente** (DEC-032) · Decisões: DEC-030 e DEC-031.
 **Rótulos:** sem rótulo, a decisão é do usuário (com a DEC). **[PROPOSTA]** é sugestão do agente. `[PREENCHER]` é o que falta, com o motivo.
 Fatos de terceiros vêm como [FATO] com fonte e data, [INFERÊNCIA] ou [NÃO ENCONTRADO]. **Toda hora é [PROPOSTA]** e nenhuma foi medida.
 

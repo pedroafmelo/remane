@@ -314,7 +314,7 @@ API oficial do WhatsApp Business. **Não pesquisei a política de bloqueio do Wh
 
 ## 12. Hospedagem do link público (Q3, requisito RE-07 e RN-10)
 
-**Escolhido na [DEC-030](decisoes.md) (07/11 16h22): Fly.io; o deploy foi adiado, a decidir mais para frente ([DEC-033](decisoes.md)).** Desenho: 1 máquina sempre ligada e 1 volume (`fly.toml` e deploy na C0b, [plano da C0](planos/camada-00-fundacao.md)). Antes, o usuário tinha dito "vamos ver isso depois" ([DEC-021](decisoes.md)). Restrições que a
+**Escolhido na [DEC-030](decisoes.md) (07/11 16h22): Fly.io; depois, o usuário adiou "tudo do deploy" e a escolha ficou em suspenso, `[PREENCHER]` ([DEC-033](decisoes.md), [DEC-034](decisoes.md)); por enquanto só local.** Desenho: 1 máquina sempre ligada e 1 volume (`fly.toml` e deploy na C0b, [plano da C0](planos/camada-00-fundacao.md)). Antes, o usuário tinha dito "vamos ver isso depois" ([DEC-021](decisoes.md)). Restrições que a
 escolha precisa cumprir: no ar de dom 08/11 13h00 a 17h30; sem dormir; pelo menos 1 GB de RAM `[INFERÊNCIA]`; um contêiner com
 Dockerfile multi-stage (build do React e FastAPI); estado pequeno que sobreviva a reinício e a reset da demo.
 

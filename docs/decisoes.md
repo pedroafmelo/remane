@@ -443,3 +443,12 @@ Formato:
 - **Motivo: [motivo não informado].**
 - **Alternativas consideradas:** nenhuma registrada.
 - **Consequências:** o G1 fica **pendente sem data** (`[PREENCHER]`) e o deploy de teste não ocorre na C0. **A escolha do Fly.io da [DEC-030](#dec-030--plano-da-c0-rodada-1-data-de-corte-nas-versões-flyio-c0b-com-a-frente-c-e-web-em-typescript) não foi desfeita nem reconfirmada:** o usuário não disse se a hospedagem em si volta a ser aberta (`[PREENCHER]`); `Dockerfile` e `fly.toml` ficam no repositório prontos, sem uso. Sem link público, RE-07 e RN-10 seguem em risco ([arquitetura.md](arquitetura.md), seção 17); a ponte do túnel do notebook continua sendo o plano B.
+
+## DEC-034 · Tudo do deploy fica para depois; por enquanto, testar e rodar localmente
+
+- 2026-11-07 16:53 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** depois da [DEC-033](#dec-033--deploy-adiado-decidir-mais-para-frente), o agente perguntou se a escolha do Fly.io da [DEC-030](#dec-030--plano-da-c0-rodada-1-data-de-corte-nas-versões-flyio-c0b-com-a-frente-c-e-web-em-typescript) continuava valendo ou se a hospedagem voltava a ficar aberta.
+- **Decisão (o que o usuário disse):** "Tudo do deploy vamos ver pra depois, vamos testar e rodar tudo localmente por enquanto."
+- **Motivo: [motivo não informado].**
+- **Alternativas consideradas:** as duas perguntadas (manter o Fly.io; reabrir a hospedagem); o usuário respondeu "tudo do deploy", o que o agente leu como **reabrir a hospedagem**, e **não** como confirmar o Fly.io.
+- **Consequências:** a hospedagem volta a `[PREENCHER]` (a parte da [DEC-030](#dec-030--plano-da-c0-rodada-1-data-de-corte-nas-versões-flyio-c0b-com-a-frente-c-e-web-em-typescript) sobre o Fly.io fica **em suspenso**, não substituída; as demais partes da DEC-030 valem). A C0b e o G1 ficam parados sem data; `Dockerfile` e `fly.toml` ficam no repositório como material pronto, sem uso. O desenvolvimento e a demonstração rodam só localmente (`uv run uvicorn` e `npm run dev`). O risco de RE-07 e RN-10 (link público estável) continua e deve voltar a ser decidido antes do G6 (dom 11h30); o túnel do notebook segue como plano B.
