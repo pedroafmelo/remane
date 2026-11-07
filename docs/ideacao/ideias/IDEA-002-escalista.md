@@ -2,9 +2,9 @@
 
 > Ficha de ideia. Origem: [proposta_escalista_converge_1.pdf](../../proposta_escalista_converge_1.pdf) (documento de
 > trabalho de 07/11/2026, versão 2), com os fatos corrigidos na Etapa 0 de 07/11/2026. Status e pontuação ficam em
-> [backlog-ideias.md](../backlog-ideias.md), não aqui. Rótulos: **[FATO]** (com fonte), **[INFERÊNCIA]**, **[HIPÓTESE]**.
+> [backlog-ideias.md](../backlog-ideias.md), não aqui. Rótulos: **[FATO]** (com fonte), **[INFERÊNCIA]**, **[HIPÓTESE]**. O PDF é base, não a fonte da verdade ([DEC-010](../../decisoes.md)).
 
-Última atualização: 2026-11-07 12:16 · Autoria: time (proposta); registro por Claude
+Última atualização: 2026-11-07 13:10 · Autoria: time (proposta); registro por Claude
 
 **Escolhida como direção (provisória)** em [DEC-003](../../decisoes.md); concorre ao Desafio Tako (frente DP). Filtros
 eliminatórios e rubrica ainda não foram aplicados: o Gate 2 faz isso. Pontuação no [backlog](../backlog-ideias.md).

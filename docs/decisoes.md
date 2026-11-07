@@ -1,6 +1,6 @@
 # Registro de decisões
 
-Última atualização: 2026-11-07 13:01. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
+Última atualização: 2026-11-07 13:10. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
 entrada:** se a decisão mudar, crie outra e marque a antiga como `substituída por DEC-NNN`. Use `/decisao` para registrar e
 propagar o efeito para as outras docs.
 
@@ -139,3 +139,17 @@ Formato:
 - **Decisão (o que o usuário disse):** (1) Gate 1 (ambiente) fechado: aprovou os dois MCPs, que passaram a "Connected", e pediu o push; (2) a IDEA-001 muda de `arquivada` para `descartada` ("essa ideia foi descartada"); (3) o tempo de 20 min para a etapa de requisitos está ok e o recorte foi aprovado; (4) ao final desta etapa, atualizar tudo e enviar um novo push.
 - **Motivo: [motivo não informado]** para descartar a IDEA-001.
 - **Consequências:** backlog, ficha da IDEA-001 e CLAUDE.md atualizados; [requisitos.md](requisitos.md) criado e **aguardando aprovação** (perguntas Q1 a Q8); o remoto já estava com o histórico limpo quando o agente tentou o push, e o histórico antigo (commit `16e1a5c`) foi removido do repositório local.
+
+## DEC-010 · O PDF é base, a política da empresa define as regras, e respostas aos requisitos
+
+- 2026-11-07 13:10 · Decidido por: usuário da sessão · Status: aceita
+- **Decisão (o que o usuário disse):**
+  - **O PDF do Escalista não é a fonte 100% da verdade, é uma base.** O que sair ao final do fluxo completo de definição (requisitos, negócio e técnica) será a verdade do projeto, que ainda pode mudar durante o desenvolvimento.
+  - **Generalização:** questões como a folga (regra dura ou média no mês) "dependerão da política da empresa". A maioria dos pontos deve ser generalizável, para o produto funcionar conforme a política de cada empresa e a lei. Resolve a Q1: a folga não é fixada, é parâmetro da política.
+  - **Conflito 2** (convenção em conflito com a emenda): "vamos definir ainda".
+  - **Conflito 3** (demo antes da vigência): o usuário lembrou que "temos até 13h de amanhã para finalizar tudo". Não houve decisão sobre o rótulo de vigência simulada: segue como pergunta.
+  - **Conflito 4** (Langfuse local e link público): "Ok". Junto com a Q2 ("Sim"), a tela de auditoria no app entra no escopo.
+  - **Conflito 5** (JEV): um colega do time tem acesso ao JEV. Segue em aberto se e onde usar.
+  - **Q6** (tipos de exceção obrigatórios na demo): "depende da política da empresa". Os tipos de exceção saem da política; os 3 da demo serão escolhidos quando existir a política fictícia da demo.
+- **Motivo:** o produto deve servir à política de cada empresa e à lei, e não a uma regra fixa do PDF.
+- **Consequências:** [requisitos.md](requisitos.md) atualizado (RF-22 de política parametrizável, RN-02 incluída, exceções derivadas da política, seção 9 com as respostas). Q3, Q4, Q5, Q7 e Q8 e os conflitos 2 e 3 seguem em aberto, e o documento continua sem aprovação.

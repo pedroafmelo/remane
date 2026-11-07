@@ -1,6 +1,6 @@
 # Requisitos do Escalista (IDEA-002)
 
-Última atualização: 2026-11-07 13:01 · Etapa: definição de requisitos ([DEC-005](decisoes.md)) · **Aprovação do usuário: pendente**
+Última atualização: 2026-11-07 13:10 · Etapa: definição de requisitos ([DEC-005](decisoes.md)) · **Aprovação do usuário: pendente**
 
 Este documento diz **o que o produto precisa fazer e provar**. Não cobre mercado, preço, concorrência nem pitch (etapa de
 negócio), nem stack, arquitetura ou contratos (etapa técnica). Ideia: [IDEA-002](ideacao/ideias/IDEA-002-escalista.md).
@@ -16,6 +16,7 @@ negócio), nem stack, arquitetura ou contratos (etapa técnica). Ideia: [IDEA-00
   lembretes e consulta; C2 atestado por imagem; C3 convenção em PDF; C4 WhatsApp real; C5 polimento visual. As prioridades
   vêm do PDF e do guia; não são decisão nova.
 - Número entre colchetes, como `[PREENCHER]`, é medida ou escolha que ainda não existe.
+- **Hierarquia das fontes ([DEC-010](decisoes.md)):** o PDF é uma base, não a verdade. A verdade do projeto é o que sair do fluxo completo de definição (requisitos, negócio e técnica), e ela ainda pode mudar durante o desenvolvimento. Onde este documento e o PDF divergem, vale este documento depois de aprovado.
 
 ## 1. Elegibilidade e submissão (RE)
 
@@ -38,7 +39,7 @@ negócio), nem stack, arquitetura ou contratos (etapa técnica). Ideia: [IDEA-00
 | ID | Requisito | Fonte | Prio. | Critério de aceite |
 |---|---|---|---|---|
 | RF-01 | Cartão de regras versionado, com vigência (44h; 42h a partir de ≈16/12/2026; 40h a partir de ≈dez/2027) e cláusula de origem em cada regra; o DP aprova uma vez | PDF§2.1, EC141 | M | Cada regra mostra origem e status (conferida, interpretação ou pendente); trocar a vigência muda a escala |
-| RF-02 | Regras duras do solver: jornada semanal, repouso semanal, interjornada de 11h, folga dominical, aprendiz sem turno noturno | PDF§2.4. As três últimas ainda sem conferência na CLT e no ECA (`INF`) | M | Escala gerada com 0 violações pelo verificador independente |
+| RF-02 | Regras do solver, cada uma parametrizável pela política (RF-22): jornada semanal, repouso semanal (mínimo por semana ou média no mês, conforme a política), interjornada de 11h, folga dominical, aprendiz sem turno noturno | PDF§2.4. As três últimas ainda sem conferência na CLT e no ECA (`INF`) | M | Escala gerada com 0 violações pelo verificador independente |
 | RF-03 | Entrada: quadro de pessoal (com telefone), demanda por faixa de 30 min, disponibilidade, banco de horas, férias, afastamentos | PDF§2.2, PDF§6 | M | Carga de uma rede pré-carregada, sem digitação |
 | RF-04 | Validação determinística dos dados, sem custo de modelo | PDF§2.3 | M | Dado inconsistente é recusado com o motivo |
 | RF-05 | Otimização: o solver cobre a demanda ao menor custo de hora extra sem violar regra dura; o modelo não calcula escala nem horas | PDF§2.4, PDF§9 | M | Mesma entrada gera a mesma escala; custo e cobertura vêm do solver |
@@ -58,11 +59,12 @@ negócio), nem stack, arquitetura ou contratos (etapa técnica). Ideia: [IDEA-00
 | RF-19 | Ler o atestado por imagem (OCR barato e visão só com baixa confiança) | PDF§3 | C2 | Sem isso, o atestado entra como texto |
 | RF-20 | Ler a convenção em PDF para gerar o cartão de regras | PDF§2.1 | C3 | Sem isso, as regras entram em YAML |
 | RF-21 | Ponte real do WhatsApp (whatsapp-web.js, chip dedicado, nunca número pessoal) | PDF§3, DEC-003 (e) | C4 | Sem isso, só o simulador |
+| RF-22 | Política da empresa parametrizável: cada empresa define, no cartão de regras, o que a convenção e a lei deixam em aberto (por exemplo repouso mínimo por semana ou média no mês, domingo, interjornada, tratamento e destino de cada exceção). Nenhuma regra de negócio fica fixa no código | DEC-010, EC141 art. 7º §2º | M | Trocar a política fictícia por outra muda a escala e as exceções sem alterar o código |
 
 ## 3. Exceções (RX)
 
 Cada exceção chega a uma fila com **motivo, evidência** (trecho da regra ou a mensagem), **opções com custo** e **quem decide**
-(G§3, G§4, PDF§4). Prioridade: **M** para pelo menos 3 tipos, propostos como RX-01, RX-05 e RX-08 (Q6); **S** para os demais.
+(G§3, G§4, PDF§4). Os tipos e o destino de cada exceção **saem da política da empresa** (RF-22, [DEC-010](decisoes.md)). Prioridade: **M** para pelo menos 3 tipos na demo; quais, depende da política fictícia da demo (Q6, respondida). Candidatas: RX-01, RX-05 e RX-08. **S** para os demais.
 
 | ID | Exceção | Destino | Fonte |
 |---|---|---|---|
@@ -95,7 +97,7 @@ Cada exceção chega a uma fila com **motivo, evidência** (trecho da regra ou a
 | ID | Requisito | Fonte | Prio. | Critério de aceite |
 |---|---|---|---|---|
 | RN-01 | Rastro por decisão, desde a primeira hora: cada restrição cita a cláusula de origem e cada evento, a mensagem que o gerou | PDF§5, CLAUDE.md, DEC-005 (Langfuse self-hosted) | M | Dado um evento, dá para reconstruir regra, mensagem e decisão |
-| RN-02 | O rastro é verificável por quem testa o link público (tela de auditoria no app), mesmo que o Langfuse rode só na máquina local | `INF` a partir de G§3 e DEC-005 | S | Rastro de um evento em até 2 cliques (Q2) |
+| RN-02 | O rastro é verificável por quem testa o link público (tela de auditoria no app), mesmo que o Langfuse rode só na máquina local | `INF` a partir de G§3 e DEC-005 | S, **incluída no escopo** (Q2: Sim) | Rastro de um evento em até 2 cliques |
 | RN-03 | Custo por execução e latência medidos no trace; estimativa de tempo manual sempre rotulada como premissa | G§4, REG 7 | M | Painel mostra o número medido |
 | RN-04 | Evals pequenos e honestos: cenários de escala com violação plantada e eventos difíceis, mais atestados sintéticos (legíveis, ruidosos, inconsistentes). Métricas: violações não detectadas (meta zero), cobertura, custo contra a planilha e acerto na leitura do atestado | PDF§5, CLAUDE.md | M | Rodam com um comando e imprimem as quatro métricas. Alvo do PDF: 30 cenários (Q5) |
 | RN-05 | Confiabilidade: falha de ferramenta, modelo ou solver não derruba o fluxo e vira exceção (RX-12) | G§4 | M | Teste que derruba cada dependência |
@@ -141,11 +143,23 @@ exceção ponta a ponta (seção 3).
 
 | # | Pergunta | Recomendação do agente |
 |---|---|---|
-| Q1 | Conflito 1: a folga entra como regra dura "2 por semana", ou como média compensável? | Dura, a mais restritiva, rotulada como interpretação |
-| Q2 | Incluir a tela de auditoria no app (RN-02), que é trabalho a mais? | Sim, é a única prova que o jurado vê pelo link |
+| Q1 | Conflito 1: a folga entra como regra dura "2 por semana", ou como média compensável? | ~~Dura, a mais restritiva~~. **Respondida:** é parâmetro da política da empresa (RF-22, DEC-010) |
+| Q2 | Incluir a tela de auditoria no app (RN-02), que é trabalho a mais? | Sim, é a única prova que o jurado vê pelo link. **Respondida: Sim** |
 | Q3 | Quando e como resolvemos a hospedagem (RE-07, RN-10)? | Na etapa técnica, com opções pesquisadas e com fonte |
 | Q4 | O JEV entra ou não (conflito 5)? | Não entra sem um uso concreto, pelo custo de um segundo provedor |
 | Q5 | Mínimo de cenários de eval, além do alvo de 30 do PDF? | [PREENCHER]: sem parâmetro, escolho depois de ver o tempo da etapa técnica |
-| Q6 | Quais 3 tipos de exceção são obrigatórios na demo? | RX-01, RX-05 e RX-08 |
+| Q6 | Quais 3 tipos de exceção são obrigatórios na demo? | RX-01, RX-05 e RX-08. **Respondida:** depende da política da empresa; escolher quando a política fictícia da demo existir |
 | Q7 | O fechamento com ponto (RF-13) é desejável ou cortável? | Desejável |
 | Q8 | Aprova este documento, com as respostas acima? | |
+
+## 9. Respostas do usuário (2026-11-07 13:10) e o que ainda está aberto
+
+| Item | Resposta | Efeito |
+|---|---|---|
+| Conflito 1 e Q1 (folga) | Depende da política da empresa; a maioria dos pontos deve ser generalizável, conforme a política de cada empresa e a lei | RF-22 criado; a folga não é fixada |
+| Conflito 2 (convenção em conflito) | "Vamos definir ainda"; o PDF é base, não a verdade | **Em aberto**. Hierarquia das fontes registrada em "Como ler" |
+| Conflito 3 (demo antes da vigência) | Lembrou que "temos até 13h de amanhã para finalizar tudo" | **Sem decisão** sobre o rótulo "vigência simulada" |
+| Conflito 4 e Q2 (rastro e link) | "Ok" e "Sim" | RN-02 incluída no escopo |
+| Conflito 5 (JEV) | Um colega do time tem acesso | **Em aberto**: se e onde usar |
+| Q6 (exceções da demo) | Depende da política da empresa | RX derivadas da política; escolher com a política fictícia da demo |
+| Q3, Q4, Q5, Q7, Q8 | Sem resposta ainda | **Em aberto** |

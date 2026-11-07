@@ -5,6 +5,7 @@ Porto Digital, Recife. Este arquivo é o ponto de entrada para quem (humano ou a
 
 **Estado atual:** fase, ideia escolhida e próximas ações estão em
 [docs/estado-do-projeto.md](docs/estado-do-projeto.md). Confira lá antes de agir, porque este arquivo não muda a cada hora.
+O PDF do Escalista é base, não a verdade: a verdade do projeto é o que sair do fluxo de definição ([DEC-010](docs/decisoes.md)).
 
 ## Missão nesta fase
 

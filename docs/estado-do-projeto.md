@@ -1,8 +1,8 @@
 # Estado do projeto
 
 > **Fonte da verdade do momento.** Atualize ao fim de cada bloco de trabalho (ver "Documentação viva" no
-> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 13:01** (Recife), por Claude, ao escrever os requisitos
-> (DEC-009).
+> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 13:10** (Recife), por Claude, ao registrar as respostas aos requisitos
+> (DEC-010).
 
 ## Fase atual
 
@@ -36,7 +36,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
       implementação ([DEC-005](decisoes.md)).
 - [ ] Time confirmar as premissas (a) e (e) da DEC-003 (as demais foram resolvidas ou viraram pergunta) e preencher a tabela do time.
 - [x] Remediação do histórico concluída ([DEC-007](decisoes.md)): remoto e repositório local limpos.
-- [ ] Aprovar [requisitos.md](requisitos.md) (perguntas Q1 a Q8) e passar à etapa de negócio.
+- [ ] Responder Q3, Q4, Q5, Q7 e Q8 e os conflitos 2 e 3 de [requisitos.md](requisitos.md) (seção 9), aprová-lo e passar à etapa de negócio.
 - [ ] Confirmar no WhatsApp os pontos em aberto abaixo.
 - [ ] Decidir se o time concorre aos créditos AWS (exige domínio próprio e e-mail corporativo; ver
       [contexto-hackathon.md](contexto-hackathon.md)).
@@ -56,7 +56,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
 | 9 | Domínio próprio (créditos AWS) | Time | O time não tem; só importa se ficar no pódio |
 | 10 | Onde roda o Langfuse self-hosted, sem servidor | Time | Em aberto; sem servidor, só na máquina local ([DEC-005](decisoes.md)) |
 | 11 | Como remediar o histórico do scaffold (commit inicial `16e1a5c`, remoto privado) | Time | Resolvida ([DEC-007](decisoes.md), [DEC-008](decisoes.md)): histórico recriado e publicado no `main` do remoto; branch antigo e commit `16e1a5c` removidos do repositório local. Os outros 3 colaboradores precisam atualizar o clone |
-| 12 | Onde usar o JEV (TypeSafe), se for usar | Time | "Vamos ver" ([DEC-006](decisoes.md)); segundo provedor de inferência, exige declaração e custo medido |
+| 12 | Onde usar o JEV (TypeSafe), se for usar | Time | "Vamos ver" ([DEC-006](decisoes.md)); segundo provedor de inferência, exige declaração e custo medido; um colega do time tem acesso ([DEC-010](decisoes.md)) |
 
 ## Riscos atuais
 
@@ -83,6 +83,7 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 
 | Data e hora | O quê | Por |
 |---|---|---|
+| 2026-11-07 13:10 | [DEC-010](decisoes.md): o PDF é base, não a verdade; política da empresa define as regras (RF-22 novo); tela de auditoria incluída (RN-02); exceções derivadas da política; conflitos 2 e 3 e Q3, Q4, Q5, Q7, Q8 em aberto; `requisitos.md` com seção 9 | Claude |
 | 2026-11-07 13:01 | [DEC-009](decisoes.md): Gate 1 fechado (MCPs conectados); IDEA-001 descartada; [requisitos.md](requisitos.md) criado (11 de elegibilidade, 21 funcionais, 12 de exceção, 6 de atos humanos, 10 não funcionais; 9 conflitos entre fontes; 8 perguntas); histórico antigo removido do repositório local | Claude |
 | 2026-11-07 12:54 | [DEC-008](decisoes.md): identidade do git (conta `pedrohmvv`), dois commits no `clean-main`, `git` e `gh` liberados no `settings.json`, PDF da ideia antiga fora do git, termo de terceiro retirado das docs; push para o remoto bloqueado pelo modo automático | Claude |
 | 2026-11-07 12:44 | [DEC-007](decisoes.md): opção A, recriar o histórico. `LICENSE` vazio, `.vscode/settings.json` e `uv.lock` removidos; `pyproject.toml` reescrito (só fastapi, uvicorn, pydantic, pydantic-settings e dev pytest, pytest-cov, ruff); `uv.lock` regenerado (26 pacotes); branch órfão `clean-main` com índice limpo; sem commit (falta identidade do git) | Claude |
