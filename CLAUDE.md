@@ -112,6 +112,7 @@ docs/
   entrega.md                       submissão, pitch de 3 min e roteiro de demo
   ideacao/                         como ideiar, critérios, backlog, template e fichas das ideias
   arquivo/                         material de ideias arquivadas (nada é apagado)
+data/regras/                       regras em YAML: lei/ (EC 141), convencao/ e politica/ (fictícias)
 src/  tests/                       código (a partir da decisão)
 ```
 
