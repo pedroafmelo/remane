@@ -1,6 +1,6 @@
 # Requisitos do Escalista (IDEA-002)
 
-Última atualização: 2026-11-07 13:10 · Etapa: definição de requisitos ([DEC-005](decisoes.md)) · **Aprovação do usuário: pendente**
+Última atualização: 2026-11-07 13:13 · Etapa: definição de requisitos ([DEC-005](decisoes.md)) · **Aprovado pelo usuário em 2026-11-07 13:13** ([DEC-011](decisoes.md)), com pendências na seção 9
 
 Este documento diz **o que o produto precisa fazer e provar**. Não cobre mercado, preço, concorrência nem pitch (etapa de
 negócio), nem stack, arquitetura ou contratos (etapa técnica). Ideia: [IDEA-002](ideacao/ideias/IDEA-002-escalista.md).
@@ -102,10 +102,11 @@ Cada exceção chega a uma fila com **motivo, evidência** (trecho da regra ou a
 | RN-04 | Evals pequenos e honestos: cenários de escala com violação plantada e eventos difíceis, mais atestados sintéticos (legíveis, ruidosos, inconsistentes). Métricas: violações não detectadas (meta zero), cobertura, custo contra a planilha e acerto na leitura do atestado | PDF§5, CLAUDE.md | M | Rodam com um comando e imprimem as quatro métricas. Alvo do PDF: 30 cenários (Q5) |
 | RN-05 | Confiabilidade: falha de ferramenta, modelo ou solver não derruba o fluxo e vira exceção (RX-12) | G§4 | M | Teste que derruba cada dependência |
 | RN-06 | Privacidade do atestado: CID nunca persistido, logado nem enviado ao trace; imagem não persistida; aviso "use só dado fictício" no canal | PDF§3, DEC-003 (f), DEC-006 | M | Teste automático falha se CID ou imagem aparecer em banco, log ou trace |
-| RN-07 | Toda a inferência via Featherless; outro provedor (por exemplo o JEV) exige declaração e custo medido | DEC-005, DEC-006 | M | Painel de custo soma um provedor só, ou todos declarados |
+| RN-07 | Toda a inferência via Featherless; outro provedor exige declaração e custo medido (o JEV foi descartado, [DEC-011](decisoes.md)) | DEC-005, DEC-006 | M | Painel de custo soma um provedor só, ou todos declarados |
 | RN-08 | Interface e docs em português; código e commits em inglês | CLAUDE.md | M | |
 | RN-09 | Nenhuma interpretação jurídica apresentada como certa: toda regra tem status (conferida, interpretação ou pendente) | PDF§9, REG 7 | M | O status aparece na tela |
 | RN-10 | Link no ar da submissão (08/11 13h00) até o fim do Demo Day (17h30), inclusive durante o teste dos jurados | `INF` a partir de G§7 a G§9 | M | Depende da hospedagem (Q3) |
+| RN-11 | Sempre que a regra de 42h ou 40h estiver ativa na demo, a tela mostra \"vigência simulada a partir de ≈16/12/2026 (conta nossa)\" | DEC-011, conflito 3 | M | O rótulo aparece junto à vigência ativa |
 
 ## 6. Critérios de aceite
 
@@ -145,12 +146,12 @@ exceção ponta a ponta (seção 3).
 |---|---|---|
 | Q1 | Conflito 1: a folga entra como regra dura "2 por semana", ou como média compensável? | ~~Dura, a mais restritiva~~. **Respondida:** é parâmetro da política da empresa (RF-22, DEC-010) |
 | Q2 | Incluir a tela de auditoria no app (RN-02), que é trabalho a mais? | Sim, é a única prova que o jurado vê pelo link. **Respondida: Sim** |
-| Q3 | Quando e como resolvemos a hospedagem (RE-07, RN-10)? | Na etapa técnica, com opções pesquisadas e com fonte |
-| Q4 | O JEV entra ou não (conflito 5)? | Não entra sem um uso concreto, pelo custo de um segundo provedor |
-| Q5 | Mínimo de cenários de eval, além do alvo de 30 do PDF? | [PREENCHER]: sem parâmetro, escolho depois de ver o tempo da etapa técnica |
+| Q3 | Quando e como resolvemos a hospedagem (RE-07, RN-10)? | Na etapa técnica, com opções pesquisadas e com fonte. **Encaminhada à etapa técnica** |
+| Q4 | O JEV entra ou não (conflito 5)? | Não entra sem um uso concreto, pelo custo de um segundo provedor. **Respondida: não, JEV descartado** ([DEC-011](decisoes.md)) |
+| Q5 | Mínimo de cenários de eval, além do alvo de 30 do PDF? | [PREENCHER]: sem parâmetro, escolho depois de ver o tempo da etapa técnica. **Encaminhada à etapa técnica** |
 | Q6 | Quais 3 tipos de exceção são obrigatórios na demo? | RX-01, RX-05 e RX-08. **Respondida:** depende da política da empresa; escolher quando a política fictícia da demo existir |
-| Q7 | O fechamento com ponto (RF-13) é desejável ou cortável? | Desejável |
-| Q8 | Aprova este documento, com as respostas acima? | |
+| Q7 | O fechamento com ponto (RF-13) é desejável ou cortável? | Desejável. **Aceita como escrito pela aprovação** |
+| Q8 | Aprova este documento, com as respostas acima? | **Respondida: aprovado** em 2026-11-07 13:13 |
 
 ## 9. Respostas do usuário (2026-11-07 13:10) e o que ainda está aberto
 
@@ -158,8 +159,8 @@ exceção ponta a ponta (seção 3).
 |---|---|---|
 | Conflito 1 e Q1 (folga) | Depende da política da empresa; a maioria dos pontos deve ser generalizável, conforme a política de cada empresa e a lei | RF-22 criado; a folga não é fixada |
 | Conflito 2 (convenção em conflito) | "Vamos definir ainda"; o PDF é base, não a verdade | **Em aberto**. Hierarquia das fontes registrada em "Como ler" |
-| Conflito 3 (demo antes da vigência) | Lembrou que "temos até 13h de amanhã para finalizar tudo" | **Sem decisão** sobre o rótulo "vigência simulada" |
+| Conflito 3 (demo antes da vigência) | Lembrou que "temos até 13h de amanhã para finalizar tudo" | **Resolvido** em [DEC-011](decisoes.md): o rótulo "vigência simulada" entra (RN-11) |
 | Conflito 4 e Q2 (rastro e link) | "Ok" e "Sim" | RN-02 incluída no escopo |
-| Conflito 5 (JEV) | Um colega do time tem acesso | **Em aberto**: se e onde usar |
+| Conflito 5 (JEV) | Um colega do time tem acesso; depois: "esqueça o JEV" | **Resolvido** em [DEC-011](decisoes.md): JEV descartado |
 | Q6 (exceções da demo) | Depende da política da empresa | RX derivadas da política; escolher com a política fictícia da demo |
-| Q3, Q4, Q5, Q7, Q8 | Sem resposta ainda | **Em aberto** |
+| Q3, Q4, Q5, Q7, Q8 | Q4 e Q8 respondidas; Q7 aceita como escrito; Q3 e Q5 vão à etapa técnica | Q3 e Q5 **em aberto** para a etapa técnica |

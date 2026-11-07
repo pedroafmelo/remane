@@ -1,15 +1,15 @@
 # Estado do projeto
 
 > **Fonte da verdade do momento.** Atualize ao fim de cada bloco de trabalho (ver "Documentação viva" no
-> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 13:10** (Recife), por Claude, ao registrar as respostas aos requisitos
-> (DEC-010).
+> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 13:13** (Recife), por Claude, ao fechar o gate de requisitos
+> (DEC-011).
 
 ## Fase atual
 
 **2 · Definição (em andamento).** Fases: 1 Ideação → 2 Definição → 3 Construção → 4 Medição e polimento → 5 Submissão →
 6 Demo Day. A ideia foi escolhida às 12h16 de sábado, de forma provisória ([DEC-003](decisoes.md)). Nesta fase, o usuário
 aprova em gates: ambiente, requisitos, negócio e técnica ([DEC-005](decisoes.md)). `produto.md` e `arquitetura.md` só são
-criados depois do gate de negócio.
+criados depois do gate de negócio. Gates fechados: ambiente ([DEC-009](decisoes.md)) e requisitos ([DEC-011](decisoes.md)).
 
 ## Ideia escolhida
 
@@ -36,7 +36,8 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
       implementação ([DEC-005](decisoes.md)).
 - [ ] Time confirmar as premissas (a) e (e) da DEC-003 (as demais foram resolvidas ou viraram pergunta) e preencher a tabela do time.
 - [x] Remediação do histórico concluída ([DEC-007](decisoes.md)): remoto e repositório local limpos.
-- [ ] Responder Q3, Q4, Q5, Q7 e Q8 e os conflitos 2 e 3 de [requisitos.md](requisitos.md) (seção 9), aprová-lo e passar à etapa de negócio.
+- [x] Requisitos aprovados ([DEC-011](decisoes.md)). Pendências para a etapa técnica: hospedagem (Q3), mínimo de evals (Q5) e conflito 2.
+- [ ] Etapa de negócio (40 min): quem paga, concorrência, filtros eliminatórios e rubrica, pitch. Gate 2 com o usuário.
 - [ ] Confirmar no WhatsApp os pontos em aberto abaixo.
 - [ ] Decidir se o time concorre aos créditos AWS (exige domínio próprio e e-mail corporativo; ver
       [contexto-hackathon.md](contexto-hackathon.md)).
@@ -56,7 +57,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
 | 9 | Domínio próprio (créditos AWS) | Time | O time não tem; só importa se ficar no pódio |
 | 10 | Onde roda o Langfuse self-hosted, sem servidor | Time | Em aberto; sem servidor, só na máquina local ([DEC-005](decisoes.md)) |
 | 11 | Como remediar o histórico do scaffold (commit inicial `16e1a5c`, remoto privado) | Time | Resolvida ([DEC-007](decisoes.md), [DEC-008](decisoes.md)): histórico recriado e publicado no `main` do remoto; branch antigo e commit `16e1a5c` removidos do repositório local. Os outros 3 colaboradores precisam atualizar o clone |
-| 12 | Onde usar o JEV (TypeSafe), se for usar | Time | "Vamos ver" ([DEC-006](decisoes.md)); segundo provedor de inferência, exige declaração e custo medido; um colega do time tem acesso ([DEC-010](decisoes.md)) |
+| 12 | Onde usar o JEV (TypeSafe), se for usar | Time | Resolvida: JEV descartado ([DEC-011](decisoes.md)) |
 
 ## Riscos atuais
 
@@ -83,6 +84,7 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 
 | Data e hora | O quê | Por |
 |---|---|---|
+| 2026-11-07 13:13 | [DEC-011](decisoes.md): requisitos aprovados; rótulo de vigência simulada (RN-11); JEV descartado; Q3 e Q5 e conflito 2 encaminhados à etapa técnica; etapa de negócio aberta | Claude |
 | 2026-11-07 13:10 | [DEC-010](decisoes.md): o PDF é base, não a verdade; política da empresa define as regras (RF-22 novo); tela de auditoria incluída (RN-02); exceções derivadas da política; conflitos 2 e 3 e Q3, Q4, Q5, Q7, Q8 em aberto; `requisitos.md` com seção 9 | Claude |
 | 2026-11-07 13:01 | [DEC-009](decisoes.md): Gate 1 fechado (MCPs conectados); IDEA-001 descartada; [requisitos.md](requisitos.md) criado (11 de elegibilidade, 21 funcionais, 12 de exceção, 6 de atos humanos, 10 não funcionais; 9 conflitos entre fontes; 8 perguntas); histórico antigo removido do repositório local | Claude |
 | 2026-11-07 12:54 | [DEC-008](decisoes.md): identidade do git (conta `pedrohmvv`), dois commits no `clean-main`, `git` e `gh` liberados no `settings.json`, PDF da ideia antiga fora do git, termo de terceiro retirado das docs; push para o remoto bloqueado pelo modo automático | Claude |

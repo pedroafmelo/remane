@@ -1,6 +1,6 @@
 # Registro de decisões
 
-Última atualização: 2026-11-07 13:10. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
+Última atualização: 2026-11-07 13:13. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
 entrada:** se a decisão mudar, crie outra e marque a antiga como `substituída por DEC-NNN`. Use `/decisao` para registrar e
 propagar o efeito para as outras docs.
 
@@ -57,7 +57,7 @@ Formato:
   - (b) Toda a inferência do produto passa pela Featherless; o Claude Code é usado só no desenvolvimento.
     **[confirmada pelo usuário em DEC-005]**
   - (c) Langfuse em nuvem (cloud), não self-host. **[substituída por DEC-005: self-hosted]**
-  - (d) JEV/TypeSafe descartado (não é necessário para um solver determinístico). **[não confirmada: o usuário disse "vamos ver"; ver DEC-006]**
+  - (d) JEV/TypeSafe descartado (não é necessário para um solver determinístico). **[não confirmada em DEC-006; confirmada em DEC-011: JEV descartado]**
   - (e) A ponte do WhatsApp é um spike de 1 hora com critério de abandono; o simulador de celular é o caminho padrão.
   - (f) O número do bot mostra o aviso "use só dado fictício" e a imagem do atestado não é persistida. **[confirmada pelo usuário em DEC-006]**
 
@@ -153,3 +153,10 @@ Formato:
   - **Q6** (tipos de exceção obrigatórios na demo): "depende da política da empresa". Os tipos de exceção saem da política; os 3 da demo serão escolhidos quando existir a política fictícia da demo.
 - **Motivo:** o produto deve servir à política de cada empresa e à lei, e não a uma regra fixa do PDF.
 - **Consequências:** [requisitos.md](requisitos.md) atualizado (RF-22 de política parametrizável, RN-02 incluída, exceções derivadas da política, seção 9 com as respostas). Q3, Q4, Q5, Q7 e Q8 e os conflitos 2 e 3 seguem em aberto, e o documento continua sem aprovação.
+
+## DEC-011 · Requisitos aprovados, vigência simulada rotulada e JEV descartado
+
+- 2026-11-07 13:13 · Decidido por: usuário da sessão · Status: aceita
+- **Decisão (o que o usuário disse):** (1) aprova o [requisitos.md](requisitos.md), com as pendências marcadas; (2) a tela mostra o rótulo "vigência simulada a partir de ≈16/12/2026" (conflito 3: "Sim"); (3) "esqueça o JEV": o JEV está descartado.
+- **Motivo: [motivo não informado]** para descartar o JEV. Pelo texto do usuário, a prioridade é fechar o gate logo.
+- **Consequências:** gate de ambiente já fechado ([DEC-009](#dec-009--gate-1-fechado-idea-001-descartada-e-início-dos-requisitos)) e gate de requisitos fechado agora; RN-11 criado (rótulo de vigência simulada); RN-07 mantém "toda a inferência via Featherless", sem JEV; a Q4 e o conflito 5 estão resolvidos. A Q7 fica como escrito no documento (RF-13 desejável). **Pendências encaminhadas:** hospedagem (Q3) e mínimo de evals (Q5) vão para a etapa técnica; o conflito 2 (convenção em conflito com a emenda) segue "a definir". Próxima etapa: negócio.
