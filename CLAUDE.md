@@ -10,8 +10,7 @@ Porto Digital, Recife. Este arquivo é o ponto de entrada para quem (humano ou a
 
 Ajudar o time a chegar, rápido, a **uma ideia que seja boa de negócio, executável em cerca de 11 horas de hacking e
 demonstrável a jurados que vão testá-la**. Depois da decisão, ajudar a detalhar e construir. A ideia anterior
-(recuperação de depósitos judiciais) foi arquivada em [docs/arquivo/](docs/arquivo/ideia-001-recuperacao-depositos/); pode voltar ao
-páreo como qualquer outra.
+(recuperação de depósitos judiciais) foi descartada ([DEC-009](docs/decisoes.md)); o material segue em [docs/arquivo/](docs/arquivo/ideia-001-recuperacao-depositos/).
 
 Leia, nesta ordem: [estado](docs/estado-do-projeto.md), [como ideiar](docs/ideacao/como-ideiar.md),
 [critérios](docs/ideacao/criterios.md), [backlog de ideias](docs/ideacao/backlog-ideias.md),
@@ -106,6 +105,7 @@ docs/
   contexto-hackathon.md            resumo operacional do evento
   regras-e-integridade.md          regras de elegibilidade e interpretações do time
   plano-de-horas.md                cronograma com gates de decisão
+  requisitos.md                    requisitos funcionais, de exceção, não funcionais e de aceite
   decisoes.md                      registro de decisões (DEC-NNN)
   declaracao-ferramentas.md        lista de ferramentas, modelos e APIs de terceiros (vai para a submissão)
   entrega.md                       submissão, pitch de 3 min e roteiro de demo

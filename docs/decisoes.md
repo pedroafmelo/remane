@@ -1,6 +1,6 @@
 # Registro de decisões
 
-Última atualização: 2026-11-07 12:54. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
+Última atualização: 2026-11-07 13:01. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
 entrada:** se a decisão mudar, crie outra e marque a antiga como `substituída por DEC-NNN`. Use `/decisao` para registrar e
 propagar o efeito para as outras docs.
 
@@ -132,3 +132,10 @@ Formato:
 - **Motivo: [motivo não informado]** para a conta escolhida e para o uso livre.
 - **Feito:** identidade local do git (conta `pedrohmvv`, e-mail noreply); dois commits no branch local `clean-main`; o termo do projeto de origem do template foi retirado das docs (clean room). A tentativa de pré-aprovar os MCPs com `enabledMcpjsonServers` no `settings.json` do projeto não surtiu efeito e foi retirada: a aprovação é feita pelo usuário, no `claude`.
 - **Pendente:** o push que sobrescreve o `main` do remoto (o repositório é de `pedroafmelo`, e o usuário tem push, sem admin, então não dá para apagar e recriar). Depois dele: limpeza local do histórico antigo. **Impacto:** os outros 3 colaboradores do repositório precisam atualizar o clone (reclonar, ou `git fetch` e `git reset --hard origin/main`).
+
+## DEC-009 · Gate 1 fechado, IDEA-001 descartada e início dos requisitos
+
+- 2026-11-07 13:01 · Decidido por: usuário da sessão · Status: aceita
+- **Decisão (o que o usuário disse):** (1) Gate 1 (ambiente) fechado: aprovou os dois MCPs, que passaram a "Connected", e pediu o push; (2) a IDEA-001 muda de `arquivada` para `descartada` ("essa ideia foi descartada"); (3) o tempo de 20 min para a etapa de requisitos está ok e o recorte foi aprovado; (4) ao final desta etapa, atualizar tudo e enviar um novo push.
+- **Motivo: [motivo não informado]** para descartar a IDEA-001.
+- **Consequências:** backlog, ficha da IDEA-001 e CLAUDE.md atualizados; [requisitos.md](requisitos.md) criado e **aguardando aprovação** (perguntas Q1 a Q8); o remoto já estava com o histórico limpo quando o agente tentou o push, e o histórico antigo (commit `16e1a5c`) foi removido do repositório local.

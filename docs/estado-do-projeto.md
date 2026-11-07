@@ -1,8 +1,8 @@
 # Estado do projeto
 
 > **Fonte da verdade do momento.** Atualize ao fim de cada bloco de trabalho (ver "Documentação viva" no
-> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 12:54** (Recife), por Claude, ao fazer os commits limpos
-> (DEC-008).
+> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 13:01** (Recife), por Claude, ao escrever os requisitos
+> (DEC-009).
 
 ## Fase atual
 
@@ -35,7 +35,8 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
 - [ ] Fluxo com o usuário, com gate em cada etapa: ambiente (Gate 1, falta fechar) → requisitos → negócio → técnica →
       implementação ([DEC-005](decisoes.md)).
 - [ ] Time confirmar as premissas (a) e (e) da DEC-003 (as demais foram resolvidas ou viraram pergunta) e preencher a tabela do time.
-- [ ] Concluir a remediação do histórico ([DEC-007](decisoes.md)): falta o push para o `main` do remoto e a limpeza local.
+- [x] Remediação do histórico concluída ([DEC-007](decisoes.md)): remoto e repositório local limpos.
+- [ ] Aprovar [requisitos.md](requisitos.md) (perguntas Q1 a Q8) e passar à etapa de negócio.
 - [ ] Confirmar no WhatsApp os pontos em aberto abaixo.
 - [ ] Decidir se o time concorre aos créditos AWS (exige domínio próprio e e-mail corporativo; ver
       [contexto-hackathon.md](contexto-hackathon.md)).
@@ -54,7 +55,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
 | 8 | Resgate dos US$ 25 da Featherless por integrante | Time | Ninguém resgatou ainda. Link e código estão só no guia original (redigidos na cópia local). O código vence em 08/11 e tem limite de resgates |
 | 9 | Domínio próprio (créditos AWS) | Time | O time não tem; só importa se ficar no pódio |
 | 10 | Onde roda o Langfuse self-hosted, sem servidor | Time | Em aberto; sem servidor, só na máquina local ([DEC-005](decisoes.md)) |
-| 11 | Como remediar o histórico do scaffold (commit inicial `16e1a5c`, remoto privado) | Time | Decidida: opção A ([DEC-007](decisoes.md)). Dois commits feitos no branch local `clean-main`, com a conta do usuário ([DEC-008](decisoes.md)). **Falta:** o `git push --force-with-lease` para o `main` do remoto, bloqueado pelo modo automático; o usuário roda ou libera. Depois: limpeza local e aviso aos outros 3 colaboradores |
+| 11 | Como remediar o histórico do scaffold (commit inicial `16e1a5c`, remoto privado) | Time | Resolvida ([DEC-007](decisoes.md), [DEC-008](decisoes.md)): histórico recriado e publicado no `main` do remoto; branch antigo e commit `16e1a5c` removidos do repositório local. Os outros 3 colaboradores precisam atualizar o clone |
 | 12 | Onde usar o JEV (TypeSafe), se for usar | Time | "Vamos ver" ([DEC-006](decisoes.md)); segundo provedor de inferência, exige declaração e custo medido |
 
 ## Riscos atuais
@@ -82,6 +83,7 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 
 | Data e hora | O quê | Por |
 |---|---|---|
+| 2026-11-07 13:01 | [DEC-009](decisoes.md): Gate 1 fechado (MCPs conectados); IDEA-001 descartada; [requisitos.md](requisitos.md) criado (11 de elegibilidade, 21 funcionais, 12 de exceção, 6 de atos humanos, 10 não funcionais; 9 conflitos entre fontes; 8 perguntas); histórico antigo removido do repositório local | Claude |
 | 2026-11-07 12:54 | [DEC-008](decisoes.md): identidade do git (conta `pedrohmvv`), dois commits no `clean-main`, `git` e `gh` liberados no `settings.json`, PDF da ideia antiga fora do git, termo de terceiro retirado das docs; push para o remoto bloqueado pelo modo automático | Claude |
 | 2026-11-07 12:44 | [DEC-007](decisoes.md): opção A, recriar o histórico. `LICENSE` vazio, `.vscode/settings.json` e `uv.lock` removidos; `pyproject.toml` reescrito (só fastapi, uvicorn, pydantic, pydantic-settings e dev pytest, pytest-cov, ruff); `uv.lock` regenerado (26 pacotes); branch órfão `clean-main` com índice limpo; sem commit (falta identidade do git) | Claude |
 | 2026-11-07 12:35 | [DEC-006](decisoes.md): respostas 12 a 15 (JEV em aberto, aviso de dado fictício confirmado, sem validação externa, conectores só se necessários) e origem do scaffold: template de um amigo, entra no clean room; auditoria do commit inicial (31 arquivos, 10 citam "[termo de terceiro omitido por clean room]", remoto privado); perguntas 11 e 12 abertas; `declaracao-ferramentas.md` atualizada | Claude |

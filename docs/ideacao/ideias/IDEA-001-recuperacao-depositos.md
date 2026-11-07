@@ -1,7 +1,7 @@
 # IDEA-001 · Analista de recuperação de depósitos judiciais
 
-Status: **arquivada** (o time decidiu mudar de ideia em 07/11/2026; motivo detalhado não informado, ver
-[DEC-001](../../decisoes.md)). Última atualização: 2026-11-07 11:55.
+Status: **descartada** (antes: arquivada, [DEC-009](../../decisoes.md)) (o time decidiu mudar de ideia em 07/11/2026; motivo detalhado não informado, ver
+[DEC-001](../../decisoes.md)). Última atualização: 2026-11-07 13:01.
 
 Material completo, preservado (só com aviso de arquivamento no topo e links ajustados), em
 [arquivo/ideia-001-recuperacao-depositos/](../../arquivo/ideia-001-recuperacao-depositos/):

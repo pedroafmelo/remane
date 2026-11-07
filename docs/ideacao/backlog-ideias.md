@@ -1,6 +1,6 @@
 # Backlog de ideias
 
-Última atualização: 2026-11-07 12:16. Atualizado por `/nova-ideia`, `/avaliar-ideias` e `/decisao`. Nada é apagado: ideia
+Última atualização: 2026-11-07 13:01. Atualizado por `/nova-ideia`, `/avaliar-ideias` e `/decisao`. Nada é apagado: ideia
 que sai muda de status.
 
 **Status:** `candidata` → `finalista` → `escolhida`. Saídas: `eliminada` (reprovou em filtro, com motivo),
@@ -13,7 +13,7 @@ informação suficiente. `—` = ainda não avaliada.
 
 | ID | Ideia (1 frase) | Status | Filtros | A | B | C | D | Total | Risco | Ficha |
 |---|---|---|---|---|---|---|---|---|---|---|
-| IDEA-001 | Digital worker que conduz a recuperação de depósitos judiciais de ponta a ponta para escritório ou jurídico de empresa; o advogado aprova só exceções e atos jurídicos | `arquivada` (time mudou de ideia em 07/11) | — | — | — | — | — | — | — | [IDEA-001](ideias/IDEA-001-recuperacao-depositos.md) |
+| IDEA-001 | Digital worker que conduz a recuperação de depósitos judiciais de ponta a ponta para escritório ou jurídico de empresa; o advogado aprova só exceções e atos jurídicos | `descartada` (time mudou de ideia em 07/11; [DEC-009](../decisoes.md)) | — | — | — | — | — | — | — | [IDEA-001](ideias/IDEA-001-recuperacao-depositos.md) |
 | IDEA-002 | Digital worker (Escalista) que monta, otimiza e mantém a escala de trabalho dentro da CLT, da convenção e da EC 141, cobre faltas pelo WhatsApp e leva só exceções ao gerente (Desafio Tako, frente DP) | `escolhida` (provisória, [DEC-003](../decisoes.md); sem filtros nem rubrica aplicados) | — | — | — | — | — | — | alto (ponte do WhatsApp) | [IDEA-002](ideias/IDEA-002-escalista.md) |
 
 Para reavaliar a IDEA-001 com a rubrica atual, rode `/avaliar-ideias IDEA-001`.
@@ -34,5 +34,6 @@ Pontos de partida do guia (seção 3) e das lentes de [como-ideiar.md](como-idei
 | Data | O que mudou |
 |---|---|
 | 2026-11-07 | Backlog criado com a IDEA-001 arquivada |
+| 2026-11-07 13:01 | IDEA-001 passa de `arquivada` para `descartada` ([DEC-009](../decisoes.md)) |
 | 2026-11-07 12:16 | IDEA-002 passa a `escolhida` (provisória) por [DEC-003](../decisoes.md); escolhida sem comparação com outras candidatas e sem pontuação; o Gate 2 aplica filtros e rubrica |
 | 2026-11-07 12:14 | IDEA-002 (Escalista) registrada como `candidata`, sem pontuação; vem da proposta em PDF, com os fatos da EC 141 corrigidos |
