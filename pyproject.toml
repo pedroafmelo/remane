@@ -4,21 +4,40 @@ version = "0.1.0"
 description = "Escalista: digital worker de escala e jornada (Converge Challenge 2026)"
 readme = "README.md"
 requires-python = ">=3.12"
-# Só a base já decidida (backend FastAPI). OR-Tools, LangGraph, Langfuse e openai entram na implementação,
-# depois da definição técnica (ver docs/declaracao-ferramentas.md).
 dependencies = [
     "fastapi",
     "uvicorn",
     "pydantic",
     "pydantic-settings",
+    "ortools>=9.15.6755",
+    "langgraph>=1.2.17",
+    "langfuse>=5.0.4",
+    "openai>=3.37.0",
+    "sqlalchemy>=2.1.6",
+    "itsdangerous>=2.2.0",
+    "openpyxl>=3.1.5",
+    "defusedxml>=0.7.1",
+    "pdfplumber>=0.11.10",
+    "pyyaml>=6.0.3",
 ]
+
+[build-system]
+requires = ["uv_build>=0.9.17,<0.10"]
+build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "httpx>=0.28.1",
+    "pillow>=13.0.0",
     "pytest",
     "pytest-cov",
+    "reportlab>=5.1.0",
     "ruff",
 ]
+
+[tool.uv]
+# Política de versões (DEC-030): só entra o que foi publicado até esta data (dependências indiretas incluídas).
+exclude-newer = "2026-10-23"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
@@ -26,3 +45,7 @@ testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 120
+extend-exclude = [".claude"]  # o hook de documentação não é código do produto
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
