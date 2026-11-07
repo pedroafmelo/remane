@@ -1,7 +1,8 @@
 # Estado do projeto
 
 > **Fonte da verdade do momento.** Atualize ao fim de cada bloco de trabalho (ver "Documentação viva" no
-> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 15:41** (Recife), por Claude, ao integrar o branch `chore/legal-rules-data` (PR #1) numa branch de merge (regras legais em `data/regras/`, DEC-023 e DEC-024); ainda sem push.
+> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 15:49** (Recife), por Claude, ao sincronizar depois do merge do PR #1 por Pedro Veloso
+> (regras legais em `data/regras/`, DEC-023 e DEC-024) e do pool de chaves da Featherless (DEC-025, ainda sem commit).
 
 ## Fase atual
 
@@ -40,7 +41,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
       `arquitetura.md` criado até 15h14 ([DEC-018](decisoes.md) a [DEC-021](decisoes.md)). As três pesquisas com fonte foram refeitas e concluídas (modelos e limites da Featherless, com visão;
       hospedagem e Langfuse; solver e leitura de arquivos). Q5 (evals) resolvida. **Hospedagem (Q3) segue `[PREENCHER]`**: o usuário disse
       "vamos ver isso depois". Pendências do negócio em [produto.md](produto.md), seções 12 e 13.
-- [ ] **Resgatar os US$ 25 da Featherless hoje** (pergunta 8): o código vence em 08/11 e, sem ele, não há teste de fumaça dos modelos.
+- [ ] **Featherless:** 3 das 4 pessoas resgataram e criaram chaves (palavra do usuário, 15h46; **nenhuma chave foi testada**). Falta a 4ª pessoa resgatar hoje (o código vence em 08/11), mover as chaves do `APIs.yaml` para o `.env` e apagar o arquivo, e testar cada chave ([DEC-025](decisoes.md)).
 - [ ] **Aguardando o comando do usuário para começar a implementar** (ele disse "não implemente ainda"). Depois dele: `uv add` das dependências ([arquitetura.md](arquitetura.md), seção 19), teste de fumaça dos
       modelos, primeiro benchmark do solver (60 × 7), e decidir a hospedagem com um deploy de teste.
 - [x] Regras legais em YAML: [ec141.yaml](../data/regras/lei/ec141.yaml) e [clt.yaml](../data/regras/lei/clt.yaml),
@@ -66,7 +67,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
 | 5 | Concorrer ou não ao Desafio Tako (RH)? | Time | Resolvida em 07/11 12h16: concorre ([DEC-003](decisoes.md), provisória); sinalizar na submissão |
 | 6 | Hospedagem do link público e da ponte: o time não tem servidor nem conta hoje | Time | **Em aberto, `[PREENCHER]`:** pesquisada em 07/11 ([arquitetura.md](arquitetura.md), seção 12); o usuário disse "vamos ver isso depois" ([DEC-021](decisoes.md)). Sem ela o link estável (RE-07, RN-10) não existe. A ponte do WhatsApp roda só no notebook |
 | 7 | Chip dedicado e aparelho para a ponte real do WhatsApp | Time | "Vamos ver"; sem chip, só o simulador de celular |
-| 8 | Resgate dos US$ 25 da Featherless por integrante | Time | Ninguém resgatou ainda. Link e código estão só no guia original (redigidos na cópia local). O código vence em 08/11 e tem limite de resgates |
+| 8 | Resgate dos US$ 25 da Featherless por integrante | Time | **3 de 4 resgataram** (palavra do usuário, 15h46; sem teste ainda); falta 1 pessoa. Link e código estão só no guia original (redigidos na cópia local). O código vence em 08/11 e tem limite de resgates. As chaves formam um pool com failover ([DEC-025](decisoes.md)) |
 | 9 | Domínio próprio (créditos AWS) | Time | O time não tem; só importa se ficar no pódio |
 | 10 | Onde roda o Langfuse self-hosted, sem servidor | Time | **Resolvida ([DEC-021](decisoes.md)):** só no notebook (a doc recomenda 4 CPU e 16 GiB); o jurado vê a tabela de rastro do app |
 | 11 | Como remediar o histórico do scaffold (commit inicial `16e1a5c`, remoto privado) | Time | Resolvida ([DEC-007](decisoes.md), [DEC-008](decisoes.md)): histórico recriado e publicado no `main` do remoto; branch antigo e commit `16e1a5c` removidos do repositório local. Os outros 3 colaboradores precisam atualizar o clone |
@@ -104,6 +105,8 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 
 | Data e hora | O quê | Por |
 |---|---|---|
+| 2026-11-07 15:49 | PR #1 aceito por Pedro Veloso às ~15h49 (18h49 UTC) como merge commit `19ef74f`, que contém o meu merge `f904ef2`; `main` local atualizada por `git pull --ff-only` e as alterações da DEC-025 reaplicadas por cima, sem conflito. Sincronia: a DEC-023 (art. 386) e a DEC-024 (Q13) agora estão no `main`; **a DEC-023 segue sem confirmação do time**; README aponta para `data/regras/`. Alterações da DEC-025 **ainda sem commit**; branch local `merge/legal-rules-data` já está contida no `main` | Claude |
+| 2026-11-07 15:46 | [DEC-025](decisoes.md): as chaves da Featherless das 4 pessoas formam um pool com failover (3 de 4 resgataram, **sem teste**); `.env.example` com `FEATHERLESS_API_KEY_1` a `_4` (só nomes); [arquitetura.md](arquitetura.md) seção 7 e riscos com o desenho do failover (`[PROPOSTA]`); `APIs.yaml` no `.gitignore` por proteção; pergunta 8 e próximas ações com o resgate. Alterações **sem commit** (depois movidas para a `main` local, ver a linha seguinte); nenhum código | Claude |
 | 2026-11-07 15:41 | Integração do PR #1 (`chore/legal-rules-data`, Pedro Veloso) numa branch de merge, sem push: conflitos em `decisoes.md`, `estado-do-projeto.md` e `declaracao-ferramentas.md` resolvidos com o conteúdo do `main` por cima; a decisão do art. 386 virou [DEC-023](decisoes.md) (o `main` já tinha DEC-013 a DEC-022) e a pergunta 13 do PR virou a 17; [DEC-024](decisoes.md) registra a resposta do usuário à Q13; referências nos YAMLs e no README de `data/regras/` atualizadas. **Atenção:** os carimbos dos registros do branch (15:20, 15:35, 15:50) não batem com os commits dele (14:57 e 15:30); mantidos como estavam | Claude |
 | 2026-11-07 15:50 | Merge do `main` no branch `chore/legal-rules-data`: a DEC do art. 386 virou [DEC-023](decisoes.md), porque o `main` já tinha a DEC-012; o conflito 2 de `requisitos.md` passa a ter regra (a mais restritiva, provisória, com exceção ao DP; resumo do time das 15h20 e P1 de `produto.md`) e os YAMLs apontam para ela; novas ações para os dados de regras | Claude |
 | 2026-11-07 15:35 | [DEC-023](decisoes.md) (registrada como DEC-012 no branch): o art. 386 da CLT (domingo quinzenal para empregadas) entra como regra dura e prevalece sobre a Lei 10.101 no comércio; `domingo_mulher` passa a `interpretacao`, e o `clt.yaml` fica com 17 itens `interpretacao` e nenhum `pendente`; o quadro sintético precisa de um campo de sexo | Claude |

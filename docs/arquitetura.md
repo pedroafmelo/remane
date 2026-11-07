@@ -233,8 +233,23 @@ ferramentas. **Nenhum foi testado por nós, nem em português nem em chamada de 
   com contexto), nunca derruba o fluxo (RN-05).
 - **Custo:** a resposta traz `usage.cost` em USD [FATO, doc de preços, editada em 06/11/2026]; esse é o custo **medido** gravado no
   rastro. **Guarda de orçamento `[PROPOSTA]`:** teto diário em variável de ambiente, para os US$ 25 por pessoa não acabarem nos evals.
-- **Crédito não resgatado:** o código vence em 08/11 e ninguém resgatou (pergunta 8 do estado). Sem ele não há como rodar o teste de
-  fumaça. **Ação humana, fora do código.**
+- **Crédito:** segundo o usuário, 3 das 4 pessoas resgataram os US$ 25 e criaram chaves (**sem teste de fumaça ainda**: validade e
+  saldo não verificados). O código vence em 08/11; falta a 4ª pessoa (pergunta 8 do estado). **Ação humana, fora do código.**
+- **Pool de chaves com failover ([DEC-025](decisoes.md)).** O usuário decidiu usar as chaves das 4 pessoas como fallback; o desenho a
+  seguir é `[PROPOSTA]`. [FATO, guia, seção 11] cada pessoa resgata na própria conta e "um time de 4 tem US$ 100 no total".
+  - **Configuração:** `FEATHERLESS_API_KEY_1` a `FEATHERLESS_API_KEY_4` no `.env` (ou nos segredos da hospedagem, nunca na imagem); o
+    cliente lê todas as `FEATHERLESS_API_KEY_*`; a ordem é a prioridade.
+  - **Failover em ordem, não rodízio:** usa a chave 1 até falhar e passa para a seguinte. Rodízio gastaria as quatro ao mesmo tempo.
+  - **Trocam de chave:** 401 (chave inválida), 429 (limite de concorrência, que é por conta [FATO, doc da Featherless]) e erro de
+    saldo. [NÃO ENCONTRADO] qual status a Featherless devolve com saldo zero: tratar erro de autenticação ou cobrança como "chave
+    esgotada" e desativá-la por um tempo `[PREENCHER: valor]`. **Não trocam:** modelo frio (400) e 503, que são do modelo; repete a chamada ou usa o modelo reserva.
+  - **"Unlock Model" é por conta** [FATO, guia, seção 11]: cada pessoa libera o modelo restrito (provável no `gemma-4-31B-it`) na própria
+    conta; sem isso o failover esconde o problema.
+  - **Rastro:** só o índice da chave ("chave 2") e o `usage.cost` medido vão ao `trace_event` e ao Langfuse; **o valor da chave nunca é
+    gravado nem logado**. O teto de gasto (`FEATHERLESS_DAILY_BUDGET_USD`) vale **por chave**.
+  - **Menor privilégio:** as 4 chaves juntas só na hospedagem e em quem roda os evals; cada pessoa usa a própria chave nas outras
+    máquinas. Reservar saldo para o app público no Demo Day.
+  - **Formato:** o guia exemplifica a chave como `fw-...`; as recebidas começam com `rc_`. Não afirmo que seja erro: o teste de fumaça confirma.
 
 ## 8. Contratos (resumo; a forma exata nasce no TDD do núcleo)
 
@@ -396,7 +411,7 @@ tests/            núcleo com TDD; fumaça no resto
 | Risco | Efeito | Mitigação |
 |---|---|---|
 | Hospedagem não decidida | Sem link estável: reprova RE-07 e RN-10 | Decidir cedo, deploy de teste, plano B de vídeo (seção 12) |
-| Crédito da Featherless não resgatado | Sem inferência para testar; o código vence em 08/11 | Resgatar hoje (ação humana) |
+| Crédito da Featherless: 3 de 4 resgatados, sem teste | Chave inválida ou sem saldo só aparece no teste de fumaça; falta a 4ª pessoa e o código vence em 08/11 | Testar cada chave hoje; pool com failover ([DEC-025](decisoes.md)); a 4ª pessoa resgata hoje (ação humana) |
 | Modelos de 2026 sem teste em português e em tool calling | Agente erra argumentos | Teste de fumaça, reserva por papel, validação pydantic |
 | Solver lento para 60 × 7 | Demo ao vivo trava | Medir cedo; limite de tempo; catálogo de turnos pequeno; escala pré-resolvida persistida |
 | Escopo do v1 grande (G2) | Fluxo ponta a ponta atrasa | Ordem de corte do produto, seção 2 |

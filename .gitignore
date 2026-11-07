@@ -232,5 +232,8 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
+# Chaves de API soltas: nunca versionar (as chaves ficam só no .env; DEC-025)
+APIs.yaml
+
 # Generated using ignr.py - github.com/Antrikshy/ignr.py
 

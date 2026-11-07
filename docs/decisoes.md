@@ -1,6 +1,6 @@
 # Registro de decisões
 
-Última atualização: 2026-11-07 15:41. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
+Última atualização: 2026-11-07 15:46. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
 entrada:** se a decisão mudar, crie outra e marque a antiga como `substituída por DEC-NNN`. Use `/decisao` para registrar e
 propagar o efeito para as outras docs.
 
@@ -338,3 +338,12 @@ Formato:
 - **Motivo:** o produto deve ser generalizável por empresa e por legislação trabalhista (palavras do usuário).
 - **Alternativas consideradas (as do PR):** (a) a convenção permite passar de 8h por dia e a demo usa as 42h inteiras; (b) o teto prático é 40h e o agente leva isso ao DP como exceção. **O usuário não escolheu nenhuma das duas.**
 - **Consequências:** o limite diário (`jornada_diaria_max`), a possibilidade de ampliá-lo por convenção ou acordo e a compensação são **parâmetros do cartão de regras e da política** (RF-22), lidos pelo solver e pelo verificador, sem valor fixo no código. A camada `lei/` de `data/regras/` é dado trocável. **`[INFERÊNCIA]` do agente:** com 8h por dia e 2 repousos o solver não achará escala de 42h; o produto precisa tratar isso como exceção (RX-02, recomendação de contratação) e não travar. **`[PREENCHER]`:** o valor da convenção fictícia da demo (decide se a demo 44h → 42h gera nova escala ou exceção de contratação) e se "por legislação" inclui outros países; `[PROPOSTA]`: o v1 cobre só CLT e EC 141 (Brasil).
+
+## DEC-025 · Chaves da Featherless das 4 pessoas formam um pool com failover
+
+- 2026-11-07 15:46 · Decidido por: usuário da sessão · Status: aceita; **só a 1ª parte (usar as chaves como pool com fallback) é dita pelo usuário; o desenho do failover é `[PROPOSTA]` do agente**
+- **Contexto:** 3 das 4 pessoas do time resgataram os US$ 25 da Featherless e criaram chaves de API (informação do usuário; **ainda sem teste de fumaça**, então a validade e o saldo de cada chave não foram verificados). O usuário perguntou como disponibilizar as 4 no `.env` e se dá para usar como fallback.
+- **Decisão (o que o usuário disse):** usar as chaves como fallback e registrar isso, atualizando `.env.example` e `arquitetura.md` (seção 7) e protegendo o arquivo `APIs.yaml` no `.gitignore`. [Base no guia, seção 11: "um time de 4 tem US$ 100 no total"; cada pessoa resgata na própria conta.]
+- **Motivo: [motivo não informado].**
+- **Alternativas consideradas (as oferecidas pelo agente):** rodízio entre as chaves em vez de failover; usar uma só chave; manter todas as chaves em todas as máquinas, em vez de só onde precisa.
+- **Consequências:** `.env.example` passa a ter `FEATHERLESS_API_KEY_1` a `FEATHERLESS_API_KEY_4` (só nomes), no lugar de `FEATHERLESS_API_KEY`; o cliente lerá todas as variáveis `FEATHERLESS_API_KEY_*`, em ordem de prioridade. `[PROPOSTA]` do agente, em [arquitetura.md](arquitetura.md), seção 7: failover em ordem; 401, 429 e erro de saldo trocam de chave; modelo frio e 503 não trocam; "Unlock Model" é por conta; só o índice da chave vai ao rastro, nunca o valor; teto de gasto por chave; as 4 chaves juntas só na hospedagem e em quem roda os evals, cada pessoa com a própria chave nas outras máquinas. **Segue `[PREENCHER]`:** a 4ª chave; qual erro a Featherless devolve com saldo zero **[NÃO ENCONTRADO]**. As chaves estavam num arquivo solto na raiz do repositório; ele passou a ser ignorado pelo git e o usuário deve movê-las para o `.env` e apagá-lo. Nenhum código foi escrito.
