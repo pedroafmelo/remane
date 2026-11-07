@@ -1,0 +1,16 @@
+.git
+.claude
+.env
+.env.*
+!.env.example
+.venv
+**/__pycache__
+.pytest_cache
+.ruff_cache
+var
+docs
+tests
+web/node_modules
+web/dist
+*.md
+!README.md
