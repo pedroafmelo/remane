@@ -134,3 +134,35 @@ def test_key_value_never_in_trace_or_log(engine, caplog):
         assert "SENTINELA" not in where
         assert literal not in where
     assert events[0].key_index == 2  # só o índice da chave
+
+
+# --- campos protegidos (RN-06, SAIDA-AC-13 v1.1) ----------------------------------------------------------------
+
+
+def stored_payloads(engine) -> str:
+    with engine.connect() as conn:
+        return repr(conn.execute(text("SELECT payload FROM trace_event")).all())
+
+
+def test_track_event_is_stored_without_cid(engine):
+    sink = SqlTraceSink(engine)
+    sink.emit(event("e1", kind="track.atestado.read", payload={"text": "CID J11 febre", "nota": "J11.1"}))
+    [back] = sink.list_events("run-1")
+    assert back.payload["text"] == REDACTED
+    assert "J11" not in json.dumps(back.payload) and "J11" not in stored_payloads(engine)
+    assert "febre" not in stored_payloads(engine)
+
+
+def test_non_track_event_keeps_cell_reference(engine):
+    sink = SqlTraceSink(engine)
+    sink.emit(event("e1", kind="llm.map_columns", payload={"evidence": "célula B12"}))
+    [back] = sink.list_events("run-1")
+    assert back.payload == {"evidence": "célula B12"}
+
+
+@pytest.mark.parametrize("kind", ["solver.run", "llm.map_columns", "track.case.closed"])
+def test_protected_key_is_redacted_in_any_kind(engine, kind):
+    sink = SqlTraceSink(engine)
+    sink.emit(event("e1", kind=kind, payload={"cid": "Z99", "nested": {"CID": "Z99"}}))
+    [back] = sink.list_events("run-1")
+    assert back.payload == {"cid": REDACTED, "nested": {"CID": REDACTED}}
