@@ -309,3 +309,32 @@ def test_no_response_carries_sex(happy: Flow, rx12: Flow) -> None:
         assert len(flow.stack.bodies) >= 5
         assert "sex" not in keys_of(flow.stack.bodies)
         assert not any(k in keys_of(flow.stack.bodies) for k in ("sexo", "gender"))
+
+
+# --- 7. Upload da C6: a codificação é do leitor do agente ------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("name", "content"),
+    [
+        # bytes que não decodificam nem em UTF-8 nem em cp1252 (0x81, 0x8D, 0x8F não existem no cp1252)
+        ("escala.csv", b"funcion\x81rio,loja,dia,inicio,fim\nE01,L\x8d01,2027-01-11,08:00,16:\x8f00\n"),
+        ("escala.xlsx", b"PK\x03\x04" + b"\x00" * 64),  # ZIP truncado: o leitor recusa, a API não abre
+    ],
+)
+def test_unreadable_file_is_rx13_from_the_agent(clean_env, name: str, content: bytes) -> None:
+    """A API não confere mais UTF-8 (C6, C1): o agente real recebe o arquivo e devolve `failed` com RX-13, sem 500."""
+    stack = make_stack()
+    response = stack.call("POST", "/api/runs", params={"file_name": name}, content=content)
+    assert response.status_code == 201, response.text
+    body = response.json()
+    assert body["phase"] == "failed" and body["exception"]["code"] == "RX-13"
+    assert body["summary"]["ok"] is False
+    assert "solver.run" not in [e["kind"] for e in stack.trace(body["run_id"])]
+
+
+def test_next_week_and_roster_without_a_first_schedule(clean_env) -> None:
+    """Banco vazio: 409 para planejar a próxima semana e 404 para o quadro, com o agente de hoje e com o da B4a."""
+    stack = make_stack()
+    assert stack.call("POST", "/api/runs/next-week").status_code == 409
+    assert stack.call("GET", "/api/roster").status_code == 404

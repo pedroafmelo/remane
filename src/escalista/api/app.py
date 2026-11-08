@@ -10,14 +10,14 @@ from sqlalchemy import text
 
 from escalista.api.auth import install_auth
 from escalista.api.routes_runs import install_runs
-from escalista.api.wiring import DEFAULT_DEMO_FILES_DIR, SliceAgent, build_agent
+from escalista.api.wiring import DEFAULT_DEMO_FILES_DIR, SliceAgentC6, build_agent
 from escalista.config import Settings
 from escalista.db import init_db, make_engine
 
 log = logging.getLogger("escalista")
 
 
-def create_app(settings: Settings | None = None, *, agent: SliceAgent | None = None) -> FastAPI:
+def create_app(settings: Settings | None = None, *, agent: SliceAgentC6 | None = None) -> FastAPI:
     settings = settings or Settings()
     engine = make_engine(settings.database_url)
     init_db(engine)

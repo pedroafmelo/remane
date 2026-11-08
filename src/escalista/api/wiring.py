@@ -1,12 +1,14 @@
 """Ligação da API ao agente da fatia (plano da C5, seção 4: C2 e C4).
 
-`SliceAgent` é o que as rotas de `routes_runs.py` consomem. `build_agent` liga o agente LangGraph da I1
-(`OptimizerSliceAgent`, que traduz os erros do agente nos daqui) com o rastro e o repositório em SQL e o cliente
-Featherless. O `FakeSliceAgent` (respostas fixas) fica só para os testes de rota, injetado em `create_app(agent=...)`.
+`SliceAgentC6` (o `SliceAgent` mais a continuidade da C6) é o que as rotas de `routes_runs.py` consomem. `build_agent`
+liga o agente LangGraph da I1 (`OptimizerSliceAgent`, que traduz os erros do agente nos daqui) com o rastro e o
+repositório em SQL e o cliente Featherless. O `FakeSliceAgent` (respostas fixas) fica só para os testes de rota,
+injetado em `create_app(agent=...)`.
 
 Divisão de responsabilidades:
-- A API cuida do transporte: sessão e papel (`require_role`), tamanho do arquivo (413) e UTF-8 (cartão RX-13). O agente
-  recebe só arquivos com até `MAX_UPLOAD_BYTES` e decodificáveis em UTF-8.
+- A API cuida do transporte: sessão e papel (`require_role`), tamanho do arquivo (413) e tipo (CSV, XLSX ou PDF, pela
+  extensão e pelos bytes iniciais; fora disso, cartão RX-13). O agente recebe só arquivos com até `MAX_UPLOAD_BYTES` e
+  de um tipo aceito; decodificar (UTF-8 e afins) é do leitor do agente, que devolve RX-13 quando não consegue.
 - A API monta o `Approval` (o ato humano) com o id e o papel da sessão; o agente o grava e só então chama `publicar`,
   que confere a aprovação **no código** e recusa sem ela (`PublishRefusedError` vira 403).
 - Nada que o agente devolve à API carrega `sex` (RN-13): pessoas saem só como `EmployeePublic`.
@@ -27,7 +29,9 @@ from sqlalchemy import Engine
 from escalista.config import Settings
 from escalista.domain.contracts import ExceptionCard, TraceEvent
 from escalista.domain.ports import Clock, LLMClient, TraceSink
+from escalista.domain.reading import ConfirmInput
 from escalista.domain.results import Approval, RunState, ScheduleVersion
+from escalista.domain.roster import Roster
 from escalista.domain.schedule import EmployeePublic, Schedule
 
 if TYPE_CHECKING:
@@ -53,16 +57,20 @@ class SliceAgent(Protocol):
     def start_run(self, file_name: str, content: bytes) -> RunState:
         """Cria a execução, valida o CSV e devolve o resumo da leitura (RF-04, RF-23).
 
-        `content` já vem com até `MAX_UPLOAD_BYTES` e decodificável em UTF-8 (a API garante). Devolve a fase
-        `awaiting_confirm` com `summary.ok`, ou `failed` com o cartão RX-13 (e `summary.issues` com a linha de
-        cada erro).
+        `content` já vem com até `MAX_UPLOAD_BYTES` e de um tipo aceito pela API (CSV, XLSX ou PDF, extensão e bytes
+        iniciais coerentes); a codificação **não** é conferida na API. Devolve a fase `awaiting_confirm` com
+        `summary.ok`, ou `failed` com o cartão RX-13 (e `summary.issues` com a linha de cada erro), inclusive para um
+        CSV que não decodifica.
         """
         ...
 
-    def confirm(self, run_id: str) -> RunState:
-        """O gestor confirmou o resumo: otimiza, verifica, compara e justifica. Fase `awaiting_approval` (com
-        `comparison`, `report`, `justification` e `version_id`) ou `failed` com o cartão (RX-02, RX-12).
-        Exige a fase `awaiting_confirm`."""
+    def confirm(self, run_id: str, data: ConfirmInput | None = None) -> RunState:
+        """O gestor confirmou (e talvez corrigiu) o resumo: otimiza, verifica, compara e justifica. Fase
+        `awaiting_approval` (com `comparison`, `report`, `justification` e `version_id`) ou `failed` com o cartão
+        (RX-02, RX-12). Exige a fase `awaiting_confirm`.
+
+        `data` é o ato humano da parada (cobertura-alvo, salário-hora, semana, identidade, pedido em texto); `None`
+        equivale a `ConfirmInput()` (tudo no padrão). Na 1ª escala, a confirmação grava o `Roster`."""
         ...
 
     def get_run(self, run_id: str) -> RunState | None: ...
@@ -88,6 +96,27 @@ class SliceAgent(Protocol):
 
     def trace(self, run_id: str) -> list[TraceEvent]:
         """Os eventos do rastro da execução, em ordem; cada um com `cost_usd` (0 nos passos sem modelo)."""
+        ...
+
+
+@runtime_checkable
+class SliceAgentC6(SliceAgent, Protocol):
+    """O `SliceAgent` com a continuidade da C6 (planejar a próxima semana sem upload e ler o quadro). É o que as rotas
+    consomem.
+
+    Os dois métodos ficam num protocolo à parte só enquanto o `OptimizerAgent` da frente B não os tem (B4a): o teste
+    `tests/agents/test_graph.py::test_agent_satisfies_the_api_protocol` confere `isinstance(agente, SliceAgent)`, e
+    pôr os métodos no `SliceAgent` o quebraria antes da hora. Quando a B4a entregar, os dois protocolos podem virar um.
+    """
+
+    def start_next_week(self) -> RunState:
+        """Planeja a semana seguinte à última publicada, sem upload (modo `continuidade`): o "antes" é a publicada
+        deslocada 7 dias, e o quadro e a demanda são os do último `Roster`. Devolve a fase `awaiting_confirm`.
+        Sem versão publicada ou sem quadro, levanta `RunPhaseError` ("envie a primeira escala")."""
+        ...
+
+    def roster(self) -> Roster | None:
+        """O último quadro confirmado, ou `None`. A API só o expõe com as pessoas como `EmployeePublic` (RN-13)."""
         ...
 
 
@@ -118,7 +147,7 @@ LLMFactory = Callable[[TraceSink, Clock], LLMClient]
 
 def build_agent(
     settings: Settings, *, engine: Engine | None = None, llm_factory: LLMFactory | None = None
-) -> SliceAgent:
+) -> SliceAgentC6:
     """Liga o agente real: `SqlTraceSink`, `SqlRepository`, relógio do sistema e o cliente Featherless.
 
     `engine` e `llm_factory` existem para os testes (SQLite em memória e falso de LLM); em produção ficam `None`
@@ -177,7 +206,7 @@ def now_brt() -> datetime:
 # --- dependências FastAPI (os testes trocam por `app.dependency_overrides`) ---
 
 
-def get_agent(request: Request) -> SliceAgent:
+def get_agent(request: Request) -> SliceAgentC6:
     return request.app.state.agent
 
 

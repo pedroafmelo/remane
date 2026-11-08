@@ -125,7 +125,8 @@ def test_no_response_of_the_flow_carries_sex(tmp_path):
     call("GET", f"/api/runs/{run_id}/trace")
     call("GET", "/api/me")
     upload(call, content=b"# SINTETICO\n")  # execução que falha (RX-13 do agente)
-    upload(call, content=b"\xff\xfe\x00")  # recusa na porta
+    upload(call, content=b"\xff\xfe\x00")  # não decodifica: RX-13 do agente
+    upload(call, content=b"\xd0\xcf\x11\xe0", name="escala.xls")  # recusa na porta (tipo)
     assert len(call.bodies) >= 12
     for body in call.bodies:
         assert "sex" not in keys_of(body), body
@@ -179,13 +180,15 @@ def test_csv_of_exactly_1mb_is_accepted(tmp_path):
     assert upload(client.request, content=content).status_code == 201
 
 
-def test_non_utf8_csv_yields_rx13_without_500(tmp_path):
+def test_non_utf8_csv_reaches_the_agent_and_yields_rx13_without_500(tmp_path):
+    """C6: a API não confere mais a codificação; o leitor do agente decodifica e devolve RX-13 quando não consegue."""
     client, agent = make_client(tmp_path)
     response = upload(client.request, content="funcionário;loja\n".encode("latin-1"))
-    assert response.status_code == 422
-    card = response.json()["exception"]
-    assert card["code"] == "RX-13" and "UTF-8" in card["reason"]
-    assert agent._runs == {}
+    assert response.status_code == 201
+    body = response.json()
+    assert body["phase"] == "failed"
+    assert body["exception"]["code"] == "RX-13" and "UTF-8" in body["exception"]["reason"]
+    assert list(agent._runs) == [body["run_id"]]  # quem recusou foi o agente
 
 
 def test_defective_csv_is_failed_run_with_rx13(tmp_path):
