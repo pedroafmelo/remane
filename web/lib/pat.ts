@@ -1,4 +1,4 @@
-/** Estados do Pat, o agente do Remane. O mascote é o rosto do logo (óculos e bigode); o olhar muda por estado. */
+/** Estados do Pat, o agente do Remane. O mascote é um rosto com óculos e bigode; o olhar muda por estado. */
 export const PAT_ESTADOS = ["parado", "trabalhando", "digitando", "resolveu", "excecao"] as const;
 export type PatEstado = (typeof PAT_ESTADOS)[number];
 
