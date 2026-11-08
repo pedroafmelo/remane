@@ -4,7 +4,9 @@ Tudo SINTÉTICO: paciente "Ana (sintético)", médica "Dra. Fictícia (sintétic
 (A09, J11, J11.1) são códigos CID-10 de doenças comuns usados só como texto fictício, para o teste de vazamento
 procurar a string. PDF digital escrito à mão (como em `e2.py`), com Helvetica em WinAnsi para o pdfplumber extrair os
 acentos; o escaneado (`at-04`) é um PDF só com imagem, feito com Pillow.
-Os bytes dependem só do conteúdo (sem data, sem id).
+As fotos (`at-05` a `at-07`, tarefa D5 da C7) são PNG com o texto do atestado da Ana desenhado em imagem: limpa, com
+rotação leve, ruído e desfoque leve (ainda legível por humano) e com desfoque forte (ilegível). O ruído vem de um
+`random.Random(seed)`, então os bytes dependem só do conteúdo e da semente (sem data, sem id, sem metadados no PNG).
 
 `gerar_atestados(seed)` devolve `{caminho relativo a data/demo: bytes}`; cada atestado tem o gabarito irmão
 `<nome>.esperado.json`.
@@ -14,9 +16,11 @@ from __future__ import annotations
 
 import io
 import json
+import random
 import unicodedata
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import PurePosixPath
 from typing import Any
 
 PASTA = "acompanhamento/atestados"
@@ -173,6 +177,50 @@ def _pdf_escaneado(linhas: list[Linha]) -> bytes:
     return saida.getvalue()
 
 
+# ------------------------------------------------------------------------------------------------ foto (PNG)
+
+
+def _foto(
+    linhas: list[Linha],
+    *,
+    seed: int,
+    rotacao: float = 0.0,
+    ruido: int = 0,
+    desfoque: float = 0.0,
+    marca_nitida: bool = False,
+) -> bytes:
+    """PNG do atestado como se fosse fotografado no celular: o texto da página em tons de cinza, com rotação (graus),
+    ruído (amplitude em níveis de cinza) e desfoque gaussiano (raio em pixels) opcionais. O ruído sai de
+    `random.Random(seed)` e o PNG não leva metadados, então os bytes são os mesmos a cada execução. Pillow só é
+    importada aqui (dependência de desenvolvimento)."""
+    from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont  # noqa: PLC0415
+
+    largura, altura = 900, 1273  # A4 a ~110 dpi: celular sem zoom
+    imagem = Image.new("L", (largura, altura), 250)
+    pincel = ImageDraw.Draw(imagem)
+    y = 110.0
+    for linha in linhas:
+        tamanho = round(linha.tamanho * 2.1)
+        if linha.texto:
+            pincel.text((80, y), _sem_acento(linha.texto), font=ImageFont.load_default(size=tamanho), fill=25)
+        y += tamanho * 1.7 if linha.texto else 30
+    if rotacao:
+        imagem = imagem.rotate(rotacao, resample=Image.Resampling.BICUBIC, expand=False, fillcolor=205)
+    if desfoque:
+        imagem = imagem.filter(ImageFilter.GaussianBlur(desfoque))
+    if ruido:
+        aleatorio = random.Random(seed)
+        camada = Image.frombytes("L", (largura, altura), aleatorio.randbytes(largura * altura))
+        # bytes uniformes de 0 a 255 viram desvios de -ruido a +ruido em torno do cinza médio
+        camada = camada.point(lambda v: 128 + (v - 128) * ruido // 128)
+        imagem = ImageChops.add(imagem, camada, scale=1.0, offset=-128)
+    if marca_nitida:  # a marca de sintético tem que continuar legível mesmo quando o texto do atestado não está
+        ImageDraw.Draw(imagem).text((80, altura - 90), _sem_acento(MARCA), font=ImageFont.load_default(size=26), fill=0)
+    saida = io.BytesIO()
+    imagem.save(saida, "PNG", optimize=False, compress_level=6)
+    return saida.getvalue()
+
+
 # ------------------------------------------------------------------------------------------------ gabaritos
 
 
@@ -213,7 +261,7 @@ def _gabarito(nome: str, expect: dict[str, Any], planted_cid: list[str], **extra
 
 
 def gerar_atestados(seed: int = 42) -> dict[str, bytes]:
-    """Os seis atestados e seus gabaritos. A seed não altera nada: o conteúdo é fixo, e os bytes são os mesmos."""
+    """Os nove atestados (6 PDFs e 3 fotos) e seus gabaritos. A seed só alimenta o ruído das fotos."""
     valido = _expect(issued_on="2027-01-13", start_on="2027-01-14", days=2, verdict="valido", reasons=[])
     arquivos: dict[str, tuple[bytes, dict[str, Any], list[str], dict[str, Any]]] = {}
 
@@ -317,8 +365,36 @@ def gerar_atestados(seed: int = 42) -> dict[str, bytes]:
         ["J11", "J11.1"],
         note="CID no cabeçalho (J11), no corpo (J11.1) e no rodapé (J11.1 e J11).",
     )
+    texto_ana = _corpo(**comum, cid_cabecalho=None, cid_corpo=CID_COMUM, cid_rodape=None, crm=True)
+    arquivos["at-05-foto-legivel.png"] = (
+        _foto(texto_ana, seed=seed),
+        valido,
+        [CID_COMUM],
+        {"note": "Foto limpa do mesmo atestado do at-01: a visão deve ler tudo."},
+    )
+    arquivos["at-06-foto-ruidosa.png"] = (
+        _foto(texto_ana, seed=seed + 6, rotacao=2.5, ruido=40, desfoque=0.8),
+        valido,
+        [CID_COMUM],
+        {"note": "Rotação leve, ruído e desfoque leve: ainda legível por um humano; o gabarito é o do at-01."},
+    )
+    arquivos["at-07-foto-ilegivel.png"] = (
+        _foto(texto_ana, seed=seed + 7, rotacao=-3.0, ruido=50, desfoque=9.0, marca_nitida=True),
+        _expect(
+            legible=False,
+            issued_on=None,
+            start_on=None,
+            days=None,
+            patient_matches=None,
+            has_crm=None,
+            verdict="ilegivel",
+            reasons=["ilegivel"],
+        ),
+        [CID_COMUM],
+        {"note": "Desfoque forte: nem um humano lê; o Pat pede outra foto ou PDF (RX-08)."},
+    )
     saida: dict[str, bytes] = {}
     for nome, (conteudo, expect, cids, extra) in arquivos.items():
         saida[f"{PASTA}/{nome}"] = conteudo
-        saida[f"{PASTA}/{nome.removesuffix('.pdf')}.esperado.json"] = _gabarito(nome, expect, cids, **extra)
+        saida[f"{PASTA}/{PurePosixPath(nome).stem}.esperado.json"] = _gabarito(nome, expect, cids, **extra)
     return saida

@@ -1,0 +1,20 @@
+{
+  "file": "acompanhamento/atestados/at-06-foto-ruidosa.png",
+  "synthetic": true,
+  "expected_day": "2027-01-14",
+  "employee_name": "Ana (sintético)",
+  "expect": {
+    "legible": true,
+    "issued_on": "2027-01-13",
+    "start_on": "2027-01-14",
+    "days": 2,
+    "patient_matches": true,
+    "has_crm": true,
+    "verdict": "valido",
+    "reasons": []
+  },
+  "planted_cid": [
+    "A09"
+  ],
+  "note": "Rotação leve, ruído e desfoque leve: ainda legível por um humano; o gabarito é o do at-01."
+}
