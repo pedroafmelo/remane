@@ -10,6 +10,7 @@ from sqlalchemy import text
 
 from escalista.api.auth import install_auth
 from escalista.api.excecoes import ExceptionDesk, build_desk, install_excecoes
+from escalista.api.routes_assistant import install_assistant
 from escalista.api.routes_insights import install_insights
 from escalista.api.routes_runs import install_runs
 from escalista.api.routes_tracker import install_tracker
@@ -61,6 +62,7 @@ def create_app(
     install_runs(app)
     install_excecoes(app)
     install_tracker(app)
+    install_assistant(app)
     install_insights(app, settings)
     _serve_spa(app, Path(settings.web_dist_dir))
     return app
@@ -87,6 +89,11 @@ def _wire_tracker(app: FastAPI, settings: Settings, llm: LLMClient | None, *, se
     app.state.track_cases = cases
     world = make_world_for(repo=SqlRepository(engine), scenario=load_scenario())
     app.state.desk.attach_tracker(tracker, cases=cases, world=world)
+    from escalista.api.assistant_wiring import build_assistant
+
+    app.state.assistant = build_assistant(
+        engine=engine, database_url=settings.database_url, clock=clock, llm=llm, known_secrets=secrets
+    )
 
 
 def _serve_spa(app: FastAPI, dist: Path) -> None:

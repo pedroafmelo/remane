@@ -254,6 +254,42 @@ class Reply(BaseModel):
     suggestions: list[str] = Field(default_factory=list)
 
 
+# --- assistente do gestor (C7b N2, FT-08): somente leitura ---------------------------------------------------------
+
+AssistantTool = Literal["get_escala", "get_excecoes", "get_hora_extra", "get_regra", "get_trace", "outro"]
+
+
+class AssistantChoice(BaseModel):
+    """O que o modelo devolve: **uma** ferramenta de leitura de uma lista fechada e os parâmetros dela. O código valida
+    o dia e a regra; o modelo nunca escreve a resposta."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    tool: AssistantTool
+    day: date | None = None  # `get_escala`
+    rule_id: str | None = Field(default=None, max_length=80)  # `get_regra`; conferido contra o cartão da semana
+
+
+class AssistantContext(BaseModel):
+    """O que o modelo precisa para escolher: hoje, os dias da semana publicada e os ids das regras (sem pessoas)."""
+
+    model_config = ConfigDict(frozen=True)
+
+    today: date
+    week_days: list[date] = Field(default_factory=list)
+    rule_ids: list[str] = Field(default_factory=list)
+
+
+class AssistantReply(BaseModel):
+    """Resposta do assistente: texto de template com os dados lidos. Sempre dado sintético na demo."""
+
+    template: str
+    body: str
+    tool: AssistantTool | None = None
+    suggestions: list[str] = Field(default_factory=list)
+    synthetic: Literal[True] = True
+
+
 class OfferView(BaseModel):
     offer_id: str
     candidate_id: str
