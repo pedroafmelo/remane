@@ -62,3 +62,17 @@ def test_exported_route_folder_serves_its_own_index(tmp_path, dist):
     client = client_for(tmp_path, dist)
     for path in ("/entrar/", "/entrar"):
         assert "pagina entrar" in client.get(path).text, path
+
+
+def test_next_export_pages_are_served_and_api_paths_stay_json_404(tmp_path, dist):
+    # Export do Next com trailingSlash: cada tela é uma pasta com o próprio index.html.
+    for page in ("entrar", "plataforma"):
+        (dist / page).mkdir()
+        (dist / page / "index.html").write_text(f"<html><body>pagina {page}</body></html>", encoding="utf-8")
+    client = client_for(tmp_path, dist)
+    for page in ("entrar", "plataforma"):
+        for path in (f"/{page}/", f"/{page}"):
+            response = client.get(path)
+            assert response.status_code == 200 and f"pagina {page}" in response.text, path
+    response = client.get("/api/x")
+    assert response.status_code == 404 and response.headers["content-type"].startswith("application/json")
