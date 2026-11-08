@@ -1,0 +1,239 @@
+{
+  "file": "e2/e2-04-titulo-mesclado.xlsx",
+  "synthetic": true,
+  "week_start": "2027-01-11",
+  "expect": "shifts",
+  "shifts": [
+    {
+      "person_name": "Fábio Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T20:00:00"
+    },
+    {
+      "person_name": "Fábio Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00"
+    },
+    {
+      "person_name": "Fábio Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00"
+    },
+    {
+      "person_name": "Fábio Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00"
+    },
+    {
+      "person_name": "Fábio Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T15:20:00"
+    },
+    {
+      "person_name": "Fábio Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00"
+    },
+    {
+      "person_name": "Hugo Cardoso (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T15:20:00"
+    },
+    {
+      "person_name": "Hugo Cardoso (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00"
+    },
+    {
+      "person_name": "Hugo Cardoso (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T12:40:00",
+      "end": "2027-01-14T20:00:00"
+    },
+    {
+      "person_name": "Hugo Cardoso (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00"
+    },
+    {
+      "person_name": "Hugo Cardoso (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00"
+    },
+    {
+      "person_name": "Hugo Cardoso (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00"
+    },
+    {
+      "person_name": "Karina Pacheco (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00"
+    },
+    {
+      "person_name": "Karina Pacheco (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00"
+    },
+    {
+      "person_name": "Karina Pacheco (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00"
+    },
+    {
+      "person_name": "Karina Pacheco (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00"
+    },
+    {
+      "person_name": "Karina Pacheco (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-15T12:40:00",
+      "end": "2027-01-15T20:00:00"
+    },
+    {
+      "person_name": "Karina Pacheco (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00"
+    },
+    {
+      "person_name": "Lucas Junqueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T23:30:00"
+    },
+    {
+      "person_name": "Lucas Junqueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00"
+    },
+    {
+      "person_name": "Lucas Junqueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00"
+    },
+    {
+      "person_name": "Lucas Junqueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00"
+    },
+    {
+      "person_name": "Lucas Junqueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00"
+    },
+    {
+      "person_name": "Lucas Junqueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00"
+    },
+    {
+      "person_name": "Paulo Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00"
+    },
+    {
+      "person_name": "Paulo Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00"
+    },
+    {
+      "person_name": "Paulo Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00"
+    },
+    {
+      "person_name": "Paulo Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-15T12:40:00",
+      "end": "2027-01-15T20:00:00"
+    },
+    {
+      "person_name": "Paulo Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00"
+    },
+    {
+      "person_name": "Paulo Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T12:40:00",
+      "end": "2027-01-17T20:00:00"
+    },
+    {
+      "person_name": "Rafael Vasconcelos (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00"
+    },
+    {
+      "person_name": "Rafael Vasconcelos (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00"
+    },
+    {
+      "person_name": "Rafael Vasconcelos (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00"
+    },
+    {
+      "person_name": "Rafael Vasconcelos (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00"
+    },
+    {
+      "person_name": "Rafael Vasconcelos (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00"
+    },
+    {
+      "person_name": "Rafael Vasconcelos (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00"
+    }
+  ],
+  "mapping_hint": {
+    "layout": "long",
+    "sheet": "Escala",
+    "header_row": 4,
+    "merged_title": "A1:E1",
+    "columns": {
+      "person_name": "Nome do colaborador",
+      "store": "Loja",
+      "date": "Dia",
+      "start": "Início",
+      "end": "Término"
+    },
+    "typed_cells": "a coluna Dia é data do Excel; Início e Término são texto HH:MM"
+  },
+  "expected_issues": []
+}

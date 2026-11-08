@@ -1,0 +1,458 @@
+{
+  "file": "e2/e2-06-datas-mistas.csv",
+  "synthetic": true,
+  "week_start": "2027-01-11",
+  "expect": "shifts",
+  "shifts": [
+    {
+      "person_name": "Carla Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T20:00:00"
+    },
+    {
+      "person_name": "Carla Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00"
+    },
+    {
+      "person_name": "Carla Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00"
+    },
+    {
+      "person_name": "Carla Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00"
+    },
+    {
+      "person_name": "Carla Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00"
+    },
+    {
+      "person_name": "Carla Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T08:00:00",
+      "end": "2027-01-17T15:20:00"
+    },
+    {
+      "person_name": "Gabriela Quintela (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00"
+    },
+    {
+      "person_name": "Gabriela Quintela (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00"
+    },
+    {
+      "person_name": "Gabriela Quintela (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00"
+    },
+    {
+      "person_name": "Gabriela Quintela (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00"
+    },
+    {
+      "person_name": "Gabriela Quintela (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T12:40:00",
+      "end": "2027-01-15T20:00:00"
+    },
+    {
+      "person_name": "Gabriela Quintela (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T08:00:00",
+      "end": "2027-01-17T15:20:00"
+    },
+    {
+      "person_name": "Iara Rezende (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00"
+    },
+    {
+      "person_name": "Iara Rezende (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00"
+    },
+    {
+      "person_name": "Iara Rezende (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00"
+    },
+    {
+      "person_name": "Iara Rezende (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T15:20:00"
+    },
+    {
+      "person_name": "Iara Rezende (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00"
+    },
+    {
+      "person_name": "Iara Rezende (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00"
+    },
+    {
+      "person_name": "João Dantas (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00"
+    },
+    {
+      "person_name": "João Dantas (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T15:20:00"
+    },
+    {
+      "person_name": "João Dantas (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00"
+    },
+    {
+      "person_name": "João Dantas (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T12:40:00",
+      "end": "2027-01-14T20:00:00"
+    },
+    {
+      "person_name": "João Dantas (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00"
+    },
+    {
+      "person_name": "João Dantas (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00"
+    },
+    {
+      "person_name": "Paulo Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T20:00:00"
+    },
+    {
+      "person_name": "Paulo Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00"
+    },
+    {
+      "person_name": "Paulo Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00"
+    },
+    {
+      "person_name": "Paulo Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T12:40:00",
+      "end": "2027-01-15T20:00:00"
+    },
+    {
+      "person_name": "Paulo Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00"
+    },
+    {
+      "person_name": "Paulo Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00"
+    },
+    {
+      "person_name": "Vitor Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T15:20:00"
+    },
+    {
+      "person_name": "Vitor Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T15:20:00"
+    },
+    {
+      "person_name": "Vitor Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00"
+    },
+    {
+      "person_name": "Vitor Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00"
+    },
+    {
+      "person_name": "Vitor Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T12:40:00",
+      "end": "2027-01-15T20:00:00"
+    },
+    {
+      "person_name": "Vitor Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00"
+    }
+  ],
+  "mapping_hint": {
+    "layout": "long",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "comment_prefix": "#",
+    "header_row": 2,
+    "columns": {
+      "person_name": "Nome",
+      "date": "Data",
+      "start": "Início",
+      "end": "Fim",
+      "store": "Loja"
+    },
+    "date_format": "misto: dd/mm/aaaa e aaaa-mm-dd na mesma coluna (dd/mm/aaaa nunca é mm/dd)",
+    "date_cells": [
+      {
+        "line": 3,
+        "column": "Data",
+        "value": "2027-01-11",
+        "format": "aaaa-mm-dd"
+      },
+      {
+        "line": 4,
+        "column": "Data",
+        "value": "13/01/2027",
+        "format": "dd/mm/aaaa"
+      },
+      {
+        "line": 5,
+        "column": "Data",
+        "value": "14/01/2027",
+        "format": "dd/mm/aaaa"
+      },
+      {
+        "line": 6,
+        "column": "Data",
+        "value": "2027-01-15",
+        "format": "aaaa-mm-dd"
+      },
+      {
+        "line": 7,
+        "column": "Data",
+        "value": "2027-01-16",
+        "format": "aaaa-mm-dd"
+      },
+      {
+        "line": 8,
+        "column": "Data",
+        "value": "17/01/2027",
+        "format": "dd/mm/aaaa"
+      },
+      {
+        "line": 9,
+        "column": "Data",
+        "value": "11/01/2027",
+        "format": "dd/mm/aaaa"
+      },
+      {
+        "line": 10,
+        "column": "Data",
+        "value": "2027-01-12",
+        "format": "aaaa-mm-dd"
+      },
+      {
+        "line": 11,
+        "column": "Data",
+        "value": "2027-01-13",
+        "format": "aaaa-mm-dd"
+      },
+      {
+        "line": 12,
+        "column": "Data",
+        "value": "14/01/2027",
+        "format": "dd/mm/aaaa"
+      },
+      {
+        "line": 13,
+        "column": "Data",
+        "value": "16/01/2027",
+        "format": "dd/mm/aaaa"
+      },
+      {
+        "line": 14,
+        "column": "Data",
+        "value": "2027-01-17",
+        "format": "aaaa-mm-dd"
+      },
+      {
+        "line": 15,
+        "column": "Data",
+        "value": "11/01/2027",
+        "format": "dd/mm/aaaa"
+      },
+      {
+        "line": 16,
+        "column": "Data",
+        "value": "12/01/2027",
+        "format": "dd/mm/aaaa"
+      },
+      {
+        "line": 17,
+        "column": "Data",
+        "value": "13/01/2027",
+        "format": "dd/mm/aaaa"
+      },
+      {
+        "line": 18,
+        "column": "Data",
+        "value": "2027-01-14",
+        "format": "aaaa-mm-dd"
+      },
+      {
+        "line": 19,
+        "column": "Data",
+        "value": "2027-01-15",
+        "format": "aaaa-mm-dd"
+      },
+      {
+        "line": 20,
+        "column": "Data",
+        "value": "16/01/2027",
+        "format": "dd/mm/aaaa"
+      },
+      {
+        "line": 21,
+        "column": "Data",
+        "value": "2027-01-11",
+        "format": "aaaa-mm-dd"
+      },
+      {
+        "line": 22,
+        "column": "Data",
+        "value": "2027-01-13",
+        "format": "aaaa-mm-dd"
+      },
+      {
+        "line": 23,
+        "column": "Data",
+        "value": "14/01/2027",
+        "format": "dd/mm/aaaa"
+      },
+      {
+        "line": 24,
+        "column": "Data",
+        "value": "15/01/2027",
+        "format": "dd/mm/aaaa"
+      },
+      {
+        "line": 25,
+        "column": "Data",
+        "value": "2027-01-16",
+        "format": "aaaa-mm-dd"
+      },
+      {
+        "line": 26,
+        "column": "Data",
+        "value": "17/01/2027",
+        "format": "dd/mm/aaaa"
+      },
+      {
+        "line": 27,
+        "column": "Data",
+        "value": "11/01/2027",
+        "format": "dd/mm/aaaa"
+      },
+      {
+        "line": 28,
+        "column": "Data",
+        "value": "12/01/2027",
+        "format": "dd/mm/aaaa"
+      },
+      {
+        "line": 29,
+        "column": "Data",
+        "value": "13/01/2027",
+        "format": "dd/mm/aaaa"
+      },
+      {
+        "line": 30,
+        "column": "Data",
+        "value": "2027-01-15",
+        "format": "aaaa-mm-dd"
+      },
+      {
+        "line": 31,
+        "column": "Data",
+        "value": "16/01/2027",
+        "format": "dd/mm/aaaa"
+      },
+      {
+        "line": 32,
+        "column": "Data",
+        "value": "2027-01-17",
+        "format": "aaaa-mm-dd"
+      },
+      {
+        "line": 33,
+        "column": "Data",
+        "value": "11/01/2027",
+        "format": "dd/mm/aaaa"
+      },
+      {
+        "line": 34,
+        "column": "Data",
+        "value": "2027-01-12",
+        "format": "aaaa-mm-dd"
+      },
+      {
+        "line": 35,
+        "column": "Data",
+        "value": "2027-01-13",
+        "format": "aaaa-mm-dd"
+      },
+      {
+        "line": 36,
+        "column": "Data",
+        "value": "14/01/2027",
+        "format": "dd/mm/aaaa"
+      },
+      {
+        "line": 37,
+        "column": "Data",
+        "value": "2027-01-15",
+        "format": "aaaa-mm-dd"
+      },
+      {
+        "line": 38,
+        "column": "Data",
+        "value": "17/01/2027",
+        "format": "dd/mm/aaaa"
+      }
+    ]
+  },
+  "expected_issues": []
+}
