@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { ScheduleGrid } from "../ScheduleGrid";
 import { StatusChip } from "../StatusChip";
 import { ChatBubble } from "../ChatBubble";
-import { LogoMark } from "../Logo";
+import { Pat } from "../Pat";
+import { patDoPasso, patLabel } from "@/lib/pat";
 import { DAYS, STORY_CAPTIONS, STORY_LAST_STEP, stepFromProgress, storyRows } from "@/lib/story";
 import { useReducedMotion } from "./useReducedMotion";
 
@@ -31,6 +32,7 @@ export function HeroStory() {
     };
   }, [reduced]);
 
+  const estadoPat = patDoPasso(step);
   const warn = step >= 2 && step < 4;
 
   return (
@@ -56,15 +58,16 @@ export function HeroStory() {
 
           <div className="overflow-hidden rounded-card bg-surface-chat shadow-float lg:w-[400px] lg:flex-none">
             <div className="flex items-center gap-3 border-b border-line bg-surface px-4 py-3 sm:px-5 sm:py-4">
-              <span className="grid size-10 place-items-center rounded-full bg-accent">
-                <LogoMark size={22} block="#ffffff" />
+              <span className="-m-1 grid size-12 flex-none place-items-center">
+                <Pat key={estadoPat} estado={estadoPat} size={48} />
               </span>
               <div className="leading-tight">
-                <b className="block font-medium">Remane</b>
-                <span className="text-[13px] text-ink-muted">agente da Loja Boa Viagem</span>
+                <b className="block font-medium">Pat</b>
+                <span className="text-[13px] text-ink-muted">agente do Remane · Loja Boa Viagem</span>
               </div>
             </div>
             <div className="flex h-[172px] flex-col justify-end gap-2.5 overflow-hidden px-4 py-3 sm:h-[330px] sm:py-4.5" aria-live="polite">
+              <span className="sr-only">{patLabel(estadoPat)}</span>
               {step >= 1 && (
                 <ChatBubble from="person" attachment="atestado.jpg · 1 dia">
                   Bom dia, não vou conseguir ir hoje. Mandei o atestado.
