@@ -1,18 +1,20 @@
 """Implementações falsas das portas de `escalista.domain.ports`, para as 3 frentes."""
 
 from collections.abc import Iterable, Mapping, Sequence
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 from escalista.domain.contracts import ExceptionCard, LLMMessage, LLMResult, LLMUnavailableError, TraceEvent
 from escalista.domain.results import Approval, RunState, ScheduleVersion
 from escalista.domain.roster import Roster
+from escalista.domain.tracking import Case, ChannelMessage, Punch, PunchUnavailableError
 
 # Nomes das ferramentas forçadas de cada nó (plano da C6, seção 5.4). Ficam aqui, e não em `domain/`, porque são da
 # borda `llm/`; os prompts da frente B usam os mesmos textos (`llm/prompts/justify.py:TOOL_NAME` já é o último).
 TOOL_MAPPING = "registrar_mapeamento"  # nó 1: ColumnMapping
 TOOL_SPEC = "registrar_especificacao"  # nó 2: SolveSpec
 TOOL_JUSTIFY = "registrar_justificativa"  # justificativa
+TOOL_ATESTADO = "read_atestado"  # C7: leitura da comprovação (`llm/prompts/atestado.py:TOOL_NAME`)
 
 
 class FixedClock:
@@ -24,6 +26,14 @@ class FixedClock:
 
     def set(self, now: datetime) -> None:
         self._now = now
+
+
+class FakeClock(FixedClock):
+    """Relógio falso que avança em passos (C7, SAIDA-AC-01)."""
+
+    def advance(self, delta: timedelta) -> datetime:
+        self._now = self._now + delta
+        return self._now
 
 
 class ListTraceSink:
@@ -142,3 +152,69 @@ class InMemoryRepository:
 
     def get_roster(self, version: int) -> Roster | None:
         return self.rosters.get(version)
+
+
+# --- acompanhamento (C7) -------------------------------------------------------------------------------------------
+
+
+class FakeChannel:
+    """`Channel` em memória; `sent` guarda tudo o que saiu (PEDIDO-EV-08)."""
+
+    def __init__(self) -> None:
+        self.messages: list[ChannelMessage] = []
+
+    @property
+    def sent(self) -> list[ChannelMessage]:
+        return [m for m in self.messages if m.direction == "out"]
+
+    def send(self, message: ChannelMessage) -> None:
+        self.messages.append(message.model_copy(deep=True))
+
+    def inbox(self, party: str) -> list[ChannelMessage]:
+        return [m for m in self.messages if m.party == party]
+
+
+class FakePunchSource:
+    """`PunchSource` com batidas fixas; `fail=True` simula o ponto fora do ar (RX-12)."""
+
+    def __init__(self, punches: Iterable[Punch] = (), *, fail: bool = False) -> None:
+        self._punches = list(punches)
+        self.fail = fail
+
+    def punches(self, *, until: datetime) -> list[Punch]:
+        if self.fail:
+            raise PunchUnavailableError("ponto simulado fora do ar (falha simulada)")
+        return [p for p in self._punches if p.at <= until]
+
+
+class InMemoryTrackRepository:
+    def __init__(self) -> None:
+        self.cases: dict[str, Case] = {}
+
+    def save_case(self, case: Case) -> None:
+        self.cases[case.id] = case.model_copy(deep=True)
+
+    def get_case(self, case_id: str) -> Case | None:
+        found = self.cases.get(case_id)
+        return found.model_copy(deep=True) if found else None
+
+    def list_cases(self) -> list[Case]:
+        return sorted((c.model_copy(deep=True) for c in self.cases.values()), key=lambda c: (c.created_at, c.id))
+
+    def reset(self) -> None:
+        self.cases.clear()
+
+
+class ListExceptionQueue:
+    """`ExceptionQueue` em lista: guarda (id, cartão, origem)."""
+
+    def __init__(self) -> None:
+        self.items: list[tuple[str, ExceptionCard, dict[str, Any]]] = []
+
+    def open(self, card: ExceptionCard, source: dict[str, Any]) -> str:
+        item_id = f"exc-{len(self.items) + 1}"
+        self.items.append((item_id, card, dict(source)))
+        return item_id
+
+    def codes(self) -> list[str]:
+        return [card.code for _, card, _ in self.items]

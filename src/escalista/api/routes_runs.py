@@ -254,8 +254,22 @@ def approve(
     return agent.approve(run_id, approval)
 
 
+TRACK_RUN_PREFIX = "track-"  # rastro do acompanhamento (C7): `track-<case_id>` por caso e `track-sweep`
+TRACK_SWEEP_RUN = "track-sweep"
+
+
 @router.get("/runs/{run_id}/trace", response_model=list[TraceEvent])
-def trace(run_id: str, agent: SliceAgentC6 = Depends(get_agent)) -> list[TraceEvent]:  # noqa: B008
+def trace(run_id: str, request: Request, agent: SliceAgentC6 = Depends(get_agent)) -> list[TraceEvent]:  # noqa: B008
+    """Rastro de uma execução do agente da escala ou, para `track-<case_id>` e `track-sweep`, do acompanhamento (a
+    auditoria de um caso, passo 6 do roteiro da C7). O acompanhamento não é execução do agente: lê direto do sink,
+    que já gravou os payloads mascarados (sem texto livre nem CID)."""
+    if run_id.startswith(TRACK_RUN_PREFIX):
+        from escalista.audit.sink import SqlTraceSink
+
+        events = SqlTraceSink(request.app.state.engine).list_events(run_id)
+        if not events and run_id != TRACK_SWEEP_RUN:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="caso sem rastro")
+        return events
     _run_or_404(agent, run_id)
     return agent.trace(run_id)
 

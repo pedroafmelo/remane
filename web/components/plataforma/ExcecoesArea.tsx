@@ -1,22 +1,26 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { asFailure } from "@/lib/api";
+import { api, asFailure } from "@/lib/api";
 import { excecoesApi } from "@/lib/api-excecoes";
 import type { Failure } from "@/lib/errors";
 import { toExceptionView } from "@/lib/exception";
-import { dueLabel } from "@/lib/excecoes";
+import { dueLabel, trackRunId } from "@/lib/excecoes";
 import { timeBr } from "@/lib/format";
 import { roleLabel } from "@/lib/roles";
+import type { TraceEvent } from "@/lib/types";
 import type { ExceptionItem, ExceptionQueue } from "@/lib/types-excecoes";
 import { Button } from "../Button";
 import { ExceptionCard } from "../ExceptionCard";
 import { Pat } from "../Pat";
+import { useClockChange } from "./DemoClockBar";
 import { Shell } from "./Shell";
 import { SessionGate, useSession } from "./session";
+import { TracePanel } from "./Trace";
 import { Card, Muted, Notice } from "./ui";
 
 type Choice = { id: string; index: number };
+type CaseTrace = { runId: string; title: string; events: TraceEvent[] };
 
 /** Fila de exceções do gestor (FT-04): abertas com as opções e o custo, a escolha confirmada, depois o histórico. */
 export function ExcecoesArea() {
@@ -25,6 +29,22 @@ export function ExcecoesArea() {
   const [choice, setChoice] = useState<Choice | null>(null);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<string | null>(null);
+  const [caseTrace, setCaseTrace] = useState<CaseTrace | null>(null);
+
+  // auditoria do caso (passo 6 do roteiro): o mesmo rastro das execuções, lido de `track-<case_id>`
+  async function showTrace(item: ExceptionItem) {
+    const runId = trackRunId(item);
+    if (!runId) return;
+    setProblem(null);
+    try {
+      setCaseTrace({ runId, title: item.card.title, events: await api.trace(runId) });
+      requestAnimationFrame(() => document.getElementById("rastro-caso")?.scrollIntoView({ behavior: "smooth" }));
+    } catch (err) {
+      const failure = asFailure(err);
+      if (failure.kind === "auth") session.toLogin();
+      else setProblem(failure);
+    }
+  }
 
   const load = useCallback(async () => {
     try {
@@ -34,6 +54,11 @@ export function ExcecoesArea() {
     }
   }, []);
   const session = useSession("gestor", load);
+  // o relógio avançou ou a demo reiniciou: os cartões novos (cobertura, ponto) chegam sem recarregar a página
+  useClockChange(() => {
+    setDone(null);
+    void load();
+  });
 
   async function decide(c: Choice) {
     setBusy(true);
@@ -77,7 +102,16 @@ export function ExcecoesArea() {
         </Card>
       ) : (
         open.map((item) => (
-          <OpenItem key={item.id} item={item} now={queue.now} choice={choice} busy={busy} onChoose={setChoice} onConfirm={decide} />
+          <OpenItem
+            key={item.id}
+            item={item}
+            now={queue.now}
+            choice={choice}
+            busy={busy}
+            onChoose={setChoice}
+            onConfirm={decide}
+            onTrace={showTrace}
+          />
         ))
       )}
       {queue && queue.decided.length > 0 && (
@@ -96,10 +130,23 @@ export function ExcecoesArea() {
                     </span>
                   </>
                 )}
+                {trackRunId(item) && (
+                  <span>
+                    <Button size="sm" variant="secondary" onClick={() => void showTrace(item)}>
+                      Ver rastro do caso
+                    </Button>
+                  </span>
+                )}
               </li>
             ))}
           </ul>
         </Card>
+      )}
+      {caseTrace && (
+        <>
+          <TracePanel events={caseTrace.events} title={`Rastro do caso · ${caseTrace.title}`} id="rastro-caso" simulated />
+          <Muted>Execução {caseTrace.runId}. Horas em tempo simulado (relógio de demo); custo e tokens são os medidos no rastro.</Muted>
+        </>
       )}
     </Shell>
   );
@@ -112,6 +159,7 @@ function OpenItem({
   busy,
   onChoose,
   onConfirm,
+  onTrace,
 }: {
   item: ExceptionItem;
   now: string;
@@ -119,6 +167,7 @@ function OpenItem({
   busy: boolean;
   onChoose: (c: Choice | null) => void;
   onConfirm: (c: Choice) => void;
+  onTrace: (item: ExceptionItem) => void;
 }) {
   const v = toExceptionView(item.card);
   const chosen = choice?.id === item.id ? choice : null;
@@ -127,7 +176,12 @@ function OpenItem({
     ...(v.recommendation ? [{ label: "Recomendação do Pat", value: v.recommendation }] : []),
     ...(v.ifNoAnswer ? [{ label: "Se ninguém responder", value: v.ifNoAnswer }] : []),
   ];
-  const actions = chosen ? (
+  const traceButton = trackRunId(item) ? (
+    <Button size="sm" variant="secondary" onClick={() => onTrace(item)} disabled={busy}>
+      Ver rastro do caso
+    </Button>
+  ) : null;
+  const decision = chosen ? (
     <div className="flex w-full flex-col gap-2 rounded-bubble border border-line-strong p-3.5">
       <p className="text-sm">
         Você escolheu: <strong>{v.options[chosen.index].label}</strong>. Confirmar?
@@ -157,6 +211,12 @@ function OpenItem({
         </li>
       ))}
     </ul>
+  );
+  const actions = (
+    <div className="flex w-full flex-col gap-2">
+      {decision}
+      {traceButton && <div>{traceButton}</div>}
+    </div>
   );
   return (
     <ExceptionCard

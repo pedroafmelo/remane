@@ -1,0 +1,32 @@
+{
+  "file": "acompanhamento/atestados/at-04-escaneado.pdf",
+  "synthetic": true,
+  "expected_day": "2027-01-14",
+  "employee_name": "Ana (sintético)",
+  "expect": {
+    "legible": false,
+    "issued_on": null,
+    "start_on": null,
+    "days": null,
+    "patient_matches": null,
+    "has_crm": null,
+    "verdict": "ilegivel",
+    "reasons": [
+      "ilegivel"
+    ]
+  },
+  "planted_cid": [
+    "A09"
+  ],
+  "note": "PDF só com imagem, sem camada de texto: ilegível sem chamar o modelo (T1).",
+  "expect_with_vision": {
+    "legible": true,
+    "issued_on": "2027-01-13",
+    "start_on": "2027-01-14",
+    "days": 2,
+    "patient_matches": true,
+    "has_crm": true,
+    "verdict": "valido",
+    "reasons": []
+  }
+}

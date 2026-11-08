@@ -1,0 +1,19 @@
+{
+  "file": "acompanhamento/atestados/at-01-legivel.pdf",
+  "synthetic": true,
+  "expected_day": "2027-01-14",
+  "employee_name": "Ana (sintético)",
+  "expect": {
+    "legible": true,
+    "issued_on": "2027-01-13",
+    "start_on": "2027-01-14",
+    "days": 2,
+    "patient_matches": true,
+    "has_crm": true,
+    "verdict": "valido",
+    "reasons": []
+  },
+  "planted_cid": [
+    "A09"
+  ]
+}

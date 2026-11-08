@@ -1,7 +1,9 @@
 """`SqlTraceSink`: implementa a porta `TraceSink` sobre a tabela `trace_event` (RN-01 a RN-03, arquitetura, seção 9).
 
 Antes de gravar, o `payload` passa pela máscara (`audit.mask`) e as colunas de texto também (defesa em profundidade:
-elas deveriam carregar só referências). O log registra só `kind`, `run_id` e `id`, nunca o `payload`.
+elas deveriam carregar só referências). Depois da máscara, o `payload` passa pelo filtro de campos protegidos
+(`audit.protected.scrub`, RN-06): por nome de campo em todo evento e pelo padrão de CID só em `track.*`.
+O log registra só `kind`, `run_id` e `id`, nunca o `payload`.
 """
 
 from __future__ import annotations
@@ -14,6 +16,7 @@ from sqlalchemy import Engine, func, select
 from sqlalchemy.orm import Session
 
 from escalista.audit.mask import Masker
+from escalista.audit.protected import scrub
 from escalista.audit.tables import TraceEventRow
 from escalista.clock.system import to_brasilia_naive
 from escalista.domain.contracts import TraceEvent
@@ -52,7 +55,7 @@ class SqlTraceSink:
             tokens_out=event.tokens_out,
             cost_usd=event.cost_usd,
             latency_ms=event.latency_ms,
-            payload=self._mask.payload(event.payload),
+            payload=scrub(self._mask.payload(event.payload), kind=event.kind),
         )
         ident = (row.kind, row.run_id, row.id)  # já mascarados; o objeto expira no commit
         with Session(self._engine) as session, session.begin():

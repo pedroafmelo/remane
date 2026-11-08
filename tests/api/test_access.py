@@ -67,6 +67,7 @@ ROUTES: list[Route] = [
     Route("GET", "/api/runs/{run_id}/schedule", GESTOR, url=f"/api/runs/{APPROVE}/schedule"),
     Route("POST", "/api/runs/{run_id}/approve", GESTOR, url=f"/api/runs/{APPROVE}/approve"),
     Route("GET", "/api/runs/{run_id}/trace", GESTOR, url=f"/api/runs/{APPROVE}/trace"),
+    Route("GET", "/api/runs/{run_id}/trace", GESTOR, url="/api/runs/track-sweep/trace"),  # rastro do acompanhamento
     Route("GET", "/api/schedules/published", GESTOR),
     Route("GET", "/api/roster", GESTOR),
     Route("GET", "/api/demo/files/{name}", GESTOR, url="/api/demo/files/escala_atual.csv"),
@@ -80,9 +81,41 @@ ROUTES: list[Route] = [
     ),
     Route("GET", "/api/colaborador/escala", COLABORADOR),
     Route("POST", "/api/colaborador/falta", COLABORADOR, request={"json": {"day": "2027-01-13"}}),
+    # C7: relógio de demo e celular simulado. Anexo, oferta e resposta a um id inexistente: 404 prova que o portão de
+    # acesso deixou passar (o fluxo feliz está em tests/api/test_tracker_routes.py).
+    Route("GET", "/api/demo/clock", ALL_ROLES),
+    Route("POST", "/api/demo/clock/advance", ALL_ROLES, request={"json": {"minutes": 15}}),
+    Route("POST", "/api/demo/reset", GESTOR),
+    Route("GET", "/api/colaborador/pessoas", COLABORADOR),
+    Route("GET", "/api/colaborador/caixa", COLABORADOR),
+    Route("POST", "/api/colaborador/aviso", COLABORADOR, request={"json": {"day": "2027-01-13", "kind": "falta"}}),
+    Route(
+        "POST",
+        "/api/colaborador/caso/{case_id}/anexo",
+        COLABORADOR,
+        ok_status=404,
+        url="/api/colaborador/caso/nao-existe/anexo",
+        request={"content": b"%PDF-1.4 sintetico", "headers": {"Content-Type": "application/pdf"}},
+    ),
+    Route(
+        "POST",
+        "/api/colaborador/oferta/{offer_id}",
+        COLABORADOR,
+        ok_status=404,
+        url="/api/colaborador/oferta/nao-existe",
+        request={"json": {"accept": True}},
+    ),
+    Route(
+        "POST",
+        "/api/colaborador/resposta",
+        COLABORADOR,
+        ok_status=404,
+        request={"json": {"case_id": "nao-existe", "coming": True}},
+    ),
     Route("GET", "/api/rules", GESTOR),
     Route("POST", "/api/simulate/vigencia", GESTOR),
     Route("GET", "/api/impact", GESTOR),
+    Route("GET", "/api/evals", GESTOR),
 ]
 
 CASES_FORBIDDEN = [(r, role) for r in ROUTES for role in Role if role not in r.roles]

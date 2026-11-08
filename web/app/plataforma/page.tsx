@@ -9,6 +9,7 @@ import { Button } from "@/components/Button";
 import { ComparePanel } from "@/components/plataforma/Compare";
 import { ExceptionPanel } from "@/components/plataforma/ExceptionPanel";
 import { NoticeList } from "@/components/plataforma/NoticeList";
+import { useClockChange } from "@/components/plataforma/DemoClockBar";
 import { PatWorking } from "@/components/plataforma/PatWorking";
 import { JustificationPanel } from "@/components/plataforma/Justification";
 import { SpecApplied } from "@/components/plataforma/SpecApplied";
@@ -80,6 +81,13 @@ export default function PlataformaPage() {
     setTrace([]);
     setProblem(null);
   }
+
+  // "Reiniciar demo" publica a semana sintética: a tela larga a execução em andamento e relê a escala publicada
+  useClockChange((change) => {
+    if (change.action !== "reset") return;
+    reset();
+    void refreshPublished();
+  });
 
   const logout = () =>
     act("logout", async () => {

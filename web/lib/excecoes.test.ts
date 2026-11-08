@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { dayLabel, dueLabel, faltaDays, faltaReply, receiptText } from "./excecoes.ts";
+import { dayLabel, dueLabel, faltaDays, faltaReply, receiptText, trackRunId } from "./excecoes.ts";
 import type { MyFalta, MyWeek } from "./types-excecoes.ts";
 
 const falta: MyFalta = {
@@ -12,6 +12,13 @@ const falta: MyFalta = {
   covered_by: null,
   decision: null,
 };
+
+test("trackRunId só devolve o rastro de cartões do acompanhamento", () => {
+  assert.equal(trackRunId({ source: { kind: "track", case_id: "c1", run_id: "track-c1" } }), "track-c1");
+  assert.equal(trackRunId({ source: { kind: "track", case_id: null, run_id: "track-sweep" } }), "track-sweep");
+  assert.equal(trackRunId({ source: { kind: "regras" } }), null);
+  assert.equal(trackRunId({ source: { kind: "falta", run_id: "run-1" } }), null);
+});
 
 test("dayLabel usa o dia da semana em português", () => {
   assert.equal(dayLabel("2027-01-13"), "qua 13/01");

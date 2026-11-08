@@ -8,6 +8,7 @@ obrigado a chamar; os argumentos são validados com o mesmo modelo.
   `LLMUnavailableError` com cartão RX-12. Falha do cliente (`LLMUnavailableError`) propaga como está.
 - **Nunca devolve texto livre no lugar:** o `content` da resposta é ignorado; só `tool_args` validado vira resultado.
 - O motivo do reenvio não repete o valor recusado (só o caminho do campo e a mensagem), para não ecoar dado no prompt.
+  Campo extra com nome de CID (o nome é texto do modelo) aparece como `(campo fora do schema)` (RN-06).
 - O rastro de cada chamada é do cliente (`kind` pedido); aqui não há evento próprio.
 """
 
@@ -20,6 +21,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ValidationError
 
+from escalista.audit.protected import CID_PATTERN, strip_cid
 from escalista.domain.contracts import ExceptionCard, LLMMessage, LLMUnavailableError
 from escalista.domain.ports import LLMClient
 
@@ -55,7 +57,7 @@ def call_structured[M: BaseModel](
     parent_id: str | None = None,
     tool_name: str | None = None,
     tool_description: str | None = None,
-    size: Literal["small", "large"] = "small",
+    size: Literal["small", "large", "vision"] = "small",
     kind: str | None = None,
     validate: Callable[[M], None] | None = None,
     what: str = "saída estruturada",
@@ -107,8 +109,16 @@ def _check[M: BaseModel](args: dict[str, Any] | None, model: type[M], validate: 
 
 
 def _describe(error: Any) -> str:
-    where = ".".join(str(p) for p in error["loc"]) or "(raiz)"
+    """Caminho e mensagem do erro. O nome de um campo extra é texto do modelo: se parecer CID (RN-06), não é ecoado."""
+    loc = [str(p) for p in error["loc"]]
+    if error.get("type") == "extra_forbidden" and loc and _looks_like_cid(loc[-1]):
+        loc[-1] = "(campo fora do schema)"
+    where = ".".join(loc) or "(raiz)"
     return f"{where}: {error['msg']}"
+
+
+def _looks_like_cid(name: str) -> bool:
+    return CID_PATTERN.search(name.upper()) is not None or strip_cid(name) != name
 
 
 def _clip(text: str) -> str:

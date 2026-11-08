@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     featherless_base_url: str = "https://api.featherless.ai/v1"
     featherless_model_small: str = "Qwen/Qwen3.5-9B"
     featherless_model_large: str = "google/gemma-4-31B-it"
+    # Foto do atestado (C7 T2): DEC-020 escolheu este modelo para a foto, mas ele **nunca foi testado com imagem** na
+    # Featherless; se não aceitar imagem, a leitura cai em RX-12 (abono provisório). Sem reserva configurada.
+    featherless_model_vision: str = "Qwen/Qwen3.5-9B"
     featherless_model_small_fallback: str | None = None
     featherless_model_large_fallback: str | None = None
     featherless_concurrency_units: int | None = None

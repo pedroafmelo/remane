@@ -1,0 +1,643 @@
+{
+  "synthetic": true,
+  "week_start": "2027-01-11",
+  "stores": [
+    {
+      "id": "L1",
+      "name": "Loja Sintética Centro",
+      "opens": "08:00",
+      "closes": "22:00"
+    },
+    {
+      "id": "L2",
+      "name": "Loja Sintética Norte",
+      "opens": "08:00",
+      "closes": "22:00"
+    },
+    {
+      "id": "L3",
+      "name": "Loja Sintética Sul",
+      "opens": "08:00",
+      "closes": "22:00"
+    }
+  ],
+  "employees": [
+    {
+      "id": "P101",
+      "name": "Ana (sintético)",
+      "store_id": "L1",
+      "job": "Atendente",
+      "hourly_wage": "11.82",
+      "contract_hours": 40,
+      "profile": "padrao"
+    },
+    {
+      "id": "P102",
+      "name": "Carla (sintético)",
+      "store_id": "L1",
+      "job": "Atendente",
+      "hourly_wage": "11.88",
+      "contract_hours": 40,
+      "profile": "padrao"
+    },
+    {
+      "id": "P103",
+      "name": "Bruno Ivo (sintético)",
+      "store_id": "L1",
+      "job": "Atendente",
+      "hourly_wage": "11.51",
+      "contract_hours": 40,
+      "profile": "padrao"
+    },
+    {
+      "id": "P104",
+      "name": "Diego Horta (sintético)",
+      "store_id": "L1",
+      "job": "Caixa",
+      "hourly_wage": "12.55",
+      "contract_hours": 40,
+      "profile": "padrao"
+    },
+    {
+      "id": "P105",
+      "name": "Elisa Rezende (sintético)",
+      "store_id": "L1",
+      "job": "Atendente",
+      "hourly_wage": "11.62",
+      "contract_hours": 24,
+      "profile": "padrao"
+    },
+    {
+      "id": "P106",
+      "name": "Fábio Cardoso (sintético)",
+      "store_id": "L1",
+      "job": "Caixa",
+      "hourly_wage": "12.54",
+      "contract_hours": 24,
+      "profile": "padrao"
+    },
+    {
+      "id": "P107",
+      "name": "Gabriela Monteiro (sintético)",
+      "store_id": "L1",
+      "job": "Atendente",
+      "hourly_wage": "11.76",
+      "contract_hours": 24,
+      "profile": "padrao"
+    },
+    {
+      "id": "P108",
+      "name": "Hugo Barros (sintético)",
+      "store_id": "L1",
+      "job": "Repositor",
+      "hourly_wage": "11.94",
+      "contract_hours": 24,
+      "profile": "padrao"
+    },
+    {
+      "id": "P201",
+      "name": "Iara Lacerda (sintético)",
+      "store_id": "L2",
+      "job": "Atendente",
+      "hourly_wage": "11.78",
+      "contract_hours": 40,
+      "profile": "padrao"
+    },
+    {
+      "id": "P202",
+      "name": "Karina Siqueira (sintético)",
+      "store_id": "L2",
+      "job": "Atendente",
+      "hourly_wage": "11.87",
+      "contract_hours": 40,
+      "profile": "padrao"
+    },
+    {
+      "id": "P203",
+      "name": "Lucas Nogueira (sintético)",
+      "store_id": "L2",
+      "job": "Caixa",
+      "hourly_wage": "12.37",
+      "contract_hours": 40,
+      "profile": "padrao"
+    },
+    {
+      "id": "P204",
+      "name": "Nelson Galvão (sintético)",
+      "store_id": "L2",
+      "job": "Atendente",
+      "hourly_wage": "11.50",
+      "contract_hours": 40,
+      "profile": "padrao"
+    },
+    {
+      "id": "P205",
+      "name": "Mariana Teixeira (sintético)",
+      "store_id": "L2",
+      "job": "Repositor",
+      "hourly_wage": "11.90",
+      "contract_hours": 40,
+      "profile": "padrao"
+    },
+    {
+      "id": "P301",
+      "name": "Olívia Quintela (sintético)",
+      "store_id": "L3",
+      "job": "Atendente",
+      "hourly_wage": "11.77",
+      "contract_hours": 40,
+      "profile": "padrao"
+    },
+    {
+      "id": "P302",
+      "name": "Paulo Oliveira (sintético)",
+      "store_id": "L3",
+      "job": "Atendente",
+      "hourly_wage": "11.71",
+      "contract_hours": 40,
+      "profile": "padrao"
+    },
+    {
+      "id": "P303",
+      "name": "Rafael Junqueira (sintético)",
+      "store_id": "L3",
+      "job": "Caixa",
+      "hourly_wage": "12.37",
+      "contract_hours": 40,
+      "profile": "padrao"
+    },
+    {
+      "id": "P304",
+      "name": "Sílvia Esteves (sintético)",
+      "store_id": "L3",
+      "job": "Atendente",
+      "hourly_wage": "11.59",
+      "contract_hours": 40,
+      "profile": "padrao"
+    }
+  ],
+  "shifts": [
+    {
+      "employee_id": "P101",
+      "store_id": "L1",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00"
+    },
+    {
+      "employee_id": "P101",
+      "store_id": "L1",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00"
+    },
+    {
+      "employee_id": "P101",
+      "store_id": "L1",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00"
+    },
+    {
+      "employee_id": "P101",
+      "store_id": "L1",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00"
+    },
+    {
+      "employee_id": "P101",
+      "store_id": "L1",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00"
+    },
+    {
+      "employee_id": "P102",
+      "store_id": "L1",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00"
+    },
+    {
+      "employee_id": "P102",
+      "store_id": "L1",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00"
+    },
+    {
+      "employee_id": "P102",
+      "store_id": "L1",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00"
+    },
+    {
+      "employee_id": "P102",
+      "store_id": "L1",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00"
+    },
+    {
+      "employee_id": "P102",
+      "store_id": "L1",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00"
+    },
+    {
+      "employee_id": "P103",
+      "store_id": "L1",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T16:00:00"
+    },
+    {
+      "employee_id": "P103",
+      "store_id": "L1",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T16:00:00"
+    },
+    {
+      "employee_id": "P103",
+      "store_id": "L1",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T16:00:00"
+    },
+    {
+      "employee_id": "P103",
+      "store_id": "L1",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T16:00:00"
+    },
+    {
+      "employee_id": "P103",
+      "store_id": "L1",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T16:00:00"
+    },
+    {
+      "employee_id": "P104",
+      "store_id": "L1",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T16:00:00"
+    },
+    {
+      "employee_id": "P104",
+      "store_id": "L1",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T16:00:00"
+    },
+    {
+      "employee_id": "P104",
+      "store_id": "L1",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T16:00:00"
+    },
+    {
+      "employee_id": "P104",
+      "store_id": "L1",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T16:00:00"
+    },
+    {
+      "employee_id": "P104",
+      "store_id": "L1",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T16:00:00"
+    },
+    {
+      "employee_id": "P105",
+      "store_id": "L1",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T16:00:00"
+    },
+    {
+      "employee_id": "P105",
+      "store_id": "L1",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T16:00:00"
+    },
+    {
+      "employee_id": "P105",
+      "store_id": "L1",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T16:00:00"
+    },
+    {
+      "employee_id": "P106",
+      "store_id": "L1",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00"
+    },
+    {
+      "employee_id": "P106",
+      "store_id": "L1",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00"
+    },
+    {
+      "employee_id": "P106",
+      "store_id": "L1",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00"
+    },
+    {
+      "employee_id": "P107",
+      "store_id": "L1",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T16:00:00"
+    },
+    {
+      "employee_id": "P107",
+      "store_id": "L1",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T16:00:00"
+    },
+    {
+      "employee_id": "P107",
+      "store_id": "L1",
+      "start": "2027-01-17T08:00:00",
+      "end": "2027-01-17T16:00:00"
+    },
+    {
+      "employee_id": "P108",
+      "store_id": "L1",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T16:00:00"
+    },
+    {
+      "employee_id": "P108",
+      "store_id": "L1",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T16:00:00"
+    },
+    {
+      "employee_id": "P108",
+      "store_id": "L1",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T16:00:00"
+    },
+    {
+      "employee_id": "P201",
+      "store_id": "L2",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T16:00:00"
+    },
+    {
+      "employee_id": "P201",
+      "store_id": "L2",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T16:00:00"
+    },
+    {
+      "employee_id": "P201",
+      "store_id": "L2",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T16:00:00"
+    },
+    {
+      "employee_id": "P201",
+      "store_id": "L2",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T16:00:00"
+    },
+    {
+      "employee_id": "P201",
+      "store_id": "L2",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T16:00:00"
+    },
+    {
+      "employee_id": "P202",
+      "store_id": "L2",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T16:00:00"
+    },
+    {
+      "employee_id": "P202",
+      "store_id": "L2",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T16:00:00"
+    },
+    {
+      "employee_id": "P202",
+      "store_id": "L2",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T16:00:00"
+    },
+    {
+      "employee_id": "P202",
+      "store_id": "L2",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T16:00:00"
+    },
+    {
+      "employee_id": "P202",
+      "store_id": "L2",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T16:00:00"
+    },
+    {
+      "employee_id": "P203",
+      "store_id": "L2",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00"
+    },
+    {
+      "employee_id": "P203",
+      "store_id": "L2",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00"
+    },
+    {
+      "employee_id": "P203",
+      "store_id": "L2",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00"
+    },
+    {
+      "employee_id": "P203",
+      "store_id": "L2",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00"
+    },
+    {
+      "employee_id": "P203",
+      "store_id": "L2",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00"
+    },
+    {
+      "employee_id": "P204",
+      "store_id": "L2",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T16:00:00"
+    },
+    {
+      "employee_id": "P204",
+      "store_id": "L2",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T16:00:00"
+    },
+    {
+      "employee_id": "P204",
+      "store_id": "L2",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T16:00:00"
+    },
+    {
+      "employee_id": "P204",
+      "store_id": "L2",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T16:00:00"
+    },
+    {
+      "employee_id": "P204",
+      "store_id": "L2",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T16:00:00"
+    },
+    {
+      "employee_id": "P205",
+      "store_id": "L2",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00"
+    },
+    {
+      "employee_id": "P205",
+      "store_id": "L2",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00"
+    },
+    {
+      "employee_id": "P205",
+      "store_id": "L2",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00"
+    },
+    {
+      "employee_id": "P205",
+      "store_id": "L2",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00"
+    },
+    {
+      "employee_id": "P205",
+      "store_id": "L2",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00"
+    },
+    {
+      "employee_id": "P301",
+      "store_id": "L3",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00"
+    },
+    {
+      "employee_id": "P301",
+      "store_id": "L3",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00"
+    },
+    {
+      "employee_id": "P301",
+      "store_id": "L3",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00"
+    },
+    {
+      "employee_id": "P301",
+      "store_id": "L3",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00"
+    },
+    {
+      "employee_id": "P301",
+      "store_id": "L3",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00"
+    },
+    {
+      "employee_id": "P302",
+      "store_id": "L3",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T16:00:00"
+    },
+    {
+      "employee_id": "P302",
+      "store_id": "L3",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T16:00:00"
+    },
+    {
+      "employee_id": "P302",
+      "store_id": "L3",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T16:00:00"
+    },
+    {
+      "employee_id": "P302",
+      "store_id": "L3",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T16:00:00"
+    },
+    {
+      "employee_id": "P302",
+      "store_id": "L3",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T16:00:00"
+    },
+    {
+      "employee_id": "P303",
+      "store_id": "L3",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00"
+    },
+    {
+      "employee_id": "P303",
+      "store_id": "L3",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00"
+    },
+    {
+      "employee_id": "P303",
+      "store_id": "L3",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00"
+    },
+    {
+      "employee_id": "P303",
+      "store_id": "L3",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00"
+    },
+    {
+      "employee_id": "P303",
+      "store_id": "L3",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00"
+    },
+    {
+      "employee_id": "P304",
+      "store_id": "L3",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T16:00:00"
+    },
+    {
+      "employee_id": "P304",
+      "store_id": "L3",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T16:00:00"
+    },
+    {
+      "employee_id": "P304",
+      "store_id": "L3",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T16:00:00"
+    },
+    {
+      "employee_id": "P304",
+      "store_id": "L3",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T16:00:00"
+    },
+    {
+      "employee_id": "P304",
+      "store_id": "L3",
+      "start": "2027-01-17T08:00:00",
+      "end": "2027-01-17T16:00:00"
+    }
+  ]
+}

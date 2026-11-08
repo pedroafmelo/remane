@@ -4,7 +4,7 @@ from datetime import date, time
 from decimal import Decimal
 
 import pytest
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from escalista.domain.contracts import LLMResult, LLMUnavailableError
 from escalista.domain.results import Comparison, Justification, ScheduleMetrics, Violation, ViolationReport
@@ -211,6 +211,20 @@ def test_call_structured_is_generic() -> None:
     client = FakeLLMClient([result({"n": "abc"}), result({"n": 3})])
     assert call_structured(client, Answer, messages=[], run_id="r").n == 3
     assert len(client.calls) == 2
+
+
+def test_resend_reason_does_not_echo_an_extra_key_chosen_by_the_model() -> None:
+    """O nome de um campo extra é texto do modelo (pode ser um CID, RN-06): o motivo do reenvio não o repete."""
+
+    class Closed(BaseModel):
+        model_config = ConfigDict(extra="forbid")
+        n: int
+
+    client = FakeLLMClient([result({"n": 1, "J11": "gripe"}), result({"n": 1})])
+    assert call_structured(client, Closed, messages=[], run_id="r").n == 1
+    resend = client.calls[1]["messages"][-1].content
+    assert "J11" not in resend and "gripe" not in resend
+    assert "campo fora do schema" in resend
 
 
 def test_make_justifier_takes_domain_types_and_builds_the_same_prompt() -> None:

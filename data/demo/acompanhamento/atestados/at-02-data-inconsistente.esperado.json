@@ -1,0 +1,21 @@
+{
+  "file": "acompanhamento/atestados/at-02-data-inconsistente.pdf",
+  "synthetic": true,
+  "expected_day": "2027-01-14",
+  "employee_name": "Ana (sintético)",
+  "expect": {
+    "legible": true,
+    "issued_on": "2027-01-05",
+    "start_on": "2027-01-05",
+    "days": 2,
+    "patient_matches": true,
+    "has_crm": true,
+    "verdict": "inconsistente",
+    "reasons": [
+      "data_nao_bate"
+    ]
+  },
+  "planted_cid": [
+    "A09"
+  ]
+}

@@ -7,7 +7,14 @@ from pathlib import Path
 
 import pytest
 
-from tests.architecture.boundaries import AGENTS_PKG, CORE_PACKAGES, check_source, check_tree
+from tests.architecture.boundaries import (
+    AGENTS_PKG,
+    CORE_PACKAGES,
+    check_source,
+    check_tree,
+    check_wallclock,
+    wallclock_calls,
+)
 
 SRC = Path(__file__).resolve().parents[2] / "src"
 
@@ -172,3 +179,25 @@ def test_tree_with_missing_or_empty_core_package_is_rejected(tmp_path):
 def test_real_source_tree_respects_boundaries():
     violations = check_tree(SRC / "escalista")
     assert violations == [], "\n".join(f"{v.path}:{v.line} importa {v.imported}: {v.rule}" for v in violations)
+
+
+# --- relógio injetado no acompanhamento (C7) ------------------------------------------------------------------------
+
+
+def test_wallclock_calls_are_detected():
+    source = "from datetime import date, datetime\nx = datetime.now()\ny = date.today()\nz = dt.datetime.now()\n"
+    assert wallclock_calls(source) == [2, 3, 4]
+
+
+def test_clock_port_is_not_a_wallclock_call():
+    assert wallclock_calls("now = self._clock.now()\n") == []
+
+
+def test_tracker_never_reads_the_system_clock():
+    violations = check_wallclock(SRC / "escalista")
+    assert violations == [], "\n".join(f"{v.path}:{v.line} {v.rule}" for v in violations)
+
+
+def test_tracker_cannot_import_concrete_borders():
+    for border in ("store", "audit", "ingest", "llm", "channel", "clock", "synth", "api"):
+        assert check_source("escalista.agents.tracker.flow", f"from escalista.{border} import x\n"), border
