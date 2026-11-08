@@ -4,9 +4,10 @@
 contra os valores plantados nos atestados sintéticos (`planted_cid` dos `*.esperado.json`): se algum aparecer, nada é
 gravado. O vazamento é dito pelo **caminho JSON** onde está, nunca pelo valor.
 
-Se `escalista.audit.protected.find_leaks` existir (C7), ele decide; senão vale a busca local (texto contido, sem
-diferenciar maiúsculas). Sem arquivos de gabarito não há o que conferir: `planted_checked == 0` e o retrato diz isso em
-`privacidade`.
+Se `escalista.audit.protected.find_leaks` existir (C7, SAIDA-AC-13), ele decide: recebe `{caminho JSON: texto}` e
+devolve a lista de `Leak` (a superfície é o caminho), só com os literais plantados (`pattern_surfaces` vazio). Senão
+vale a busca local (texto contido, sem diferenciar maiúsculas). Sem arquivos de gabarito não há o que conferir:
+`planted_checked == 0` e o retrato diz isso em `privacidade`.
 """
 
 from __future__ import annotations
@@ -22,6 +23,7 @@ SNAPSHOT_NAME = "evals-latest.json"
 PLANTED_DIR = Path("demo") / "acompanhamento" / "atestados"
 NO_PLANTED_NOTE = "sem valores plantados disponíveis"
 KEY_PLACEHOLDER = "<chave>"
+EXTERNAL_SOURCE = "escalista.audit.protected.find_leaks"
 
 
 @dataclass(frozen=True)
@@ -62,20 +64,30 @@ def _find_key(node: Any, key: str) -> Iterator[str]:
             yield from _find_key(item, key)
 
 
-def _leak_paths(node: Any, hit: Callable[[str], bool], path: str = "") -> Iterator[str]:
-    """Caminhos das folhas e chaves em que `hit` acusa valor plantado. Uma chave que acusa vira `<chave>` no caminho."""
+def _blobs(node: Any, path: str = "", out: dict[str, str] | None = None) -> dict[str, str]:
+    """`{caminho JSON: texto}` de cada folha e de cada chave. A chave entra no caminho `<pai>.<chave>` (placeholder): se
+    ela acusar valor plantado, o caminho do vazamento não repete o valor. Caminhos repetidos juntam os textos."""
+    out = {} if out is None else out
+
+    def put(where: str, text: str) -> None:
+        where = where.lstrip(".")
+        out[where] = f"{out[where]}\n{text}" if where in out else text
+
     if isinstance(node, dict):
         for k, v in node.items():
-            bad_key = hit(str(k))
-            joined = f"{path}.{KEY_PLACEHOLDER if bad_key else k}"
-            if bad_key:
-                yield joined.lstrip(".")
-            yield from _leak_paths(v, hit, joined)
+            put(f"{path}.{KEY_PLACEHOLDER}", str(k))
+            _blobs(v, f"{path}.{k}", out)
     elif isinstance(node, list):
         for i, item in enumerate(node):
-            yield from _leak_paths(item, hit, f"{path}[{i}]")
-    elif node is not None and hit(str(node)):
-        yield path.lstrip(".")
+            _blobs(item, f"{path}[{i}]", out)
+    elif node is not None:
+        put(path, str(node))
+    return out
+
+
+def _local_find(blobs: dict[str, str], planted: list[str]) -> list[str]:
+    needles = [p.lower() for p in planted if p]
+    return [where for where, text in blobs.items() if any(n in text.lower() for n in needles)]
 
 
 def _external_find_leaks() -> Callable[..., Any] | None:
@@ -86,25 +98,22 @@ def _external_find_leaks() -> Callable[..., Any] | None:
 
 
 def check_no_leaks(report: dict[str, Any], data_dir: Path) -> LeakCheck:
+    """Procura os valores plantados em cada folha e cada chave do relatório. Com a C7, usa
+    `find_leaks(blobs, planted, pattern_surfaces=set())`: só os literais (o padrão de CID casaria célula `B12` da
+    evidência do E2, que o relatório pode citar). Sem a C7 (ou assinatura diferente), a busca local."""
     planted = planted_values(data_dir)
     if not planted:
         return LeakCheck(leaks=[], planted_checked=0)
+    blobs = _blobs(report)
     external = _external_find_leaks()
-    state = {"source": "busca local"}
-
-    def hit(text: str) -> bool:
-        if external is not None:
-            try:
-                found = bool(external(text, planted))
-                state["source"] = "escalista.audit.protected.find_leaks"
-                return found
-            except TypeError:  # assinatura diferente da esperada: a busca local segue valendo
-                pass
-        lowered = text.lower()
-        return any(p.lower() in lowered for p in planted)
-
-    leaks = list(dict.fromkeys(_leak_paths(report, hit)))
-    return LeakCheck(leaks=leaks, planted_checked=len(planted), source=state["source"])
+    if external is not None:
+        try:
+            found = external(blobs, planted, pattern_surfaces=set())
+            leaks = list(dict.fromkeys(str(leak.surface) for leak in found))
+            return LeakCheck(leaks=leaks, planted_checked=len(planted), source=EXTERNAL_SOURCE)
+        except (TypeError, AttributeError):  # assinatura diferente da do contrato: a busca local segue valendo
+            pass
+    return LeakCheck(leaks=_local_find(blobs, planted), planted_checked=len(planted))
 
 
 def write_snapshot(report: dict[str, Any], out_dir: Path, data_dir: Path) -> LeakCheck:

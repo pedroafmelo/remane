@@ -74,3 +74,44 @@ def test_snapshot_without_planted_values_says_so(tmp_path):
     written = json.loads((tmp_path / "out" / SNAPSHOT_NAME).read_text(encoding="utf-8"))
     assert check.planted_checked == 0
     assert written["privacidade"] == "sem valores plantados disponíveis"
+
+
+class _FakeLeak:
+    def __init__(self, surface: str) -> None:
+        self.surface = surface
+
+
+def test_uses_the_c7_find_leaks_with_the_contract_signature(tmp_path, monkeypatch):
+    import types
+
+    seen = {}
+
+    def find_leaks(blobs, planted, *, pattern_surfaces):
+        seen.update(blobs=blobs, planted=planted, pattern_surfaces=pattern_surfaces)
+        return [_FakeLeak(where) for where, text in blobs.items() if any(p in text for p in planted)]
+
+    module = types.ModuleType("escalista.audit.protected")
+    module.find_leaks = find_leaks
+    monkeypatch.setitem(__import__("sys").modules, "escalista.audit.protected", module)
+    seed_planted(tmp_path, PLANTED)
+    report = sample_report()
+    report["cenarios"][0]["obtido"] = f"lido {PLANTED}"
+
+    check = check_no_leaks(report, tmp_path)
+
+    assert check.leaks == ["cenarios[0].obtido"]
+    assert check.source == "escalista.audit.protected.find_leaks"
+    assert seen["planted"] == [PLANTED] and seen["pattern_surfaces"] == set()
+    assert all(isinstance(k, str) and isinstance(v, str) for k, v in seen["blobs"].items())
+
+
+def test_with_the_real_c7_find_leaks_when_it_exists(tmp_path):
+    pytest.importorskip("escalista.audit.protected")
+    seed_planted(tmp_path, PLANTED)
+    report = sample_report()
+    report["suites"][PLANTED] = {}
+    report["cenarios"][1]["obtido"] = PLANTED.lower()
+    check = check_no_leaks(report, tmp_path)
+    assert check.source == "escalista.audit.protected.find_leaks"
+    assert set(check.leaks) == {"suites.<chave>", "cenarios[1].obtido"}
+    assert PLANTED not in repr(check)
