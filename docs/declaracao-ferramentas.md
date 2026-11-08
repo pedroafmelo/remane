@@ -1,6 +1,6 @@
 # Declaração de ferramentas, modelos e APIs de terceiros
 
-Última atualização: 2026-11-07 16:48 (auditoria depois da C0a: dependências Python e npm instaladas sob a data de corte 2026-10-23, [DEC-030](decisoes.md); Fly.io e Docker decididos; `web/` criado. A mudança mais recente do `pyproject.toml` foi só a exclusão de `.claude` na configuração do ruff, **sem dependência nova**). **A submissão exige esta lista** (guia, seção 7) e a regra de uso de IA pede que APIs,
+Última atualização: 2026-11-08 00:05 (convenção e política fictícias em YAML, sem dependência nova). Antes: 2026-11-07 16:48 (auditoria depois da C0a: dependências Python e npm instaladas sob a data de corte 2026-10-23, [DEC-030](decisoes.md); Fly.io e Docker decididos; `web/` criado. A mudança mais recente do `pyproject.toml` foi só a exclusão de `.claude` na configuração do ruff, **sem dependência nova**). **A submissão exige esta lista** (guia, seção 7) e a regra de uso de IA pede que APIs,
 modelos e plataformas sejam declarados (seção 5). Atualize **no mesmo turno** em que algo entrar ou sair do projeto.
 Status: `planejado`, `em uso`, `removido`. Não remova linhas: marque `removido`.
 
@@ -97,6 +97,7 @@ gerada, para a declaração honesta exigida na submissão.
 | Demanda por faixa de 30 minutos com sazonalidade semanal | Gerada por script; parâmetros inventados | planejado |
 | Escala atual da rede fictícia em XLSX, CSV e PDF | Gerada por script, com layouts diferentes; um arquivo com defeito plantado e uma escala com violações plantadas; 100% fictícia | planejado ([DEC-014](decisoes.md)) |
 | Convenção coletiva fictícia (PDF) | Escrita por nós; não reproduz convenção real | planejado |
+| Convenção e política fictícias em YAML ([convencao/](../data/regras/convencao/cct_comercio_ficticia.yaml), [politica/](../data/regras/politica/politica_ficticia.yaml)) | Escritas por Claude a pedido de Pedro Veloso em 08/11; empresa, sindicatos e lojas inventados; sem base em documento real (clean room) | em uso (camadas 2 e 3 do cartão de regras) |
 | Atestados sintéticos em PDF e em foto, com ruído de digitalização ([DEC-014](decisoes.md)) | Gerados por script (Pillow e reportlab), com marca "SINTÉTICO"; médicos, CRM e CID fictícios. A foto vai ao modelo de visão da Featherless ([DEC-020](decisoes.md)) | planejado |
 | Relógio de demo e ponto simulado ([DEC-019](decisoes.md)) | Relógio gravado no banco, avançado por botões; batidas geradas por script com falta, atraso e hora extra plantados. **O tempo é simulado e a tela rotula** | planejado |
 | Ponto realizado e HRIS (mocks) | Simulados por nós, com desvios plantados; o agente chama de verdade a API simulada | planejado |

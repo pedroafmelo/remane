@@ -66,7 +66,8 @@ Cada feature segue os 12 itens da entrevista.
    (4) Em conflito ou ambiguidade, **aplica a mais restritiva, de forma provisória, e abre exceção ao DP** (RX-01, RX-11). (5)
    **DP** aprova uma vez; o cartão fica ativo e versionado. Qualquer mudança de regra passa pelo DP.
 5. **Exceções.** (a) Cláusula em conflito com a lei, **ao DP** (RX-01); (b) cláusula ambígua ou regime 12x36, regra pendente,
-   **ao DP** (RX-11). As opções de cada uma saem da política da empresa (RF-22): `[PREENCHER com a política fictícia da demo]`.
+   **ao DP** (RX-11). As opções de cada uma saem da política da empresa (RF-22). Na demo, as da RX-01 estão em
+   [politica_ficticia.yaml](../data/regras/politica/politica_ficticia.yaml) (`excecoes_demo`); a RX-11 não tem opções: a regra fica pendente para o DP.
 6. **Regras de negócio.** *Parâmetro da política:* todas as regras de escala, de hora extra, prazos e destino das exceções.
    *Fixas no produto:* a política só **restringe** a lei e a convenção, nunca as afrouxa; em conflito vale a mais restritiva,
    provisória; toda regra tem origem, vigência e status; só o DP muda regra.
@@ -155,8 +156,9 @@ Cada feature segue os 12 itens da entrevista.
      RX-05).
 5. **Exceções.** (a) Comprovação ilegível ou com data inconsistente, **ao DP**, o agente não recusa (RX-08); (b) sem colega elegível
    ou ninguém aceita, **ao gerente**, com opções e custo (RX-05, RX-06); (c) número fora do quadro é recusado e registrado no canal real (RX-10, [DEC-017](decisoes.md)); no simulador o número já é do quadro;
-   (d) colaborador que não responde ao aviso de falta ou atraso, **ao gerente** (RX-09). Opções de cada uma:
-   `[PREENCHER com a política fictícia da demo]`.
+   (d) colaborador que não responde ao aviso de falta ou atraso, **ao gerente** (RX-09). Opções de cada uma: na demo, as da
+   RX-05 estão em `excecoes_demo` de [politica_ficticia.yaml](../data/regras/politica/politica_ficticia.yaml); prazos e limites de
+   RX-06 e RX-09 estão em `pol_oferta_turno` e `pol_atraso`.
 6. **Regras de negócio.** *Parâmetro da política:* prazo de cada oferta, limite de atraso, ordem de oferta (quem não gera hora
    extra primeiro), limite de hora extra. *Fixas:* nunca recusar atestado, nunca guardar CID nem a imagem, nada irreversível sem
    humano, e **o gerente valida sempre a cobertura** (substitui o RH-05).
@@ -288,7 +290,8 @@ discutido na entrevista.
 
 O prazo de resposta de cada exceção, aprovação e oferta de turno é **parâmetro da política**. Vencido o prazo, o agente **escala ao
 próximo decisor**; se ninguém decidir, o turno fica **descoberto**, sem ação irreversível. O valor dos prazos:
-`[PREENCHER na política fictícia da demo]`.
+na demo, em `pol_prazos_e_escalada` e `excecoes_demo` de [politica_ficticia.yaml](../data/regras/politica/politica_ficticia.yaml)
+(aprovação da escala em 24h; RX-01 em 48h, RX-05 em 30 min e RX-08 em 24h, em relógio simulado).
 
 ## 6. Como o produto se generaliza
 

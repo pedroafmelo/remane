@@ -1,0 +1,175 @@
+# Política FICTÍCIA da empresa da demo (camada 3). 100% sintética: empresa e lojas inventadas pelo time, sem base em
+# documento real, de cliente ou de empregador (clean room). Declarar como sintética na submissão.
+# Escrita por Claude a pedido de Pedro Veloso em 2026-11-07 (G2 do plano macro, DEC-028).
+# A política só restringe a lei e a convenção, nunca afrouxa (P1 de docs/produto.md). Tudo aqui é parâmetro.
+# Prazos em minutos de relógio simulado (DEC-019). Custos em R$ são parâmetros; o cálculo fica no código.
+# "proposta: true" = [PROPOSTA] do agente, à espera de decisão do time (docs/plano-implementacao.md, pendências).
+
+empresa: Farmácias Exemplo Ltda. (fictícia)
+lojas: [Loja Centro, Loja Bairro Norte, Loja Shopping]   # nomes fictícios; quadro e horários vêm dos dados sintéticos
+sintetico: true
+vigencia: {de: 2026-11-01}
+
+regras:
+  - id: pol_hora_extra
+    limite_diario_por_pessoa_horas: 1.5      # lei: até 2h (clt.yaml: hora_extra_limite_diario)
+    limite_semanal_por_pessoa_horas: 6
+    limite_mensal_por_pessoa_horas: 20
+    preferir_banco_de_horas: true            # compensar no banco (cct_banco_de_horas) antes de pagar
+    fonte: "Política fictícia, item 1"
+    restringe: hora_extra_limite_diario
+    status: interpretacao
+
+  - id: pol_ordem_preferencia_cobertura
+    ordem:
+      - sem_hora_extra          # quem cobre dentro da jornada contratada vem primeiro
+      - menor_saldo_banco_horas
+      - mesma_loja
+      - outra_loja              # remanejamento
+    fonte: "Política fictícia, item 2"
+    nota: "Mesma ordem para escalar e para oferecer turno (pol_oferta_turno)."
+    status: interpretacao
+
+  - id: pol_interjornada
+    horas: 12
+    fonte: "Política fictícia, item 3"
+    restringe: interjornada_min               # lei: 11h (clt.yaml)
+    status: interpretacao
+
+  - id: pol_aprendiz_horario
+    turno_termina_ate: "20:00"
+    fonte: "Política fictícia, item 4"
+    restringe: menor_trabalho_noturno         # lei: nada entre 22h e 5h para menores (clt.yaml)
+    nota: "Vale para aprendizes de qualquer idade e para menores de 18 anos."
+    status: interpretacao
+
+  - id: pol_noturno
+    evitar_noturno: true
+    so_com_aceite: true
+    fonte: "Política fictícia, item 5"
+    nota: "Turno após 22h só para quem aceitou no cadastro; o adicional vem de cct_adicional_noturno."
+    status: interpretacao
+
+  - id: pol_atraso
+    tolerancia_min: 10
+    fonte: "Política fictícia, item 6"
+    nota: >
+      Passados 10 min do início do turno sem batida no ponto simulado, o agente pergunta ao colaborador (gatilho
+      ativo de falta ou atraso). Sem resposta em 15 min, abre RX-09 ao gerente.
+    prazo_resposta_colaborador_min: 15
+    status: interpretacao
+
+  - id: pol_oferta_turno
+    prazo_por_candidato_min: 20
+    candidatos_max_antes_de_escalar: 3
+    ordem: pol_ordem_preferencia_cobertura
+    fonte: "Política fictícia, item 7"
+    nota: "O colega confirma antes; o gerente valida sempre (produto.md, FT-03). Sem aceite dos 3, abre RX-06."
+    status: interpretacao
+
+  - id: pol_aviso_hora_extra_estourando
+    dispara_em_percentual_do_limite: 80
+    destino: gerente
+    fonte: "Política fictícia, item 8"
+    nota: "Gatilho ativo (b) do FT-03: aviso ao gerente quando alguém chega a 80% do limite semanal ou mensal de pol_hora_extra."
+    status: interpretacao
+
+  - id: pol_aviso_necessidade_hora_extra
+    proposta: true
+    dispara_quando:
+      - "a cobertura de uma falta só fecha com hora extra"
+      - "a escala da semana seguinte só fecha com mais de 10 horas extras somadas na loja"
+    destino: gerente
+    copia: dp
+    fonte: "Política fictícia, item 9"
+    nota: "[PROPOSTA] Gatilho ativo (c) do FT-03 (RF-28). O time ainda não decidiu o que dispara o aviso nem quem o recebe."
+    status: interpretacao
+
+  - id: pol_reotimizacao_semanal
+    proposta: true
+    quando: "segunda-feira, 08:00 (relógio simulado)"
+    propor_se_qualquer:
+      - "cobertura projetada da semana abaixo de 95% da demanda"
+      - "hora extra projetada acima de 10 horas na loja"
+      - "2 ou mais mudanças no quadro da loja na semana (férias, afastamento, admissão ou desligamento)"
+    fonte: "Política fictícia, item 10"
+    nota: "[PROPOSTA] Critério do RF-25 (produto.md, FT-02). O agente propõe; o gerente confirma e depois aprova a escala."
+    status: interpretacao
+
+  - id: pol_prazos_e_escalada
+    aprovacao_escala_min: 1440              # 24h
+    cadeia: [gerente, dp]
+    sem_decisor: turno_descoberto           # sem ação irreversível (produto.md, seção 5.4)
+    remanejamento_ajuda_deslocamento_brl: 20
+    fonte: "Política fictícia, item 11"
+    nota: "Prazo de cada exceção em excecoes_demo. Vencido o prazo, escala ao próximo da cadeia."
+    status: interpretacao
+
+# As 3 exceções da demo (Q6 de requisitos.md). Campos espelham ExceptionCard (src/escalista/domain/contracts.py):
+#   code, titulo -> title, motivo -> reason, decisor -> decider, prazo_min -> deadline, opcoes -> options
+#   (rotulo -> label, efeito -> effect, custo_base -> como o código calcula cost_usd), recomendacao -> recommendation,
+#   sem_resposta -> if_no_answer.
+excecoes_demo:
+  - code: RX-01
+    titulo: "Cláusula da convenção em conflito com a EC 141"
+    motivo: "Cláusula 6ª (1 repouso semanal + 1 por quinzena) conflita com os 2 dias de repouso a partir de 16/12/2026."
+    gatilho: cct_repouso_semanal
+    decisor: dp
+    prazo_min: 2880                          # 48h
+    opcoes:
+      - rotulo: "Confirmar a regra da EC: 2 repousos por semana; cláusula 6ª sem efeito"
+        efeito: "A regra provisória vira definitiva no cartão de regras, com a origem."
+        custo_base: nenhum
+      - rotulo: "Manter provisória e consultar o jurídico ou o sindicato"
+        efeito: "A escala segue com 2 repousos por semana; a exceção fica aberta."
+        custo_base: nenhum
+    opcoes_vedadas:
+      - "Aplicar a cláusula 6ª: afrouxa a lei (P1 de produto.md)"
+    recomendacao: "Confirmar a regra da EC."
+    sem_resposta: "A regra mais restritiva continua provisória e a exceção segue aberta. Não há próximo decisor."
+    acao: escalar
+    fonte: "Política fictícia, item 12"
+    status: interpretacao
+
+  - code: RX-05
+    titulo: "Falta sem substituto dentro da regra"
+    motivo: "Nenhum colega elegível cobre o turno sem hora extra, e a oferta de turno não fechou."
+    gatilho: pol_oferta_turno
+    decisor: gerente
+    prazo_min: 30
+    opcoes:
+      - rotulo: "Hora extra de um colega da mesma loja"
+        efeito: "O colega com menor saldo de banco de horas e dentro de pol_hora_extra cobre o turno."
+        custo_base: hora_extra               # horas x valor-hora x (1 + cct_adicional_hora_extra)
+      - rotulo: "Remanejar de outra loja"
+        efeito: "Um colega de outra loja, sem hora extra, cobre o turno."
+        custo_base: remanejamento            # pol_prazos_e_escalada.remanejamento_ajuda_deslocamento_brl
+      - rotulo: "Deixar o turno descoberto"
+        efeito: "A cobertura cai na faixa do turno; fica registrado no painel."
+        custo_base: nenhum
+    recomendacao: "A opção de menor custo que mantém a cobertura; empate: remanejar, para não gerar hora extra."
+    sem_resposta: "Escala ao DP com mais 30 min; sem decisão, o turno fica descoberto."
+    acao: escalar
+    fonte: "Política fictícia, item 13"
+    status: interpretacao
+
+  - code: RX-08
+    titulo: "Atestado ilegível ou com data inconsistente"
+    motivo: "A leitura do atestado não confirmou a data, ou a data não bate com a falta."
+    gatilho: leitura_atestado
+    decisor: dp
+    prazo_min: 1440                          # 24h
+    opcoes:
+      - rotulo: "Manter o abono provisório e validar o original depois"
+        efeito: "O abono segue provisório até o DP confirmar (produto.md)."
+        custo_base: nenhum
+      - rotulo: "Pedir ao colaborador uma nova foto ou o PDF"
+        efeito: "O agente envia a mensagem ao colaborador, registrada com a decisão que a gerou (RH-06)."
+        custo_base: nenhum
+    opcoes_vedadas:
+      - "Recusar o atestado: só um humano decide, e fora do agente (RH-03)"
+    recomendacao: "Pedir uma nova foto ou o PDF."
+    sem_resposta: "O abono segue provisório, e o agente lembra o DP no dia seguinte. Nunca há recusa automática."
+    acao: escalar
+    fonte: "Política fictícia, item 14"
+    status: interpretacao
