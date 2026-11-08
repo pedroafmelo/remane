@@ -36,9 +36,9 @@ export function HeroStory() {
   const warn = step >= 2 && step < 4;
 
   return (
-    <div ref={ref} className={`px-4 sm:px-6 lg:px-10 ${reduced ? "" : "h-[180vh]"}`}>
+    <div ref={ref} className={`[overflow-anchor:none] px-4 sm:px-6 lg:px-10 ${reduced ? "" : "h-[300vh]"}`}>
       <div
-        className={`panel-live flex animate-drift flex-col items-center justify-start gap-3 overflow-hidden rounded-panel p-3.5 sm:p-6 lg:justify-center lg:gap-6 ${
+        className={`panel-live flex flex-col items-center justify-start gap-3 overflow-hidden rounded-panel p-3.5 sm:p-6 lg:justify-center lg:gap-6 ${
           reduced ? "" : "sticky top-[72px] h-[calc(100svh-84px)] max-h-[780px]"
         }`}
       >
@@ -66,7 +66,7 @@ export function HeroStory() {
                 <span className="text-[13px] text-ink-muted">agente do Remane · Loja Boa Viagem</span>
               </div>
             </div>
-            <div className="flex h-[172px] flex-col justify-end gap-2.5 overflow-hidden px-4 py-3 sm:h-[330px] sm:py-4.5" aria-live="polite">
+            <div className="flex h-[172px] flex-col justify-end overflow-hidden px-4 pb-0.5 pt-3 sm:h-[330px] sm:pt-4.5" aria-live="polite">
               <span className="sr-only">{patLabel(estadoPat)}</span>
               {step >= 1 && (
                 <ChatBubble from="person" attachment="atestado.jpg · 1 dia">

@@ -12,7 +12,7 @@ const styles: Record<ShiftKind, string> = {
 export function ShiftCell({ kind, label, alert }: ShiftCellProps) {
   return (
     <div
-      className={`tabular grid min-h-9 place-items-center rounded-cell px-1 text-center text-[13px] outline-2 transition-[outline-color] duration-300 sm:min-h-11 sm:text-sm ${styles[kind]} ${
+      className={`tabular grid min-h-9 place-items-center rounded-cell px-1 text-center text-[13px] outline-2 transition-[outline-color,background-color,color,box-shadow] duration-300 sm:min-h-11 sm:text-sm ${styles[kind]} ${
         alert ? "outline-warning" : "outline-transparent"
       }`}
     >

@@ -38,14 +38,33 @@
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 
-.panel-live {
+/* O degradê vive numa camada própria que se move só com transform (compositor, sem repintar a cada quadro). */
+.panel-live { isolation: isolate; background: #e9ece6; }
+/* relative só quando não é sticky: senão sobrescreve o `sticky` do Tailwind e o painel rola com a página */
+.panel-live:not(.sticky) { position: relative; }
+.panel-live::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  z-index: -1;
   background:
     radial-gradient(60% 70% at 15% 20%, #2bd48a88 0%, transparent 60%),
     radial-gradient(50% 60% at 85% 15%, #2bd48a55 0%, transparent 65%),
-    radial-gradient(70% 70% at 60% 95%, #ffffff 0%, transparent 60%),
-    #e9ece6;
-  background-size: 140% 140%;
+    radial-gradient(70% 70% at 60% 95%, #ffffff 0%, transparent 60%);
+  will-change: transform;
+  animation: drift-layer 14s ease-in-out infinite alternate;
 }
+@keyframes drift-layer {
+  from { transform: translate3d(-4%, -3%, 0) scale(1); }
+  to { transform: translate3d(5%, 4%, 0) scale(1.08); }
+}
+/* balão de chat novo: abre espaço e aparece, sem os antigos darem um salto */
+@keyframes bubble-in {
+  from { grid-template-rows: 0fr; opacity: 0; transform: translateY(8px); }
+  to { grid-template-rows: 1fr; opacity: 1; transform: none; }
+}
+/* a altura do balão anima; sem isso o Chrome rola a página para "ancorar" o conteúdo (overflow-anchor: none no hero) */
+.bubble-in { display: grid; overflow-anchor: none; grid-template-rows: 1fr; animation: bubble-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
 .tabular { font-variant-numeric: tabular-nums; }
 
 /* clip (e não hidden) para não quebrar o sticky do hero */

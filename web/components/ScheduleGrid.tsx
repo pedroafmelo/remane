@@ -35,7 +35,7 @@ export function ScheduleGrid({ title, chip, days, rows, nameCol = "64px", minWid
                 {r.sub && <span className="tabular block text-xs font-normal text-ink-muted">{r.sub}</span>}
               </span>
               {r.cells.map((c, i) => (
-                <ShiftCell key={`${r.name}-${i}-${c.kind}`} {...c} />
+                <ShiftCell key={`${r.name}-${i}`} {...c} />
               ))}
             </div>
           ))}
