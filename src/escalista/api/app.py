@@ -8,6 +8,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy import text
 
+from escalista.api.auth import install_auth
 from escalista.config import Settings
 from escalista.db import init_db, make_engine
 
@@ -30,6 +31,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             conn.execute(text("SELECT 1"))
         return {"status": "ok", "db": "ok", "version": os.environ.get("GIT_SHA", "dev"), **settings.summary()}
 
+    install_auth(app, settings)  # antes da SPA: o fallback `/{path}` não pode engolir `/api/me`
     _serve_spa(app, Path(settings.web_dist_dir))
     return app
 
