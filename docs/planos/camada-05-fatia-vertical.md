@@ -431,7 +431,7 @@ Horários abaixo por `date` nos relatórios dos subagentes; os hashes são os do
 - **Fumaça da C4 (sem chave, porta 8010):** `confirm` em 12,02 s; antes 158 violações e R$ 33.989,15 com 216,5 h de hora extra; depois
   0 violações, R$ 20.014,00 e 0 h de hora extra; RX-12 visível sem texto inventado; publicação e rastro persistidos depois de reiniciar;
   `escala_defeito.csv` → RX-13 com as 5 linhas.
-- **Item 6 (à mão, com o `.env` e o modelo real): pendente, é do usuário.** Roteiro na resposta da sessão orquestradora e em
+- **Item 6 (à mão, com o `.env` e o modelo real): passou, segundo o usuário (2026-11-08 02:51).** Custo e latência do `llm.justify` não foram informados. Roteiro na resposta da sessão orquestradora e em
   [estado](../estado-do-projeto.md) (próximas ações).
 
 ### Integração com o remoto ([DEC-042](../decisoes.md)), 2026-11-08 01:44
@@ -439,4 +439,4 @@ Branch `integrate/remote-main` (worktree `cc61-integra`), mergeada no `main` pel
 - **Regras:** a D1 (`convencao/demo.yaml`, `politica/demo.yaml`) foi **substituída** pela convenção e pela política fictícias de Pedro Veloso (G2). O carregador (A1) passou a ler `restringe: <primitiva>`; `amplia:` continua `info`. Em vigor na demo: hora extra a 60% e **interjornada de 12 h** (a seção 4, A, cita 11 h: valia só para a lei). E1-03 e E1-10 mudaram o controle "no limite" de 11 h para 12 h; o `rule_id` das violações de interjornada plantadas é `pol_interjornada`.
 - **Medido pelo subagente das regras** (antes → depois da mudança): violações 158 → 0 e custo R$ 33.989,15 → R$ 20.014,00 nos dois casos; solver 60 x 7 com 1 thread 12,64 s → 9,46 s (ótimo nas 3 lojas); `confirm` da fatia 12,15 s → 9,62 s. A `escala_atual.csv` não tem descanso entre 11 h e 12 h (o menor é 9,8 h), por isso o "antes" não mudou. Na branch integrada: **477 testes**, ruff limpo, E1 **10/10**.
 - **Front:** a SPA Vite da C3 foi portada para Next com o design system (`/entrar/`, `/plataforma/`); os fontes antigos saíram de `web/src/`. Rotas reais da API: `POST /auth/demo/{papel}` e `POST /auth/logout` ficam **fora** de `/api`; no `next dev`, o proxy ganhou `/auth/:path*`. Todas as rotas `/api/runs*` e `/api/schedules/published` exigem o papel gerente. **Não verificado:** aparência, responsividade e acessibilidade no navegador (só testes e build); o caminho feliz com o modelo real.
-- **Item 6 do G3** segue pendente (usuário), agora sobre a interface em Next.
+- **Item 6 do G3:** passou, segundo o usuário (2026-11-08 02:51), sobre a interface em Next.

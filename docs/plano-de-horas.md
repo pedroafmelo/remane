@@ -70,7 +70,7 @@ decidir nesse momento; SPA React com login e botões de demo; spike de 1 h do Wh
 | C0a e G0 (esqueleto, contratos v0, teste de fronteiras, `/health`) | 2026-11-07 16:41 (plano da C0) |
 | Modelo e tracing funcionando | |
 | Plano macro de implementação | 2026-11-07 16:11 (aprovado, DEC-029) |
-| Primeiro fluxo ponta a ponta | 2026-11-08 00:42 (G3 itens 1 a 5, local; item 6 à mão pendente) |
+| Primeiro fluxo ponta a ponta | 2026-11-08 00:42 (G3 itens 1 a 5); item 6 à mão passou, segundo o usuário (2026-11-08 02:51) |
 | Evals rodando | |
 | Link público: landing no ar (G1) | 2026-11-08 01:03 (Railway, DEC-037); app completo ainda não publicado |
 | Submissão enviada | |
