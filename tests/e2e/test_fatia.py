@@ -288,7 +288,8 @@ def test_defect_csv_raises_rx13_with_the_lines(clean_env) -> None:
 def test_llm_failure_shows_rx12_and_no_justification_text(rx12: Flow) -> None:
     confirmed = rx12.confirmed
     assert confirmed["phase"] == "awaiting_approval"  # a escala é válida e o gestor ainda decide
-    assert confirmed["exception"]["code"] == "RX-12"
+    assert confirmed["exception"] is None  # C6: RX-12 da justificativa é aviso, não bloqueia
+    assert [n["code"] for n in confirmed["notices"]] == ["RX-12"]
     assert confirmed["justification"] is None
     assert confirmed["report"]["total"] == 0
     dump = str(rx12.stack.bodies)

@@ -1,7 +1,8 @@
 """Ferramentas e portas injetadas do agente de otimização (arquitetura, seções 2.1 e 4).
 
 - As bordas entram como callables tipados só com contratos de `escalista.domain` (`ReadCsv`, `Justifier`,
-  `ListEvents`): `agents` não importa `ingest`, `llm` nem `audit`.
+  `ListEvents`; na C6, `ReadTables`, `MapColumns`, `Enrich` e `LoadCard`): `agents` não importa `ingest`, `llm` nem
+  `audit`. Os resultados das bordas entram como `Protocol` só com os campos que o agente lê.
 - `Tracer`: um `TraceEvent` por passo, com `cost_usd = 0` e `payload.cost_basis` nos passos sem modelo, latência
   medida com `time.perf_counter`, carimbo pelo `Clock` e `parent_id` encadeado no passo anterior da execução.
 - `publicar`: a única ferramenta com efeito da fatia. **Lê a aprovação no próprio código** (`repo.get_approval`) e
@@ -12,16 +13,19 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable, Iterable
-from datetime import datetime
+from datetime import date, datetime
+from datetime import time as Time
 from decimal import Decimal
 from typing import Any, Protocol
 
 from escalista.agents.optimizer.errors import PublishRefusedError
 from escalista.domain.contracts import ExceptionCard, Role, TraceEvent
-from escalista.domain.ports import Clock, Repository, TraceSink
+from escalista.domain.ports import Clock, Repository, RosterRepository, TraceSink
+from escalista.domain.reading import ColumnMapping, RawTable
 from escalista.domain.results import Comparison, Justification, ScheduleVersion, ViolationReport
 from escalista.domain.rules import RuleCard
-from escalista.domain.schedule import DemandSlot, ReadSummary, Schedule
+from escalista.domain.schedule import DemandSlot, Employee, ReadSummary, Schedule
+from escalista.rules.identity import PersonDraft, StoreDraft
 
 NO_MODEL = "sem chamada de modelo"
 PUBLISHER_ROLES: frozenset[Role] = frozenset({Role.GESTOR})  # RH-01: o gestor aprova e publica
@@ -67,6 +71,80 @@ class Justifier(Protocol):
         run_id: str,
         parent_id: str | None = None,
     ) -> Justification: ...
+
+
+class AgentRepository(Repository, RosterRepository, Protocol):
+    """O repositório do agente na C6: execução, versões e aprovações (`Repository`) mais o quadro (`RosterRepository`).
+    O `InMemoryRepository` dos testes e o `SqlRepository` (B1) implementam as duas portas."""
+
+
+# --- bordas da leitura por agente (C6) ------------------------------------------------------------------------------
+
+
+class TablesMetaLike(Protocol):
+    def as_dict(self) -> dict[str, object]: ...
+
+
+class TablesRead(Protocol):
+    """Resultado de `ingest.tables.read_tables` (o `TablesResult` satisfaz). `exception` não nulo é RX-13."""
+
+    @property
+    def format(self) -> str | None: ...
+
+    @property
+    def tables(self) -> list[RawTable]: ...
+
+    @property
+    def exception(self) -> ExceptionCard | None: ...
+
+    @property
+    def meta(self) -> TablesMetaLike: ...
+
+
+ReadTables = Callable[[str, bytes], TablesRead]
+"""`(file_name, content) -> TablesRead`: bytes do arquivo enviado em tabelas cruas (CSV ou XLSX)."""
+
+MapColumns = Callable[[list[RawTable], str, str | None], ColumnMapping]
+"""`(tables, run_id, parent_id) -> ColumnMapping` pelo modelo (nó 1), já conferido por `rules.mapping.check_mapping`.
+Levanta `LLMUnavailableError` (RX-12) quando o modelo falha ou insiste em mapeamento recusado: o agente cai na
+heurística de cabeçalhos."""
+
+LoadCard = Callable[[date], RuleCard]
+"""`week_start -> RuleCard` da semana (`rules.loader.load_rule_card_for_week` ligado ao diretório das regras)."""
+
+
+class EnrichOutcome(Protocol):
+    """Resultado de `ingest.cadastro.enrich` (o `EnrichResult` satisfaz)."""
+
+    @property
+    def employees(self) -> list[Employee]: ...
+
+    @property
+    def store_hours(self) -> dict[str, tuple[Time, Time]]: ...
+
+    @property
+    def matched_people(self) -> int: ...
+
+    @property
+    def matched_stores(self) -> int: ...
+
+    @property
+    def assumptions(self) -> list[str]: ...
+
+
+class Enrich(Protocol):
+    """`ingest.cadastro.enrich`: completa as pessoas lidas com salário, cargo e carga (cadastro simulado, salário do
+    arquivo ou o valor confirmado pelo gestor). Levanta `ValueError` sem cadastro e sem `default_wage`."""
+
+    def __call__(
+        self,
+        people: list[PersonDraft],
+        stores: list[StoreDraft],
+        *,
+        cadastro: Any,
+        default_wage: Decimal | None,
+        default_contract_hours: int,
+    ) -> EnrichOutcome: ...
 
 
 # --- rastro --------------------------------------------------------------------------------------------------------
