@@ -473,3 +473,26 @@ Formato:
   sem rotas dinâmicas sem `generateStaticParams` (a API é o FastAPI). Vite e @vitejs/plugin-react saem da
   [declaração](declaracao-ferramentas.md); entram next, tailwindcss, @tailwindcss/postcss, geist, qrcode.react, eslint e eslint-config-next,
   sob a mesma data de corte da [DEC-030](#dec-030--plano-da-c0-rodada-1-data-de-corte-nas-versões-flyio-c0b-com-a-frente-c-e-web-em-typescript).
+
+## DEC-036 · Posicionamento da landing: "engenheiro de escala", sem a 6x1 no centro
+
+- 2026-11-08 00:36 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** revisão da landing do PR da [DEC-035](#dec-035--marca-remane-landing-e-web-em-nextjs-com-export-estático). O usuário não gostou de
+  frases como "Sua escala se remaneja sozinha" e do peso da escala 6x1. O agente notou que a landing girava em torno de cobrir falta,
+  enquanto o [produto.md](produto.md) põe no núcleo a escala ótima ("escala pronta, legal e ao menor custo").
+- **Decisão (o que o usuário disse):**
+  - "Evitar falar da escala 6 por 1. Não pode ser o nosso cerne." A seção "Fim da 6x1" e o link saem; a EC 141 fica só como uma regra entre outras.
+  - O Remane é "um engenheiro de escala de trabalho, que constrói a escala de forma ótima e acompanha os trabalhadores".
+    Título: "O engenheiro da sua escala de trabalho."; subtítulo (opção 2 de 4): "Do planejamento da semana à falta de última hora: o Remane
+    monta, confere e ajusta a escala, e só chama você para decidir." As demais frases propostas pelo agente foram aprovadas ("curti").
+  - A personagem da história do hero passa de Joana a **Patrick**.
+  - Os botões de demo por papel ficam **dentro do "Testar a demo"**, em `/entrar` (resolve a pergunta deixada na DEC-035).
+  - "A ligação com o WhatsApp tem que sair": a seção de teste pelo WhatsApp fica na landing. **Muda o produto.md**, que listava a ponte
+    real do WhatsApp (RF-21) como cortável.
+  - A história do hero ficou "muito comprida": a rolagem caiu de ~1,6 para ~0,8 tela.
+- **Motivo:** a 6x1 não pode ser o cerne; o restante sem motivo informado.
+- **Alternativas consideradas (as oferecidas):** títulos "A escala certa, montada e acompanhada por um agente." e "Escala ótima no papel e no
+  dia a dia."; mais três subtítulos; trocar a rolagem por uma história que toca sozinha; tirar a seção do WhatsApp.
+- **Consequências:** `[PREENCHER]` com o backend: o número do jurado não está no quadro e a regra atual (DEC-017) recusa número de fora; o
+  teste pelo WhatsApp precisa de um modo demo que trate número desconhecido como um funcionário de demonstração. [landing.md](landing.md)
+  guarda a copy antiga; vale a da `web/app/page.tsx`.
