@@ -5,10 +5,7 @@ import { HeroStory } from "@/components/landing/HeroStory";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { AnchorGlide } from "@/components/landing/AnchorGlide";
 import { Reveal } from "@/components/landing/Reveal";
-import { WhatsAppQR } from "@/components/landing/WhatsAppQR";
-import { ABSENCE_TEXT, WHATSAPP_NUMBER, waLink } from "@/lib/whatsapp";
-
-const wa = WHATSAPP_NUMBER ? waLink(WHATSAPP_NUMBER, ABSENCE_TEXT) : null;
+import { ChatBubble } from "@/components/ChatBubble";
 
 const Section = ({ id, children }: { id?: string; children: ReactNode }) => (
   <section id={id} className="mx-auto max-w-[1180px] px-4 py-24 sm:px-6 lg:px-10 lg:py-32">
@@ -38,7 +35,7 @@ export default function Home() {
         </a>
         <div className="flex items-center gap-7 text-[15px]">
           <a href="#como-funciona" className="hidden hover:text-ink-muted md:inline">Como funciona</a>
-          <a href="#whatsapp" className="hidden hover:text-ink-muted md:inline">WhatsApp</a>
+          <a href="#teste" className="hidden hover:text-ink-muted md:inline">Teste agora</a>
           <Button href="/entrar">Testar a demo</Button>
         </div>
       </nav>
@@ -56,7 +53,6 @@ export default function Home() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button href="/entrar">Testar a demo</Button>
-            {wa && <Button href={wa} variant="secondary">Falar com o agente no WhatsApp</Button>}
           </div>
         </section>
 
@@ -79,24 +75,27 @@ export default function Home() {
           <HowItWorks />
         </Section>
 
-        <Section id="whatsapp">
+        <Section id="teste">
           <Reveal className="flex flex-col items-start gap-10 rounded-panel bg-surface p-8 sm:p-12 md:flex-row md:items-center md:justify-between">
             <div className="max-w-xl">
               <h2 className="text-[34px] font-bold leading-[1.03] tracking-[-0.045em] sm:text-5xl">
-                Teste agora: avise uma falta pelo WhatsApp e veja o Remane encontrar quem cobre.
+                Teste agora: avise uma falta e veja o Remane encontrar quem cobre.
               </h2>
               <p className="mt-4 text-lg leading-normal text-ink-muted">
-                {wa
-                  ? "Aponte a câmera do celular para o código. A mensagem já vai escrita; o agente responde como faria na loja."
-                  : "Abra a demo e veja o agente cobrir a falta do Pedro do começo ao fim."}
+                Na demo, um celular simulado faz o papel do WhatsApp: escolha alguém da equipe, mande a mensagem e acompanhe a escala
+                mudando do lado do gestor.
               </p>
-              {wa && <Button href={wa} variant="secondary" className="mt-6">Abrir no WhatsApp</Button>}
+              <Button href="/entrar" className="mt-6">Testar a demo</Button>
             </div>
-            {wa ? (
-              <div className="rounded-card border border-line p-3"><WhatsAppQR href={wa} /></div>
-            ) : (
-              <Button href="/entrar">Testar a demo</Button>
-            )}
+            <div className="w-full max-w-[320px] overflow-hidden rounded-card border border-line bg-surface-chat" aria-hidden="true">
+              <div className="border-b border-line bg-surface px-4 py-3 text-[13px] font-medium">
+                Celular simulado <span className="text-ink-muted">· Pedro, Loja Boa Viagem</span>
+              </div>
+              <div className="flex flex-col gap-2.5 p-4">
+                <ChatBubble from="person">Bom dia, não vou conseguir ir hoje.</ChatBubble>
+                <ChatBubble from="agent">Recebi, Pedro. Já estou procurando quem cubra seu turno das 14h.</ChatBubble>
+              </div>
+            </div>
           </Reveal>
         </Section>
 

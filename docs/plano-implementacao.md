@@ -89,7 +89,7 @@ antes de abrir C6 a C8. A fatia tem prioridade sobre qualquer camada nova.
 | Critério da reotimização semanal (RF-25) | C7 (varredor) | Usuário | Antes do plano da C7 |
 | O que dispara o aviso de necessidade de hora extra e quem o recebe (RF-28) | C7 | Usuário | Antes do plano da C7 |
 | Prioridade do FT-08; ordem entre os desejáveis; o que é a "consulta" do RF-40 | Fila de desejáveis | Usuário | Antes de abrir a fila |
-| Chip e aparelho para o spike do WhatsApp (pergunta 7) | Spike (depois da C7) | Time `[PREENCHER]` | Antes do fim da C7 |
+| ~~Chip e aparelho para o spike do WhatsApp (pergunta 7)~~ spike feito e abandonado; agora: app da Meta com número de teste ([DEC-043](decisoes.md)) | Spike (depois da C7) | Time `[PREENCHER]` | Antes do fim da C7 |
 | Langfuse local no ar num notebook | Exportador opcional da C3 (corte técnico) | `[PREENCHER]` | Antes da C5 |
 | Tabela do time (nomes, perfis, frente de cada um) | Divisão das frentes | Usuário | Agora |
 
