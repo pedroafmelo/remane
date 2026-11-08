@@ -9,7 +9,7 @@ Os slides de cada bloco seguem o desenho dela: uma frase grande, um visual e pou
 
 **Regras que valem aqui** ([CLAUDE.md](../CLAUDE.md), [entrega.md](entrega.md)):
 
-- São **3 minutos com tempo controlado**, cerca de 400 palavras faladas. As falas abaixo somam ~390.
+- São **3 minutos com tempo controlado**, cerca de 400 palavras faladas. As falas abaixo somam ~330, mais a da equipe; sobra folga para respirar.
 - **Sem a 6x1 no centro** ([DEC-036](decisoes.md)): a EC 141 aparece só como o *why now*, uma regra entre outras.
 - **Só número medido**, com a origem. Número de mercado tem fonte. Preço é **[HIPÓTESE]** e é dito como hipótese.
 - **Os dados são sintéticos, e a convenção e a política são fictícias.** O celular é simulado. Isso precisa ser dito.
