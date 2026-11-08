@@ -21,6 +21,7 @@ from __future__ import annotations
 import io
 import json
 import logging
+import re
 import uuid
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -343,6 +344,16 @@ def capture_root_log(buffer: io.StringIO) -> Iterator[None]:
         root.setLevel(old_level)
 
 
+# Identificadores aleatórios (uuid hex, `exc-<12 hex>`): o `find_leaks` procura sem caixa e um CID curto (`A09`) aparece
+# dentro de um hex ao acaso (falso positivo intermitente, achado ao rodar contra a C7). Os ids viram `<id>` antes da
+# busca; um CID não é uma sequência de 12+ dígitos hexadecimais minúsculos, então nada que seja vazamento some.
+_RANDOM_ID = re.compile(r"[0-9a-f]{12,}")
+
+
+def _mask_ids(text: str) -> str:
+    return _RANDOM_ID.sub("<id>", text)
+
+
 def _text(value: Any) -> str:
     if isinstance(value, bytes):
         return value.decode("utf-8", errors="ignore")
@@ -369,7 +380,7 @@ def surfaces(rig: Rig, *, returns: dict[str, Any], llm_messages: list[Any]) -> d
         dumped = value.model_dump_json() if hasattr(value, "model_dump_json") else json.dumps(value, default=str)
         blobs[f"retorno.{name}"] = dumped
     blobs["llm.mensagens"] = "\n".join(_text(getattr(m, "content", m)) for m in llm_messages)
-    return blobs
+    return {name: _mask_ids(text) for name, text in blobs.items()}
 
 
 def leaks(blobs: dict[str, str], planted: list[str]) -> list[Any]:
