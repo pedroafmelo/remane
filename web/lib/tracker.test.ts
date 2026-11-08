@@ -102,7 +102,10 @@ test("attestationLabel depende da leitura e do abono", () => {
   assert.equal(attestationLabel({ ...base, abono: "provisorio", reading }), "atestado lido: válido, 2 dias; abono provisório até o gestor confirmar");
   assert.equal(attestationLabel({ ...base, abono: "provisorio", reading: { ...reading, days: 1 } }), "atestado lido: válido, 1 dia; abono provisório até o gestor confirmar");
   assert.equal(attestationLabel({ ...base, reading: { ...reading, verdict: "inconsistente" } }), "atestado com pendência; o gestor vai conferir");
-  assert.equal(attestationLabel({ ...base, reading: { ...reading, legible: false, verdict: "ilegivel" } }), "atestado com pendência; o gestor vai conferir");
+  assert.equal(
+    attestationLabel({ ...base, reading: { ...reading, legible: false, verdict: "ilegivel" } }),
+    "não reconheci um atestado neste arquivo (outro tipo de documento ou ilegível); o gestor vai conferir",
+  );
   assert.equal(attestationLabel({ ...base, abono: "provisorio" }), "anexo recebido; leitura indisponível; abono provisório");
   assert.equal(attestationLabel(base), null);
 });

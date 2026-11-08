@@ -231,6 +231,7 @@ def test_unrecognized_columns_fail_with_rx13_and_the_model_notice() -> None:
 
     assert state.phase == "failed" and state.exception.code == "RX-13"
     assert "colunas" in state.exception.reason
+    assert "não parece uma escala de trabalho" in state.exception.reason
     assert [n.code for n in state.notices] == ["RX-12"]
 
 
