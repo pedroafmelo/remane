@@ -1,6 +1,6 @@
 # Entrega: submissão, pitch e demo
 
-Última atualização: 2026-11-07 14:42. Prazo de submissão: **domingo 08/11, 13h00**, no painel
+Última atualização: 2026-11-08 03:20 (pitch, vídeo e descrição em [pitch.md](pitch.md)). Antes: 2026-11-07 14:42. Prazo de submissão: **domingo 08/11, 13h00**, no painel
 https://hackathons.canastra.ventures/. Percorra esta lista antes de enviar (e com `/sync-docs`).
 
 ## 1. Checklist de submissão (guia, seção 7)
@@ -42,7 +42,7 @@ Esqueleto; adapte à ideia escolhida. Meta: a banca sair sabendo **quem sofre, o
 
 Ensaiar com cronômetro pelo menos 3 vezes. Quem fala o quê já definido. Uma frase de abertura que dá para dizer em 5 segundos.
 
-### 3.1 Rascunho do pitch da IDEA-002 (provisório; os números entre colchetes só entram se medidos)
+### 3.1 Rascunho do pitch da IDEA-002 (**substituído** por [pitch.md](pitch.md) em 08/11 03:20: abria com a 6x1, contra a [DEC-036](decisoes.md))
 
 Abertura de 5 segundos: "A 6x1 acaba em dezembro. Quem refaz a escala da sua loja?" Fatos e rótulos em
 [IDEA-002](ideacao/ideias/IDEA-002-escalista.md).
