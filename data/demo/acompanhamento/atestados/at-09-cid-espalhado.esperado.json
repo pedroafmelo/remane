@@ -1,0 +1,21 @@
+{
+  "file": "acompanhamento/atestados/at-09-cid-espalhado.pdf",
+  "synthetic": true,
+  "expected_day": "2027-01-14",
+  "employee_name": "Ana (sintético)",
+  "expect": {
+    "legible": true,
+    "issued_on": "2027-01-13",
+    "start_on": "2027-01-14",
+    "days": 3,
+    "patient_matches": true,
+    "has_crm": true,
+    "verdict": "valido",
+    "reasons": []
+  },
+  "planted_cid": [
+    "J11",
+    "J11.1"
+  ],
+  "note": "CID no cabeçalho (J11), no corpo (J11.1) e no rodapé (J11.1 e J11)."
+}
