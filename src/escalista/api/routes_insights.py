@@ -1,4 +1,4 @@
-"""Rotas do painel do gestor: regras em vigor (FT-01), simulação de vigência (FT-07) e impacto medido (FT-05).
+"""Rotas do painel do gestor: regras em vigor (FT-01), simulação de vigência (FT-07), impacto medido (FT-05) e evals.
 
 Todas exigem o papel `gestor` e têm linha na matriz de `tests/api/test_access.py`. Nenhuma muda escala: a simulação
 calcula e recomenda; quem decide é o gestor.
@@ -12,6 +12,7 @@ from fastapi import APIRouter, Depends, FastAPI, Request
 from fastapi.concurrency import run_in_threadpool
 
 from escalista.api.deps import require_role
+from escalista.api.evals_view import EvalsMissing, EvalsReport, load_evals
 from escalista.api.insights import Impact, RulesView, impact, rules_view
 from escalista.api.simulation import VigenciaSimulation, VigenciaSimulator
 from escalista.api.wiring import DEFAULT_DEMO_FILES_DIR, DEFAULT_RULES_DIR, DEMO_WEEK_START
@@ -56,3 +57,9 @@ async def simulate_vigencia(sim: VigenciaSimulator = Depends(get_simulator)) -> 
 @router.get("/impact", response_model=Impact)
 def get_impact(request: Request) -> Impact:
     return impact(request.app.state.engine)
+
+
+@router.get("/evals", response_model=EvalsReport | EvalsMissing)
+def get_evals() -> EvalsReport | EvalsMissing:
+    """O retrato commitado do relatório de evals (dados sintéticos); sem retrato válido, `sem_relatorio`."""
+    return load_evals()

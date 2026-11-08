@@ -83,6 +83,7 @@ ROUTES: list[Route] = [
     Route("GET", "/api/rules", GESTOR),
     Route("POST", "/api/simulate/vigencia", GESTOR),
     Route("GET", "/api/impact", GESTOR),
+    Route("GET", "/api/evals", GESTOR),
 ]
 
 CASES_FORBIDDEN = [(r, role) for r in ROUTES for role in Role if role not in r.roles]
