@@ -10,6 +10,7 @@ from sqlalchemy import text
 
 from escalista.api.auth import install_auth
 from escalista.api.excecoes import ExceptionDesk, build_desk, install_excecoes
+from escalista.api.routes_insights import install_insights
 from escalista.api.routes_runs import install_runs
 from escalista.api.wiring import DEFAULT_DEMO_FILES_DIR, SliceAgent, build_agent
 from escalista.config import Settings
@@ -42,6 +43,7 @@ def create_app(
     install_auth(app, settings)  # antes da SPA: o fallback `/{path}` não pode engolir `/api/me`
     install_runs(app)
     install_excecoes(app)
+    install_insights(app, settings)
     _serve_spa(app, Path(settings.web_dist_dir))
     return app
 

@@ -22,12 +22,15 @@ from escalista.api.app import create_app
 from escalista.api.auth import SESSION_COOKIE
 from escalista.api.deps import require_role
 from escalista.api.fake_agent import SEEDED_AWAITING_APPROVAL, SEEDED_AWAITING_CONFIRM, FakeSliceAgent
+from escalista.api.routes_insights import get_simulator
 from escalista.api.wiring import get_agent, get_demo_files_dir
 from escalista.config import Settings
 from escalista.domain.contracts import Role
 from tests.api.published_seed import seed_published
+from tests.api.test_insights import tiny_simulator
 
 SENTINEL = "rc_SENTINELA_NAO_VAZAR"
+SIMULATOR = tiny_simulator()
 ALL_ROLES = frozenset(Role)
 
 
@@ -75,6 +78,9 @@ ROUTES: list[Route] = [
     ),
     Route("GET", "/api/colaborador/escala", COLABORADOR),
     Route("POST", "/api/colaborador/falta", COLABORADOR, request={"json": {"day": "2027-01-13"}}),
+    Route("GET", "/api/rules", GESTOR),
+    Route("POST", "/api/simulate/vigencia", GESTOR),
+    Route("GET", "/api/impact", GESTOR),
 ]
 
 CASES_FORBIDDEN = [(r, role) for r in ROUTES for role in Role if role not in r.roles]
@@ -103,6 +109,7 @@ def make_client(tmp_path, *, demo_mode: bool = True, secret: str | None = f"{SEN
     (demo_dir / "escala_atual.csv").write_bytes(CSV_OK)
     app.dependency_overrides[get_agent] = lambda: agent
     app.dependency_overrides[get_demo_files_dir] = lambda: demo_dir
+    app.dependency_overrides[get_simulator] = lambda: SIMULATOR  # instância pequena, nunca a 60 × 7
     return TestClient(app)
 
 
