@@ -1,6 +1,6 @@
 # Pitch, vídeo e descrição da submissão
 
-Última atualização: 2026-11-08 08:50 (Recife), por Claude (Sonnet 5.5): economia do exemplo com o PR #16 já no `main` ([DEC-055](decisoes.md)). **Rascunho para o time revisar.** Os slides vão ser montados no
+Última atualização: 2026-11-08 11:33 (Recife), por Claude (Opus 5.5): declaração sem WhatsApp, chat no app ([DEC-069](decisoes.md)). Antes: 08:50, por Claude (Sonnet 5.5): economia do exemplo com o PR #16 já no `main` ([DEC-055](decisoes.md)). **Rascunho para o time revisar.** Os slides vão ser montados no
 Canva pela manhã; este arquivo traz só o texto de cada slide, a fala e o que mostrar.
 
 **Modelo:** a apresentação "Sprint Pitch: como criar um pitch de alto impacto", de Erica Marques (PDF na pasta do projeto, fora do
@@ -229,7 +229,7 @@ segundo, para não parecer truque. Sem música alta. Legenda "dados sintéticos"
 > sem senha.
 >
 > **Declarações.** Todos os dados são sintéticos, gerados pelo time. A convenção coletiva e a política da empresa são fictícias. O
-> celular do colaborador é simulado, não é WhatsApp. Decisões sobre pessoas ficam sempre com humanos. Ferramentas, modelos e APIs de
+> colaborador conversa com o agente por um chat dentro do app, num celular simulado. Decisões sobre pessoas ficam sempre com humanos. Ferramentas, modelos e APIs de
 > terceiros: Featherless (Qwen3.5-9B e Gemma 4 31B), OR-Tools, LangGraph, FastAPI, Next.js, SQLite e Railway. A lista completa com
 > licenças está em `docs/declaracao-ferramentas.md`. O código foi escrito durante o evento, com apoio do Claude Code.
 

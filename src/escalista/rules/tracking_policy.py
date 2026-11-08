@@ -1,6 +1,7 @@
 """Parâmetros do acompanhamento lidos da política fictícia (plano da C7, A2): `TrackPolicy`.
 
-Lê só o que o varredor e o fluxo usam: `pol_atraso` (tolerância e prazo de resposta do colaborador),
+Lê só o que o varredor e o fluxo usam: `pol_atraso` (tolerância, prazo de resposta do colaborador e, opcional, o
+atraso que abre cobertura: ausente = nunca abre, C7b),
 `pol_oferta_turno` (prazo por candidato e máximo de candidatos), `pol_hora_extra` (limite semanal) e
 `pol_aviso_hora_extra_estourando` (percentual do aviso). Não inventa valor: campo ausente ou não inteiro levanta
 `TrackPolicyError` com o caminho do campo (`<id da regra>.<campo>`).
@@ -68,4 +69,9 @@ def load_track_policy(path: Path = POLICY_FILE) -> TrackPolicy:
         max_candidates=get("pol_oferta_turno", "candidatos_max_antes_de_escalar"),
         overtime_weekly_limit_h=_hours(rules, path, "pol_hora_extra", "limite_semanal_por_pessoa_horas"),
         overtime_warn_pct=get("pol_aviso_hora_extra_estourando", "dispara_em_percentual_do_limite"),
+        late_cover_from_min=(
+            get("pol_atraso", "cobertura_a_partir_de_min")
+            if "cobertura_a_partir_de_min" in rules.get("pol_atraso", {})
+            else None
+        ),
     )

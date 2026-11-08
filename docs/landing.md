@@ -2,7 +2,8 @@
 
 > Handoff original da landing, mantido como referência de marca, tokens, copy e movimento. **Onde diverge do repositório, vale a
 > [DEC-035](decisoes.md):** a landing fica em `web/` com export estático servido pelo FastAPI (não Vercel), e o botão "Testar a demo"
-> leva a `/entrar` (não `/app`). **A copy e a seção "Fim da 6x1" abaixo foram substituídas pela [DEC-036](decisoes.md)**; o texto em vigor está no código. Código: `web/app/page.tsx` e `web/components/`.
+> leva a `/entrar` (não `/app`). **A copy e a seção "Fim da 6x1" abaixo foram substituídas pela [DEC-036](decisoes.md)**; o texto em vigor está no código. Código: `web/app/page.tsx` e `web/components/`. **Toda menção a WhatsApp abaixo está
+> superada pela [DEC-069](decisoes.md)** (2026-11-08 11:31): o canal é um chat dentro do app; não há botão nem QR do WhatsApp.
 
 
 Leia este arquivo inteiro antes de começar.

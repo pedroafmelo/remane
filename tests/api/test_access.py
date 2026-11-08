@@ -112,6 +112,10 @@ ROUTES: list[Route] = [
         ok_status=404,
         request={"json": {"case_id": "nao-existe", "coming": True}},
     ),
+    # C7b: chat do colaborador (sem chave do modelo, a resposta é o template "não entendi", 200)
+    Route("POST", "/api/colaborador/mensagem", COLABORADOR, request={"json": {"text": "oi"}}),
+    # C7b N2: assistente do gestor, somente leitura
+    Route("POST", "/api/assistente/mensagem", GESTOR, request={"json": {"text": "quais exceções estão abertas?"}}),
     Route("GET", "/api/rules", GESTOR),
     Route("POST", "/api/simulate/vigencia", GESTOR),
     Route("GET", "/api/impact", GESTOR),

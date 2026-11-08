@@ -22,12 +22,12 @@ def engine():
     return eng
 
 
-def msg(msg_id: str, party: str, *, direction="out", body: str | None = "oi", minutes: int = 0, **extra):
+def msg(msg_id: str, party: str, *, direction="out", body: str | None = "oi", minutes: int = 0, template="t", **extra):
     return ChannelMessage(
         id=msg_id,
         direction=direction,
         party=party,
-        template="t",
+        template=template,
         body=body,
         at=T0 + timedelta(minutes=minutes),
         **extra,
@@ -67,13 +67,27 @@ def test_round_trip_preserves_every_field(engine):
     assert phone.inbox("e1") == [message]
 
 
-def test_inbound_with_body_is_refused_and_not_stored(engine):
+def test_inbound_with_body_outside_the_chat_is_refused_and_not_stored(engine):
     phone = SimulatedPhone(engine)
     with pytest.raises(ValueError, match="RN-06"):
         phone.send(msg("m1", "e1", direction="in", body="tenho CID J11"))
     assert phone.all_messages() == []
     with Session(engine) as session:
         assert session.scalars(select(ChannelMessageRow)).all() == []
+
+
+def test_inbound_chat_text_is_stored_only_after_the_cid_cut(engine):
+    """C7b (RN-06 revisto): o texto do chat é guardado, mas já sem CID, com ou sem rótulo."""
+    phone = SimulatedPhone(engine)
+    phone.send(
+        msg("m1", "e1", direction="in", template="chat", body="não vou, CID J11 e também j11.1 e A09", has_text=True)
+    )
+    (stored,) = phone.inbox("e1")
+    assert "J11" not in stored.body and "A09" not in stored.body.upper()
+    assert stored.body.startswith("não vou, CID [CID removido]")
+    with Session(engine) as session:
+        (row,) = session.scalars(select(ChannelMessageRow)).all()
+        assert "J11" not in row.body.upper()
 
 
 def test_order_survives_new_instance_and_resumes_seq(engine):

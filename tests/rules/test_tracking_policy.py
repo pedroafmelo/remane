@@ -21,7 +21,33 @@ def test_reads_the_current_values_of_the_fictional_policy():
         max_candidates=3,
         overtime_weekly_limit_h=Decimal("6"),
         overtime_warn_pct=80,
+        late_cover_from_min=30,
     )
+
+
+def test_late_cover_threshold_is_a_fictional_proposal():
+    (rule,) = [r for r in POLICY["regras"] if r["id"] == "pol_atraso"]
+    assert rule["cobertura_a_partir_de_min"] == 30
+    assert rule["status"] == "interpretacao"
+    assert "confirmar com Pedro Veloso" in rule["nota_cobertura"]
+
+
+def test_missing_late_cover_threshold_means_never(tmp_path):
+    assert (
+        load_track_policy(_write_without(tmp_path, "pol_atraso", "cobertura_a_partir_de_min")).late_cover_from_min
+        is None
+    )
+
+
+def test_non_integer_late_cover_threshold_is_rejected(tmp_path):
+    raw = yaml.safe_load(Path(POLICY_FILE).read_text(encoding="utf-8"))
+    for rule in raw["regras"]:
+        if rule["id"] == "pol_atraso":
+            rule["cobertura_a_partir_de_min"] = "meia hora"
+    path = tmp_path / "politica.yaml"
+    path.write_text(yaml.safe_dump(raw, allow_unicode=True), encoding="utf-8")
+    with pytest.raises(TrackPolicyError, match=r"pol_atraso\.cobertura_a_partir_de_min"):
+        load_track_policy(path)
 
 
 def test_weekly_limit_is_decimal():

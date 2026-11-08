@@ -5,14 +5,14 @@ Cada rota tem linha na matriz de `tests/api/test_access.py`.
 - só gestor: `POST /api/demo/reset`;
 - colaborador: `GET /api/colaborador/pessoas`, `GET /api/colaborador/caixa`, `POST /api/colaborador/aviso`,
   `POST /api/colaborador/caso/{case_id}/anexo` (PDF ou foto PNG/JPEG no corpo bruto),
-  `POST /api/colaborador/oferta/{offer_id}` e `POST /api/colaborador/resposta`.
+  `POST /api/colaborador/oferta/{offer_id}`, `POST /api/colaborador/resposta` e (C7b) `POST /api/colaborador/mensagem`.
 
 Quem é o colaborador (`as`): sem `as`, a pessoa padrão da demo (`ExceptionDesk.default_person`). Trocar de pessoa só
 com `DEMO_MODE` ligado e só para alguém do quadro da escala publicada (RX-10: o `Tracker.inbound` registra a recusa);
 sem `DEMO_MODE`, `as` de outra pessoa é 403.
 
-Privacidade (RN-06): o texto livre não chega ao servidor (o aviso traz só `has_text`), os bytes do anexo ficam em
-memória e nenhuma resposta ecoa texto livre, bytes ou CID.
+Privacidade (RN-06, revisto na C7b): o aviso por botão traz só `has_text`; o texto do chat é guardado só no canal, já
+sem CID, e só volta na caixa da própria pessoa. Os bytes do anexo ficam em memória e nenhuma resposta ecoa bytes ou CID.
 """
 
 from __future__ import annotations
@@ -26,13 +26,13 @@ from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Request, 
 from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
-from escalista.agents.tracker.flow import Tracker, TrackerError
+from escalista.agents.tracker.flow import CHAT_MAX_CHARS, Tracker, TrackerError
 from escalista.api.deps import require_role
 from escalista.api.excecoes import ExceptionDesk
 from escalista.api.tracker_wiring import InboundLog, reset_demo
 from escalista.clock.demo import DEMO_CLOCK_BASE
 from escalista.domain.contracts import Role
-from escalista.domain.tracking import Attachment, CaseView, MediaType
+from escalista.domain.tracking import Attachment, CaseView, MediaType, Reply
 
 MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024  # 5 MB (MiB)
 PDF_MAGIC = b"%PDF"
@@ -91,7 +91,7 @@ class InboxMessage(BaseModel):
     id: str
     direction: Literal["in", "out"]
     template: str
-    body: str | None  # só nas de saída (texto nosso)
+    body: str | None  # saída: texto nosso; entrada: só o chat da própria pessoa, já sem CID (C7b)
     has_text: bool
     attachment_media_type: str | None
     at: datetime
@@ -144,6 +144,11 @@ class AnswerBody(BaseModel):
     as_: str | None = Field(default=None, alias="as")
     case_id: str
     coming: bool
+
+
+class MessageBody(BaseModel):
+    as_: str | None = Field(default=None, alias="as")
+    text: str = Field(max_length=CHAT_MAX_CHARS)
 
 
 # --- apoio ----------------------------------------------------------------------------------------------------------
@@ -370,6 +375,14 @@ def answer_question(body: AnswerBody, request: Request) -> CaseView:
     return _guarded(
         log, message_id, lambda: tracker.answer(case_id=body.case_id, employee_id=person, coming=body.coming)
     )
+
+
+@phone_router.post("/mensagem", response_model=Reply)
+def message(body: MessageBody, request: Request) -> Reply:
+    """Mensagem livre do chat (C7b): até 300 caracteres, 10 por minuto. O modelo só classifica; a resposta é texto de
+    template. O texto vai ao canal (gravado já sem CID) e ao modelo (sem CID); nunca a rastro, log ou outra resposta."""
+    person = resolve_person(request, body.as_)
+    return _flow(lambda: _tracker(request).message(employee_id=person, text=body.text))
 
 
 def install_tracker(app: FastAPI) -> None:

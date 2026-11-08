@@ -1,6 +1,6 @@
 # Registro de decisões
 
-Última atualização: 2026-11-08 10:47 (integração do `c7/m3` e dos evals em `integra/c7-evals`: DEC-058 a DEC-068, C7, e DEC-080 a DEC-085, evals; a faixa DEC-069 a DEC-079 fica livre para a C7b e o que vier). Antes: 10:31 (DEC-058 a DEC-068, C7; renumeradas duas vezes, depois das DEC-056 e DEC-057 do logo, que estão no `main`). Antes: 10:25 (DEC-057, logo de volta à grade); 10:04 (C7). Antes: 12:38 (registro do `main`, hora como escrita lá), 08:50. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
+Última atualização: 2026-11-08 11:31 (C7b em `c7/chat`: DEC-069 a DEC-074, chat no app e assistente do gestor). Antes: 10:47 (integração do `c7/m3` e dos evals em `integra/c7-evals`: DEC-058 a DEC-068, C7, e DEC-080 a DEC-085, evals; a faixa DEC-069 a DEC-079 fica livre para a C7b e o que vier). Antes: 10:31 (DEC-058 a DEC-068, C7; renumeradas duas vezes, depois das DEC-056 e DEC-057 do logo, que estão no `main`). Antes: 10:25 (DEC-057, logo de volta à grade); 10:04 (C7). Antes: 12:38 (registro do `main`, hora como escrita lá), 08:50. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
 entrada:** se a decisão mudar, crie outra e marque a antiga como `substituída por DEC-NNN`. Use `/decisao` para registrar e
 propagar o efeito para as outras docs.
 
@@ -768,6 +768,40 @@ Formato:
 - **Contexto:** (1) a D1 mostrou que a `find_cover` nunca devolve candidato com hora extra numa escala válida (hora extra viola o limite diário ou semanal do cartão), então "o 1º candidato gera hora extra" ([DEC-061](#dec-061--padrões-de-rf-28-rf-27-e-rf-25)) não acontece; (2) o backend não tem `python-multipart` e a regra proíbe dependência nova.
 - **Decisão:** (1) o aviso de necessidade de hora extra (RF-28) também dispara quando o replanejamento não acha nenhum candidato dentro das regras, junto do RX-05, que oferece "Hora extra de um colega"; (2) o aviso de falta vai em JSON com `has_text` (o texto livre do colaborador **não chega ao servidor**) e o PDF vai numa segunda chamada, no corpo bruto, como o upload da C6.
 - **Consequências:** o gabarito do cenário marca `overtime_needed: true` nas lojas sem candidato; o contrato com os evals registra as duas mudanças (seção 4); o evento `track.report.received.has_text` fica sempre `false` (o `has_text` real vive na mensagem de entrada do celular).
+
+## DEC-069 · Sem WhatsApp: o colaborador conversa com o agente por um chat dentro do app
+
+- 2026-11-08 ~10:50 · Decidido por: usuário ([plano da C7b](planos/camada-07b-chat.md), seção 1) · Status: aceita
+- **Decisão:** o canal com o colaborador é uma tela de chat em texto livre dentro do app (`POST /api/colaborador/mensagem`, celular simulado). **Substitui a DEC-043** (Cloud API no pitch) e o teste pelo WhatsApp da DEC-036; [planos/whatsapp-cloud-api.md](planos/whatsapp-cloud-api.md) fica superado.
+- **Consequências:** landing, pitch e entrega deixam de prometer WhatsApp; os botões e o formulário de aviso (com anexo) continuam como caminho alternativo; sugestões só preenchem o campo.
+
+## DEC-070 · Texto livre do chat guardado depois do corte de CID, só no canal
+
+- 2026-11-08 ~10:50 · Decidido por: usuário (seção 1 do plano) · Status: aceita
+- **Decisão:** a mensagem do chat é gravada em `channel_message.body` **depois** do corte de CID (maiúsculo ou minúsculo, `strip_cid_any_case`) e da limpeza de segredos; volta só para a própria pessoa. O rastro guarda só `track.chat.message {employee_id, intent, length}`. Reverte "texto livre não é gravado" da C7 ([DEC-068](#dec-068--rf-28-dispara-também-quando-não-há-cobertura-dentro-das-regras-aviso-do-colaborador-sem-texto-livre-no-servidor), item 2) para o chat; o aviso por formulário continua só com `has_text`.
+- **Consequências:** palavras de saúde sem código (ex.: "gripe") ficam no texto guardado; só o CID é cortado (escolha do usuário). O teste de vazamento da C7b (`tests/privacy/test_rn06_chat.py`) é bloqueante: o texto só pode aparecer em `channel_message`, no arquivo do banco, na caixa do autor e na chamada ao modelo.
+
+## DEC-071 · O modelo só classifica; toda resposta sai de modelo de texto nosso
+
+- 2026-11-08 ~10:50 · Decidido por: usuário (seção 1 do plano) · Status: aceita
+- **Decisão:** `classify_message` devolve só `ChatInterpretation` (esquema fechado, `extra="forbid"`, `intent` em lista fechada, `day`, `minutes_late` 1–480). Quem pede é o `employee_id` da sessão, nunca o texto. A resposta ao colaborador sai de `agents/tracker/messages.py`. Guard-rails: 300 caracteres, 10 mensagens por minuto por pessoa, dia só entre os turnos da pessoa, oferta e pergunta só as dela; fora disso, recusa fixa e `track.chat.refused {reason}`. Modelo fora do ar ou resposta inválida: "não entendi", sem efeito.
+- **Consequências:** custo e latência de `classify_message` **não medidos** (testes só com modelo falso).
+
+## DEC-072 · Validação do gestor mantida em toda cobertura vinda do chat
+
+- 2026-11-08 ~10:50 · Decidido por: usuário (seção 1 do plano) · Status: aceita
+- **Decisão:** "aceito" no chat só registra o aceite da oferta; a escala publicada muda apenas depois da aprovação do gestor (`aplicar_cobertura`), como no fluxo por botões. Coberto pelo E2E `tests/e2e/test_c7b_chat.py`.
+
+## DEC-073 · Atraso que abre cobertura é parâmetro da política
+
+- 2026-11-08 ~10:50 · Decidido por: usuário (seção 1 do plano) · Status: provisória (valor fictício a confirmar com Pedro Veloso)
+- **Decisão:** `pol_atraso.cobertura_a_partir_de_min` (padrão fictício **30**, marcado como proposta). Atraso com `minutes_late` ≥ limite avisa o colaborador e abre a busca de cobertura; abaixo, só registra. Sem o parâmetro, atraso nunca abre cobertura.
+
+## DEC-074 · Assistente do gestor (FT-08) somente leitura
+
+- 2026-11-08 ~10:50 (decisão) · implementado 11:19 · Decidido por: usuário (seção 1 do plano) · Status: aceita
+- **Decisão:** `POST /api/assistente/mensagem`, só gestor. O modelo escolhe uma ferramenta de uma lista fechada (`get_escala`, `get_excecoes`, `get_hora_extra`, `get_regra`, `get_trace`, `outro`); a resposta sai de modelo de texto. Defesa estrutural: os dados vêm por um motor de banco separado em modo só leitura (`PRAGMA query_only=ON` no SQLite; transação `READ ONLY` no Postgres) e o teste `test_readonly_engine_refuses_writes` tenta `DELETE` e `CREATE TABLE` e falha. Nunca mostra sexo (RN-13) nem CID; sobre lei, cita só o cartão de regras com a fonte e "Não é parecer jurídico."
+- **Consequências:** com SQLite em memória (só testes) não há motor separado: usa-se o do app, e o assistente continua sem ferramenta de escrita. Tela "Assistente" na plataforma do gestor.
 
 ## DEC-080 · Evals: regra de contagem dos 30 cenários
 

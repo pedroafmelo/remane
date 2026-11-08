@@ -38,7 +38,7 @@ export interface InboxMessage {
   id: string;
   direction: "in" | "out";
   template: string;
-  /** só nas mensagens `out`; o texto livre do colaborador nunca volta do servidor */
+  /** mensagens `out` e o chat da própria pessoa (já sem CID); o texto do aviso por formulário nunca vai ao servidor */
   body: string | null;
   /** o colaborador escreveu algo (o texto em si não sai do celular) */
   has_text: boolean;
@@ -131,6 +131,23 @@ export interface ReportInput {
   /** fica no celular: só vira `has_text` no corpo do aviso */
   text?: string;
   file?: File | null;
+}
+
+/** Resposta do `POST /api/colaborador/mensagem` (C7b): texto de modelo do servidor e sugestões fixas. */
+export interface ChatReply {
+  template: string;
+  body: string;
+  case_id: string | null;
+  suggestions: string[];
+}
+
+/** Resposta do `POST /api/assistente/mensagem` (C7b N2): somente leitura, texto de modelo do servidor. */
+export interface AssistantReply {
+  template: string;
+  body: string;
+  tool: string | null;
+  suggestions: string[];
+  synthetic: true;
 }
 
 /** Corpo do `POST /api/colaborador/aviso`. */

@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import threading
 import time
+from collections import deque
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
@@ -35,7 +36,16 @@ from escalista.agents.cover import CoverCandidate, find_cover
 from escalista.agents.optimizer.errors import PublishRefusedError
 from escalista.agents.optimizer.tools import Tracer
 from escalista.agents.tracker import cards
-from escalista.agents.tracker.messages import deadline_label, first_name, overtime_label, render, shift_label
+from escalista.agents.tracker.messages import (
+    CASE_STATE_TEXT,
+    CHAT_REFUSAL_TEXT,
+    TEMPLATES,
+    deadline_label,
+    first_name,
+    overtime_label,
+    render,
+    shift_label,
+)
 from escalista.agents.tracker.replan import CoverFn, CoverOutcome, dispatch, request_for
 from escalista.agents.tracker.sweep import detect
 from escalista.agents.tracker.tools import GESTOR_PARTY, aplicar_cobertura, enviar, enviar_sem_caso, refuse
@@ -45,6 +55,7 @@ from escalista.domain.ports import (
     Channel,
     Clock,
     ExceptionQueue,
+    MessageInterpreter,
     PunchSource,
     Repository,
     TrackRepository,
@@ -57,8 +68,11 @@ from escalista.domain.tracking import (
     Case,
     CaseView,
     ChannelMessage,
+    ChatContext,
+    ChatInterpretation,
     Offer,
     ReplanReason,
+    Reply,
     ToolRefusedError,
     TrackPolicy,
     Trigger,
@@ -72,6 +86,20 @@ CLOSED: frozenset[str] = frozenset({"coberto", "descoberto", "atraso_registrado"
 COVER_FAILED = "rx12:cover"  # marca no `Case.handled`: o RX-12 aberto é o da busca de cobertura (bloqueia o caso)
 OVERTIME_RULE = "pol_aviso_necessidade_hora_extra"
 OVERTIME_KINDS: frozenset[str] = frozenset({"overtime_near_limit", "overtime_limit"})
+
+# Chat do colaborador (C7b, seção 4)
+CHAT_MAX_CHARS = 300
+CHAT_RATE_MAX = 10  # mensagens por janela, por pessoa
+CHAT_RATE_WINDOW_S = 60.0
+CHAT_REFUSALS: dict[str, str] = {name: TEMPLATES[name] for name in ("chat_fora_escopo", "chat_nao_entendi")}
+SUGGEST_DEFAULT = ["Amanhã não vou conseguir ir", "Vou me atrasar 40 min", "Qual é a minha escala?"]
+SUGGEST_OFFER = ["Pode ser, aceito", "Não posso"]
+SUGGEST_QUESTION = ["Estou a caminho", "Hoje não vou"]
+
+
+def chat_run(employee_id: str) -> str:
+    """Rastro da conversa de uma pessoa (eventos `track.chat.*` e a classificação do modelo)."""
+    return f"track-chat-{employee_id}"
 
 
 @dataclass(frozen=True)
@@ -140,6 +168,8 @@ class Tracker:
         punches: PunchSource | None = None,
         cover_fn: CoverFn = find_cover,
         new_id: Callable[[], str] = lambda: uuid4().hex,
+        interpreter: MessageInterpreter | None = None,
+        rate_clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self._repo = repo
         self._cases = cases
@@ -159,6 +189,9 @@ class Tracker:
         self._punch_card_open = False  # RX-12 do ponto já aberto (uma vez até o ponto voltar)
         self._overtime_fired: dict[str, str] = {}  # `Trigger.key` de hora extra -> id do `track.trigger.fired`
         self._overtime_last: str | None = None  # `ref` do último cartão HORA_EXTRA (sem `source` na decisão)
+        self._interpreter = interpreter
+        self._rate_clock = rate_clock  # relógio real (monotônico): o relógio da demo não anda sozinho
+        self._chat_hits: dict[str, deque[float]] = {}
 
     # --- entrada do colaborador ---------------------------------------------------------------------------------
 
@@ -170,8 +203,10 @@ class Tracker:
         kind: Literal["falta", "atraso"],
         text: str | None = None,
         attachment: Attachment | None = None,
+        minutes_late: int | None = None,
     ) -> CaseView:
-        """Aviso de falta ou de atraso pelo celular simulado (SAIDA-AC-03). `text` só vira `has_text`."""
+        """Aviso de falta ou de atraso pelo celular simulado (SAIDA-AC-03). `text` só vira `has_text`. Atraso com
+        `minutes_late` a partir do limite da política (`late_cover_from_min`) abre a busca de cobertura (C7b)."""
         has_text = bool(text and text.strip())
         with self._lock:
             version = self._published()
@@ -207,12 +242,20 @@ class Tracker:
                     "media_type": attachment.media_type if attachment else None,
                 },
             )
-            if kind == "atraso":
+            if kind == "atraso" and not self._policy.late_opens_cover(minutes_late):
                 self._send(case, employee_id, "atraso_recebido", received.id)
                 name = first_name(self._name(world, employee_id))
                 self._send(case, GESTOR_PARTY, "atraso_aviso", received.id, pessoa=name)
                 case.status = "atraso_registrado"
                 self._close(case, "atraso_registrado")
+                return self._save(case)
+            if kind == "atraso":
+                minutes = str(minutes_late)
+                name = first_name(self._name(world, employee_id))
+                self._send(case, employee_id, "atraso_recebido_cobertura", received.id, minutos=minutes)
+                self._send(case, GESTOR_PARTY, "atraso_aviso_cobertura", received.id, pessoa=name, minutos=minutes)
+                self._cases.save_case(case)
+                self._replan(case, version, world, reason="atraso", origin=received.id)
                 return self._save(case)
             self._send(case, employee_id, "recebido", received.id)
             self._cases.save_case(case)
@@ -229,8 +272,9 @@ class Tracker:
             self._read(case, attachment, self._world(version))
             return self._save(case)
 
-    def respond_offer(self, *, offer_id: str, employee_id: str, accept: bool) -> CaseView:
-        """O colega aceita ou recusa (SAIDA-AC-04). Só o próprio candidato responde; o aceite vai ao gestor."""
+    def respond_offer(self, *, offer_id: str, employee_id: str, accept: bool, ack_decline: bool = False) -> CaseView:
+        """O colega aceita ou recusa (SAIDA-AC-04). Só o próprio candidato responde; o aceite vai ao gestor.
+        `ack_decline`: a recusa ganha a resposta `recusa_recebida` (o chat responde sempre)."""
         with self._lock:
             found = next(((c, o) for c in self._cases.list_cases() for o in c.offers if o.id == offer_id), None)
             if found is None:
@@ -244,7 +288,9 @@ class Tracker:
             payload = {"case_id": case.id, "offer_id": offer.id, "candidate_id": offer.candidate_id}
             if not accept:
                 offer.status = "recusada"
-                self._tracer.step(case.run_id, "track.offer.declined", payload=payload)
+                declined = self._tracer.step(case.run_id, "track.offer.declined", payload=payload)
+                if ack_decline:
+                    self._send(case, offer.candidate_id, "recusa_recebida", declined.id)
                 return self._advance(case)
             offer.status = "aceita"
             accepted = self._tracer.step(case.run_id, "track.offer.accepted", payload=payload)
@@ -299,6 +345,223 @@ class Tracker:
             version = self._published()
             self._replan(case, version, self._world(version), reason="falta", origin=received.id)
             return self._save(case)
+
+    # --- chat do colaborador (C7b) -------------------------------------------------------------------------------
+
+    def message(self, *, employee_id: str, text: str) -> Reply:
+        """Mensagem livre do colaborador (SAIDA-AC-17). O modelo só classifica (porta `MessageInterpreter`); o código
+        valida o que ele extraiu contra os dados da própria pessoa, chama as mesmas funções dos botões e responde por
+        template. Quem pediu é `employee_id` (da sessão), nunca o texto. O texto vai só ao canal (que corta o CID antes
+        de gravar) e ao interpretador; o rastro guarda `track.chat.message {employee_id, intent, length}`."""
+        run_id = chat_run(employee_id)
+        with self._lock:
+            self._rate_check(employee_id, run_id)
+            if not text.strip() or len(text) > CHAT_MAX_CHARS:
+                self._chat_refused(run_id, employee_id, "limite")
+                raise TrackerError(422, f"a mensagem precisa ter de 1 a {CHAT_MAX_CHARS} caracteres")
+            version = self._published()
+            world = self._world(version)
+            self._channel.send(
+                ChannelMessage(
+                    id=self._new_id(),
+                    direction="in",
+                    party=employee_id,
+                    template="chat",
+                    body=text,
+                    has_text=True,
+                    at=self._clock.now(),
+                )
+            )
+            parsed: ChatInterpretation | None = None
+            if self._interpreter is not None:
+                try:
+                    parsed = self._interpreter(
+                        text=text,
+                        employee_name=first_name(self._name(world, employee_id)),
+                        context=self._chat_context(employee_id, version),
+                        run_id=run_id,
+                    )
+                except LLMUnavailableError:  # schema recusado 3 vezes ou modelo fora: "não entendi", nada mais
+                    parsed = None
+            if parsed is None:
+                refused = self._chat_refused(run_id, employee_id, "nao_entendi")
+                return self._chat_reply(
+                    run_id, employee_id, "chat_nao_entendi", refused.id, TEMPLATES["chat_nao_entendi"]
+                )
+            event = self._tracer.step(
+                run_id,
+                "track.chat.message",
+                payload={"employee_id": employee_id, "intent": parsed.intent, "length": len(text)},
+            )
+            return self._dispatch_chat(parsed, employee_id, text, version, run_id, event.id)
+
+    def _dispatch_chat(
+        self, parsed: ChatInterpretation, employee_id: str, text: str, version: ScheduleVersion, run_id: str, ref: str
+    ) -> Reply:
+        intent = parsed.intent
+        if intent in ("falta", "atraso"):
+            return self._chat_report(parsed, employee_id, text, version, run_id, ref)
+        if intent in ("aceitar_oferta", "recusar_oferta"):
+            offers = [
+                (c, o)
+                for c in self._cases.list_cases()
+                for o in c.offers
+                if o.candidate_id == employee_id and o.status == "enviada"
+            ]
+            if parsed.day is not None:
+                offers = [(c, o) for c, o in offers if c.shift.start.date() == parsed.day]
+            if not offers:
+                return self._chat_refuse(run_id, employee_id, "sem_oferta", ref)
+            if len(offers) > 1:
+                return self._chat_refuse(run_id, employee_id, "oferta_ambigua", ref)
+            case, offer = offers[0]
+            accept = intent == "aceitar_oferta"
+            return self._chat_delegate(
+                run_id,
+                employee_id,
+                ref,
+                lambda: self.respond_offer(offer_id=offer.id, employee_id=employee_id, accept=accept, ack_decline=True),
+            )
+        if intent in ("resposta_ponto_vou", "resposta_ponto_nao_vou"):
+            open_questions = [
+                c
+                for c in self._cases.list_cases()
+                if c.employee_id == employee_id and c.status == "aguardando_colaborador"
+            ]
+            if not open_questions:
+                return self._chat_refuse(run_id, employee_id, "sem_pergunta", ref)
+            case = open_questions[-1]
+            coming = intent == "resposta_ponto_vou"
+            return self._chat_delegate(
+                run_id, employee_id, ref, lambda: self.answer(case_id=case.id, employee_id=employee_id, coming=coming)
+            )
+        if intent == "consultar_escala":
+            body = render("chat_escala", dias=self._days_label(employee_id, version))
+            return self._chat_reply(run_id, employee_id, "chat_escala", ref, body)
+        if intent == "consultar_caso":
+            mine = [c for c in self._cases.list_cases() if c.employee_id == employee_id]
+            if not mine:
+                body = render("chat_caso", estado="Não há aviso seu registrado nesta semana.")
+                return self._chat_reply(run_id, employee_id, "chat_caso", ref, body)
+            last = mine[-1]
+            state = CASE_STATE_TEXT[last.status].format(turno=shift_label(last.shift))
+            if last.abono == "provisorio":
+                state += " Comprovação recebida; abono provisório até a confirmação do gestor."
+            body = render("chat_caso", estado=state)
+            return self._chat_reply(run_id, employee_id, "chat_caso", ref, body, case_id=last.id)
+        refused = self._chat_refused(run_id, employee_id, "fora_de_contexto")
+        return self._chat_reply(run_id, employee_id, "chat_fora_escopo", refused.id, TEMPLATES["chat_fora_escopo"])
+
+    def _chat_report(
+        self, parsed: ChatInterpretation, employee_id: str, text: str, version: ScheduleVersion, run_id: str, ref: str
+    ) -> Reply:
+        own_days = {s.start.date() for s in version.schedule.shifts if s.employee_id == employee_id}
+        day = parsed.day
+        if day is None and parsed.intent == "atraso" and self._clock.now().date() in own_days:
+            day = self._clock.now().date()  # "vou me atrasar" sem dia: o turno de hoje
+        if day is None:
+            return self._chat_refuse(run_id, employee_id, "sem_dia", ref, dias=self._days_label(employee_id, version))
+        if day not in own_days:
+            return self._chat_refuse(
+                run_id, employee_id, "dia_invalido", ref, dias=self._days_label(employee_id, version)
+            )
+        kind: Literal["falta", "atraso"] = "falta" if parsed.intent == "falta" else "atraso"
+        return self._chat_delegate(
+            run_id,
+            employee_id,
+            ref,
+            lambda: self.report(
+                employee_id=employee_id, day=day, kind=kind, text=text, minutes_late=parsed.minutes_late
+            ),
+        )
+
+    def _chat_delegate(self, run_id: str, employee_id: str, ref: str, act: Callable[[], CaseView]) -> Reply:
+        """Roda o mesmo ato dos botões; a resposta é a última mensagem de template que o ato mandou à pessoa."""
+        before = len(self._channel.inbox(employee_id))
+        try:
+            view = act()
+        except TrackerError as exc:
+            return self._chat_refuse(run_id, employee_id, "acao_recusada", ref, motivo=exc.message)
+        sent = [m for m in self._channel.inbox(employee_id)[before:] if m.direction == "out"]
+        if not sent:
+            state = CASE_STATE_TEXT[view.status].format(turno=view.day.strftime("%d/%m"))
+            return self._chat_reply(run_id, employee_id, "chat_caso", ref, state, case_id=view.case_id)
+        last = sent[-1]
+        return Reply(
+            template=last.template,
+            body=last.body or "",
+            case_id=view.case_id,
+            suggestions=self._suggestions(employee_id),
+        )
+
+    def _chat_refuse(self, run_id: str, employee_id: str, reason: str, ref: str, **fields: str) -> Reply:
+        refused = self._chat_refused(run_id, employee_id, reason)
+        body = render("chat_recusa", motivo=CHAT_REFUSAL_TEXT[reason].format(**fields))
+        return self._chat_reply(run_id, employee_id, "chat_recusa", refused.id or ref, body)
+
+    def _chat_refused(self, run_id: str, employee_id: str, reason: str) -> TraceEvent:
+        return self._tracer.step(run_id, "track.chat.refused", payload={"employee_id": employee_id, "reason": reason})
+
+    def _chat_reply(
+        self, run_id: str, employee_id: str, template: str, ref: str, body: str, *, case_id: str | None = None
+    ) -> Reply:
+        enviar_sem_caso(
+            channel=self._channel,
+            tracer=self._tracer,
+            run_id=run_id,
+            employee_id=employee_id,
+            to=employee_id,
+            template=template,
+            body=body,
+            decision_ref=ref,
+            new_id=self._new_id,
+        )
+        return Reply(template=template, body=body, case_id=case_id, suggestions=self._suggestions(employee_id))
+
+    def _rate_check(self, employee_id: str, run_id: str) -> None:
+        now = self._rate_clock()
+        hits = self._chat_hits.setdefault(employee_id, deque())
+        while hits and hits[0] <= now - CHAT_RATE_WINDOW_S:
+            hits.popleft()
+        if len(hits) >= CHAT_RATE_MAX:
+            self._chat_refused(run_id, employee_id, "taxa")
+            raise TrackerError(429, f"muitas mensagens: no máximo {CHAT_RATE_MAX} por minuto")
+        hits.append(now)
+
+    def _chat_context(self, employee_id: str, version: ScheduleVersion) -> ChatContext:
+        cases = self._cases.list_cases()
+        return ChatContext(
+            today=self._clock.now().date(),
+            own_shift_days=sorted({s.start.date() for s in version.schedule.shifts if s.employee_id == employee_id}),
+            open_offer_days=sorted(
+                {
+                    c.shift.start.date()
+                    for c in cases
+                    for o in c.offers
+                    if o.candidate_id == employee_id and o.status == "enviada"
+                }
+            ),
+            open_question_days=sorted(
+                {
+                    c.shift.start.date()
+                    for c in cases
+                    if c.employee_id == employee_id and c.status == "aguardando_colaborador"
+                }
+            ),
+        )
+
+    def _suggestions(self, employee_id: str) -> list[str]:
+        cases = self._cases.list_cases()
+        if any(o.candidate_id == employee_id and o.status == "enviada" for c in cases for o in c.offers):
+            return list(SUGGEST_OFFER)
+        if any(c.employee_id == employee_id and c.status == "aguardando_colaborador" for c in cases):
+            return list(SUGGEST_QUESTION)
+        return list(SUGGEST_DEFAULT)
+
+    @staticmethod
+    def _days_label(employee_id: str, version: ScheduleVersion) -> str:
+        shifts = sorted((s for s in version.schedule.shifts if s.employee_id == employee_id), key=lambda s: s.start)
+        return "; ".join(shift_label(s) for s in shifts) or "nenhum"
 
     # --- varredura ---------------------------------------------------------------------------------------------
 
@@ -933,7 +1196,9 @@ class Tracker:
 
     @staticmethod
     def _reason(case: Case) -> ReplanReason:
-        return "no_punch" if case.origin == "ponto" else "falta"
+        if case.origin == "ponto":
+            return "no_punch"
+        return "atraso" if case.kind == "atraso" else "falta"
 
     @staticmethod
     def _name(world: World, employee_id: str) -> str:

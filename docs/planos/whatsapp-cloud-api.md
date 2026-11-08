@@ -1,5 +1,8 @@
 # WhatsApp real no pitch: Cloud API da Meta em modo de teste
 
+> **Superado pela [DEC-069](../decisoes.md) (2026-11-08 ~10:50):** sem WhatsApp; o colaborador conversa com o agente por um chat
+> dentro do app ([plano da C7b](camada-07b-chat.md)). Mantido só como histórico.
+
 Última atualização: 2026-11-08 02:05 · Decisão: [DEC-043](../decisoes.md)
 
 **Para quê.** Os jurados testam o atendimento pelo **celular simulado** no link (caminho garantido, C7). O WhatsApp de verdade aparece

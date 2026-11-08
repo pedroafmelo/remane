@@ -1,7 +1,9 @@
 """Celular simulado (C7, seção 4.3): implementa a porta `Channel` gravando em `channel_message` (RH-06).
 
-A caixa do celular lê daqui (sondagem de 3 s). **RN-06:** o texto livre do colaborador nunca é gravado; mensagem de
-entrada só carrega metadados (`has_text`, tipo do anexo).
+A caixa do celular lê daqui (sondagem de 3 s). **RN-06 (revisto na C7b):** CID, imagem e dado de saúde nunca são
+gravados. O texto do chat (`template="chat"`) é guardado, para a conversa aparecer ao recarregar, mas só **depois**
+do corte de CID (`audit.protected.strip_cid_any_case`), feito aqui, na única porta de gravação. As outras mensagens
+de entrada só carregam metadados (`has_text`, tipo do anexo): `body` nelas é recusado.
 """
 
 from __future__ import annotations
@@ -9,8 +11,11 @@ from __future__ import annotations
 from sqlalchemy import Engine, func, select
 from sqlalchemy.orm import Session
 
+from escalista.audit.protected import strip_cid_any_case
 from escalista.domain.tracking import ChannelMessage
 from escalista.store.tracking import ChannelMessageRow
+
+CHAT_TEMPLATE = "chat"
 
 
 def _to_row(message: ChannelMessage, seq: int) -> ChannelMessageRow:
@@ -51,9 +56,11 @@ class SimulatedPhone:
         self._engine = engine
 
     def send(self, message: ChannelMessage) -> None:
-        """Grava a mensagem. Levanta `ValueError` se for de entrada e trouxer `body` (RN-06)."""
+        """Grava a mensagem. Entrada do chat: `body` já sem CID. Outra entrada com `body`: `ValueError` (RN-06)."""
         if message.direction == "in" and message.body is not None:
-            raise ValueError("RN-06: o texto do colaborador nunca é gravado (mensagem de entrada com body)")
+            if message.template != CHAT_TEMPLATE:
+                raise ValueError("RN-06: só o texto do chat é gravado (mensagem de entrada com body)")
+            message = message.model_copy(update={"body": strip_cid_any_case(message.body)})
         with Session(self._engine) as session, session.begin():
             last = session.scalar(select(func.max(ChannelMessageRow.seq)))
             session.add(_to_row(message, (last or 0) + 1))

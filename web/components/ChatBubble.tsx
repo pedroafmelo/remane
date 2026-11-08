@@ -16,7 +16,7 @@ const justify: Record<From, string> = {
   typing: "justify-end",
 };
 
-/** `mirrored`: o celular é de quem fala (o colaborador), então ele fica à direita e o Pat à esquerda, como no WhatsApp. */
+/** `mirrored`: o celular é de quem fala (o colaborador), então ele fica à direita e o Pat à esquerda, como num app de mensagens. */
 export function ChatBubble({ from, children, attachment, mirrored = false }: { from: From; children?: ReactNode; attachment?: string; mirrored?: boolean }) {
   const side = mirrored && (from === "person" || from === "agent" || from === "typing") ? (from === "person" ? "justify-end" : "justify-start") : justify[from];
   return (

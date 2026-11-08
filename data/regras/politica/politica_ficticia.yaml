@@ -57,6 +57,11 @@ regras:
       Passados 10 min do início do turno sem batida no ponto simulado, o agente pergunta ao colaborador (gatilho
       ativo de falta ou atraso). Sem resposta em 15 min, abre uma exceção ao gestor.
     prazo_resposta_colaborador_min: 15
+    cobertura_a_partir_de_min: 30
+    proposta: true
+    nota_cobertura: >
+      Atraso avisado de 30 min ou mais abre a busca de cobertura, como a falta (oferta ao colega e validação do
+      gestor). Valor fictício do agente; a empresa define; confirmar com Pedro Veloso.
     status: interpretacao
 
   - id: pol_oferta_turno

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { asFailure } from "@/lib/api";
 import { trackerApi } from "@/lib/api-tracker";
+import { chatSuggestions } from "@/lib/chat";
 import type { Failure } from "@/lib/errors";
 import type { PatEstado } from "@/lib/pat";
 import {
@@ -27,6 +28,7 @@ import { ChatBubble } from "@/components/ChatBubble";
 import { Pat } from "@/components/Pat";
 import { StatusChip } from "@/components/StatusChip";
 import { useClockChange } from "@/components/plataforma/DemoClockBar";
+import { ChatComposer } from "@/components/plataforma/ChatComposer";
 import { ReportForm } from "@/components/plataforma/ReportForm";
 import { Shell } from "@/components/plataforma/Shell";
 import { SessionGate, useSession } from "@/components/plataforma/session";
@@ -52,7 +54,7 @@ function rememberPerson(id: string) {
 
 type Step = { kind: "menu" } | { kind: "form"; report: ReportInput["kind"] };
 
-/** Celular simulado do colaborador (FT-03): semana, caixa do Pat, avisos com anexo, ofertas e perguntas do agente. */
+/** Celular simulado do colaborador (FT-03, C7b): chat em texto livre com o Pat, avisos com anexo, ofertas e perguntas. */
 export default function ColaboradorPage() {
   const [people, setPeople] = useState<PeopleList | null>(null);
   const [personId, setPersonId] = useState<string | null>(null);
@@ -130,6 +132,23 @@ export default function ColaboradorPage() {
     setStep({ kind: "menu" });
     return act(() => trackerApi.report({ as: personId, day, kind, text, file }));
   };
+  async function sendChat(text: string): Promise<boolean> {
+    if (!personId) return false;
+    setSending(true);
+    setProblem(null);
+    try {
+      await trackerApi.message(personId, text);
+      await loadInbox();
+      return true;
+    } catch (err) {
+      const failure = asFailure(err);
+      if (failure.kind === "auth") session.toLogin();
+      else setProblem(failure);
+      return false;
+    } finally {
+      setSending(false);
+    }
+  }
   const answerOffer = (offerId: string, accept: boolean) => personId && act(() => trackerApi.answerOffer(offerId, personId, accept));
   const answerQuestion = (caseId: string, coming: boolean) => personId && act(() => trackerApi.answerQuestion(personId, caseId, coming));
 
@@ -268,6 +287,13 @@ export default function ColaboradorPage() {
             <div className="flex flex-wrap justify-end gap-2 border-t border-line bg-surface px-3 py-3">
               {step.kind === "menu" ? (
                 <>
+                  <ChatComposer
+                    suggestions={chatSuggestions({ openQuestions: questions.length, openOffers: openOffers.length })}
+                    busy={sending}
+                    placeholder="Escreva para o Pat"
+                    onSend={sendChat}
+                  />
+                  <span className="mr-auto self-center text-xs text-ink-muted">Ou avise pelo formulário, com anexo:</span>
                   <Button size="sm" variant="secondary" onClick={() => setStep({ kind: "form", report: "falta" })} disabled={sending || days.length === 0}>
                     Vou faltar
                   </Button>

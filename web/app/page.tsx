@@ -82,7 +82,7 @@ export default function Home() {
                 Teste agora: avise uma falta e veja o Remane encontrar quem cobre.
               </h2>
               <p className="mt-4 text-lg leading-normal text-ink-muted">
-                Na demo, um celular simulado faz o papel do WhatsApp: escolha alguém da equipe, mande a mensagem e acompanhe a escala
+                Na demo, o chat fica dentro do app, num celular simulado: escolha alguém da equipe, escreva para o Pat e acompanhe a escala
                 mudando do lado do gestor.
               </p>
               <Button href="/entrar" className="mt-6">Testar a demo</Button>

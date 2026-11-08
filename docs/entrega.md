@@ -1,6 +1,6 @@
 # Entrega: submissão, pitch e demo
 
-Última atualização: 2026-11-08 03:20 (pitch, vídeo e descrição em [pitch.md](pitch.md)). Antes: 2026-11-07 14:42. Prazo de submissão: **domingo 08/11, 13h00**, no painel
+Última atualização: 2026-11-08 11:31 (chat no app em vez de WhatsApp, [DEC-069](decisoes.md)). Antes: 03:20 (pitch, vídeo e descrição em [pitch.md](pitch.md)). Antes: 2026-11-07 14:42. Prazo de submissão: **domingo 08/11, 13h00**, no painel
 https://hackathons.canastra.ventures/. Percorra esta lista antes de enviar (e com `/sync-docs`).
 
 ## 1. Checklist de submissão (guia, seção 7)
@@ -56,7 +56,7 @@ Abertura de 5 segundos: "A 6x1 acaba em dezembro. Quem refaz a escala da sua loj
 | 2:40 - 3:00 | Cobrança por colaborador escalado por mês (hipótese; o ponto custa de R$ 3,75 a R$ 6,90 por colaborador, Genyo). A política da empresa é parâmetro: cada convenção vira regras versionadas com origem. O canal com o trabalhador é a porta para o resto do DP. Próximo passo: piloto com uma rede | **[HIPÓTESE]** de preço; **[FATO]** da âncora de ponto |
 
 Cuidados: não dizer que "ninguém faz isso" (ausência de evidência); não apresentar interpretação jurídica como certa; avisar que
-dados e atestados são sintéticos e que o WhatsApp é simulado ou não oficial.
+dados e atestados são sintéticos e que o chat do colaborador é dentro do app, num celular simulado ([DEC-069](decisoes.md)).
 
 ## 4. O que evitar
 

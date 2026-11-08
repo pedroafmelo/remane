@@ -14,7 +14,17 @@ from typing import Any, Literal, Protocol, runtime_checkable
 from escalista.domain.contracts import ExceptionCard, LLMMessage, LLMResult, TraceEvent
 from escalista.domain.results import Approval, RunState, ScheduleVersion
 from escalista.domain.roster import Roster
-from escalista.domain.tracking import AtestadoReading, Case, ChannelMessage, Punch
+from escalista.domain.rules import Rule
+from escalista.domain.tracking import (
+    AssistantChoice,
+    AssistantContext,
+    AtestadoReading,
+    Case,
+    ChannelMessage,
+    ChatContext,
+    ChatInterpretation,
+    Punch,
+)
 
 
 @runtime_checkable
@@ -109,6 +119,44 @@ class AtestadoReader(Protocol):
     def __call__(
         self, *, data: bytes, media_type: str, run_id: str, expected_day: date, employee_name: str
     ) -> AtestadoReading: ...
+
+
+@runtime_checkable
+class MessageInterpreter(Protocol):
+    """Classifica a mensagem livre do colaborador (borda `ingest/chat.py`, C7b). Só classifica, em schema fechado;
+    levanta `LLMUnavailableError` quando o modelo falha ou não entrega o schema."""
+
+    def __call__(self, *, text: str, employee_name: str, context: ChatContext, run_id: str) -> ChatInterpretation: ...
+
+
+@runtime_checkable
+class AssistantData(Protocol):
+    """Tudo o que o assistente do gestor enxerga (C7b N2). **Só leitura**, por construção: nenhum método muda nada, e
+    a implementação lê de um banco aberto como somente leitura (`api/assistant_wiring.py`). Pessoas só pelo nome
+    (nunca `sex`, RN-13); casos sem CID (o `Case` não tem campo para isso)."""
+
+    def published(self) -> ScheduleVersion | None: ...
+
+    def people(self) -> dict[str, str]: ...  # id -> nome
+
+    def store_names(self) -> dict[str, str]: ...
+
+    def open_exceptions(self) -> list[tuple[str, str]]: ...  # (código, título)
+
+    def overtime(self) -> list[tuple[str, int]]: ...  # (id, minutos de hora extra na semana, no ponto simulado)
+
+    def overtime_limit_h(self) -> str: ...
+
+    def rules(self) -> list[Rule]: ...
+
+    def last_case(self) -> tuple[Case, list[str]] | None: ...  # o caso e os `kind` do rastro dele
+
+
+@runtime_checkable
+class AssistantChooser(Protocol):
+    """Escolhe a ferramenta de leitura (borda `ingest/assistant.py`). Levanta `LLMUnavailableError`."""
+
+    def __call__(self, *, text: str, context: AssistantContext, run_id: str) -> AssistantChoice: ...
 
 
 @runtime_checkable
