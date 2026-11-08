@@ -1,7 +1,13 @@
 // Textos puros da fila de exceções e do celular simulado (pt-BR). Só apresentam o que o backend decidiu.
 
 import { shiftLabel, spanHours } from "./format.ts";
-import type { MyFalta, MyWeek } from "./types-excecoes.ts";
+import type { ExceptionItem, MyFalta, MyWeek } from "./types-excecoes.ts";
+
+/** Execução do rastro de um cartão do acompanhamento (`track-<case_id>` ou `track-sweep`); `null` nos demais. */
+export function trackRunId(item: Pick<ExceptionItem, "source">): string | null {
+  const { kind, run_id: runId } = item.source;
+  return kind === "track" && typeof runId === "string" && runId.startsWith("track-") ? runId : null;
+}
 
 const WEEKDAYS = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
 

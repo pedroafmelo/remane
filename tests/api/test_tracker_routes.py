@@ -240,3 +240,32 @@ def test_answer_to_the_agent_question(tmp_path):
         "/api/colaborador/resposta", json={"as": "P101", "case_id": box["questions"][0]["case_id"], "coming": False}
     )
     assert other.status_code in (403, 409)
+
+
+def test_gestor_reads_the_case_trace_and_the_colaborador_does_not(tmp_path):
+    """Passo 6 do roteiro: a auditoria do caso pela mesma rota de rastro das execuções (`track-<case_id>`)."""
+    api = make_client(tmp_path)
+    api.login("colaborador")
+    case = api.post(
+        "/api/colaborador/aviso", json={"as": "P101", "day": THURSDAY, "kind": "falta", "has_text": True}
+    ).json()
+    api.post(
+        f"/api/colaborador/caso/{case['case_id']}/anexo",
+        params={"as": "P101", "file_name": "atestado.pdf"},
+        content=ATESTADO.read_bytes(),
+    )
+    url = f"/api/runs/track-{case['case_id']}/trace"
+    assert api.get(url).status_code == 403
+    assert api.get("/api/runs/track-sweep/trace").status_code == 403
+
+    api.login("gestor")
+    response = api.get(url)
+    assert response.status_code == 200
+    events = response.json()
+    kinds = [e["kind"] for e in events]
+    assert kinds[0] == "track.report.received" and "track.atestado.read" in kinds and "track.offer.sent" in kinds
+    assert {e["run_id"] for e in events} == {f"track-{case['case_id']}"}
+    assert all("cost_usd" in e and "tokens_in" in e and "latency_ms" in e for e in events)
+    assert CID not in response.text and "text" not in events[0]["payload"]
+    assert api.get("/api/runs/track-sweep/trace").status_code == 200
+    assert api.get("/api/runs/track-nao-existe/trace").status_code == 404

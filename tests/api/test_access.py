@@ -67,6 +67,7 @@ ROUTES: list[Route] = [
     Route("GET", "/api/runs/{run_id}/schedule", GESTOR, url=f"/api/runs/{APPROVE}/schedule"),
     Route("POST", "/api/runs/{run_id}/approve", GESTOR, url=f"/api/runs/{APPROVE}/approve"),
     Route("GET", "/api/runs/{run_id}/trace", GESTOR, url=f"/api/runs/{APPROVE}/trace"),
+    Route("GET", "/api/runs/{run_id}/trace", GESTOR, url="/api/runs/track-sweep/trace"),  # rastro do acompanhamento
     Route("GET", "/api/schedules/published", GESTOR),
     Route("GET", "/api/roster", GESTOR),
     Route("GET", "/api/demo/files/{name}", GESTOR, url="/api/demo/files/escala_atual.csv"),

@@ -144,9 +144,11 @@ def test_demo_script_end_to_end(tmp_path):
     assert "P107" in thursday and "P101" not in thursday
     assert "cobertura_confirmada" in templates("P107")
     assert "falta_coberta" in templates("P101")
-    # `GET /api/runs/{id}/trace` é do agente da escala e não cobre `track-<caso>`: lê-se o sink pelo `app.state`
-    assert api.get(f"/api/runs/track-{case_id}/trace").status_code == 404
+    # passo 6: a auditoria do caso pela mesma rota de rastro das execuções (C3b), igual ao que o sink gravou
+    audit = api.get(f"/api/runs/track-{case_id}/trace")
+    assert audit.status_code == 200
     events = sink.list_events(f"track-{case_id}")
+    assert [e["id"] for e in audit.json()] == [e.id for e in events]
     closed = [e for e in events if e.kind == "track.case.closed"]
     assert closed and closed[-1].payload["new_violations"] == 0 and closed[-1].payload["outcome"] == "coberta"
     assert {"track.offer.accepted", "exception.decided", "schedule.republished"} <= set(kinds(events))
