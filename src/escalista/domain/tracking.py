@@ -170,7 +170,8 @@ class Case(BaseModel):
 
 
 class ChannelMessage(BaseModel):
-    """Mensagem do canal (RH-06). Entrada: `body` sempre `None` (o texto do colaborador não é gravado, RN-06)."""
+    """Mensagem do canal (RH-06). Entrada: `body` só no chat (C7b), já sem CID nem campo protegido (RN-06: o canal
+    corta antes de gravar); as outras entradas guardam só metadados."""
 
     id: str
     case_id: str | None = None
@@ -196,6 +197,59 @@ class TrackPolicy(BaseModel):
     max_candidates: int
     overtime_weekly_limit_h: Decimal
     overtime_warn_pct: int
+    late_cover_from_min: int | None = None  # `pol_atraso.cobertura_a_partir_de_min`; `None` = atraso nunca abre cobertura
+
+    def late_opens_cover(self, minutes_late: int | None) -> bool:
+        """O atraso abre a busca de cobertura (C7b, seção 5)? Sem limite na política ou sem minutos, nunca."""
+        if self.late_cover_from_min is None or minutes_late is None:
+            return False
+        return minutes_late >= self.late_cover_from_min
+
+
+# --- chat do colaborador (C7b) ------------------------------------------------------------------------------------
+
+ChatIntent = Literal[
+    "falta",
+    "atraso",
+    "aceitar_oferta",
+    "recusar_oferta",
+    "resposta_ponto_vou",
+    "resposta_ponto_nao_vou",
+    "consultar_escala",
+    "consultar_caso",
+    "outro",
+]
+
+
+class ChatInterpretation(BaseModel):
+    """O que o modelo devolve ao classificar a mensagem livre. Schema fechado: só a intenção e dois campos; o modelo
+    nunca escreve a resposta, nunca escolhe ferramenta nem id (C7b, seção 4)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    intent: ChatIntent
+    day: date | None = None  # só para falta e atraso
+    minutes_late: int | None = Field(default=None, ge=1, le=480)
+
+
+class ChatContext(BaseModel):
+    """Só dados da própria pessoa, montados pelo código, para o modelo resolver "amanhã" e "aceito"."""
+
+    model_config = ConfigDict(frozen=True)
+
+    today: date
+    own_shift_days: list[date] = Field(default_factory=list)
+    open_offer_days: list[date] = Field(default_factory=list)
+    open_question_days: list[date] = Field(default_factory=list)
+
+
+class Reply(BaseModel):
+    """O que o `Tracker.message` devolve (SAIDA-AC-17): texto de template nosso, nunca do modelo."""
+
+    template: str
+    body: str
+    case_id: str | None = None
+    suggestions: list[str] = Field(default_factory=list)
 
 
 class OfferView(BaseModel):

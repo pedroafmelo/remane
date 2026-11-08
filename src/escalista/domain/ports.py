@@ -14,7 +14,7 @@ from typing import Any, Literal, Protocol, runtime_checkable
 from escalista.domain.contracts import ExceptionCard, LLMMessage, LLMResult, TraceEvent
 from escalista.domain.results import Approval, RunState, ScheduleVersion
 from escalista.domain.roster import Roster
-from escalista.domain.tracking import AtestadoReading, Case, ChannelMessage, Punch
+from escalista.domain.tracking import AtestadoReading, Case, ChannelMessage, ChatContext, ChatInterpretation, Punch
 
 
 @runtime_checkable
@@ -109,6 +109,16 @@ class AtestadoReader(Protocol):
     def __call__(
         self, *, data: bytes, media_type: str, run_id: str, expected_day: date, employee_name: str
     ) -> AtestadoReading: ...
+
+
+@runtime_checkable
+class MessageInterpreter(Protocol):
+    """Classifica a mensagem livre do colaborador (borda `ingest/chat.py`, C7b). Só classifica, em schema fechado;
+    levanta `LLMUnavailableError` quando o modelo falha ou não entrega o schema."""
+
+    def __call__(
+        self, *, text: str, employee_name: str, context: ChatContext, run_id: str
+    ) -> ChatInterpretation: ...
 
 
 @runtime_checkable
