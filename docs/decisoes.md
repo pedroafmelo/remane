@@ -1,6 +1,6 @@
 # Registro de decisões
 
-Última atualização: 2026-11-07 23:41. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
+Última atualização: 2026-11-08 00:46. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
 entrada:** se a decisão mudar, crie outra e marque a antiga como `substituída por DEC-NNN`. Use `/decisao` para registrar e
 propagar o efeito para as outras docs.
 
@@ -479,3 +479,12 @@ Formato:
 - **Motivo: [motivo não informado].**
 - **Alternativas consideradas (as oferecidas):** commits autorizados por tarefa concluída, na branch do worktree e nunca no `main`; ou não autorizados.
 - **Consequências:** os itens `[PROPOSTA]` do plano entram na aprovação e seguem rotulados (nomes de contratos, quinta primitiva `jornada_diaria_max`, semana de 11 a 17/01/2027, hora extra só com autorização, pacote `store/`, verificador na sessão D, fluxo sem PR); qualquer um muda por nova DEC. **Commits autorizados** para as 4 sessões, por tarefa concluída, **na branch do worktree** (`c5/<frente>-<tarefa>`), **sem push e sem commit no `main`**: o `main` só recebe o que o usuário integra com `merge --ff-only`. Esta autorização vale só para as sessões da C5. **Segue `[PREENCHER]`:** o que fazer com C6, C7 e C8 diante do G4 (plano da C5, seção 9). Os worktrees foram criados às 23h47 (`/Users/pedrohmv/Projetos/cc61-a` a `cc61-d`, branches `c5/a-contracts`, `c5/b-trace`, `c5/c-access` e `c5/d-data`) a partir de `d6c10c7`.
+
+## DEC-038 · Execução da C5 por uma sessão orquestradora com subagentes; merge local pelo orquestrador
+
+- 2026-11-07 23:55 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** o usuário entregou um roteiro de orquestração para executar a C5 ([plano da C5](planos/camada-05-fatia-vertical.md)) com uma sessão que delega cada tarefa a um subagente nos 4 worktrees, com três escolhas em aberto. O `main` tinha a [DEC-037](#dec-037--plano-da-c5-aprovado-commits-autorizados-nas-branches-dos-worktrees) sem commit.
+- **Decisão (o que o usuário escolheu):** (1) DEC-037: "Eu commito agora", isto é, o orquestrador a commita; (2) merge no `main`: "Orquestrador, ff-only" (local, sem push); (3) duração: "Indefinido."; (4) commit das docs de registro: "Orquestrador commita".
+- **Motivo: [motivo não informado].**
+- **Alternativas consideradas (as oferecidas):** (1) o usuário commita; (2) só o usuário integra; (3) parar às ~03h e voltar às 07h, ou seguir sem supervisão até o G3; (4) só o usuário commita.
+- **Consequências:** o fluxo da [seção 7 do plano da C5](planos/camada-05-fatia-vertical.md) muda: quem integra é o orquestrador, e não o usuário, sempre sem push. "Indefinido" foi lido pelo agente como "seguir até o G3" (**interpretação, não confirmada**). Decisões tomadas pelo **agente** durante a execução, sem consulta, registradas aqui para revisão: (a) upload do CSV em corpo bruto `text/csv`, porque `python-multipart` não está instalado e `uv add` estava vedado; (b) teto de 8 pessoas por faixa na demanda sintética (D2b), porque o ótimo deixava 9,5 pessoa-horas descobertas e a demo padrão cairia sempre no RX-02; (c) uma tarefa a mais, S1 (`store/`), que o plano previa sem tarefa. Execução e G3 no [registro da C5](planos/camada-05-fatia-vertical.md), seção 12.

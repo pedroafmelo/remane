@@ -1,6 +1,6 @@
 # Plano macro de implementação do Escalista
 
-Última atualização: 2026-11-07 23:41 (Recife; G3 local pela [DEC-035](decisoes.md)) · Situação: **aprovado pelo usuário em 2026-11-07 16:13** ([DEC-029](decisoes.md)) · Decisões desta etapa:
+Última atualização: 2026-11-08 00:45 (Recife; C5 em execução, G3 itens 1 a 5 passaram; antes: G3 local pela [DEC-035](decisoes.md)) · Situação: **aprovado pelo usuário em 2026-11-07 16:13** ([DEC-029](decisoes.md)) · Decisões desta etapa:
 [DEC-027](decisoes.md) e [DEC-028](decisoes.md).
 
 Este arquivo diz **o que cada camada entrega, do que depende e como saber que acabou**. Ele não repete o produto
@@ -317,7 +317,7 @@ puxado. Não há sessão própria.
 | C2 Solver, verificador e custo | A | a planejar (subconjunto planejado na C5) | subconjunto em [camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md) |
 | C3 Cliente LLM, pool de chaves e rastro | B | a planejar (subconjunto planejado na C5) | subconjunto em [camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md) |
 | C4 API, login, papéis e SPA base | C | a planejar (subconjunto planejado na C5) | subconjunto em [camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md) |
-| C5 Primeira fatia vertical | todas | **planejada** (aprovada, [DEC-037](decisoes.md)) | [camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md) |
+| C5 Primeira fatia vertical | todas | **em execução**: código integrado no `main` local às 00h42 de 08/11; G3 itens 1 a 5 passaram, falta o item 6 à mão (usuário) | [camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md) |
 | C6 Leitura completa e FT-01 | B, D | a planejar | — |
 | C7 Acompanhamento (FT-03) | B, C | a planejar | — |
 | C8 Exceções, painel, auditoria e FT-07 | A, C | a planejar | — |

@@ -1,6 +1,6 @@
 # Plano da C5 · Primeira fatia vertical (com os subconjuntos de C1 a C4)
 
-Última atualização: 2026-11-07 23:41 (Recife) · Situação: **aprovado pelo usuário em 2026-11-07 23:49** ([DEC-037](../decisoes.md)) · Decisões desta etapa:
+Última atualização: 2026-11-08 00:45 (Recife; registro de execução na seção 12) · Situação: **aprovado pelo usuário em 2026-11-07 23:49** ([DEC-037](../decisoes.md)); **executado: itens 1 a 5 do G3 passaram, item 6 pendente** · Decisões desta etapa:
 [DEC-035](../decisoes.md) e [DEC-036](../decisoes.md). Planejado pelo Opus 5.5 ([DEC-028](../decisoes.md)).
 
 **Rótulos:** sem rótulo é decisão do usuário (com a DEC). **[PROPOSTA]** é sugestão do agente, ainda não confirmada. `[PREENCHER]` é o que
@@ -362,8 +362,74 @@ Os outros 3 integrantes não programam nesta madrugada. O que podem fazer está 
 
 Cada sessão escreve só na sua subseção: início, fim (`date`), desvios e métricas medidas.
 
+**Como rodou (08/11, 23h52 a 00h43):** uma sessão orquestradora (Claude, Opus 5.5) delegou cada tarefa a um subagente no worktree da
+frente, verificou o diff, a suíte e o ruff, fez o rebase e integrou no `main` local com `merge --ff-only`, **sem push**. Escolhas do
+usuário às 23h55: merge pelo orquestrador; commit das docs de registro pelo orquestrador; duração "indefinido" (lida como "até o G3").
+Horários abaixo por `date` nos relatórios dos subagentes; os hashes são os do `main` depois do rebase.
+
 ### Sessão A
+- **T0** (opus) 23:54:38–23:56:58, `7ce7517`: contratos da tabela 3.1 em `domain/rules.py`, `schedule.py` e `results.py`; porta
+  `Repository`; `InMemoryRepository`; `store` em `CONCRETE_BORDERS`; marcador `slow`. Escolhas de forma: `Schedule.week_start` exige
+  segunda-feira; `EmployeePublic` não herda de `Employee`; `ViolationReport.total` é campo calculado.
+- **A1** (opus) 23:59:19–00:03:03, `81eeb99`: `rules/loader.py` e `merge.py`; 7 testes do TDD na ordem. `kind` = id do YAML; `params`
+  `{"hours"}`, `{"days"}` ou `{"percent"}`. **Desvio:** todo conflito entre camadas abre `ExceptionCard` com código RX-01 (o requisito
+  define RX-01 só para convenção contra a EC 141); constante `merge.CONFLICT_CODE`.
+- **A3** (opus) 00:03:55–00:05:35, `39ad2a7`: `solver/cost.py` (`compute_metrics`, `compare`, `compare_schedules`). Turno noturno conta
+  no dia de início; arredondamento `ROUND_HALF_UP` só na saída.
+- **A2** (opus) 00:06:35–00:18:52, `3b5795c`: catálogo (85 turnos por loja), CP-SAT decomposto por loja (exato: a pessoa só trabalha na
+  própria loja), presolve desligado (medido: com ele, 13,5 s e 20,5 s), RX-02 com o DP como decisor e a conta de contratação. Bench
+  medido na demanda original: 7,39 s (1 thread) e 6,46 s (8), ótimo, 9,5 pessoa-horas descobertas → motivou a D2b.
+
 ### Sessão B
+- **B1** (opus) 23:54:38–23:59:28, `847c231`: tabela `trace_event`, `SqlTraceSink` (máscara também nas colunas de texto), `Masker`,
+  `SystemClock`. **Desvio:** coluna `seq` a mais na tabela, só para ordenar (o `TraceEvent` não mudou).
+- **B2** (opus) 00:00:29–00:07:35, `4f89986`: `FeatherlessClient` e `KeyPool`. **Desvios:** 402 e 403 também trocam de chave; 5xx e
+  erro de conexão repetem como o 503; semáforo padrão 2 `[PROPOSTA]`; sem guarda de orçamento diário. Da documentação da Featherless
+  (consultada em 08/11): `usage.cost` em USD confirmado; o status de saldo zerado (402) e o `tool_choice` forçado **não** confirmados.
+- **B3** (sonnet) 00:08:31–00:10:04, `b214414`: `tool_schema_for`, `call_structured` (até 2 reenvios, depois RX-12), `justify` com
+  checagem de `rule_refs`; prompt sem nome nem sexo.
+- **S1** (sonnet) 00:10:42–00:11:46, `041f236`: `store/` com `SqlRepository`; mesma bateria de testes contra o falso e o SQL. Lacuna do
+  plano preenchida (a seção 3.2 previa o pacote, mas nenhuma tarefa o criava).
+- **B4** (sonnet) 00:12:22–00:13:42, `b424677`: `uv run python -m escalista.llm.smoke` (`--dry-run`, `--large`). **Não rodado com chave
+  real** (é do usuário).
+- **I1** (opus) 00:21:11–00:31:08, `7455fe1`: `OptimizerAgent` com um grafo LangGraph por trecho entre as paradas humanas, sem
+  checkpointer; `publicar` lê `get_approval` no código e recusa em 7 casos (inclui papel sem permissão e versão com violação).
+  **Desvios:** o CSV enviado fica em memória entre `start_run` e `confirm` (reinício do processo → 409); o `RunState` guarda um só cartão;
+  na falha do modelo, o `exception.raised` do cliente real tem `cost_usd` nulo (custo não medido).
+
 ### Sessão C
+- **C1** (opus) 23:54:38–23:56:35, `8b2d3f5`: sessão por cookie assinado, `require_role`, login de demo, matriz rota × papel.
+  **Pendentes:** limite de taxa no login de demo; `Secure` no cookie quando houver https.
+- **C2** (opus) 23:59:19–00:04:19, `3e54c30`: rotas da fatia contra o agente falso; Protocol `SliceAgent`. **Desvio de ambiente:** sem
+  `python-multipart` instalado (e sem `uv add`), o CSV vai no corpo bruto `text/csv`.
+- **C3** (sonnet) 00:05:18–00:07:32, `5f0dbfc`: telas da SPA. Build e typecheck verdes; **ainda não aberta num navegador**.
+- **C4** (sonnet) ~00:31–00:39:20, `81c8680` e `90ed22c`: `build_agent` e o adaptador `OptimizerSliceAgent`; `tests/e2e/test_fatia.py`
+  (7 testes). **Ponto frágil:** o teste de recusa sem aprovação depende da ordem dos testes do arquivo.
+
 ### Sessão D
+- **D1** (haiku) 23:54–23:55, `b9ddb98`: convenção e política fictícias (`status: ficticia`); hora extra só com autorização do DP em
+  `excecoes:`.
+- **D2** (haiku) 23:59–00:04, `cff6037`: geradores com seed 42; 3 lojas, 60 pessoas, CSV longo da DEC-036 com a marca SINTETICO;
+  9 violações e 5 defeitos plantados.
+- **D3** (opus) 00:04:45–00:08:11, `8b61450`: leitura (borda) e validação (pura). RX-13 também para dado inconsistente, com a escala
+  parcial; `fim == inicio` é problema, não turno de 24h.
+- **D4** (opus) 00:09:00–00:11:11, `b8fd023`: verificador independente; 9 de 9 violações plantadas, 0 falso positivo.
+- **D2b** (sonnet) 00:21:11–00:23:31, `5691b58`: teto de 8 pessoas por faixa (40% da equipe) na demanda sintética, porque o ótimo deixava
+  9,5 pessoa-horas descobertas e a demo padrão cairia sempre no RX-02. **Decisão do orquestrador** (a D2 já tinha que caber na
+  capacidade); só `demanda.json` mudou em `data/demo/`. Texto "46h40" de P003 corrigido para 46h.
+- **D5** (sonnet) 00:24:28–00:27:23, `bf9ab44`: E1 com 10 cenários sem modelo.
+
 ### Integração e G3
+- **Ordem real de merge:** T0, C1, D1, B1, A1, D2, C2, A3, C3, B2, D3, B3, D4, S1, B4, A2, D2b, D5, I1, C4. Sempre que mais de uma tarefa
+  estava pronta, valeu a ordem do plano; a C2 e a C3 entraram antes da sua vez porque eram as únicas prontas. A I1 e a C4 foram
+  integradas com as outras frentes paradas. Nenhum conflito de rebase.
+- **G3, itens 1 a 5, conferidos pelo orquestrador no `main` às 00h42** (`90ed22c`): (1) `uv run pytest -q` **463 passed** em 66 s
+  (o padrão roda os `slow`), fronteiras incluídas; (2) `ruff check` limpo; (3) `npm --prefix web run typecheck` e `build` sem erro;
+  (4) `tests/e2e/test_fatia.py` **7 passed** em 25 s; (5) E1 **10/10**. Bench `--seed 42`: 1 thread 11,99 s e 8 threads 12,27 s, ótimo
+  nas 3 lojas, R$ 20.014,00, cobertura 100%. Nenhum teste lê o `.env` real (conferido: todo `Settings(...)` dos testes usa
+  `_env_file=None`).
+- **Fumaça da C4 (sem chave, porta 8010):** `confirm` em 12,02 s; antes 158 violações e R$ 33.989,15 com 216,5 h de hora extra; depois
+  0 violações, R$ 20.014,00 e 0 h de hora extra; RX-12 visível sem texto inventado; publicação e rastro persistidos depois de reiniciar;
+  `escala_defeito.csv` → RX-13 com as 5 linhas.
+- **Item 6 (à mão, com o `.env` e o modelo real): pendente, é do usuário.** Roteiro na resposta da sessão orquestradora e em
+  [estado](../estado-do-projeto.md) (próximas ações).
