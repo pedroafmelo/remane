@@ -9,6 +9,7 @@ from pathlib import Path
 from escalista.domain.contracts import LLMUnavailableError, TraceEvent
 from escalista.evals import e3, e4
 from escalista.evals.common import EvalContext, run_scenarios
+from escalista.evals.e3 import BUILD_TRACKER
 from escalista.evals.fakes import ScriptedLLM
 from escalista.ingest.tables import read_tables
 from escalista.rules.header_aliases import guess_mapping
@@ -73,12 +74,17 @@ def test_e4_registry():
         assert "SAIDA-AC-05" in _saidas(by[i]), i
 
 
-def test_without_c7_every_dependent_scenario_says_which_output_is_missing():
-    results = run_scenarios([*e3.SCENARIOS, *e4.SCENARIOS], EvalContext())
-    assert {r.status for r in results} == {"não executado"}
-    by = {r.id: r for r in results}
-    assert by["E3-01"].reason.startswith("falta SAIDA-AC-02 (escalista.api.tracker_wiring.build_tracker)")
-    assert by["E4-02"].reason == "sem --with-model"
+def test_every_scenario_with_a_missing_output_says_which_one_and_never_passes():
+    scenarios = [*e3.SCENARIOS, *e4.SCENARIOS]
+    results = {r.id: r for r in run_scenarios(scenarios, EvalContext())}
+    for s in scenarios:
+        missing = [req for req in s.requires if req.missing()]
+        if missing:
+            assert results[s.id].status == "não executado", s.id
+            assert results[s.id].reason == missing[0].reason(), s.id
+    assert results["E4-02"].reason == "sem --with-model"
+    if BUILD_TRACKER.missing():
+        assert results["E3-01"].reason.startswith("falta SAIDA-AC-02 (escalista.api.tracker_wiring.build_tracker)")
 
 
 class _Emitting:
