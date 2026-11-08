@@ -1,6 +1,6 @@
 # Registro de decisões
 
-Última atualização: 2026-11-08 01:44. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
+Última atualização: 2026-11-08 08:05. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
 entrada:** se a decisão mudar, crie outra e marque a antiga como `substituída por DEC-NNN`. Use `/decisao` para registrar e
 propagar o efeito para as outras docs.
 
@@ -670,3 +670,10 @@ Formato:
 - **Decisão:** `Employee.sex` passa a `None` por padrão (contrato da A0, `1e9b482`); nenhuma regra o usa nesta camada. A primitiva do domingo quinzenal ([DEC-023](decisoes.md)) segue para depois.
 - **Motivo:** [motivo não informado]; consequência técnica: um quadro lido de arquivo não traz esse dado.
 - **Consequências:** RN-13 continua valendo: o campo nunca vai à tela, à API nem ao rastro.
+
+## DEC-054 · Integração única da C6 com o `main`, em vez de três marcos
+
+- 2026-11-08 08:05 · Decidido por: usuário da sessão (pedido ao orquestrador da integração) · Status: aceita
+- **Decisão:** a C6 entra no `main` por **um** PR, `c6/final`, com merge commit e sem squash. `c6/final` é `c6/m3` mais o merge de `origin/main` (`be360d9`: PRs #15, #17, #18 e #19). Fica no lugar dos três pacotes M1, M2 e M3 (`c6/m1`, `c6/m2`, `c6/m3`).
+- **Motivo:** [motivo não informado].
+- **Consequências:** `c6/m1` (`28c0ec5`) e `c6/m2` (`d441127`) ficam como pontos de reversão no histórico. O **PR #16** (carga do contrato no solver) continua aberto e em rascunho, **fora desta integração**, e a decisão sobre ele é do usuário: ele toca o solver da C6 (`solver/model.py`, junto da restrição de teto por pessoa do A5). Enquanto ele não entra, os números de custo e economia da escala de exemplo ainda incluem o efeito que ele aponta (horas de contrato não trabalhadas).

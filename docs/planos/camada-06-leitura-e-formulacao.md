@@ -588,3 +588,87 @@ nos relatórios dos subagentes.
 - **Pendências do usuário:** push e PR de `c6/m1`, `c6/m2` e `c6/m3` (nessa ordem, merge commit); G3 da C6 à mão com a chave (seção 19) e
   `--suite e2 --with-model` (custo e latência de `llm.map_columns` e `llm.formulate` **não medidos**); ordem de merge com as branches da outra
   sessão; o `/sync-docs` não foi rodado porque opera no diretório principal, que não é do orquestrador.
+
+### Integração com o `main` (`c6/final`, [DEC-054](../decisoes.md))
+
+Pedido do usuário: uma única integração (um PR, merge commit, sem squash) no lugar de M1, M2 e M3. Executada em 08/11/2026, **07:56 a ~08:15**
+(Recife), num worktree próprio (`cc61-c6-final`), sem tocar no diretório principal nem no `main`. Sem push e sem PR até o "pode" do usuário.
+`c6/final` parte de `c6/m3` (`08c1677`); o merge de `origin/main` (`be360d9`: PRs #15, #17, #18 e #19) é o commit `5b6aa4a`. As pontas
+`c6/m1` (`28c0ec5`) e `c6/m2` (`d441127`) seguem como pontos de reversão. **O PR #16 (carga do contrato no solver) ficou de fora.**
+
+**Linha de base de `c6/final` antes de fundir** (= `c6/m3`; código de saída conferido): pytest 1.274 passados em 138 s, ruff e format ok, E1 10/10,
+E2 16/16 (795/795, 0 inventados), front com typecheck, lint, 44 testes e build ok.
+
+**Os 14 arquivos em conflito, como foram resolvidos:**
+
+| Arquivo em conflito | Resolução | Teste que prova |
+|---|---|---|
+| `.gitignore` | união: `!data/**/*.xlsx` (C6) e `.claude/worktrees/` (time) | `git check-ignore data/demo/escala_exemplo_grade.xlsx` sai com 1 (não ignorado); a imagem o serve (`/api/demo/files/escala_exemplo_grade.xlsx` 200, 7.685 B) |
+| `docs/estado-do-projeto.md` | união das linhas do registro (a da C6 em cima, as do time embaixo) e cabeçalho novo | `/sync-docs` abaixo |
+| `domain/contracts.py` | `Role` do time com o `_missing_` (linhas antigas `gerente` e `dp` leem como `gestor`); docstring da C6 | `tests/domain/test_contracts_v0.py::test_role_values` (valores, `Role("gerente") is GESTOR`, `Role("admin")` levanta) |
+| `tests/domain/test_contracts_v0.py` | o teste de contrato fixa os dois: só dois valores e o `_missing_` | o mesmo |
+| `agents/optimizer/tools.py` | `PUBLISHER_ROLES = {GESTOR}` (idêntico nos dois lados; ficou o comentário da C6) | `tests/agents/test_tools.py::test_publish_refusals` (recusas da publicação, inclusive de papel sem permissão) |
+| `agents/optimizer/graph.py` | a C6 como base: o trecho do time era o código antigo, que a C6 moveu e já usa `Role.GESTOR` nos 7 pontos; nenhum `GERENTE` ou `DP` sobrou em `src/` | `tests/agents/test_graph.py` e `tests/agents/test_graph_c6.py` |
+| `api/routes_runs.py` | a C6 como base (`gestor = require_role(Role.GESTOR)`; rotas `next-week`, `roster`, binário) | matriz abaixo |
+| `api/app.py` | os dois conjuntos de rotas (`install_runs`, `install_excecoes`, `install_insights`); `_serve_spa` por último; `create_app(settings, agent=, desk=)` | `tests/api/test_spa.py::test_unknown_api_path_is_a_json_404` e `test_health_still_wins_over_the_spa_fallback` (a SPA não engole a API), e `test_every_api_route_is_in_the_matrix` |
+| `tests/api/test_access.py` | matriz única com as rotas do time (`/api/rules`, `/api/simulate/vigencia`, `/api/impact`, `/api/exceptions*`, `/api/colaborador/*`) **e** as da C6 (`/api/runs/next-week`, `/api/roster`, upload e o XLSX de exemplo); `/auth/demo/gerente`, `dp` e `GESTOR` continuam 404 | o próprio arquivo: 401 sem sessão, 403 por papel e sucesso por papel em cada linha |
+| `web/lib/roles.ts` | `ROLE_LABELS`, `HOME_BY_ROLE` e as descrições do time; comentário da C6 | `web/lib/platform.test.ts` |
+| `web/lib/platform.test.ts` | união dos casos; fica o `roleLabel("gerente") === "gerente"` (papel antigo sem alias na tela) | `npm test` (48 passam) |
+| `web/components/plataforma/Summary.tsx` | a C6 como base (mapeamento, identidade, capacidade, salário, semana, texto, `ConfirmInput`); a mudança do time era só um comentário | `npm run typecheck` e `npm test` |
+| `web/components/plataforma/Upload.tsx` | o texto da C6 (CSV, XLSX e PDF, exemplos) com a propriedade `title` do time (o título muda para "Planejar uma nova escala" quando já há escala vigente) | `npm run typecheck` e build |
+| `web/app/plataforma/page.tsx` | a página do time como base (`useSession`, `SessionGate`, menu das 4 áreas, "escala vigente" primeiro, Pat trabalhando) com a C6 por cima: `NoticeList`, `SpecApplied`, `SummaryPanel` com `mode` e `ConfirmInput`, `planNextWeek` | `npm run typecheck`, lint e build; **sem verificação visual** |
+
+**O que o merge limpo não pegou e precisou de correção** (nenhum teste do time falhava no `main`; falhou a união):
+
+1. `api/wiring.py`: a C6 removeu `DEMO_WEEK_START`, que Regras, a simulação e a fila de exceções importam. **Restaurada** (11/01/2027), com comentário.
+2. `api/insights.py`: o `rules_view` percorria todas as camadas e a C6 criou a `execucao` (nasce do pedido de cada execução, não do cartão em vigor);
+   `KeyError` em `GET /api/rules`. Agora percorre só as camadas com título, e a tela de Regras fica idêntica.
+3. `api/excecoes.py` (a mais importante): a fila e o celular do colaborador usavam o quadro de `data/demo` (`P001…`) e um cartão fixo. A C6 publica com os
+   ids do quadro guardado (`n-<nome>`) e em qualquer semana; sem a correção, o colaborador não achava a própria escala e a falta dava erro. Agora
+   `ExceptionDesk._use(version)` pega pessoas e lojas do `latest_roster` quando a escala publicada é da C6 (a escala semeada de teste segue em `data/demo`),
+   e o cartão é o da semana da própria escala (`load_rule_card_for_week`). **Testes novos:**
+   `tests/api/test_excecoes_c6.py` (escala publicada pela C6 na semana seguinte: o colaborador vê a semana, a falta acha cobertura no quadro, o verificador
+   tira quem violaria a interjornada, a decisão republica pelo `publicar` e a identidade não muda); **os dois falham sem a correção** (conferido).
+
+**Cartão por execução × Regras e simulação.** `GET /api/rules` e a simulação seguem usando `load_rule_card(DEMO_WEEK_START)`. O agente usa
+`load_rule_card_for_week`. Na semana da demo (nenhuma vigência muda no meio dela) os dois cartões são **iguais**: teste
+`tests/api/test_insights.py::test_rules_screen_and_simulation_use_the_same_card_the_agent_builds_for_the_demo_week` (mesmas regras na tela, nenhuma regra
+de `execucao`, e o regime de 42 h da simulação é o cartão do agente). Como o `input_hash` do solver inclui o cartão, a simulação parte da mesma entrada.
+
+**Gates em `c6/final` (código de saída conferido), 08:06 a 08:10:**
+
+| Gate | Resultado |
+|---|---|
+| `uv run pytest -q` | **1.313 passados** em 103 s, exit 0 (1.274 da linha de base, 3 testes novos desta integração e o restante vindo do `main`) |
+| `ruff check` e `ruff format --check` | ok (206 arquivos) |
+| E1 | 10/10 |
+| E2 sem modelo | 16/16; 795/795 turnos; 0 inventados; 0 perdidos; RX-13 4/4 |
+| `uv run pytest tests/e2e -q` | 20 passados em 24 s |
+| front | typecheck, lint e build ok; 48 testes |
+| solver 60 × 7, seed 42 | 1 thread 9,27 s; 8 threads 13,06 s; ótimo nas 3 lojas; R$ 20.014,00; load médio 3,9. Sem piora contra os ~9,3 s |
+| `docker build` (SHA `5b6aa4a`) | ok, 35 s |
+| imagem com `DEMO_MODE=1`, sem chave (porta 8080) | `/health` 200 com `version` `5b6aa4a`; `/`, `/entrar/`, `/plataforma/`, `/colaborador/` e as 3 áreas 200; `/api/me` sem sessão 401; `/auth/demo/gerente` 404; login de gestor e de colaborador 200; `/api/rules`, `/api/impact`, `/api/exceptions` 200 para o gestor; colaborador 403 em `/api/rules` e no XLSX; `/api/roster` 404 antes da 1ª confirmação; `next-week` 409 sem escala publicada; **nenhum `.env` na imagem** |
+
+**Antes e depois da escala de exemplo, pelo fluxo completo na imagem** (XLSX de exemplo, mapeamento pela **heurística**, porque não havia chave; sem
+justificativa; cobertura-alvo de 80% por loja = "ajustar para caber"; dados sintéticos): antes **158 violações, R$ 33.989,15, 216,5 h de hora extra,
+cobertura 97,04%**; depois **0 violações, R$ 28.381,60, 0 h de hora extra, cobertura 98,5%**. **Esses números ainda incluem o efeito que o PR #16 aponta**
+(horas de contrato não trabalhadas: o custo da escala otimizada conta salário que o mensalista recebe de qualquer jeito); eles mudam se o usuário decidir
+incorporá-lo. Em seguida, no mesmo fluxo: aprovação e publicação (`approve` 200), o colaborador vê a semana de 11/01/2027 (5 turnos, id `n-ana-dantas-sintetico`) e
+avisa falta.
+
+**Observação de demo, medida:** na escala otimizada do exemplo, **nenhuma falta teve cobertura** (5 dias testados: seg, ter, qua, qui e dom; todos RX-05, com 4 a 7 colegas
+avaliados em cada dia). A otimização usa toda a capacidade das pessoas, então ninguém cobre sem estourar 42 h ou o repouso. É o comportamento correto do verificador, mas o
+caminho com candidatos (cartão de cobertura e republicação) só aparece no teste e na escala semeada de teste, não no fluxo do XLSX de exemplo. Se a demo precisar
+mostrar a cobertura, é preciso uma escala com folga (por exemplo cobertura-alvo menor); isso é decisão do usuário.
+
+**Onde o PR #16 vai tocar o solver da C6 (A5), sem tê-lo incluído:** ele acrescenta, em `solver/model.py::_solve_store`, um piso de horas
+(`week_minutes >= min(contract_hours * 60, limits.per_person_week_min)`) logo depois da linha do teto `<= limits.weekly_min`, que é onde a C6 já pendura
+o teto por pessoa da formulação (`person.weekly_cap_min`). **Conflito textual certo** (`git merge-tree` com `c6/final` dá conflito em `solver/model.py`), e conflito de
+lógica provável: o piso não considera as restrições duras da `SolveSpec` (um `jornada_semanal_max_pessoa` abaixo da carga do contrato, ou indisponibilidades que
+tiram dias, deixaria o modelo inviável). Ele também reverte `Role.GESTOR` para `Role.DP` em `_rx02`, porque nasceu antes da troca de papéis. Não medido: o efeito dele sobre o
+tempo do solver e sobre as 158 violações / R$ 28.381,60 acima.
+
+**O que não foi verificado:** (1) nada foi visto no navegador (o front foi conferido por tipos, lint, testes e build; a página `plataforma/page.tsx`
+reconciliada **não foi aberta**); (2) o teste à mão com a chave e o modelo real, e `--suite e2 --with-model` (custo e latência de `llm.map_columns` e
+`llm.formulate` **seguem não medidos**; é do usuário); (3) o deploy no Railway (volume com linhas antigas, `/health` e login na URL pública), que só existe depois do merge;
+(4) o G3 da C6 à mão; (5) o efeito do PR #16.
