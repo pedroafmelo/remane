@@ -1,0 +1,44 @@
+<!-- @dsCard group="Marca" height=200 subtitle="Símbolo animado, estático e negativo" -->
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Logo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../../tokens.css">
+<style>
+  body { margin: 0; padding: 24px; background: var(--paper); font-family: var(--font-sans); color: var(--ink); }
+  .row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .tile { background: var(--surface); border-radius: var(--radius-lg); padding: 24px 28px; display: flex; align-items: center; gap: 14px; }
+  .tile.dark { background: var(--ink); color: var(--surface); }
+  .word { font-size: 44px; font-weight: 500; letter-spacing: -0.06em; line-height: 0.9; }
+  .ink { fill: var(--ink); } .white { fill: var(--surface); } .acc { fill: var(--accent); }
+  .move { animation: slide 4s ease-in-out infinite; }
+  @keyframes slide { 0%, 15% { transform: translate(0, 0); } 35%, 85% { transform: translate(6px, -6px); } 100% { transform: translate(0, 0); } }
+  @media (prefers-reduced-motion: reduce) { .move { animation: none; transform: translate(6px, -6px); } }
+</style>
+</head>
+<body>
+<div class="row">
+  <div class="tile">
+    <svg width="52" height="48" viewBox="0 0 70 64" aria-hidden="true">
+      <rect class="ink" x="4" y="4" width="16" height="16" rx="5"/><rect class="ink" x="24" y="4" width="16" height="16" rx="5"/><rect class="ink" x="44" y="4" width="16" height="16" rx="5"/>
+      <rect class="ink" x="4" y="24" width="16" height="16" rx="5"/><rect class="ink" x="24" y="24" width="16" height="16" rx="5"/>
+      <rect x="44.5" y="24.5" width="15" height="15" rx="5" fill="none" stroke="var(--line-strong)" stroke-width="1"/>
+      <rect class="acc move" x="44" y="24" width="16" height="16" rx="5"/>
+      <rect class="ink" x="4" y="44" width="16" height="16" rx="5"/><rect class="ink" x="24" y="44" width="16" height="16" rx="5"/><rect class="ink" x="44" y="44" width="16" height="16" rx="5"/>
+    </svg>
+    <span class="word">remane</span>
+  </div>
+  <div class="tile dark">
+    <svg width="52" height="48" viewBox="0 0 70 64" aria-hidden="true">
+      <rect class="white" x="4" y="4" width="16" height="16" rx="5"/><rect class="white" x="24" y="4" width="16" height="16" rx="5"/><rect class="white" x="44" y="4" width="16" height="16" rx="5"/>
+      <rect class="white" x="4" y="24" width="16" height="16" rx="5"/><rect class="white" x="24" y="24" width="16" height="16" rx="5"/>
+      <rect class="acc" x="50" y="18" width="16" height="16" rx="5"/>
+      <rect class="white" x="4" y="44" width="16" height="16" rx="5"/><rect class="white" x="24" y="44" width="16" height="16" rx="5"/><rect class="white" x="44" y="44" width="16" height="16" rx="5"/>
+    </svg>
+    <span class="word">remane</span>
+  </div>
+</div>
+</body>
+</html>

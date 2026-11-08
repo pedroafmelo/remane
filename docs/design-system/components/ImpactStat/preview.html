@@ -1,0 +1,28 @@
+<!-- @dsCard group="Impacto" height=200 subtitle="Os números que o trace mede" -->
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>ImpactStat</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../../tokens.css">
+<style>
+  body { margin: 0; padding: 24px; background: var(--paper); font-family: var(--font-sans); color: var(--ink); }
+  .row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; max-width: 760px; }
+  .stat { background: var(--surface); border-radius: var(--radius-lg); padding: 20px 22px; display: flex; flex-direction: column; gap: 8px; }
+  .k { font: 500 13px/1.3 var(--font-sans); color: var(--ink-muted); }
+  .v { font-size: 40px; font-weight: 700; letter-spacing: -0.045em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .v small { font-size: 18px; font-weight: 500; letter-spacing: -0.02em; color: var(--ink-muted); }
+  .bar { height: 6px; border-radius: var(--radius-full); background: var(--paper); overflow: hidden; }
+  .fill { height: 100%; background: var(--accent); border-radius: inherit; }
+  .note { font: 400 12px/1.4 var(--font-sans); color: var(--ink-muted); }
+</style>
+</head>
+<body>
+<div class="row">
+  <div class="stat"><span class="k">Faltas cobertas sem o gestor</span><span class="v">9<small> de 10</small></span><div class="bar"><div class="fill" style="width: 90%"></div></div></div>
+  <div class="stat"><span class="k">Tempo até o turno coberto</span><span class="v">7<small> min</small></span><span class="note">mediana da semana</span></div>
+  <div class="stat"><span class="k">Custo do agente por evento</span><span class="v">R$ 0,04</span><span class="note">medido no trace</span></div>
+</div>
+</body>
+</html>

@@ -1,7 +1,7 @@
 # Estado do projeto
 
 > **Fonte da verdade do momento.** Atualize ao fim de cada bloco de trabalho (ver "Documentação viva" no
-> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-08 00:52** (Recife), por Claude (Opus 5.5), ao trazer a landing Remane e trocar o `web/` para Next.js ([DEC-035](decisoes.md)). Antes: 16:47, por Claude (Sonnet 5.5), ao planejar e executar a C0a e auditar as docs ([plano da C0](planos/camada-00-fundacao.md), [DEC-030](decisoes.md) a [DEC-032](decisoes.md)): **G0 atingido às 16h41**. Antes: plano macro ([plano-implementacao.md](plano-implementacao.md), [DEC-027](decisoes.md) a [DEC-029](decisoes.md)).
+> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-08 01:05** (Recife), por Claude (Opus 5.5), ao trazer a landing Remane e trocar o `web/` para Next.js ([DEC-035](decisoes.md)). Antes: 16:47, por Claude (Sonnet 5.5), ao planejar e executar a C0a e auditar as docs ([plano da C0](planos/camada-00-fundacao.md), [DEC-030](decisoes.md) a [DEC-032](decisoes.md)): **G0 atingido às 16h41**. Antes: plano macro ([plano-implementacao.md](plano-implementacao.md), [DEC-027](decisoes.md) a [DEC-029](decisoes.md)).
 
 ## Fase atual
 
@@ -116,6 +116,7 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 
 | Data e hora | O quê | Por |
 |---|---|---|
+| 2026-11-08 01:05 | Design system Remane trazido do claude.ai para [docs/design-system/](design-system/README.md): manual da marca, uso no Next, tokens, 8 componentes (guia e preview) e 4 logos; copy antiga marcada como substituída pela [DEC-036](decisoes.md); `.gitignore` libera os previews `.html` e a pasta `Cover` | Claude |
 | 2026-11-08 00:52 | [DEC-037](decisoes.md): hospedagem no Railway; `railway.json` (Dockerfile, health check em `/health`); imagem Docker com o Next testada localmente (`/`, `/entrar/`, `/health` com 200 e SQLite no volume) | Claude |
 | 2026-11-08 00:36 | Landing com a copy da [DEC-036](decisoes.md): "engenheiro de escala", sem a seção da 6x1, Patrick no lugar de Joana, história do hero com metade da rolagem; WhatsApp mantido | Claude |
 | 2026-11-07 23:55 | Landing Remane trazida para `web/`, que troca o Vite por Next.js com export estático em `web/dist` ([DEC-035](decisoes.md)); `_serve_spa` serve `rota/index.html` do export (teste novo em `tests/api/test_spa.py`); [landing.md](landing.md) com o handoff; declaração, arquitetura, README e CLAUDE.md atualizados. 91 testes Python, 3 testes do `web/`, lint e build ok | Claude |

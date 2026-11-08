@@ -1,0 +1,38 @@
+<!-- @dsCard group="Escala" height=360 subtitle="A grade semanal de uma loja" -->
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>ScheduleGrid</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../../tokens.css">
+<style>
+  body { margin: 0; padding: 24px; background: var(--paper); font-family: var(--font-sans); color: var(--ink); }
+  .card { max-width: 720px; background: var(--surface); border-radius: var(--radius-lg); padding: 20px 22px 18px; box-shadow: var(--shadow-float); display: flex; flex-direction: column; gap: 8px; }
+  .head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+  .title { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+  .chip { font: 500 12px/1 var(--font-sans); background: var(--paper); padding: 7px 11px; border-radius: var(--radius-full); }
+  .grid { display: grid; grid-template-columns: 70px repeat(7, minmax(0, 1fr)); gap: 6px; align-items: center; }
+  .days span { font: 500 12px/1 var(--font-sans); color: var(--ink-muted); }
+  .name { font: 500 14px/1 var(--font-sans); }
+  .c { font: 500 12px/1 var(--font-sans); font-variant-numeric: tabular-nums; height: 38px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
+  .t { background: var(--paper); }
+  .f { color: var(--ink-subtle); border: 1px dashed var(--line-strong); }
+  .x { color: var(--ink-subtle); background: repeating-linear-gradient(135deg, var(--surface-chat) 0 6px, var(--line) 6px 12px); text-decoration: line-through; }
+  .m { background: var(--accent); box-shadow: var(--shadow-accent); animation: pop 4s ease-out infinite; }
+  @keyframes pop { 0%, 20% { transform: scale(.86); opacity: .35; } 32% { transform: scale(1.04); opacity: 1; } 40%, 100% { transform: scale(1); opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .m { animation: none; } }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="head"><span class="title">Loja Boa Viagem · 14 a 20 de dezembro</span><span class="chip">42h · 2 folgas · tudo conforme</span></div>
+  <div class="grid days"><span></span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span>Dom</span></div>
+  <div class="grid"><span class="name">Ana</span><span class="c t">7–15h</span><span class="c t">7–15h</span><span class="c f">folga</span><span class="c t">7–15h</span><span class="c t">7–15h</span><span class="c t">7–15h</span><span class="c f">folga</span></div>
+  <div class="grid"><span class="name">Bruno</span><span class="c t">14–22h</span><span class="c t">14–22h</span><span class="c t">14–22h</span><span class="c f">folga</span><span class="c t">14–22h</span><span class="c t">14–22h</span><span class="c f">folga</span></div>
+  <div class="grid"><span class="name">Carlos</span><span class="c t">7–15h</span><span class="c f">folga</span><span class="c m">14–22h</span><span class="c t">7–15h</span><span class="c t">7–15h</span><span class="c f">folga</span><span class="c t">7–15h</span></div>
+  <div class="grid"><span class="name">Joana</span><span class="c t">14–22h</span><span class="c t">14–22h</span><span class="c x">atestado</span><span class="c f">folga</span><span class="c t">14–22h</span><span class="c t">14–22h</span><span class="c f">folga</span></div>
+  <div class="grid"><span class="name">Diego</span><span class="c f">folga</span><span class="c t">14–22h</span><span class="c t">7–15h</span><span class="c t">14–22h</span><span class="c t">14–22h</span><span class="c f">folga</span><span class="c t">7–15h</span></div>
+</div>
+</body>
+</html>
