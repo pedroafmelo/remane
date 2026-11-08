@@ -590,7 +590,7 @@ Formato:
   destino o número de teste aceita (não confirmado na doc); se o webhook precisa do app fora do modo de desenvolvimento. A seção de teste pelo WhatsApp da landing (QR)
   deixaria de funcionar para jurados, porque o número de teste só fala com os números cadastrados: **o usuário escolheu "Trocar pelo
   simulador"** ({T}); a seção vira um convite ao celular simulado da demo, e saem o QR, o botão do WhatsApp no hero e o `qrcode.react`.
-## DEC-039 · Dois papéis na demo: gestor e colaborador
+## DEC-044 · Dois papéis na demo: gestor e colaborador
 
 - 2026-11-08 02:34 · Decidido por: usuário da sessão · Status: aceita
 - **Contexto:** o [produto.md](produto.md) (seção 1) e a [arquitetura, seção 11](arquitetura.md) tinham três papéis com login de demo

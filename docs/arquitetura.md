@@ -307,7 +307,7 @@ API oficial do WhatsApp Business. **Não pesquisei a política de bloqueio do Wh
 
 - **Contas semeadas** nos dados sintéticos (gerente, DP e colaboradores). Senhas com `hashlib.scrypt` da stdlib (sem dependência);
   sessão por cookie assinado (`SessionMiddleware` do Starlette, que usa `itsdangerous`: confirmar licença na declaração).
-- **Papéis ([DEC-039](decisoes.md)): `gestor` (gerente + DP) e `colaborador`.** Antes: `gerente`, `dp`, `colaborador`, e `[PREENCHER]` o "gestor de RH" do usuário (é o gerente, o DP ou um papel novo: pergunta 15).
+- **Papéis ([DEC-044](decisoes.md)): `gestor` (gerente + DP) e `colaborador`.** Antes: `gerente`, `dp`, `colaborador`, e `[PREENCHER]` o "gestor de RH" do usuário (é o gerente, o DP ou um papel novo: pergunta 15).
   Controle de acesso por **dependência da rota** (`require_role`), com **teste automático** por rota e papel; a SPA só esconde, não protege.
 - **Botões de demo** da landing: `POST /auth/demo/{papel}` cria sessão de uma conta semeada, sem digitar nada (RE-07), ativo só com
   `DEMO_MODE=1`, limitado por taxa. Rotulam "dados sintéticos" e "tempo simulado". O colaborador usa o celular simulado.
