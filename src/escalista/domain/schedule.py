@@ -37,7 +37,7 @@ class Employee(BaseModel):
 
 
 class EmployeePublic(BaseModel):
-    """Os campos de `Employee` sem `sex` (RN-13, DEC-036). Não herda de `Employee`, de propósito: assim um
+    """Os campos de `Employee` sem `sex` (RN-13, DEC-039). Não herda de `Employee`, de propósito: assim um
     `Employee` nunca passa por `EmployeePublic` e não vaza `sex` numa resposta."""
 
     id: str

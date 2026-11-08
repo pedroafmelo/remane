@@ -12,7 +12,7 @@ from escalista.domain.contracts import ExceptionCard
 
 
 class RuleStatus(StrEnum):
-    """`ficticia` vale só para `convencao/` e `politica/` (DEC-036); a regra é do carregador."""
+    """`ficticia` vale só para `convencao/` e `politica/` (DEC-039); a regra é do carregador."""
 
     CONFERIDA = "conferida"
     INTERPRETACAO = "interpretacao"

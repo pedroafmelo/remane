@@ -453,16 +453,16 @@ Formato:
 - **Alternativas consideradas:** as duas perguntadas (manter o Fly.io; reabrir a hospedagem); o usuário respondeu "tudo do deploy", o que o agente leu como **reabrir a hospedagem**, e **não** como confirmar o Fly.io.
 - **Consequências:** a hospedagem volta a `[PREENCHER]` (a parte da [DEC-030](#dec-030--plano-da-c0-rodada-1-data-de-corte-nas-versões-flyio-c0b-com-a-frente-c-e-web-em-typescript) sobre o Fly.io fica **em suspenso**, não substituída; as demais partes da DEC-030 valem). A C0b e o G1 ficam parados sem data; `Dockerfile` e `fly.toml` ficam no repositório como material pronto, sem uso. O desenvolvimento e a demonstração rodam só localmente (`uv run uvicorn` e `npm run dev`). O risco de RE-07 e RN-10 (link público estável) continua e deve voltar a ser decidido antes do G6 (dom 11h30); o túnel do notebook segue como plano B.
 
-## DEC-035 · Plano da C5, rodada 1: G3 local, janela até 03h e de volta às 07h, o usuário em todas as frentes, contratos pela frente A
+## DEC-038 · Plano da C5, rodada 1: G3 local, janela até 03h e de volta às 07h, o usuário em todas as frentes, contratos pela frente A
 
 - 2026-11-07 23:37 · Decidido por: usuário da sessão · Status: aceita
 - **Contexto:** o G3 (primeira fatia vertical, 21h30) venceu sem a fatia; o `main` tem só a C0a; o deploy foi adiado ([DEC-034](#dec-034--tudo-do-deploy-fica-para-depois-por-enquanto-testar-e-rodar-localmente)); a política fictícia não chegou. O agente planeja a fatia para execução em paralelo ([plano da C5](planos/camada-05-fatia-vertical.md)).
 - **Decisão (o que o usuário escolheu):** (1) "Sim, G3 local": o G3 passa em `http://localhost:8000`, e não no deploy; (2) "Todos até ~03h, voltam 07h"; (3) quem fica em cada frente: "Eu em todos."; (4) quem congela os contratos: "Pessoa da frente A".
 - **Motivo: [motivo não informado].**
 - **Alternativas consideradas (as oferecidas):** (1) G3 local agora com deploy no G4; G3 só no deploy. (2) Todos direto até o G4; turnos 2 + 2. (3) Nomes por frente ou `[PREENCHER]`. (4) Sessão da frente B; Claude no plano.
-- **Consequências:** ~4h45 de relógio por frente até o G4 (dom 08h30). O fluxo à mão numa URL pública só é testado quando o deploy for decidido (antes do G6). A tarefa T0 (contratos) bloqueia as outras frentes por 30 a 45 min `[PROPOSTA]`. "Eu em todos" foi esclarecido na [DEC-036](#dec-036--plano-da-c5-rodada-2-4-sessões-do-claude-em-paralelo-csv-longo-status-ficticia-e-campo-sexo-fora-da-tela).
+- **Consequências:** ~4h45 de relógio por frente até o G4 (dom 08h30). O fluxo à mão numa URL pública só é testado quando o deploy for decidido (antes do G6). A tarefa T0 (contratos) bloqueia as outras frentes por 30 a 45 min `[PROPOSTA]`. "Eu em todos" foi esclarecido na [DEC-039](#dec-039--plano-da-c5-rodada-2-4-sessões-do-claude-em-paralelo-csv-longo-status-ficticia-e-campo-sexo-fora-da-tela).
 
-## DEC-036 · Plano da C5, rodada 2: 4 sessões do Claude em paralelo, CSV longo, status `ficticia` e campo sexo fora da tela
+## DEC-039 · Plano da C5, rodada 2: 4 sessões do Claude em paralelo, CSV longo, status `ficticia` e campo sexo fora da tela
 
 - 2026-11-07 23:38 · Decidido por: usuário da sessão · Status: aceita
 - **Contexto:** a rodada 1 deixou "Eu em todos" ambíguo; faltavam o formato do CSV, o status das regras fictícias (o RN-09 só prevê `conferida`, `interpretacao` e `pendente`) e o RN-13 com a [DEC-023](#dec-023--art-386-da-clt-domingo-quinzenal-para-empregadas-entra-como-regra-dura).
@@ -471,20 +471,20 @@ Formato:
 - **Alternativas consideradas (as oferecidas):** (1) o time programa e o usuário coordena; uma sessão, frente a frente. (2) grade pessoa × dia. (3) `conferida`; `interpretacao`. (4) visível na grade; fora do contrato agora.
 - **Consequências:** a atenção do usuário vira o gargalo `[INFERÊNCIA]`; o fluxo de git usa worktrees e merge local (plano da C5, seção 7). O schema do carregador ganha o valor `ficticia`, aceito só em `convencao/` e `politica/` `[PROPOSTA]`; a tela mostra "fictícia (demo)". A primitiva `domingo_mulher` fica para depois da fatia, mas o contrato `Employee` já nasce com `sex`.
 
-## DEC-037 · Plano da C5 aprovado; commits autorizados nas branches dos worktrees
+## DEC-040 · Plano da C5 aprovado; commits autorizados nas branches dos worktrees
 
 - 2026-11-07 23:49 · Decidido por: usuário da sessão · Status: aceita
-- **Contexto:** o plano da C5 ([planos/camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md)) esperava o "aprovado" e a decisão sobre commits por tarefa nas 4 sessões ([DEC-035](#dec-035--plano-da-c5-rodada-1-g3-local-janela-até-03h-e-de-volta-às-07h-o-usuário-em-todas-as-frentes-contratos-pela-frente-a), [DEC-036](#dec-036--plano-da-c5-rodada-2-4-sessões-do-claude-em-paralelo-csv-longo-status-ficticia-e-campo-sexo-fora-da-tela)).
+- **Contexto:** o plano da C5 ([planos/camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md)) esperava o "aprovado" e a decisão sobre commits por tarefa nas 4 sessões ([DEC-038](#dec-038--plano-da-c5-rodada-1-g3-local-janela-até-03h-e-de-volta-às-07h-o-usuário-em-todas-as-frentes-contratos-pela-frente-a), [DEC-039](#dec-039--plano-da-c5-rodada-2-4-sessões-do-claude-em-paralelo-csv-longo-status-ficticia-e-campo-sexo-fora-da-tela)).
 - **Decisão (o que o usuário disse):** "Aprovo o plano." e, sobre os commits, "Autorizados."
 - **Motivo: [motivo não informado].**
 - **Alternativas consideradas (as oferecidas):** commits autorizados por tarefa concluída, na branch do worktree e nunca no `main`; ou não autorizados.
 - **Consequências:** os itens `[PROPOSTA]` do plano entram na aprovação e seguem rotulados (nomes de contratos, quinta primitiva `jornada_diaria_max`, semana de 11 a 17/01/2027, hora extra só com autorização, pacote `store/`, verificador na sessão D, fluxo sem PR); qualquer um muda por nova DEC. **Commits autorizados** para as 4 sessões, por tarefa concluída, **na branch do worktree** (`c5/<frente>-<tarefa>`), **sem push e sem commit no `main`**: o `main` só recebe o que o usuário integra com `merge --ff-only`. Esta autorização vale só para as sessões da C5. **Segue `[PREENCHER]`:** o que fazer com C6, C7 e C8 diante do G4 (plano da C5, seção 9). Os worktrees foram criados às 23h47 (`/Users/pedrohmv/Projetos/cc61-a` a `cc61-d`, branches `c5/a-contracts`, `c5/b-trace`, `c5/c-access` e `c5/d-data`) a partir de `d6c10c7`.
 
-## DEC-038 · Execução da C5 por uma sessão orquestradora com subagentes; merge local pelo orquestrador
+## DEC-041 · Execução da C5 por uma sessão orquestradora com subagentes; merge local pelo orquestrador
 
 - 2026-11-07 23:55 · Decidido por: usuário da sessão · Status: aceita
-- **Contexto:** o usuário entregou um roteiro de orquestração para executar a C5 ([plano da C5](planos/camada-05-fatia-vertical.md)) com uma sessão que delega cada tarefa a um subagente nos 4 worktrees, com três escolhas em aberto. O `main` tinha a [DEC-037](#dec-037--plano-da-c5-aprovado-commits-autorizados-nas-branches-dos-worktrees) sem commit.
-- **Decisão (o que o usuário escolheu):** (1) DEC-037: "Eu commito agora", isto é, o orquestrador a commita; (2) merge no `main`: "Orquestrador, ff-only" (local, sem push); (3) duração: "Indefinido."; (4) commit das docs de registro: "Orquestrador commita".
+- **Contexto:** o usuário entregou um roteiro de orquestração para executar a C5 ([plano da C5](planos/camada-05-fatia-vertical.md)) com uma sessão que delega cada tarefa a um subagente nos 4 worktrees, com três escolhas em aberto. O `main` tinha a [DEC-040](#dec-040--plano-da-c5-aprovado-commits-autorizados-nas-branches-dos-worktrees) sem commit.
+- **Decisão (o que o usuário escolheu):** (1) DEC-040: "Eu commito agora", isto é, o orquestrador a commita; (2) merge no `main`: "Orquestrador, ff-only" (local, sem push); (3) duração: "Indefinido."; (4) commit das docs de registro: "Orquestrador commita".
 - **Motivo: [motivo não informado].**
 - **Alternativas consideradas (as oferecidas):** (1) o usuário commita; (2) só o usuário integra; (3) parar às ~03h e voltar às 07h, ou seguir sem supervisão até o G3; (4) só o usuário commita.
 - **Consequências:** o fluxo da [seção 7 do plano da C5](planos/camada-05-fatia-vertical.md) muda: quem integra é o orquestrador, e não o usuário, sempre sem push. "Indefinido" foi lido pelo agente como "seguir até o G3" (**interpretação, não confirmada**). Decisões tomadas pelo **agente** durante a execução, sem consulta, registradas aqui para revisão: (a) upload do CSV em corpo bruto `text/csv`, porque `python-multipart` não está instalado e `uv add` estava vedado; (b) teto de 8 pessoas por faixa na demanda sintética (D2b), porque o ótimo deixava 9,5 pessoa-horas descobertas e a demo padrão cairia sempre no RX-02; (c) uma tarefa a mais, S1 (`store/`), que o plano previa sem tarefa. Execução e G3 no [registro da C5](planos/camada-05-fatia-vertical.md), seção 12.

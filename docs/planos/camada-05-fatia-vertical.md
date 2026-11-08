@@ -1,7 +1,7 @@
 # Plano da C5 · Primeira fatia vertical (com os subconjuntos de C1 a C4)
 
-Última atualização: 2026-11-08 00:45 (Recife; registro de execução na seção 12) · Situação: **aprovado pelo usuário em 2026-11-07 23:49** ([DEC-037](../decisoes.md)); **executado: itens 1 a 5 do G3 passaram, item 6 pendente** · Decisões desta etapa:
-[DEC-035](../decisoes.md) e [DEC-036](../decisoes.md). Planejado pelo Opus 5.5 ([DEC-028](../decisoes.md)).
+Última atualização: 2026-11-08 00:45 (Recife; registro de execução na seção 12) · Situação: **aprovado pelo usuário em 2026-11-07 23:49** ([DEC-040](../decisoes.md)); **executado: itens 1 a 5 do G3 passaram, item 6 pendente** · Decisões desta etapa:
+[DEC-038](../decisoes.md) e [DEC-039](../decisoes.md). Planejado pelo Opus 5.5 ([DEC-028](../decisoes.md)).
 
 **Rótulos:** sem rótulo é decisão do usuário (com a DEC). **[PROPOSTA]** é sugestão do agente, ainda não confirmada. `[PREENCHER]` é o que
 falta, com o motivo. **[INFERÊNCIA]** é dedução sem medição. Todas as horas são **[PROPOSTA]**, em faixa, e não foram medidas.
@@ -9,13 +9,13 @@ falta, com o motivo. **[INFERÊNCIA]** é dedução sem medição. Todas as hora
 Este plano cobre **só o subconjunto de C1, C2, C3 e C4 que a fatia exige, mais a integração da C5**. Os planos completos de C1 a C4 vêm
 depois ([plano macro](../plano-implementacao.md), seção 6). Ele não repete o produto, a arquitetura nem os requisitos: aponta para eles.
 
-## 0. Como o trabalho roda ([DEC-036](../decisoes.md))
+## 0. Como o trabalho roda ([DEC-039](../decisoes.md))
 
 - **Uma pessoa, 4 sessões do Claude Code em paralelo**, uma por frente (A, B, C e D), cada uma no seu `git worktree` e branch. O usuário
   (Pedro Vieira) revisa e integra no `main`. Os outros 3 integrantes não programam nesta madrugada.
-- **Janela:** hoje até ~03h e de volta às 07h ([DEC-035](../decisoes.md)): **~3h15 + 1h30 = ~4h45 de relógio por sessão** até o G4
+- **Janela:** hoje até ~03h e de volta às 07h ([DEC-038](../decisoes.md)): **~3h15 + 1h30 = ~4h45 de relógio por sessão** até o G4
   (dom 08h30), contando a partir das 23h45.
-- **G3 vale local** ([DEC-035](../decisoes.md)): `http://localhost:8000`, não deploy. O deploy volta a ser decidido antes do G6.
+- **G3 vale local** ([DEC-038](../decisoes.md)): `http://localhost:8000`, não deploy. O deploy volta a ser decidido antes do G6.
 - **Gargalo [INFERÊNCIA]:** a atenção do usuário (revisar ~20 merges e trocar entre 4 sessões), e não a escrita do código. A C0a levou
   ~4 min de relógio contra 75 a 110 min estimados ([estado](../estado-do-projeto.md), Métricas medidas); as faixas abaixo já são menores
   que as do plano macro, mas o solver e a integração têm risco real de modelagem e de depuração.
@@ -65,7 +65,7 @@ E o fluxo à mão da seção 6, item 6, com a lista de eventos do rastro mostran
 
 ## 3. Contratos a congelar primeiro (tarefa T0, frente A)
 
-**Quem:** a sessão A (dono dos contratos, [DEC-035](../decisoes.md)). **Quanto:** **30 a 45 min** [PROPOSTA]. **Como:** um único PR
+**Quem:** a sessão A (dono dos contratos, [DEC-038](../decisoes.md)). **Quanto:** **30 a 45 min** [PROPOSTA]. **Como:** um único PR
 `feat(domain): add slice contracts and repository port`, com `tests/domain/test_contracts_v1.py` fixando os nomes dos campos (mesma
 regra da [C0, seção 4](camada-00-fundacao.md)). Só forma, sem lógica: a lógica nasce no TDD de cada frente.
 
@@ -79,12 +79,12 @@ horas como `date`, `time` e `datetime` sem fuso (horário de Brasília implícit
 
 | Modelo | Campos mínimos | Produz | Consome |
 |---|---|---|---|
-| `RuleStatus` (StrEnum) | `conferida`, `interpretacao`, `pendente`, **`ficticia`** ([DEC-036](../decisoes.md)) | A (carregador) | C (tela), evals |
+| `RuleStatus` (StrEnum) | `conferida`, `interpretacao`, `pendente`, **`ficticia`** ([DEC-039](../decisoes.md)) | A (carregador) | C (tela), evals |
 | `RuleLayer` (StrEnum) | `lei`, `convencao`, `politica` | A | A, C |
 | `Rule` (frozen) | `id`, `kind` (tipo de primitiva ou `"info"`), `layer`, `params: dict`, `valid_from: date \| None`, `valid_to: date \| None`, `status`, `source` (fonte), `action: Literal["escalar","verificar_convencao"] \| None`, `note` | A (`rules/`) | solver, verificador, custo, justificativa |
 | `RuleCard` | `reference_date: date`, `rules: list[Rule]` (já fundidas e vigentes), `provisional: list[str]` (ids aplicados como "mais restritiva provisória"), `exceptions: list[ExceptionCard]` (conflitos ao DP) | A | todos do núcleo; agente |
 | `Store` | `id`, `name`, `opens: time`, `closes: time` | D (`synth/`) | A, C |
-| `Employee` | `id`, `name`, `store_id`, `job` (cargo), `hourly_wage: Decimal`, `contract_hours: int`, `sex: Literal["F","M"]` (**RN-13: nunca vai à tela, à resposta da API do gerente nem ao trace**, [DEC-036](../decisoes.md)), `profile: Literal["padrao","aprendiz","menor"] = "padrao"` | D | A; C só via `EmployeePublic` (sem `sex`) |
+| `Employee` | `id`, `name`, `store_id`, `job` (cargo), `hourly_wage: Decimal`, `contract_hours: int`, `sex: Literal["F","M"]` (**RN-13: nunca vai à tela, à resposta da API do gerente nem ao trace**, [DEC-039](../decisoes.md)), `profile: Literal["padrao","aprendiz","menor"] = "padrao"` | D | A; C só via `EmployeePublic` (sem `sex`) |
 | `DemandSlot` | `store_id`, `day: date`, `start: time` (faixa de 30 min), `required: int` | D | solver, verificador (cobertura) |
 | `Shift` | `employee_id`, `store_id`, `start: datetime`, `end: datetime` (`end` > `start`; turno que vira a noite termina no dia seguinte) | ingestão, solver | verificador, custo, grade |
 | `Schedule` | `week_start: date` (segunda), `shifts: list[Shift]` | ingestão, solver | todos |
@@ -290,7 +290,7 @@ C1 acesso (sem dependência)   D1 YAMLs (sem dependência)
   [estado](../estado-do-projeto.md) e as Métricas medidas, só o usuário (ou a sessão A, a pedido dele) no merge. O hook `docs_sync.py`
   vai cobrar doc em cada sessão: a resposta é a linha no registro deste plano.
 - **Commits:** em inglês, Conventional Commits, terminando com `Co-Authored-By` do modelo que executou. **Só quando o usuário pedir**
-  (CLAUDE.md): se o "aprovado" deste plano vale como pedido de commit por tarefa nas 4 sessões **foi autorizado na [DEC-037](../decisoes.md)**, só na branch do worktree.
+  (CLAUDE.md): se o "aprovado" deste plano vale como pedido de commit por tarefa nas 4 sessões **foi autorizado na [DEC-040](../decisoes.md)**, só na branch do worktree.
   Sequência sugerida: `feat(domain): add slice contracts and repository port` → `feat(rules): load and merge rule layers` →
   `feat(audit): persist trace events with masking` → `feat(api): add demo session and role guard` → `feat(rules): add fictitious demo
   convention and policy` (D1, mesmo sendo dado) → `feat(synth): generate seeded network, demand and schedules` → `feat(ingest): validate
@@ -301,7 +301,7 @@ C1 acesso (sem dependência)   D1 YAMLs (sem dependência)
 
 ## 8. Divisão por sessão e modelo de desenvolvimento
 
-O usuário opera as 4 sessões ([DEC-036](../decisoes.md)). Os modelos seguem a política da [DEC-028](../decisoes.md); a distribuição por tarefa
+O usuário opera as 4 sessões ([DEC-039](../decisoes.md)). Os modelos seguem a política da [DEC-028](../decisoes.md); a distribuição por tarefa
 é **[INFERÊNCIA]** e se troca com `/model` antes de cada tarefa.
 
 | Sessão | Tarefas | Modelo | Por quê |
@@ -349,14 +349,14 @@ Os outros 3 integrantes não programam nesta madrugada. O que podem fazer está 
 
 ## 11. Pendências que bloqueiam
 
-- `Commits por tarefa nas 4 sessões: **autorizados** na branch do worktree, sem push e sem commit no `main` ([DEC-037](../decisoes.md)).
+- `Commits por tarefa nas 4 sessões: **autorizados** na branch do worktree, sem push e sem commit no `main` ([DEC-040](../decisoes.md)).
 - `[PREENCHER]` O que fazer com C6, C7 e C8 diante do G4 (seção 9).
 - `[PREENCHER]` Política e convenção do Pedro Veloso (G2 venceu às 19h sem entrega; D1 cobre a fatia).
 - `[PREENCHER]` Valor da ampliação diária da convenção fictícia (pergunta 17); a fatia não depende dele.
 - `[PREENCHER]` "Gestor de RH" (pergunta 15): a fatia usa só o gerente; resolver antes da C8.
 - Chave 1 da Featherless e o resgate da 4ª pessoa (ação humana; B4 depende).
 - Os itens `[PROPOSTA]` deste plano (nomes de contratos, quinta primitiva, semana de 11/01/2027, hora extra só com autorização, `store/`,
-  verificador na sessão D, fluxo sem PR) entraram no "aprovado" ([DEC-037](../decisoes.md)) ou mudam por nova DEC.
+  verificador na sessão D, fluxo sem PR) entraram no "aprovado" ([DEC-040](../decisoes.md)) ou mudam por nova DEC.
 
 ## 12. Registro de execução
 
@@ -409,7 +409,7 @@ Horários abaixo por `date` nos relatórios dos subagentes; os hashes são os do
 ### Sessão D
 - **D1** (haiku) 23:54–23:55, `b9ddb98`: convenção e política fictícias (`status: ficticia`); hora extra só com autorização do DP em
   `excecoes:`.
-- **D2** (haiku) 23:59–00:04, `cff6037`: geradores com seed 42; 3 lojas, 60 pessoas, CSV longo da DEC-036 com a marca SINTETICO;
+- **D2** (haiku) 23:59–00:04, `cff6037`: geradores com seed 42; 3 lojas, 60 pessoas, CSV longo da DEC-039 com a marca SINTETICO;
   9 violações e 5 defeitos plantados.
 - **D3** (opus) 00:04:45–00:08:11, `8b61450`: leitura (borda) e validação (pura). RX-13 também para dado inconsistente, com a escala
   parcial; `fim == inicio` é problema, não turno de 24h.

@@ -21,7 +21,7 @@ FIM_DA_SEMANA = SEMANA_INICIO.toordinal() + 6
 
 
 def _csv(linhas: list[list[str]]) -> str:
-    """CSV longo (DEC-036): marca, cabeçalho e uma linha por turno."""
+    """CSV longo (DEC-039): marca, cabeçalho e uma linha por turno."""
     buffer = io.StringIO()
     buffer.write(MARCA + "\n")
     escritor = csv.writer(buffer, lineterminator="\n")

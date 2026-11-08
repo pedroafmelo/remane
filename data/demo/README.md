@@ -28,7 +28,7 @@ uv run python -m escalista.synth --seed 42 --out data/demo
 | `escala_violacoes.csv` | Escala **válida para leitura**, com violações plantadas e conhecidas. As outras pessoas ficam dentro de todas as regras. | Teste do verificador (RN-04: meta 0 violações não detectadas) |
 | `violacoes_plantadas.json` | `[{"rule_id", "kind", "employee_id", "day"}]`, a lista completa e exata das violações de `escala_violacoes.csv`. `kind` repete o `rule_id` (o tipo da primitiva). `day` é `null` nas regras de semana. | Gabarito do verificador |
 
-Os turnos estão em CSV longo (DEC-036), um turno por linha. O `escala_violacoes.csv` e o `escala_atual.csv` começam com a
+Os turnos estão em CSV longo (DEC-039), um turno por linha. O `escala_violacoes.csv` e o `escala_atual.csv` começam com a
 marca `# SINTETICO - dados ficticios`, e o cabeçalho vem na linha 2.
 
 ## Formato do CSV longo

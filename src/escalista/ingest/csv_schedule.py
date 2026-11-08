@@ -1,4 +1,4 @@
-"""Leitura do CSV da escala atual (borda; RF-04, RF-23, RX-13). Formato longo da DEC-036: um turno por linha,
+"""Leitura do CSV da escala atual (borda; RF-04, RF-23, RX-13). Formato longo da DEC-039: um turno por linha,
 cabeçalho `loja_id,pessoa_id,nome,data,inicio,fim`, linhas que começam com `#` são comentário.
 
 Aqui só se decodifica o arquivo e se separa em linhas cruas; a validação dos dados é pura e fica em
