@@ -1,7 +1,7 @@
 # Estado do projeto
 
 > **Fonte da verdade do momento.** Atualize ao fim de cada bloco de trabalho (ver "Documentação viva" no
-> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-08 01:23** (Recife), por Claude (Sonnet 5.5), ao integrar o remoto (landing Remane em Next.js, Railway, regras do Pedro Veloso e design system) com a C5 numa branch própria ([DEC-042](decisoes.md)). Antes: 01:03, landing Remane e `web/` em Next.js ([DEC-035](decisoes.md)); 00:45, a primeira fatia vertical no `main` local e itens 1 a 5 do G3 ([DEC-041](decisoes.md), [plano da C5](planos/camada-05-fatia-vertical.md), seção 12); 16:47, C0a e G0 ([plano da C0](planos/camada-00-fundacao.md)).
+> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-08 02:58** (Recife), por Claude (Sonnet 5.5), mascote Pat ([DEC-043](decisoes.md)). Antes: **2026-11-08 01:23** (Recife), por Claude (Sonnet 5.5), ao integrar o remoto (landing Remane em Next.js, Railway, regras do Pedro Veloso e design system) com a C5 numa branch própria ([DEC-042](decisoes.md)). Antes: 01:03, landing Remane e `web/` em Next.js ([DEC-035](decisoes.md)); 00:45, a primeira fatia vertical no `main` local e itens 1 a 5 do G3 ([DEC-041](decisoes.md), [plano da C5](planos/camada-05-fatia-vertical.md), seção 12); 16:47, C0a e G0 ([plano da C0](planos/camada-00-fundacao.md)).
 
 ## Fase atual
 
@@ -18,6 +18,8 @@ aprova em gates: ambiente, requisitos, negócio e técnica ([DEC-005](decisoes.m
 
 | Pessoa | Perfil / foco | Disponibilidade |
 |---|---|---|
+| 2026-11-08 02:58 | **Pat na landing:** avatar do chat do hero troca de estado a cada passo da história e os 4 visuais de "Como funciona" levam o Pat; "trabalhando" ficou concentrado (olhos estreitos, sobrancelhas, olhar que varre); `patDoPasso` + testes (27 no front), typecheck, lint e build ok; conferido por screenshot só o estado inicial do hero e a folha dos estados ([DEC-043](decisoes.md)) | Claude |
+| 2026-11-08 02:52 | Pat: "trabalhando" ganhou forma própria (bloco deslocado com contorno tracejado e olhos para o lado), pois ficava igual a "parado" na imagem estática; +2 testes (24 no front) | Claude |
 | Pedro Vieira (usuário) | **Todas as frentes (A a D) da C5**, com 4 sessões do Claude Code em paralelo, uma por worktree; revisa e integra no `main` ([DEC-038](decisoes.md), [DEC-039](decisoes.md)) | Até ~03h; volta às 07h ([DEC-038](decisoes.md)) |
 | Pedro Veloso | Política e convenção fictícias da demo até 19h ([DEC-028](decisoes.md)); **não entregues até 23h37** (pastas vazias no remoto); não programa nesta madrugada ([DEC-039](decisoes.md)) | [PREENCHER] |
 | [PREENCHER] (2 pessoas) | Não programam nesta madrugada ([DEC-039](decisoes.md)); sugestão: pitch e resgate da Featherless ([plano da C5](planos/camada-05-fatia-vertical.md), seção 10) | [PREENCHER] |
@@ -122,6 +124,7 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 
 | Data e hora | O quê | Por |
 |---|---|---|
+| 2026-11-08 02:40 | **Mascote do agente Pat** proposto e implementado como componente (bloco do logo com dois olhos, 5 estados), ainda não ligado a tela ([DEC-043](decisoes.md)); `web/components/Pat.tsx`, `web/lib/pat.ts` + teste (22 testes do front, typecheck e lint ok), folha `pat-estados.svg` | Claude |
 | 2026-11-08 01:59 | **PR #8 mergeado pelo usuário às 01h51** (`77749c2`; o #7 ficou "Merged" por estar contido nele). Depois, o usuário clicou em "reverter" no GitHub: isso criou só a branch `revert-8-integrate/remote-main` (`bf93433`), **sem PR e sem merge**; o `origin/main` **não** foi revertido. `main` local atualizado com `pull --ff-only` e conferido: 477 testes, ruff, E1 10/10, `typecheck`, `lint`, `test` e `build` do front sem erro. **Railway:** às 01h57 a URL pública ainda respondia o código antigo (`/health` com `version: dev`, `/api/me` 404, login da demo 405); causa **não determinada** (só o painel mostra): conferir o deploy de `77749c2`, definir `DEMO_MODE=1` e as chaves da Featherless, e refazer o deploy. Limpeza de worktrees e branches `c5/*` e `integrate/*` **pendente** (bloqueada pelo ambiente, aguarda o usuário) | Claude |
 | 2026-11-08 01:47 | Personagem da história da landing: **Patrick → Pedro** (pedido do usuário, para não se confundir com o agente Pat): `web/app/page.tsx`, `web/components/landing/HeroStory.tsx`, `web/lib/story.ts`; as DECs históricas não foram reescritas ([DEC-042](decisoes.md)) | Claude |
 | 2026-11-08 01:44 | **Integração do remoto com a C5** ([DEC-042](decisoes.md)), na branch `integrate/remote-main` (worktree `cc61-integra`), **sem push**: DEC-035 a 038 locais renumeradas para 038 a 041; merge do `origin/main` (conflitos só em `decisoes`, `declaracao-ferramentas`, `estado-do-projeto` e nos 3 arquivos do Vite que o Next apagou) e do PR #7 (design system); SPA da fatia portada para Next (`/entrar/`, `/plataforma/`; 15 testes novos do front, sem dependência npm nova); o carregador lê `restringe:` do Pedro Veloso e o D1 foi removido (E1 10/10). **Medido na branch:** 477 testes Python, ruff limpo, E1 10/10, `typecheck`, `lint` e `build` do Next sem erro. **Não verificado:** visual no navegador; caminho feliz com o modelo real (sem chave) | Claude |

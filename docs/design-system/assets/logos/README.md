@@ -6,3 +6,4 @@
 - **remane-avatar-whatsapp.svg**: foto de perfil do agente no WhatsApp (círculo accent, símbolo em ink com o bloco branco).
 
 O nome "remane" não é um arquivo: escreva em Geist 500, minúsculas, tracking -0.06em, à direita do símbolo, com altura de x próxima da altura de um quadrado. Espaço livre mínimo em volta do conjunto: a largura de um quadrado. Não gire, não recolora os oito quadrados e não troque a cor do bloco remanejado.
+- **pat-estados.svg**: folha estática dos 5 estados do Pat (parado, trabalhando, digitando, resolveu, exceção); "trabalhando" sai do lugar deixando o contorno tracejado e olha para o lado. O componente vivo é `web/components/Pat.tsx`; a regra dos estados está em `web/lib/pat.ts`. Pat é o bloco remanejado do logo com dois olhos: não recolora, não adicione boca, braços nem rosto; `warning` só no estado de exceção.
