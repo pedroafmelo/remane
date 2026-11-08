@@ -437,6 +437,8 @@ def test_attach_after_report():
     view = _report(env)
     view = env.tracker.attach(view.case_id, PDF)
     assert view.abono == "provisorio" and env.queue.codes() == ["RX-08"]
+    evidence = " ".join(env.queue.items[0][1].evidence)
+    assert "não reconhecido como atestado" in evidence and "outro tipo de documento" in evidence
 
 
 def test_free_text_never_leaves_the_call():
