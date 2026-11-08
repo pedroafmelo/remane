@@ -593,7 +593,7 @@ nos relatórios dos subagentes.
 
 Pedido do usuário: uma única integração (um PR, merge commit, sem squash) no lugar de M1, M2 e M3. Executada em 08/11/2026, **07:56 a ~08:15**
 (Recife), num worktree próprio (`cc61-c6-final`), sem tocar no diretório principal nem no `main`. Sem push e sem PR até o "pode" do usuário.
-`c6/final` parte de `c6/m3` (`08c1677`); o merge de `origin/main` (`be360d9`: PRs #15, #17, #18 e #19) é o commit `5b6aa4a`. As pontas
+`c6/final` parte de `c6/m3` (`08c1677`); o merge de `origin/main` (`be360d9`: PRs #15, #17, #18 e #19) é o commit `5b6aa4a`. **O `main` andou durante a verificação** (PR #20, `29fcbfd`, 08:15): segundo merge, `eec0d53` (abaixo). As pontas
 `c6/m1` (`28c0ec5`) e `c6/m2` (`d441127`) seguem como pontos de reversão. **O PR #16 (carga do contrato no solver) ficou de fora.**
 
 **Linha de base de `c6/final` antes de fundir** (= `c6/m3`; código de saída conferido): pytest 1.274 passados em 138 s, ruff e format ok, E1 10/10,
@@ -672,3 +672,12 @@ tempo do solver e sobre as 158 violações / R$ 28.381,60 acima.
 reconciliada **não foi aberta**); (2) o teste à mão com a chave e o modelo real, e `--suite e2 --with-model` (custo e latência de `llm.map_columns` e
 `llm.formulate` **seguem não medidos**; é do usuário); (3) o deploy no Railway (volume com linhas antigas, `/health` e login na URL pública), que só existe depois do merge;
 (4) o G3 da C6 à mão; (5) o efeito do PR #16.
+
+**Segundo merge: PR #20 do time (`29fcbfd`, "textos das regras sem referências internas"), commit `eec0d53`, 08:15 a ~08:25.** O `main` mudou depois do primeiro merge e o PR passou a
+conflitar em 5 arquivos. Resolução: `data/regras/politica/autorizacao_hora_extra.yaml` e `politica_ficticia.yaml`, os textos do time (inclusive o id novo
+`hora_extra_autorizacao_previa`, que a tela de Regras mostra); `data/regras/README.md` e o docstring de `solver/model.py`, a redação da DEC-044 (gestor; o lado do time ainda dizia "DP")
+com o id novo; `docs/estado-do-projeto.md`, união em ordem de hora. Os gates rodaram de novo com o merge no índice: pytest **1.313 passados** (107 s), E1 10/10, E2 16/16
+(795/795, 0 inventados), e2e 20, bench 1 thread 9,37 s e 8 threads 12,25 s (ótimo, R$ 20.014,00); o ruff pegou uma linha de 121 colunas no docstring (o id novo), corrigida
+antes do commit (`ruff` e `format` ok, e os 555 testes de `solver`, `rules` e `insights` de novo). Front: sem arquivo da `web/` no PR #20; os gates do front são os da primeira rodada.
+Imagem refeita com o SHA `eec0d53`: `/health` 200, `/` 200, `/api/me` 401, a tela de Regras mostra `hora_extra_autorizacao_previa` e não a `_dp`, nenhum `.env` na imagem.
+`git merge-tree origin/main c6/final` sem conflito (43 commits à frente do `main`).
