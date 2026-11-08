@@ -41,8 +41,8 @@ const visuals: ReactNode[] = [
     days={DAYS}
     rows={storyRows(0).slice(0, 4)}
   />,
-  <div key="chat" className="flex flex-col gap-2.5 rounded-card bg-surface-chat p-5 shadow-float">
-    <div className="mb-1 flex items-center gap-2.5 text-[13px] font-medium text-ink-subtle"><PatTag i={2} /> Pat resolveu o atraso</div>
+  <div key="chat" className="flex flex-col rounded-card bg-surface-chat p-5 pb-2.5 shadow-float">
+    <div className="mb-3 flex items-center gap-2.5 text-[13px] font-medium text-ink-subtle"><PatTag i={2} /> Pat resolveu o atraso</div>
     <ChatBubble from="person">Vou atrasar uns 30 min, o ônibus quebrou.</ChatBubble>
     <ChatBubble from="agent">Tranquilo, Diego. Já avisei a loja e a Ana segura o caixa até você chegar.</ChatBubble>
     <ChatBubble from="event">Ana confirmou · atraso registrado</ChatBubble>
@@ -81,7 +81,7 @@ export function HowItWorks() {
   }, []);
 
   return (
-    <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16">
+    <div className="mt-12 grid [overflow-anchor:none] grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16">
       <ol className="flex flex-col gap-12 lg:gap-0">
         {STEPS.map(([title, text], i) => (
           <li
