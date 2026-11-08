@@ -93,7 +93,7 @@ def full_run(run_id: str = "run-1") -> RunState:
             code="RX-02",
             title="Sem solução viável",
             reason="demanda acima da capacidade",
-            decider=Role.GERENTE,
+            decider=Role.GESTOR,
             deadline=datetime(2026, 11, 8, 9, 0, tzinfo=UTC),
             evidence=["loja 2, sexta"],
             options=[ExceptionOption(label="contratar", cost_usd=Decimal("12.5"), effect="cobre a sexta")],
@@ -120,7 +120,7 @@ def version(vid: str = "v1", status: str = "draft", **kw) -> ScheduleVersion:
 
 
 def approval(version_id: str = "v1", aid: str = "a1", by: str = "u1") -> Approval:
-    return Approval(id=aid, version_id=version_id, approved_by=by, role=Role.GERENTE, at=T0)
+    return Approval(id=aid, version_id=version_id, approved_by=by, role=Role.GESTOR, at=T0)
 
 
 def test_sql_repository_satisfies_port(engine):

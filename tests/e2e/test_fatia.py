@@ -107,7 +107,7 @@ def make_stack(*, llm_fail: bool = False) -> Stack:
     )
     app = create_app(settings, agent=agent)
     stack = Stack(TestClient(app), engine, app)
-    assert stack.call("POST", "/auth/demo/gerente").status_code == 200
+    assert stack.call("POST", "/auth/demo/gestor").status_code == 200
     return stack
 
 

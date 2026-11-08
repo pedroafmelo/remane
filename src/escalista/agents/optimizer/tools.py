@@ -24,7 +24,7 @@ from escalista.domain.rules import RuleCard
 from escalista.domain.schedule import DemandSlot, ReadSummary, Schedule
 
 NO_MODEL = "sem chamada de modelo"
-PUBLISHER_ROLES: frozenset[Role] = frozenset({Role.GERENTE})  # RH-01: o gerente aprova e publica
+PUBLISHER_ROLES: frozenset[Role] = frozenset({Role.GESTOR})  # RH-01: o gerente aprova e publica
 PERSONAL_KEYS = frozenset({"sex", "sexo", "name", "nome"})  # RN-13 e minimização: nada disso vai ao rastro
 
 

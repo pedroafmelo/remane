@@ -163,5 +163,5 @@ class Harness:
     def kinds(self, run_id: str) -> list[str]:
         return [e.kind for e in self.events(run_id)]
 
-    def approval(self, version_id: str, *, role: Role = Role.GERENTE) -> Approval:
-        return Approval(id=f"apr-{version_id}", version_id=version_id, approved_by="demo-gerente", role=role, at=NOW)
+    def approval(self, version_id: str, *, role: Role = Role.GESTOR) -> Approval:
+        return Approval(id=f"apr-{version_id}", version_id=version_id, approved_by="demo-gestor", role=role, at=NOW)

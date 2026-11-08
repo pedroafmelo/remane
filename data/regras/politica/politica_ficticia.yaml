@@ -114,7 +114,7 @@ excecoes_demo:
     titulo: "Cláusula da convenção em conflito com a EC 141"
     motivo: "Cláusula 6ª (1 repouso semanal + 1 por quinzena) conflita com os 2 dias de repouso a partir de 16/12/2026."
     gatilho: cct_repouso_semanal
-    decisor: dp
+    decisor: gestor
     prazo_min: 2880                          # 48h
     opcoes:
       - rotulo: "Confirmar a regra da EC: 2 repousos por semana; cláusula 6ª sem efeito"
@@ -135,7 +135,7 @@ excecoes_demo:
     titulo: "Falta sem substituto dentro da regra"
     motivo: "Nenhum colega elegível cobre o turno sem hora extra, e a oferta de turno não fechou."
     gatilho: pol_oferta_turno
-    decisor: gerente
+    decisor: gestor
     prazo_min: 30
     opcoes:
       - rotulo: "Hora extra de um colega da mesma loja"
@@ -157,7 +157,7 @@ excecoes_demo:
     titulo: "Atestado ilegível ou com data inconsistente"
     motivo: "A leitura do atestado não confirmou a data, ou a data não bate com a falta."
     gatilho: leitura_atestado
-    decisor: dp
+    decisor: gestor
     prazo_min: 1440                          # 24h
     opcoes:
       - rotulo: "Manter o abono provisório e validar o original depois"

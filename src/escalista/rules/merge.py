@@ -110,7 +110,7 @@ def _conflict_card(applied: Rule, looser: Rule, stricter: Rule) -> ExceptionCard
             f"A camada {looser.layer.value} é mais frouxa que a {stricter.layer.value} em {applied.id}. "
             "A regra mais restritiva foi aplicada de forma provisória até o DP decidir."
         ),
-        decider=Role.DP,
+        decider=Role.GESTOR,
         evidence=[_describe(looser), _describe(stricter), f"aplicada (provisória): {_describe(applied)}"],
         recommendation=f"Manter a mais restritiva ({_describe(applied)}) e corrigir a camada {looser.layer.value}.",
         if_no_answer="A regra mais restritiva segue aplicada como provisória.",

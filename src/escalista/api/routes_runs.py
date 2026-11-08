@@ -37,7 +37,7 @@ from escalista.domain.schedule import EmployeePublic, Schedule
 
 DEMO_FILES = frozenset({"escala_atual.csv", "escala_defeito.csv"})
 
-gerente = require_role(Role.GERENTE)
+gerente = require_role(Role.GESTOR)
 
 
 class ProposedSchedule(BaseModel):
@@ -91,7 +91,7 @@ def _rx13(file_name: str, reason: str) -> ExceptionCard:
         code="RX-13",
         title="Arquivo de escala ilegível",
         reason=reason,
-        decider=Role.GERENTE,
+        decider=Role.GESTOR,
         evidence=[f"arquivo: {file_name}"],
         recommendation="Salvar a planilha como CSV em UTF-8, com até 1 MB, e enviar de novo.",
     )

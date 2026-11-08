@@ -366,7 +366,7 @@ def _rx02(uncovered: list[DemandSlot], stores: list[Store], limits: Limits, stat
             f"Mesmo com as regras respeitadas, faltam {_br(total_h)} pessoa-horas na semana em "
             f"{len(missing)} loja(s). A escala parcial foi gerada sem hora extra."
         ),
-        decider=Role.DP,
+        decider=Role.GESTOR,
         evidence=evidence,
         options=[
             ExceptionOption(

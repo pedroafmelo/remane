@@ -43,7 +43,7 @@ class Route:
         return f"{self.method} {self.path}"
 
 
-GERENTE = frozenset({Role.GERENTE})
+GESTOR = frozenset({Role.GESTOR})
 CSV_OK = b"# SINTETICO - dados ficticios\nfuncionario,loja,dia,inicio,fim\nE01,L01,2027-01-11,08:00,16:00\n"
 CONFIRM, APPROVE = SEEDED_AWAITING_CONFIRM, SEEDED_AWAITING_APPROVAL
 
@@ -52,17 +52,17 @@ ROUTES: list[Route] = [
     Route(
         "POST",
         "/api/runs",
-        GERENTE,
+        GESTOR,
         ok_status=201,
         request={"params": {"file_name": "escala.csv"}, "content": CSV_OK, "headers": {"Content-Type": "text/csv"}},
     ),
-    Route("GET", "/api/runs/{run_id}", GERENTE, url=f"/api/runs/{APPROVE}"),
-    Route("POST", "/api/runs/{run_id}/confirm", GERENTE, url=f"/api/runs/{CONFIRM}/confirm"),
-    Route("GET", "/api/runs/{run_id}/schedule", GERENTE, url=f"/api/runs/{APPROVE}/schedule"),
-    Route("POST", "/api/runs/{run_id}/approve", GERENTE, url=f"/api/runs/{APPROVE}/approve"),
-    Route("GET", "/api/runs/{run_id}/trace", GERENTE, url=f"/api/runs/{APPROVE}/trace"),
-    Route("GET", "/api/schedules/published", GERENTE),
-    Route("GET", "/api/demo/files/{name}", GERENTE, url="/api/demo/files/escala_atual.csv"),
+    Route("GET", "/api/runs/{run_id}", GESTOR, url=f"/api/runs/{APPROVE}"),
+    Route("POST", "/api/runs/{run_id}/confirm", GESTOR, url=f"/api/runs/{CONFIRM}/confirm"),
+    Route("GET", "/api/runs/{run_id}/schedule", GESTOR, url=f"/api/runs/{APPROVE}/schedule"),
+    Route("POST", "/api/runs/{run_id}/approve", GESTOR, url=f"/api/runs/{APPROVE}/approve"),
+    Route("GET", "/api/runs/{run_id}/trace", GESTOR, url=f"/api/runs/{APPROVE}/trace"),
+    Route("GET", "/api/schedules/published", GESTOR),
+    Route("GET", "/api/demo/files/{name}", GESTOR, url="/api/demo/files/escala_atual.csv"),
 ]
 
 CASES_FORBIDDEN = [(r, role) for r in ROUTES for role in Role if role not in r.roles]
@@ -139,10 +139,10 @@ def test_every_api_route_is_in_the_matrix(tmp_path):
 def test_require_role_on_a_gerente_only_route(tmp_path, role):
     """`require_role` isolado das rotas reais, numa rota de teste só do gerente."""
     client = make_client(tmp_path)
-    client.app.add_api_route("/probe/gerente", lambda: {"ok": True}, dependencies=[Depends(require_role(Role.GERENTE))])
-    assert client.get("/probe/gerente").status_code == 401
+    client.app.add_api_route("/probe/gestor", lambda: {"ok": True}, dependencies=[Depends(require_role(Role.GESTOR))])
+    assert client.get("/probe/gestor").status_code == 401
     login(client, role)
-    assert client.get("/probe/gerente").status_code == (200 if role == Role.GERENTE else 403)
+    assert client.get("/probe/gestor").status_code == (200 if role == Role.GESTOR else 403)
 
 
 def test_require_role_needs_at_least_one_role():
@@ -185,7 +185,7 @@ def test_demo_login_with_unknown_role_is_404(tmp_path):
 
 
 def test_session_cookie_is_httponly_and_samesite_lax(tmp_path):
-    response = make_client(tmp_path).post("/auth/demo/gerente")
+    response = make_client(tmp_path).post("/auth/demo/gestor")
     cookie = response.headers["set-cookie"].lower()
     assert cookie.startswith(f"{SESSION_COOKIE}=")
     assert "httponly" in cookie and "samesite=lax" in cookie and "path=/" in cookie
@@ -193,7 +193,7 @@ def test_session_cookie_is_httponly_and_samesite_lax(tmp_path):
 
 def test_logout_ends_the_session(tmp_path):
     client = make_client(tmp_path)
-    login(client, Role.GERENTE)
+    login(client, Role.GESTOR)
     assert client.post("/auth/logout").status_code == 204
     assert client.get("/api/me").status_code == 401
     assert client.post("/auth/logout").status_code == 204  # idempotente, sem sessão também
@@ -223,7 +223,7 @@ def test_cookie_signed_with_another_secret_is_401(tmp_path):
 def test_me_and_cookie_never_carry_the_secret(tmp_path, caplog):
     with caplog.at_level(logging.DEBUG):
         client = make_client(tmp_path)
-        login_response = client.post("/auth/demo/gerente")
+        login_response = client.post("/auth/demo/gestor")
         me = client.get("/api/me")
     assert set(me.json()) == {"id", "nome", "papel"}
     for text in (me.text, login_response.text, login_response.headers["set-cookie"], caplog.text):
@@ -233,8 +233,8 @@ def test_me_and_cookie_never_carry_the_secret(tmp_path, caplog):
 def test_without_configured_secret_sessions_still_work(tmp_path):
     """Sem `SESSION_SECRET`, o app gera um segredo efêmero (sessões caem no restart) em vez de assinar com um fixo."""
     client = make_client(tmp_path, secret=None)
-    login(client, Role.GERENTE)
-    assert client.get("/api/me").json()["papel"] == "gerente"
+    login(client, Role.GESTOR)
+    assert client.get("/api/me").json()["papel"] == "gestor"
     other = make_client(tmp_path, secret=None)
     other.cookies.set(SESSION_COOKIE, client.cookies[SESSION_COOKIE])
     assert other.get("/api/me").status_code == 401

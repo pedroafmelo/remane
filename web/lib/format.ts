@@ -58,7 +58,7 @@ export const PHASE_LABELS: Record<string, string> = {
   read: "Lendo o arquivo",
   awaiting_confirm: "Aguardando a confirmação da leitura",
   optimized: "Escala otimizada",
-  awaiting_approval: "Aguardando a aprovação do gerente",
+  awaiting_approval: "Aguardando a aprovação do gestor",
   published: "Publicada",
   failed: "Interrompida com exceção",
 };
