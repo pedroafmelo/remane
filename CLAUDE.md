@@ -114,11 +114,12 @@ docs/
   decisoes.md                      registro de decisões (DEC-NNN)
   declaracao-ferramentas.md        lista de ferramentas, modelos e APIs de terceiros (vai para a submissão)
   entrega.md                       submissão, pitch de 3 min e roteiro de demo
+  landing.md                       handoff de design da landing Remane (marca, tokens, seções, movimento)
   ideacao/                         como ideiar, critérios, backlog, template e fichas das ideias
   arquivo/                         material de ideias arquivadas (nada é apagado)
 data/regras/                       regras em YAML: lei/ (EC 141), convencao/ e politica/ (fictícias)
 src/  tests/                       código do backend Python (pacote escalista) e testes
-web/                               SPA React + TypeScript (Vite)
+web/                               Next.js + TypeScript (landing Remane e plataforma; export estático, DEC-035)
 Dockerfile  fly.toml               imagem única e configuração do Fly.io (DEC-030)
 ```
 

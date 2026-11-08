@@ -46,6 +46,8 @@ def _serve_spa(app: FastAPI, dist: Path) -> None:
         if path == "api" or path.startswith("api/"):
             raise HTTPException(status_code=404)
         candidate = (root / path).resolve()
+        if candidate.is_dir():  # export estático do Next: /rota/ é a pasta rota/ com o próprio index.html
+            candidate = candidate / "index.html"
         if candidate.is_file() and candidate.is_relative_to(root):
             return FileResponse(candidate)
         return FileResponse(index)

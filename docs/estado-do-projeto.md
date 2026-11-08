@@ -1,7 +1,7 @@
 # Estado do projeto
 
 > **Fonte da verdade do momento.** Atualize ao fim de cada bloco de trabalho (ver "Documentação viva" no
-> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-08 00:05** (Recife), por Claude, ao entregar a convenção e a política fictícias (G2, branch `chore/demo-convention-policy`). Antes: 2026-11-07 16:47, por Claude (Sonnet 5.5), ao planejar e executar a C0a e auditar as docs ([plano da C0](planos/camada-00-fundacao.md), [DEC-030](decisoes.md) a [DEC-032](decisoes.md)): **G0 atingido às 16h41**. Antes: plano macro ([plano-implementacao.md](plano-implementacao.md), [DEC-027](decisoes.md) a [DEC-029](decisoes.md)).
+> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-08 00:36** (Recife), por Claude (Opus 5.5), ao trazer a landing Remane e trocar o `web/` para Next.js ([DEC-035](decisoes.md)). Antes: 16:47, por Claude (Sonnet 5.5), ao planejar e executar a C0a e auditar as docs ([plano da C0](planos/camada-00-fundacao.md), [DEC-030](decisoes.md) a [DEC-032](decisoes.md)): **G0 atingido às 16h41**. Antes: plano macro ([plano-implementacao.md](plano-implementacao.md), [DEC-027](decisoes.md) a [DEC-029](decisoes.md)).
 
 ## Fase atual
 
@@ -46,10 +46,8 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
       **Camada 0** em detalhe (`docs/planos/camada-00-fundacao.md`), com o Opus 5.5 ([DEC-028](decisoes.md)).
 - [ ] **Hospedagem e deploy: tudo adiado; por enquanto, testar e rodar localmente** ([DEC-033](decisoes.md), [DEC-034](decisoes.md)). A hospedagem volta a `[PREENCHER]` (o Fly.io da [DEC-030](decisoes.md) fica em suspenso); G1 pendente sem data. **Decidir antes do G6 (dom 11h30)**, porque sem link público RE-07 e RN-10 não se cumprem.
 - [x] **C0a concluída, G0 às 16h41** ([plano da C0](planos/camada-00-fundacao.md)): 84 testes verdes, ruff limpo, teste de fronteiras provado. `web/` (T9, T10), `Dockerfile` e `fly.toml` também prontos (90 testes; imagem testada localmente). **Falta:** o deploy e o G1 (adiados, [DEC-033](decisoes.md)) e avisar as frentes A, B e C de que o G0 passou. Commitado a pedido do usuário às 16h51.
-- [x] **Pedro Veloso: política e convenção fictícias (G2)**, entregues em 08/11 00h05, depois do prazo das 19h ([DEC-028](decisoes.md)):
-      [cct_comercio_ficticia.yaml](../data/regras/convencao/cct_comercio_ficticia.yaml) e
-      [politica_ficticia.yaml](../data/regras/politica/politica_ficticia.yaml). **Falta:** a frente A (C1) confirmar que o formato
-      serve ao carregador e ao solver.
+- [ ] **Landing Remane pronta em `web/` (branch `feat/landing`, [DEC-035](decisoes.md), copy da [DEC-036](decisoes.md)).** Falta a frente C ligar o login e os botões de demo por papel em `/entrar`; o backend tratar no modo demo o número de WhatsApp de quem não está no quadro (a ponte real do WhatsApp agora tem que sair, DEC-036); definir `NEXT_PUBLIC_WHATSAPP_NUMBER` quando o número existir (sem ela, a seção WhatsApp mostra "Testar a demo").
+- [ ] **Pedro Veloso: política e convenção fictícias até 19h** ([DEC-028](decisoes.md)); gate G2 do plano macro.
 - [ ] **Primeira fatia vertical até 21h30** ([DEC-028](decisoes.md)): seção 2 do [plano macro](plano-implementacao.md).
 - [ ] Responder antes dos planos das camadas: "gestor de RH" (antes da C4), dados do RN-13 (antes da C1), RF-25 e RF-28 (antes da C7);
       tabela do time com a frente de cada pessoa. Lista completa na seção 3 do [plano macro](plano-implementacao.md).
@@ -118,7 +116,8 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 
 | Data e hora | O quê | Por |
 |---|---|---|
-| 2026-11-08 00:05 | G2: convenção e política fictícias em `data/regras/` (branch `chore/demo-convention-policy`). Convenção: 9h por dia a partir de 16/12 (pergunta 17), adicional de 60% e de 100%, banco de 120 dias, RX-01 (repouso) e RX-11 (domingos) plantados. Política: 11 parâmetros (2 `[PROPOSTA]`: RF-25 e RF-28) e as 3 exceções da demo no formato do `ExceptionCard`. As 4 camadas validadas juntas; 90 testes verdes | Claude |
+| 2026-11-08 00:36 | Landing com a copy da [DEC-036](decisoes.md): "engenheiro de escala", sem a seção da 6x1, Patrick no lugar de Joana, história do hero com metade da rolagem; WhatsApp mantido | Claude |
+| 2026-11-07 23:55 | Landing Remane trazida para `web/`, que troca o Vite por Next.js com export estático em `web/dist` ([DEC-035](decisoes.md)); `_serve_spa` serve `rota/index.html` do export (teste novo em `tests/api/test_spa.py`); [landing.md](landing.md) com o handoff; declaração, arquitetura, README e CLAUDE.md atualizados. 91 testes Python, 3 testes do `web/`, lint e build ok | Claude |
 | 2026-11-07 16:53 | [DEC-034](decisoes.md): "tudo do deploy" fica para depois e tudo roda localmente; a hospedagem volta a `[PREENCHER]` (Fly.io em suspenso). README ganha a seção de execução local. Sem commit desta alteração | Claude |
 | 2026-11-07 16:51 | [DEC-033](decisoes.md): o usuário adiou o deploy e a decisão de hospedagem; pediu o commit (feito em partes, em inglês, Conventional Commits) e que o plano da próxima camada não seja preparado agora. `.gitignore` ganhou exceção para os HTML de `web/` | Claude |
 | 2026-11-07 16:47 | Auditoria `/sync-docs` depois da C0a: 25 arquivos `.md`, 0 links quebrados; `src/`, `tests/`, `web/`, `pyproject.toml` e `.env.example` (18 nomes: os 16 de antes mais `DATABASE_URL` e `WEB_DIST_DIR`, agora citados na [arquitetura](arquitetura.md), seção 12) conferidos contra as docs. **Corrigido:** nota errada sobre `.claude/hooks/docs_sync.py` (foi o meu `ruff format`; arquivo revertido, `.claude` excluído do ruff); item "implementação (ainda não começou)"; métricas medidas preenchidas; estrutura do CLAUDE.md (`web/`, `Dockerfile`, `fly.toml`); notas de 3 portas no plano macro e na arquitetura (seção 2.1). **Pendente de decisão humana:** ver a resposta desta auditoria | Claude |
