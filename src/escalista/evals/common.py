@@ -124,7 +124,9 @@ class EvalContext:
     """Entradas compartilhadas, lidas uma vez e só se algum cenário as pedir.
 
     `with_model` liga os cenários com modelo; `llm` é o cliente (já com o teto, `BudgetedClient`) ou `None` quando não
-    há chave; `sink` recebe os eventos do cliente, de onde sai o `ModelUse` de cada cenário."""
+    há chave; `sink` recebe os eventos do cliente, de onde sai o `ModelUse` de cada cenário. `client_factory` monta um
+    cliente que emite no sink pedido (e, na rodada real, também no sink compartilhado do teto): é o que os cenários
+    que reaproveitam a cadeia do E2 (com o próprio `MemorySink`) usam."""
 
     data_dir: Path = Path("data/demo")
     rules_dir: Path = Path("data/regras")
@@ -132,6 +134,7 @@ class EvalContext:
     with_model: bool = False
     llm: LLMClient | None = None
     sink: MemorySink = field(default_factory=MemorySink)
+    client_factory: Callable[[Any], LLMClient] | None = None
 
     @cached_property
     def card(self) -> RuleCard:
@@ -155,6 +158,7 @@ class Outcome:
     passed: bool
     model: ModelUse | None = field(default=None, kw_only=True)
     metrics: dict[str, Any] | None = field(default=None, kw_only=True)
+    reason: str | None = field(default=None, kw_only=True)  # por que passou ou falhou, quando não é óbvio
 
 
 @dataclass(frozen=True)
@@ -245,7 +249,7 @@ def _gate(scenario: Scenario, ctx: EvalContext) -> str | None:
             return req.reason()
     if scenario.uses_model and not ctx.with_model:
         return REASON_NO_FLAG
-    if scenario.uses_model and ctx.llm is None:
+    if scenario.uses_model and ctx.llm is None and ctx.client_factory is None:
         return REASON_NO_KEY
     return None
 
@@ -269,7 +273,7 @@ def run_one(scenario: Scenario, ctx: EvalContext) -> ScenarioResult:
         outcome = Outcome(expected="cenário roda sem erro", obtained=f"erro: {type(exc).__name__}: {exc}", passed=False)
     elapsed = int((wallclock.perf_counter() - t0) * 1000)
     executed = scenario.uses_model and outcome.model is not None and outcome.model.real_model_called
-    status, reason = (PASSED if outcome.passed else FAILED), None
+    status, reason = (PASSED if outcome.passed else FAILED), outcome.reason
     if scenario.uses_model and not executed:
         status, reason = NOT_RUN, REASON_NO_CALL
     return ScenarioResult(
@@ -335,6 +339,17 @@ GUARD_PRICE_OUT_PER_M = Decimal("0.25")
 MILLION = Decimal(1_000_000)
 
 
+class TeeSink:
+    """Repassa cada evento a vários sinks (o do cenário e o compartilhado do teto), sem repetir o mesmo sink."""
+
+    def __init__(self, *sinks: Any) -> None:
+        self._sinks = list({id(s): s for s in sinks}.values())
+
+    def emit(self, event: TraceEvent) -> None:
+        for sink in self._sinks:
+            sink.emit(event)
+
+
 class BudgetedClient:
     """`LLMClient` com teto: antes de cada chamada, se o gasto (soma do `cost_usd` medido no sink; tokens × preço
     declarado nos eventos sem custo) chegou ao teto, ou o tempo passou de `max_seconds`, levanta `NotRun`."""
@@ -349,6 +364,7 @@ class BudgetedClient:
         price_out_per_m: Decimal = GUARD_PRICE_OUT_PER_M,
         max_seconds: float | None = None,
         clock: Callable[[], float] = time.monotonic,
+        started_at: float | None = None,
     ) -> None:
         self._inner = inner
         self._sink = sink
@@ -357,7 +373,7 @@ class BudgetedClient:
         self._price_out = price_out_per_m
         self._max_seconds = max_seconds
         self._clock = clock
-        self._started = clock()
+        self._started = clock() if started_at is None else started_at
 
     def spent_usd(self) -> Decimal:
         total = Decimal(0)

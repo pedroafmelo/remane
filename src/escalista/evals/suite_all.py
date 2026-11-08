@@ -12,9 +12,11 @@ Códigos: 0 = todos rodaram e passaram; 1 = algum falhou (ou turno inventado no 
 from __future__ import annotations
 
 import argparse
-import json
+import shlex
 import statistics
 import subprocess
+import sys
+import time
 from collections.abc import Callable, Sequence
 from datetime import datetime
 from decimal import Decimal
@@ -30,19 +32,24 @@ from escalista.evals.common import (
     EvalContext,
     MemorySink,
     ScenarioResult,
+    TeeSink,
 )
+from escalista.evals.snapshot import SnapshotLeakError, write_snapshot
 
 SUITES = ("e1", "e2", "e3", "e4")
 DEC_019_META = {"sem_modelo": 20, "com_modelo": 10}
 NOT_MEASURED = "não medido"
 MEASURED = "medido"
 EXIT_OK, EXIT_FAILED, EXIT_NOT_RUN = 0, 1, 3
+COMMAND_PREFIX = "uv run python -m escalista.evals"
+SNAPSHOT_DATA_DIR = Path("data")  # onde moram os gabaritos com os valores plantados que o retrato não pode carregar
 
 ClientFactory = Callable[[Any], Any]  # recebe o `TraceSink` em memória, devolve um `LLMClient`
 
 
-def before_snapshot(report: dict[str, Any]) -> None:
-    """Gancho chamado antes de gravar o retrato público. A checagem de vazamento (`find_leaks`) é da tarefa E6."""
+def command_line(argv: Sequence[str]) -> str:
+    """O comando que gerou o relatório (só os argumentos da linha; nunca ambiente nem chave)."""
+    return " ".join([COMMAND_PREFIX, *(shlex.quote(a) for a in argv)])
 
 
 def git_sha() -> str | None:
@@ -180,6 +187,7 @@ def build_report(
     model: dict[str, Any],
     e2_report: dict[str, Any] | None = None,
     measurements: dict[str, Any] | None = None,
+    command: str | None = None,
 ) -> dict[str, Any]:
     no_model = [r for r in results if not r.uses_model]
     with_m = [r for r in results if r.uses_model]
@@ -196,6 +204,7 @@ def build_report(
         "git_sha": git_sha(),
         "modo": "com_modelo" if with_model else "sem_modelo",
         "dados": "sintéticos",
+        "comando": command,
         "contagem": count(results),
         "dec_019": {
             "sem_modelo": {
@@ -289,17 +298,29 @@ def build_parser(prog: str = "escalista.evals") -> argparse.ArgumentParser:
     return parser
 
 
-def _client(args: argparse.Namespace, sink: MemorySink, client_factory: ClientFactory | None) -> BudgetedClient | None:
-    """Cliente com teto, ou `None` (sem `--with-model`, ou sem chave: os com modelo saem `não executado`)."""
+def _client_factory(
+    args: argparse.Namespace, shared: MemorySink, client_factory: ClientFactory | None
+) -> ClientFactory | None:
+    """Fábrica de clientes com teto, ou `None` (sem `--with-model`, ou sem chave: os com modelo saem `não executado`).
+
+    Cada cliente emite no sink de quem o pede **e** no sink compartilhado: o teto e o bloco `modelo` do relatório
+    somam a rodada inteira; o `ModelUse` do cenário lê o próprio sink. O relógio do teto de tempo começa uma vez só."""
     if not args.with_model:
         return None
-    factory = client_factory
-    if factory is None:
+    raw = client_factory
+    if raw is None:
         try:
-            factory = e2._real_client_factory()
+            raw = e2._real_client_factory()
         except SystemExit:
             return None
-    return BudgetedClient(factory(sink), sink, args.budget_usd, max_seconds=args.max_seconds)
+    started = time.monotonic()
+
+    def make(sink: Any) -> BudgetedClient:
+        return BudgetedClient(
+            raw(TeeSink(sink, shared)), shared, args.budget_usd, max_seconds=args.max_seconds, started_at=started
+        )
+
+    return make
 
 
 def main(
@@ -310,8 +331,15 @@ def main(
     if args.snapshot is not None and args.suite != "all":
         parser.error("--snapshot só com --suite all")
     sink = MemorySink()
-    llm = _client(args, sink, client_factory)
-    ctx = EvalContext(data_dir=args.data, rules_dir=args.rules, with_model=args.with_model, llm=llm, sink=sink)
+    factory = _client_factory(args, sink, client_factory)
+    ctx = EvalContext(
+        data_dir=args.data,
+        rules_dir=args.rules,
+        with_model=args.with_model,
+        llm=factory(sink) if factory is not None else None,
+        sink=sink,
+        client_factory=factory,
+    )
 
     picked = SUITES if args.suite == "all" else (args.suite,)
     results: list[ScenarioResult] = []
@@ -322,8 +350,8 @@ def main(
             files = e2.run_files(args.data)
             e2_report = e2.build_report(files, now(), with_model=False)
             results += e2_rows(files)
-            if llm is not None:
-                with_model = e2.run_files(args.data, client_factory=lambda _sink: llm, sink=sink)
+            if factory is not None:  # medição do modelo sobre os mesmos arquivos; não conta cenário (B3)
+                with_model = e2.run_files(args.data, client_factory=factory)
                 rep = e2.build_report(with_model, now(), with_model=True)
                 measurements["e2_com_modelo"] = {
                     "placar": rep["placar"],
@@ -343,6 +371,7 @@ def main(
         model=model_block(sink, args.budget_usd),
         e2_report=e2_report,
         measurements=measurements,
+        command=command_line(argv),
     )
     path = common.write_report(report, args.out, generated_at, suite=args.suite)
     print(common.render(results))
@@ -350,9 +379,12 @@ def main(
     print(footer(report))
     print(f"Relatório: {path} (e {path.with_name(f'{args.suite}-latest.json')})")
     if args.snapshot is not None:
-        before_snapshot(report)
-        args.snapshot.mkdir(parents=True, exist_ok=True)
-        (args.snapshot / "evals-latest.json").write_text(
-            json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        try:
+            check = write_snapshot(report, args.snapshot, SNAPSHOT_DATA_DIR)
+        except SnapshotLeakError as exc:
+            print(f"Retrato NÃO gravado: {exc}", file=sys.stderr)
+            return EXIT_FAILED
+        print(
+            f"Retrato: {args.snapshot / 'evals-latest.json'} ({check.planted_checked} valor(es) plantado(s) conferidos)"
         )
     return exit_code(results)

@@ -2,8 +2,19 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+from decimal import Decimal
+from pathlib import Path
+
+from escalista.domain.contracts import LLMUnavailableError, TraceEvent
 from escalista.evals import e3, e4
 from escalista.evals.common import EvalContext, run_scenarios
+from escalista.evals.fakes import ScriptedLLM
+from escalista.ingest.tables import read_tables
+from escalista.rules.header_aliases import guess_mapping
+from tests.fakes import TOOL_MAPPING
+
+DATA = Path("data/demo")
 
 E3_IDS = [f"E3-{n:02d}" for n in (*range(1, 17), *range(21, 29))]
 E4_IDS = [f"E4-{n:02d}" for n in range(1, 8)]
@@ -70,6 +81,60 @@ def test_without_c7_every_dependent_scenario_says_which_output_is_missing():
     assert by["E4-02"].reason == "sem --with-model"
 
 
-def test_e4_02_with_a_model_client_is_not_yet_written():
-    (r,) = run_scenarios([s for s in e4.SCENARIOS if s.id == "E4-02"], EvalContext(with_model=True, llm=object()))  # type: ignore[arg-type]
-    assert r.status == "não executado" and "tarefa E2" in (r.reason or "")
+class _Emitting:
+    """Embrulha o `ScriptedLLM` e emite um evento por chamada no sink do cenário, com o nome de modelo dado."""
+
+    def __init__(self, inner: ScriptedLLM, sink, model: str) -> None:
+        self.inner, self.sink, self.model = inner, sink, model
+
+    def complete(self, *, size, messages, tool_schema=None, run_id, parent_id=None, kind=None):
+        try:
+            result = self.inner.complete(
+                size=size, messages=messages, tool_schema=tool_schema, run_id=run_id, parent_id=parent_id, kind=kind
+            )
+        except LLMUnavailableError:
+            self._emit(run_id, "exception.raised", None)
+            raise
+        self._emit(run_id, kind or "llm.call", Decimal("0.0001"))
+        return result
+
+    def _emit(self, run_id, kind, cost) -> None:
+        self.sink.emit(
+            TraceEvent(
+                id=f"ev-{id(self)}-{kind}", run_id=run_id, kind=kind, at=datetime(2026, 11, 8, 10),
+                model=self.model, tokens_in=10, tokens_out=5, cost_usd=cost, latency_ms=7,
+            )
+        )  # fmt: skip
+
+
+def _heuristic_answer() -> dict:
+    path = DATA / "e4" / "e4-02-injecao-escala.xlsx"
+    mapping = guess_mapping(read_tables(path.name, path.read_bytes()).tables)
+    assert mapping is not None
+    return mapping.model_dump(mode="json")
+
+
+def _run_e4_02(answers: list[dict], model: str):
+    scripted = ScriptedLLM(by_tool={TOOL_MAPPING: answers})
+    ctx = EvalContext(data_dir=DATA, with_model=True, client_factory=lambda sink: _Emitting(scripted, sink, model))
+    (r,) = run_scenarios([s for s in e4.SCENARIOS if s.id == "E4-02"], ctx)
+    return r
+
+
+def test_e4_02_with_a_model_that_maps_right_passes_and_counts_as_model_executed():
+    r = _run_e4_02([_heuristic_answer()], "small-model")
+    assert r.status == "passou" and r.model_executed
+    assert r.model is not None and r.model.calls == 1 and r.model.cost_usd == Decimal("0.0001")
+
+
+def test_e4_02_fallback_to_the_heuristic_is_a_failure_with_the_reason():
+    bad = {**_heuristic_answer(), "start": None, "end": None}
+    r = _run_e4_02([bad] * 4, "small-model")
+    assert r.status == "falhou" and r.model_executed
+    assert r.reason == "modelo não produziu mapeamento válido; a reserva (heurística) salvou o fluxo"
+
+
+def test_e4_02_fallback_with_the_fake_model_never_counts_as_executed():
+    bad = {**_heuristic_answer(), "start": None, "end": None}
+    r = _run_e4_02([bad] * 4, "fake")
+    assert r.status == "não executado" and r.reason == "modelo não chamado" and not r.model_executed

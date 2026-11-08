@@ -14,6 +14,7 @@ from escalista.domain.contracts import LLMResult, TraceEvent
 from escalista.evals import __main__ as evals_cli
 from escalista.evals import e1, e2, e3, e4, suite_all
 from escalista.evals.common import NotRun, Outcome, Scenario
+from escalista.evals.snapshot import SnapshotLeakError
 from tests.fakes import TOOL_MAPPING
 
 DATA = Path("data/demo")
@@ -146,7 +147,7 @@ class _EmittingFake:
     def complete(self, *, size, messages, tool_schema=None, run_id, parent_id=None, kind=None):
         self.sink.emit(
             TraceEvent(
-                id=f"ev-{len(self.sink.events)}",
+                id=f"ev-{id(self)}-{len(self.answers)}",
                 run_id=run_id,
                 kind=kind or "llm.call",
                 at=NOW,
@@ -183,12 +184,42 @@ def test_with_model_measures_e2_again_without_counting_scenarios(tmp_path: Path,
     assert code == 3  # E4-02 do fixture não chamou modelo nenhum: forçado a `não executado`
 
 
-def test_snapshot_calls_the_hook_and_copies_the_report(tmp_path: Path, small_all: Path, monkeypatch):
+def test_report_carries_the_command_line_without_env(tmp_path: Path, small_all: Path):
+    out = tmp_path / "o"
+    evals_cli.main(["--suite", "all", "--data", str(small_all), "--out", str(out)])
+    report = json.loads((out / "all-latest.json").read_text())
+    assert report["comando"] == f"uv run python -m escalista.evals --suite all --data {small_all} --out {out}"
+    assert {"cenarios", "passaram", "falharam", "nao_executados"} <= set(report["suites"]["e3"])
+
+
+def test_snapshot_goes_through_the_leak_checked_writer(tmp_path: Path, small_all: Path, monkeypatch):
     seen = []
-    monkeypatch.setattr(suite_all, "before_snapshot", lambda report: seen.append(report["suite"]))
+    real = suite_all.write_snapshot
+
+    def spy(report, out_dir, data_dir):
+        seen.append((report["suite"], out_dir, data_dir))
+        return real(report, out_dir, data_dir)
+
+    monkeypatch.setattr(suite_all, "write_snapshot", spy)
     snap = tmp_path / "snap"
 
-    evals_cli.main(["--data", str(small_all), "--out", str(tmp_path / "o"), "--snapshot", str(snap)])
+    code = evals_cli.main(["--data", str(small_all), "--out", str(tmp_path / "o"), "--snapshot", str(snap)])
 
-    assert seen == ["all"]
-    assert (snap / "evals-latest.json").read_text() == (tmp_path / "o" / "all-latest.json").read_text()
+    assert code == 3 and seen == [("all", snap, Path("data"))]
+    saved = json.loads((snap / "evals-latest.json").read_text())
+    report = json.loads((tmp_path / "o" / "all-latest.json").read_text())
+    assert saved.pop("privacidade") and saved == report
+
+
+def test_snapshot_with_a_leak_writes_nothing_and_exits_one(tmp_path: Path, small_all: Path, monkeypatch, capsys):
+
+    def leaky(report, out_dir, data_dir):
+        raise SnapshotLeakError(["cenarios[0].obtido"])
+
+    monkeypatch.setattr(suite_all, "write_snapshot", leaky)
+    snap = tmp_path / "snap"
+
+    code = evals_cli.main(["--data", str(small_all), "--out", str(tmp_path / "o"), "--snapshot", str(snap)])
+
+    assert code == 1 and not snap.exists()
+    assert "cenarios[0].obtido" in capsys.readouterr().err
