@@ -1,0 +1,54 @@
+{
+  "synthetic": true,
+  "deviations": [
+    {
+      "id": "DV-01",
+      "employee_id": "P102",
+      "shift_start": "2027-01-13T14:00:00",
+      "kind": "falta",
+      "minutes": 0
+    },
+    {
+      "id": "DV-02",
+      "employee_id": "P103",
+      "shift_start": "2027-01-14T08:00:00",
+      "kind": "atraso",
+      "minutes": 25
+    },
+    {
+      "id": "DV-03",
+      "employee_id": "P204",
+      "shift_start": "2027-01-11T08:00:00",
+      "kind": "hora_extra",
+      "minutes": 90
+    },
+    {
+      "id": "DV-04",
+      "employee_id": "P204",
+      "shift_start": "2027-01-12T08:00:00",
+      "kind": "hora_extra",
+      "minutes": 90
+    },
+    {
+      "id": "DV-05",
+      "employee_id": "P204",
+      "shift_start": "2027-01-13T08:00:00",
+      "kind": "hora_extra",
+      "minutes": 60
+    },
+    {
+      "id": "DV-06",
+      "employee_id": "P204",
+      "shift_start": "2027-01-14T08:00:00",
+      "kind": "hora_extra",
+      "minutes": 60
+    },
+    {
+      "id": "DV-07",
+      "employee_id": "P204",
+      "shift_start": "2027-01-15T08:00:00",
+      "kind": "hora_extra",
+      "minutes": 75
+    }
+  ]
+}
