@@ -8,6 +8,7 @@ import type { ProposedSchedule, PublishedSchedule, RunState, TraceEvent } from "
 import { Button } from "@/components/Button";
 import { ComparePanel } from "@/components/plataforma/Compare";
 import { ExceptionPanel } from "@/components/plataforma/ExceptionPanel";
+import { PatWorking } from "@/components/plataforma/PatWorking";
 import { JustificationPanel } from "@/components/plataforma/Justification";
 import { ScheduleView } from "@/components/plataforma/ScheduleView";
 import { Shell } from "@/components/plataforma/Shell";
@@ -141,20 +142,21 @@ export default function PlataformaPage() {
 
       {!run && (
         <>
+          {published?.version && (
+            <ScheduleView
+              id="escala-vigente"
+              title="Escala vigente"
+              schedule={published.version.schedule}
+              employees={published.employees}
+              note={`Criada em ${timeBr(published.version.created_at)} · ${published.version.violations_total} violações das regras`}
+            />
+          )}
           <UploadPanel
+            title={published?.version ? "Planejar uma nova escala" : "Enviar a escala atual"}
             busy={busy === "upload"}
             onFile={(f) => send(async () => ({ name: f.name, blob: f }))}
             onDemo={(name) => send(async () => ({ name, blob: await api.demoFile(name) }))}
           />
-          {published?.version && (
-            <ScheduleView
-              id="ultima-publicada"
-              title="Última grade publicada"
-              schedule={published.version.schedule}
-              employees={published.employees}
-              note={`Versão ${published.version.id} · ${published.version.violations_total} violações · criada em ${timeBr(published.version.created_at)}`}
-            />
-          )}
         </>
       )}
 
@@ -166,6 +168,18 @@ export default function PlataformaPage() {
 
           {run.summary && (
             <SummaryPanel summary={run.summary} canConfirm={run.phase === "awaiting_confirm"} busy={busy === "confirm"} onConfirm={() => confirm(run)} />
+          )}
+
+          {busy === "confirm" && (
+            <PatWorking
+              title="O Pat está montando a escala"
+              steps={[
+                "Otimiza a semana dentro da lei, da convenção e da política (cerca de 20 s)",
+                "Confere a proposta com um verificador independente",
+                "Compara antes e depois com a mesma função de custo",
+                "Escreve a justificativa com o modelo (cerca de 15 s)",
+              ]}
+            />
           )}
 
           {run.exception && <ExceptionPanel card={run.exception} />}
