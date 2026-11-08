@@ -1,6 +1,6 @@
 # Registro de decisões
 
-Última atualização: 2026-11-08 08:05. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
+Última atualização: 2026-11-08 08:50. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
 entrada:** se a decisão mudar, crie outra e marque a antiga como `substituída por DEC-NNN`. Use `/decisao` para registrar e
 propagar o efeito para as outras docs.
 
@@ -677,3 +677,10 @@ Formato:
 - **Decisão:** a C6 entra no `main` por **um** PR, `c6/final`, com merge commit e sem squash. `c6/final` é `c6/m3` mais o merge de `origin/main` (`be360d9`: PRs #15, #17, #18 e #19). Fica no lugar dos três pacotes M1, M2 e M3 (`c6/m1`, `c6/m2`, `c6/m3`).
 - **Motivo:** [motivo não informado].
 - **Consequências:** `c6/m1` (`28c0ec5`) e `c6/m2` (`d441127`) ficam como pontos de reversão no histórico. O **PR #16** (carga do contrato no solver) continua aberto e em rascunho, **fora desta integração**, e a decisão sobre ele é do usuário: ele toca o solver da C6 (`solver/model.py`, junto da restrição de teto por pessoa do A5). Enquanto ele não entra, os números de custo e economia da escala de exemplo ainda incluem o efeito que ele aponta (horas de contrato não trabalhadas).
+
+## DEC-055 · Piso da carga do contrato no solver (PR #16) entra no `main`, com limites
+
+- 2026-11-08 08:42 · Decidido por: usuário da sessão ("vou mergear", depois "mergeei", após a revisão do PR) · Status: aceita
+- **Decisão:** o PR #16 entra no `main` (`a45a98b`) com a revisão `review/solver-contract-hours` (`7110122` e `e95f833`). Cada pessoa trabalha **pelo menos** mín(`contract_hours`, limites do cartão, teto semanal da pessoa, dias sem indisponibilidade que comportam turno). Se uma loja ficar inviável por causa do piso, ela é resolvida de novo **sem** o piso. A quebra de simetria agrupa por (salário, contrato).
+- **Motivo:** o mensalista recebe a carga contratada trabalhando ou não, e o solver deixava pessoas em 0 h e contava o salário delas como economia. [motivo do usuário não informado além do merge]
+- **Consequências:** (1) o custo da demo passa de R$ 20.014,00 para **R$ 28.456,00** e **não varia mais com a cobertura-alvo** (todas as 60 pessoas têm 44 h de contrato); (2) a economia do exemplo cai de R$ 13.975,15 (41,1%) para R$ 5.533,15 (16,3%), e o pitch ([pitch.md](pitch.md)) usa o número menor; (3) com 1 thread, o solver da demo leva ~3,4 s (medido; referência do `main` anterior: ~9,3 s), mas num quadro misto pode chegar a ~18 s e parar em `feasible`; (4) quem não está no cadastro continua com contrato igual ao limite semanal do cartão (42 h) e é levado a 40 h: **a decisão sobre esse padrão segue em aberto** (recomendação da revisão: mín(horas no "antes", teto legal), registrado como suposição); (5) `solver/cost.py` e o verificador não mudaram, então o "depois" não conta as 240 h pagas e não trabalhadas.
