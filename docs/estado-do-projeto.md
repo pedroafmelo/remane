@@ -1,7 +1,7 @@
 # Estado do projeto
 
 > **Fonte da verdade do momento.** Atualize ao fim de cada bloco de trabalho (ver "Documentação viva" no
-> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-08 03:55** (Recife), por Claude (Sonnet 5.5), mascote Pat ([DEC-045](decisoes.md)). Antes: **2026-11-08 01:23** (Recife), por Claude (Sonnet 5.5), ao integrar o remoto (landing Remane em Next.js, Railway, regras do Pedro Veloso e design system) com a C5 numa branch própria ([DEC-042](decisoes.md)). Antes: 01:03, landing Remane e `web/` em Next.js ([DEC-035](decisoes.md)); 00:45, a primeira fatia vertical no `main` local e itens 1 a 5 do G3 ([DEC-041](decisoes.md), [plano da C5](planos/camada-05-fatia-vertical.md), seção 12); 16:47, C0a e G0 ([plano da C0](planos/camada-00-fundacao.md)).
+> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-08 04:37** (Recife), por Claude (Opus 5.5), orquestrador da C6 em `c6/integra` ([DEC-046](decisoes.md) a [DEC-053](decisoes.md)). Antes: **2026-11-08 03:55** (Recife), por Claude (Sonnet 5.5), mascote Pat ([DEC-045](decisoes.md)). Antes: **2026-11-08 01:23** (Recife), por Claude (Sonnet 5.5), ao integrar o remoto (landing Remane em Next.js, Railway, regras do Pedro Veloso e design system) com a C5 numa branch própria ([DEC-042](decisoes.md)). Antes: 01:03, landing Remane e `web/` em Next.js ([DEC-035](decisoes.md)); 00:45, a primeira fatia vertical no `main` local e itens 1 a 5 do G3 ([DEC-041](decisoes.md), [plano da C5](planos/camada-05-fatia-vertical.md), seção 12); 16:47, C0a e G0 ([plano da C0](planos/camada-00-fundacao.md)).
 
 ## Fase atual
 
@@ -32,6 +32,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
 
 ## Próximas ações
 
+- [ ] **C6 (leitura por agente e formulação), M1 pronto em `c6/integra`** ([plano](planos/camada-06-leitura-e-formulacao.md), seção 21): CSV e XLSX com cabeçalhos livres, nó 1 com reservas, quadro guardado, próxima semana sem upload. **Falta (usuário):** `git push origin c6/integra`, PR com merge commit, conferir `/health` e o login no Railway depois do merge; o G3 da C6 à mão com a chave (seção 19 do plano) e `uv run python -m escalista.evals --suite e2 --with-model` (custo e latência de `llm.map_columns` e `llm.formulate` **não medidos**). M2 (formulação e laço) e M3 (PDF) seguem em `c6/integra`.
 - [x] ~~Time alinhar restrições e semear o backlog ([como-ideiar.md](ideacao/como-ideiar.md), passos 1 e 2)~~: superada, a ideia
       foi escolhida pela [DEC-003](decisoes.md) sem esse passo (auditoria de 14:42).
 - [x] Filtrar e pontuar a IDEA-002 com [criterios.md](ideacao/criterios.md): feito às 13:18 e refeito às 14:47 com o produto
@@ -120,6 +121,9 @@ rotuladas como premissa.
 | Solver, instância de demo 60 pessoas × 7 dias (3 lojas, seed 42) | 1 thread 11,99 s; 8 threads 12,27 s; ótimo nas 3 lojas; 36.288 variáveis; cobertura 100%; custo R$ 20.014,00 | `uv run python -m escalista.solver.bench --seed 42` (máquina do usuário, 10 núcleos; dados sintéticos) | 08/11/2026 |
 | Evals E1 (sem modelo) | 10/10; ~11,9 s no total (o cenário do solver leva ~11,9 s) | `uv run python -m escalista.evals --suite e1` | 08/11/2026 |
 | Antes e depois na demo (dados sintéticos, sem modelo) | antes: 158 violações, R$ 33.989,15, 216,5 h de hora extra; depois: 0 violações, R$ 20.014,00, 0 h de hora extra | fumaça da C4 em `localhost:8010`, sem chave (a justificativa saiu como RX-12) | 08/11/2026 |
+| Evals E2 sem modelo (leitura, C6) | 15/15 arquivos; 747/747 turnos corretos; **0 inventados**, 0 perdidos; problemas 6/6; RX-13 4/4 | `uv run python -m escalista.evals --suite e2` em `c6/integra` (`e9462b0`), pelo orquestrador | 08/11/2026 04:12 |
+| Demanda inferida do exemplo contra a capacidade (C6) | 2.777 pessoa-hora (horário das lojas do arquivo) ou 2.774,5 (horário do cadastro simulado) contra 2.400 de capacidade sob 42h; "ajustar para caber" = 80% | testes da A3 e da B4a (`tests/rules/test_demand.py`, `tests/agents/test_graph_c6.py`) | 08/11/2026 |
+| Fluxo C6 ponta a ponta com modelo falso (60 × 7, cobertura-alvo 80%) | antes 158 violações, R$ 33.989,15, cobertura 97,04%; depois 0 violações, R$ 28.381,60, cobertura 98,5%; semana seguinte sem upload com 0 violações | `tests/e2e/test_c6.py` (relatório da C3; dados sintéticos, sem modelo real) | 08/11/2026 |
 | Custo e latência do modelo pequeno na justificativa | **não medido** (sem chave na fumaça); medir no G3 item 6 | — | — |
 
 ## Registro de atualizações
@@ -128,6 +132,7 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 
 | Data e hora | O quê | Por |
 |---|---|---|
+| 2026-11-08 04:37 | **C6 em execução por orquestrador em `c6/integra`** (sem push, sem tocar no `main`): R0 (papéis gestor e colaborador), A0 a A4, B1 a B4a, C1 a C3, D1 a D5 e D7 integradas; A5 e D6 prontas em branch (M2 e M3). DEC-046 a DEC-053 gravadas em `c6/integra`. Detalhe, hashes e desvios no [registro da C6](planos/camada-06-leitura-e-formulacao.md), seção 21. **Pacote M1** entregue ao usuário para o merge | Claude |
 | 2026-11-08 02:51 | **G3, item 6 passou**, segundo o usuário (teste à mão com o `.env` e o modelo real, interface em Next). Sem números informados: custo e latência do `llm.justify` ficam `[PREENCHER]`. Mascote Pat: ajuste final (estados e animação do balão) e DEC do mascote renumerada de 043 para **045** (DEC-043 estava duplicada em `main`: WhatsApp e mascote) | Claude |
 | 2026-11-08 02:40 | **Mascote do agente Pat** proposto e implementado como componente (bloco do logo com dois olhos, 5 estados), ainda não ligado a tela ([DEC-045](decisoes.md)); `web/components/Pat.tsx`, `web/lib/pat.ts` + teste (22 testes do front, typecheck e lint ok), folha `pat-estados.svg` | Claude |
 | 2026-11-08 02:34 | [DEC-044](decisoes.md): dois papéis na demo, gestor (gerente + DP) e colaborador; resolve a pergunta 15; produto, arquitetura e plano anotados. Avisar o backend antes do login (C4) | Claude |
