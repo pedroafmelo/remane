@@ -194,6 +194,20 @@ export interface Justification {
 
 export type Phase = 'read' | 'awaiting_confirm' | 'optimized' | 'awaiting_approval' | 'published' | 'failed'
 
+/** Restrição aceita da especificação (nó 2). Só forma: o modelo não tem campo para lei nem convenção. */
+export type SpecConstraint =
+  | { type: 'indisponivel'; employee_id: string; evidence: string; day: string; start?: string | null; end?: string | null }
+  | { type: 'max_horas_semana'; employee_id: string; evidence: string; hours: number }
+  | { type: 'folga_preferida'; employee_id: string; evidence: string; day: string }
+  | { type: 'janela_preferida'; employee_id: string; evidence: string; window: 'manha' | 'tarde' | 'noite' }
+
+export interface SolveSpec {
+  shortfall_weight: number
+  stability_weight: number
+  preference_weight: number
+  constraints: SpecConstraint[]
+}
+
 export interface RunState {
   run_id: string
   phase: Phase
@@ -207,6 +221,8 @@ export interface RunState {
   week_start: string | null
   /** Avisos que não bloqueiam (RX-02, RX-12 da leitura e da formulação). `exception` é o que bloqueia. */
   notices: ExceptionCard[]
+  /** Especificação aplicada pelo Pat (restrições aceitas); `null` antes da formulação. */
+  spec?: SolveSpec | null
 }
 
 export interface Shift {

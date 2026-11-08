@@ -12,6 +12,7 @@ import { ComparePanel } from "@/components/plataforma/Compare";
 import { ExceptionPanel } from "@/components/plataforma/ExceptionPanel";
 import { NoticeList } from "@/components/plataforma/NoticeList";
 import { JustificationPanel } from "@/components/plataforma/Justification";
+import { SpecApplied } from "@/components/plataforma/SpecApplied";
 import { ScheduleView } from "@/components/plataforma/ScheduleView";
 import { Shell } from "@/components/plataforma/Shell";
 import { SummaryPanel } from "@/components/plataforma/Summary";
@@ -268,6 +269,7 @@ export default function PlataformaPage() {
           <NoticeList notices={run.notices} />
 
           {run.comparison && <ComparePanel comparison={run.comparison} />}
+          {run.spec && proposed && !run.exception && <SpecApplied spec={run.spec} employees={proposed.employees} />}
           {justification && <JustificationPanel justification={justification} />}
 
           {run.phase === "awaiting_approval" && proposed && (

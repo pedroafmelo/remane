@@ -155,6 +155,7 @@ def build_agent(
     from escalista.ingest.cadastro import enrich, load_cadastro
     from escalista.ingest.tables import read_tables
     from escalista.llm.client import FeatherlessClient
+    from escalista.llm.prompts.formulate import formulate
     from escalista.llm.prompts.justify import make_justifier
     from escalista.llm.prompts.map_columns import propose_mapping
     from escalista.rules.loader import load_rule_card_for_week
@@ -184,6 +185,7 @@ def build_agent(
         cadastro=load_cadastro(Path(DEFAULT_DEMO_FILES_DIR)),
         enrich=enrich,
         load_card=functools.partial(load_rule_card_for_week, Path(DEFAULT_RULES_DIR)),
+        formulate_spec=functools.partial(formulate, client),
     )
     log.info("agente da fatia: OptimizerAgent (LangGraph, caminho C6), chaves: %d", len(settings.featherless_keys))
     return OptimizerSliceAgent(agent)

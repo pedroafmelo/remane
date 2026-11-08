@@ -26,9 +26,10 @@ from escalista.api.wiring import build_agent
 from escalista.config import Settings
 from escalista.ingest.tables import read_tables
 from escalista.rules.header_aliases import guess_mapping
+from escalista.rules.identity import person_id
 from tests.agents.support import GOOD_JUSTIFICATION
 from tests.e2e.test_fatia import ENV_NAMES, keys_of, memory_engine
-from tests.fakes import TOOL_JUSTIFY, TOOL_MAPPING, FakeLLMClient
+from tests.fakes import TOOL_JUSTIFY, TOOL_MAPPING, TOOL_SPEC, FakeLLMClient
 
 DEMO = Path("data/demo")
 EXAMPLE = DEMO / "escala_exemplo_grade.xlsx"
@@ -81,11 +82,12 @@ class Stack:
         return response.json()
 
 
-def make_stack(*, fail_mapping: bool = False) -> Stack:
-    llm = FakeLLMClient(
-        by_tool={TOOL_MAPPING: [model_mapping()] * 4, TOOL_JUSTIFY: [GOOD_JUSTIFICATION] * 4},
-        fail_tools={TOOL_MAPPING} if fail_mapping else (),
-    )
+def make_stack(*, fail_mapping: bool = False, specs: list[dict] | None = None, fail_spec: bool = False) -> Stack:
+    by_tool: dict[str, list] = {TOOL_MAPPING: [model_mapping()] * 4, TOOL_JUSTIFY: [GOOD_JUSTIFICATION] * 4}
+    if specs is not None:
+        by_tool[TOOL_SPEC] = specs * 3  # a mesma resposta nas tentativas de reenvio
+    fail_tools = ({TOOL_MAPPING} if fail_mapping else set()) | ({TOOL_SPEC} if fail_spec else set())
+    llm = FakeLLMClient(by_tool=by_tool, fail_tools=fail_tools)
     settings = Settings(
         _env_file=None,
         database_url="sqlite://",
@@ -243,3 +245,85 @@ def test_roster_and_every_response_are_free_of_sex(flow: Flow) -> None:
     assert len(flow.stack.bodies) >= 10
     assert "sex" not in keys_of(flow.stack.bodies)
     assert not any(k in keys_of(flow.stack.bodies) for k in ("sexo", "gender"))
+
+
+# --- 3. o pedido do gestor vira especificação (nó 2) e o solver a respeita (seção 19 do plano) -----------------------
+
+PERSON = next(e for e in __import__("json").loads((DEMO / "pessoas.json").read_text()) if e["id"] == "P037")
+PERSON_ID = person_id(PERSON["name"], None)  # a grade não traz matrícula: o id é o do nome normalizado
+WEDNESDAY = FILE_WEEK + timedelta(days=2)
+REQUEST = f"{PERSON['name']} não pode na quarta"
+
+
+def confirm_with_request(stack: Stack, note: str) -> dict:
+    from escalista.domain.reading import ConfirmInput
+
+    started = stack.upload_example().json()
+    fit = started["summary"]["capacity"]["max_fitting_pct"]
+    confirm = ConfirmInput(coverage_pct={sid: fit for sid in started["summary"]["store_ids"]}, note=note)
+    response = stack.call("POST", f"/api/runs/{started['run_id']}/confirm", json=confirm.model_dump(mode="json"))
+    assert response.status_code == 200, response.text
+    return response.json()
+
+
+def unavailable_spec(evidence: str) -> dict:
+    return {
+        "constraints": [
+            {"type": "indisponivel", "employee_id": PERSON_ID, "day": WEDNESDAY.isoformat(), "evidence": evidence}
+        ]
+    }
+
+
+@pytest.mark.slow
+def test_request_becomes_a_hard_unavailability_the_solver_respects(clean_env) -> None:
+    stack = make_stack(specs=[unavailable_spec(REQUEST)])
+
+    body = confirm_with_request(stack, REQUEST)
+
+    run_id = body["run_id"]
+    assert body["phase"] == "awaiting_approval" and body["exception"] is None
+    assert body["report"]["total"] == 0 and body["comparison"]["after"]["violations"] == 0
+    proposed = stack.call("GET", f"/api/runs/{run_id}/schedule").json()
+    assert PERSON_ID in {e["id"] for e in proposed["employees"]}
+    shifts = [s for s in proposed["schedule"]["shifts"] if s["employee_id"] == PERSON_ID]
+    assert shifts, "a pessoa do pedido precisa ter turnos na semana, para o teste valer"
+    assert not [s for s in shifts if s["start"].startswith(WEDNESDAY.isoformat())]
+    assert [c["type"] for c in body["spec"]["constraints"]] == ["indisponivel"]
+    assert body["spec"]["constraints"][0]["employee_id"] == PERSON_ID
+    assert "RX-12" not in [n["code"] for n in body["notices"]]  # o modelo respondeu; o RX-02 é da capacidade
+    kinds = [e["kind"] for e in stack.trace(run_id)]
+    # o `llm.formulate` é emitido pelo cliente real (o falso não grava rastro): aqui vale a chamada da ferramenta
+    assert "spec.validate" in kinds and "solver.run" in kinds
+    validated = next(e for e in stack.trace(run_id) if e["kind"] == "spec.validate")
+    assert validated["payload"]["used_model"] is True and validated["payload"]["accepted"] == {"indisponivel": 1}
+    assert TOOL_SPEC in [c["tool_name"] for c in stack.llm.calls]
+    assert "sex" not in keys_of(stack.bodies)
+
+
+@pytest.mark.slow
+def test_request_to_loosen_a_limit_is_refused_and_listed_in_the_assumptions(clean_env) -> None:
+    note = f"{PERSON['name']} pode trabalhar 50 horas por semana"
+    loosen = {"constraints": [{"type": "max_horas_semana", "employee_id": PERSON_ID, "hours": 50, "evidence": note}]}
+    stack = make_stack(specs=[loosen])
+
+    body = confirm_with_request(stack, note)
+
+    assert body["phase"] == "awaiting_approval" and body["report"]["total"] == 0
+    assert body["spec"]["constraints"] == []
+    assumptions = body["summary"]["assumptions"]
+    assert any(a.startswith("Pedido não aplicado") for a in assumptions), assumptions
+    validated = next(e for e in stack.trace(body["run_id"]) if e["kind"] == "spec.validate")
+    assert validated["payload"]["accepted"] == {} and len(validated["payload"]["rejected"]) == 1
+
+
+@pytest.mark.slow
+def test_formulation_failure_falls_back_to_the_default_spec_with_rx12(clean_env) -> None:
+    stack = make_stack(fail_spec=True)
+
+    body = confirm_with_request(stack, REQUEST)
+
+    assert body["phase"] == "awaiting_approval" and body["exception"] is None
+    assert body["report"]["total"] == 0 and body["spec"]["constraints"] == []
+    assert "RX-12" in [n["code"] for n in body["notices"]]
+    kinds = [e["kind"] for e in stack.trace(body["run_id"])]
+    assert "spec.validate" in kinds and "solver.run" in kinds
