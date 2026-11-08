@@ -63,7 +63,7 @@ const visuals: ReactNode[] = [
 const STEPS = [
   ["Lê as regras", "Lei e convenção coletiva viram regras, cada uma com a sua origem. O DP confere uma vez."],
   ["Monta a escala ótima", "Um otimizador cobre a demanda ao menor custo, sem violar nenhuma regra. O gestor aprova."],
-  ["Acompanha o dia a dia", "Falta, atraso, atestado e troca chegam pelo WhatsApp. O agente encontra quem pode cobrir e confirma."],
+  ["Acompanha o dia a dia", "Falta, atraso e atestado chegam pelo chat do app. O agente encontra quem pode cobrir e o gestor valida."],
   ["Chama você só quando precisa", "O que custa dinheiro ou foge da regra vira exceção, com as opções e o custo de cada uma."],
 ];
 

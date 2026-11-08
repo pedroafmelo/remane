@@ -1,6 +1,7 @@
 # Plano da C7b · Chat dentro do app (colaborador e gestor) no lugar do WhatsApp
 
-Última atualização: 2026-11-08 10:55 (Recife) · Situação: **proposta, decidida em conversa com o usuário; pronta para executar (Cursor ou Claude Code)** ·
+Última atualização: 2026-11-08 11:33 (Recife) · Situação: **executada em `c7/chat` (seção 11), aguardando push e PR do usuário**; DECs: DEC-069 a DEC-074 ·
+Antes: 10:55, proposta pronta para executar ·
 Planejado por Claude (Sonnet 5.5) ·
 Escrito para: **quem vai executar sem ter visto a conversa** (outra ferramenta, com contexto zero). Este arquivo é autossuficiente; o que ele cita
 está no repositório. Base: o M3 da C7 (`c7/m3`, ver [plano da C7](camada-07-acompanhamento.md), seção 17).
@@ -185,4 +186,34 @@ nenhum efeito. **Não verificado até aqui:** modelo real; rode `--with-model` c
 
 ## 11. Registro de execução
 
-(vazio; cada sessão escreve início, fim `date`, hash, desvios e métricas medidas)
+**Execução · 2026-11-08 ~10:53 a 11:33 (`date`) · Claude (Opus 5.5), no Cursor · branch `c7/chat` a partir de `origin/main` `dd6b8f0`,
+worktree irmão `cc61-c7chat` (o checkout principal tinha mudanças do usuário e ficou intocado) · sem push, sem PR.**
+
+| Etapa | Hash | Hora |
+|---|---|---|
+| E1 contratos, porta, parâmetro da política | `209324f` | 10:58 |
+| E2 prompt `classify_message` e intérprete | `b05dc3d` | 10:59 |
+| E3 `Tracker.message` e guard-rails | `b207296` | 11:06 |
+| E4 rota e caixa | `6bb4f36` | 11:08 |
+| E6 vazamento e E2E | `552317c` | 11:14 (N1 verde antes do corte das 11h15) |
+| N2 assistente somente leitura (backend) | `8d08372` | 11:20 |
+| E5 + N2 telas | `db06050` | 11:24 |
+| E7 docs | commit seguinte | 11:33 |
+
+**Gates (11:25):** `uv run pytest -q` 1953 passed (linha de base 1842); ruff `All checks passed!` e 302 arquivos formatados;
+`tests/privacy tests/e2e` 31 passed; E1 11/11; E2 16/16; `uv run python -m escalista.evals` saída 3, 58 cenários, 45 executados e aprovados,
+0 falhas, 13 não executados (igual à linha de base); web typecheck e lint limpos, 78 testes (linha de base 74), build com `/plataforma/assistente`.
+
+**Desvios:**
+1. O CID também é cortado em minúsculas (`strip_cid_any_case`) no canal e antes do modelo: "j11.1" passava pelo `CID_PATTERN` (só maiúsculas).
+2. Palavras de saúde sem código (ex.: "gripe") ficam no texto guardado; só o CID é cortado (seção 1, item 2).
+3. Eventos `track.chat.*` e a classificação usam sempre `track-chat-<employee_id>`, não o run do caso (seção 7 previa o do caso quando existe).
+4. `Reply` ganhou `suggestions`; a lista de intenções é mais fina que a da SAIDA-AC-17 original (contrato, seção 7, atualizado).
+5. E5 enxuto: chips, contador e "Pat digitando" entraram; **o clipe de anexo não entrou no campo do chat**: o anexo segue pelo formulário
+   "Vou faltar / Vou me atrasar" (que continua como caminho alternativo, junto dos botões de oferta e pergunta). As sugestões da tela são
+   calculadas da caixa com a mesma regra do servidor.
+6. N2: com SQLite em memória (só testes) não há motor separado somente leitura; usa o do app (sem ferramenta de escrita de todo modo).
+7. Payload de `track.report.received` inalterado (sem `minutes_late`).
+
+**Não verificado:** modelo real (custo e latência de `track.llm.classify_message` e `assistant.llm.choose_tool` **não medidos**), as telas no
+navegador, `docker build` e `/health`. **Pendente nos evals:** corpos de E3-03 e E4-03/04/07.
