@@ -1,0 +1,59 @@
+<!-- @dsCard height=320 -->
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Remane</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../../tokens.css">
+<style>
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--font-sans); overflow: hidden; }
+  .cover { position: relative; height: 320px; overflow: hidden; }
+  .art { position: absolute; top: 0; left: 480px; width: 480px; height: 320px; overflow: hidden; }
+  .art svg { display: block; width: 480px; height: 320px; }
+  .acc { fill: var(--accent); }
+  .ink { fill: var(--ink); }
+  .surf { fill: var(--surface); }
+  .line { fill: var(--line); }
+  .blk { rx: var(--radius-xl); }
+  .rel { rx: var(--radius-lg); }
+  .tile { rx: var(--radius-sm); }
+  .words { position: absolute; left: var(--space-8); bottom: var(--space-8); max-width: 440px; }
+  .name { margin: 0; font-size: 120px; line-height: .92; font-weight: 700; letter-spacing: -0.055em; color: var(--ink); }
+  .tag { margin: var(--space-2) 0 0 4px; font-size: 14px; line-height: 20px; color: var(--ink-muted); }
+</style>
+</head>
+<body>
+<div class="cover">
+<div class="art" aria-hidden="true">
+<svg viewBox="0 0 480 320" width="480" height="320">
+<!--
+  blocks      accent 248×200 bled off the top and right (the identity colour, largest) · ink 200×224 bled off the bottom · surface 240×150 as relief, bled off the right and bottom — about a third of 960×320
+  arrangement one ink slab low-left with satellites: the accent slab high-right, the white relief tucked under it
+  pattern     the brand's own motif ("a grade da semana com um bloco sendo remanejado"): 8 surface tiles cut out of the ink slab, the ninth in accent and pushed out of its slot; two line tiles on the relief as the week's folgas
+  scales      tiles 40 at a 52 pitch (space-12 + space-1); corners radius-xl on slabs, radius-lg on the relief, radius-sm on tiles
+-->
+<rect class="acc blk" x="256" y="-24" width="248" height="200" rx="32"/>
+<rect class="ink blk" x="40" y="120" width="200" height="224" rx="32"/>
+<rect class="surf rel" x="256" y="196" width="240" height="150" rx="24"/>
+<rect class="surf tile" x="68" y="148" width="40" height="40" rx="10"/>
+<rect class="surf tile" x="120" y="148" width="40" height="40" rx="10"/>
+<rect class="surf tile" x="172" y="148" width="40" height="40" rx="10"/>
+<rect class="surf tile" x="68" y="200" width="40" height="40" rx="10"/>
+<rect class="surf tile" x="120" y="200" width="40" height="40" rx="10"/>
+<rect class="acc tile" x="182" y="190" width="40" height="40" rx="10"/>
+<rect class="surf tile" x="68" y="252" width="40" height="40" rx="10"/>
+<rect class="surf tile" x="120" y="252" width="40" height="40" rx="10"/>
+<rect class="surf tile" x="172" y="252" width="40" height="40" rx="10"/>
+<rect class="line tile" x="284" y="224" width="40" height="40" rx="10"/>
+<rect class="line tile" x="336" y="224" width="40" height="40" rx="10"/>
+</svg>
+</div>
+<div class="words">
+<h1 class="name">Remane</h1>
+<p class="tag">Sua escala se remaneja sozinha.</p>
+</div>
+</div>
+</body>
+</html>

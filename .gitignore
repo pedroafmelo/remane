@@ -13,6 +13,7 @@
 !data/**/*.html
 !src/**/*.html
 !web/*.html
+!docs/design-system/**/*.html
 # Ideia arquivada: o PDF original fica fora do git (decisão do usuário, DEC-008)
 docs/arquivo/**/*.pdf
 
@@ -239,3 +240,6 @@ APIs.yaml
 
 # Generated using ignr.py - github.com/Antrikshy/ignr.py
 
+
+# Design system: a pasta Cover não é relatório de cobertura (o padrão cover/ acima a pegava no macOS)
+!docs/design-system/components/Cover/

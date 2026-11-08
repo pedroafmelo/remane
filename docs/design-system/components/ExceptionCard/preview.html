@@ -1,0 +1,42 @@
+<!-- @dsCard group="Exceções" height=320 subtitle="Um caso que o agente não resolve sozinho" -->
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>ExceptionCard</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../../tokens.css">
+<style>
+  body { margin: 0; padding: 24px; background: var(--paper); font-family: var(--font-sans); color: var(--ink); }
+  .card { max-width: 560px; background: var(--surface); border-radius: var(--radius-lg); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font: 500 12px/1 var(--font-sans); padding: 7px 11px; border-radius: var(--radius-full); background: var(--warning-soft); color: var(--warning-ink); }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--warning); }
+  .time { font: 500 12px/1 var(--font-sans); color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+  h3 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+  p { margin: 0; font-size: 15px; line-height: 1.5; color: var(--ink-muted); }
+  .opts { display: flex; flex-direction: column; gap: 8px; }
+  .opt { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--radius-md); background: var(--paper); font-size: 14px; }
+  .cost { font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .rule { font: 500 12px/1.4 var(--font-sans); color: var(--ink-muted); border-top: 1px solid var(--line); padding-top: 12px; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn { font: 500 14px/1 var(--font-sans); border-radius: var(--radius-full); padding: 11px 16px; border: 1px solid transparent; }
+  .warn { background: var(--warning-soft); color: var(--warning-ink); border-color: var(--warning); }
+  .sec { background: var(--surface); color: var(--ink); border-color: var(--line-strong); }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="top"><span class="chip"><span class="dot"></span>precisa de você</span><span class="time">hoje, 06:42</span></div>
+  <h3>Turno de sábado, 14–22h, sem cobertura</h3>
+  <p>Diego faltou. Ofereci o turno a 4 colegas; quem está disponível passaria do limite de 42h.</p>
+  <div class="opts">
+    <div class="opt"><span>Bruno cobre com 2h extras</span><span class="cost">R$ 61,20</span></div>
+    <div class="opt"><span>Trazer Ana da Loja Recife Antigo</span><span class="cost">R$ 18,00 transporte</span></div>
+    <div class="opt"><span>Deixar o turno descoberto</span><span class="cost">−1 pessoa no pico</span></div>
+  </div>
+  <div class="rule">Regra: jornada máxima de 42h · EC 141, art. 7º · versão das regras de 15/12</div>
+  <div class="actions"><button class="btn warn" type="button">Cobrir com hora extra</button><button class="btn sec" type="button">Trazer da outra loja</button></div>
+</div>
+</body>
+</html>
