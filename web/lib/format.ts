@@ -13,6 +13,11 @@ export function hours(value: string | number): string {
   return `${num2.format(Number(value))} h`;
 }
 
+/** Pessoa-hora (a conta de capacidade): "2.776 pessoa-hora". */
+export function personHours(value: string | number): string {
+  return `${num2.format(Number(value))} pessoa-hora`;
+}
+
 export function pct(value: number): string {
   return `${num2.format(value)}%`;
 }

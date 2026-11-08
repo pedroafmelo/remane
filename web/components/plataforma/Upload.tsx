@@ -1,17 +1,17 @@
 "use client";
 
 import { useId } from "react";
+import { UPLOAD_ACCEPT } from "@/lib/files";
 import { Button } from "../Button";
 import { Card, Muted } from "./ui";
 
-/** Envio: um CSV do disco ou um dos arquivos de exemplo (sintéticos) da rota de demo. */
+/** Envio: um CSV, XLSX ou PDF do disco ou um dos arquivos de exemplo (sintéticos) da rota de demo. */
 export function UploadPanel({ busy, onFile, onDemo }: { busy: boolean; onFile: (file: File) => void; onDemo: (name: string) => void }) {
   const inputId = useId();
   return (
     <Card title="Enviar a escala atual">
       <p className="mb-4 text-[15px] leading-relaxed text-ink-muted">
-        Envie a escala da semana em CSV (UTF-8, até 1 MB) ou use um arquivo de exemplo. Os exemplos são dados sintéticos gerados pelo
-        time.
+        Envie a escala da semana em CSV ou XLSX, até 1 MB, com os cabeçalhos que a sua empresa já usa (o Pat lê e mostra como entendeu cada coluna), ou use um arquivo de exemplo. PDF também é aceito; se não der para ler, o Pat explica num cartão. Os exemplos são dados sintéticos gerados pelo time.
       </p>
       <div className="flex flex-wrap items-center gap-3">
         <Button disabled={busy} aria-busy={busy} onClick={() => onDemo("escala_atual.csv")}>
@@ -24,7 +24,7 @@ export function UploadPanel({ busy, onFile, onDemo }: { busy: boolean; onFile: (
         <input
           id={inputId}
           type="file"
-          accept=".csv,text/csv"
+          accept={UPLOAD_ACCEPT}
           disabled={busy}
           className="peer sr-only"
           onChange={(e) => {
@@ -37,7 +37,7 @@ export function UploadPanel({ busy, onFile, onDemo }: { busy: boolean; onFile: (
           htmlFor={inputId}
           className="inline-flex h-11 cursor-pointer items-center rounded-full border border-line-strong bg-surface px-5.5 text-[15px] font-medium transition-colors hover:border-ink-subtle peer-focus-visible:outline-2 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-ink peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
         >
-          Escolher um arquivo CSV
+          Escolher um arquivo
         </label>
       </div>
       {busy && (

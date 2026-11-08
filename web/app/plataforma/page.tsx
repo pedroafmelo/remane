@@ -6,10 +6,11 @@ import { api, asFailure } from "@/lib/api";
 import type { Failure } from "@/lib/errors";
 import { phaseLabel, timeBr } from "@/lib/format";
 import { canOperateSchedule, roleLabel } from "@/lib/roles";
-import type { Me, ProposedSchedule, PublishedSchedule, RunState, TraceEvent } from "@/lib/types";
+import type { ConfirmInput, Me, ProposedSchedule, PublishedSchedule, RunState, TraceEvent } from "@/lib/types";
 import { Button } from "@/components/Button";
 import { ComparePanel } from "@/components/plataforma/Compare";
 import { ExceptionPanel } from "@/components/plataforma/ExceptionPanel";
+import { NoticeList } from "@/components/plataforma/NoticeList";
 import { JustificationPanel } from "@/components/plataforma/Justification";
 import { ScheduleView } from "@/components/plataforma/ScheduleView";
 import { Shell } from "@/components/plataforma/Shell";
@@ -20,6 +21,7 @@ import { Card, Muted, Notice } from "@/components/plataforma/ui";
 
 const BUSY_LABELS: Record<string, string> = {
   upload: "Enviando e lendo o arquivo…",
+  nextweek: "Preparando a próxima semana a partir da última escala publicada…",
   confirm: "Otimizando a escala, conferindo as regras e montando a justificativa…",
   approve: "Publicando a escala aprovada…",
   logout: "Saindo…",
@@ -122,11 +124,22 @@ export default function PlataformaPage() {
       await refreshTrace(state.run_id);
     });
 
-  const confirm = (r: RunState) =>
+  /** Sem upload: parte da última escala publicada e do quadro guardado. 409 sem publicada volta com a mensagem do servidor. */
+  const planNextWeek = () =>
+    act("nextweek", async () => {
+      setRun(null);
+      setProposed(null);
+      setTrace([]);
+      const state = await api.nextWeek();
+      setRun(state);
+      await refreshTrace(state.run_id);
+    });
+
+  const confirm = (r: RunState, input: ConfirmInput) =>
     act(
       "confirm",
       async () => {
-        const state = await api.confirm(r.run_id);
+        const state = await api.confirm(r.run_id, input);
         setRun(state);
         if (state.phase === "awaiting_approval") setProposed(await api.schedule(r.run_id));
       },
@@ -215,6 +228,14 @@ export default function PlataformaPage() {
             onDemo={(name) => send(async () => ({ name, blob: await api.demoFile(name) }))}
           />
           {published?.version && (
+            <div className="flex flex-wrap items-center gap-3">
+              <Button variant="secondary" onClick={planNextWeek} disabled={working} aria-busy={busy === "nextweek"}>
+                {busy === "nextweek" ? "Preparando…" : "Planejar a próxima semana"}
+              </Button>
+              <Muted>Sem novo arquivo: parte da última escala publicada e do quadro já confirmado.</Muted>
+            </div>
+          )}
+          {published?.version && (
             <ScheduleView
               id="ultima-publicada"
               title="Última grade publicada"
@@ -233,10 +254,18 @@ export default function PlataformaPage() {
           </p>
 
           {run.summary && (
-            <SummaryPanel summary={run.summary} canConfirm={run.phase === "awaiting_confirm"} busy={busy === "confirm"} onConfirm={() => confirm(run)} />
+            <SummaryPanel
+              key={run.run_id}
+              summary={run.summary}
+              mode={run.mode}
+              canConfirm={run.phase === "awaiting_confirm"}
+              busy={busy === "confirm"}
+              onConfirm={(input) => confirm(run, input)}
+            />
           )}
 
           {run.exception && <ExceptionPanel card={run.exception} />}
+          <NoticeList notices={run.notices} />
 
           {run.comparison && <ComparePanel comparison={run.comparison} />}
           {justification && <JustificationPanel justification={justification} />}
@@ -260,13 +289,21 @@ export default function PlataformaPage() {
           )}
 
           {run.phase === "published" && published?.version && (
-            <ScheduleView
-              id="grade-publicada"
-              title="Grade publicada"
-              schedule={published.version.schedule}
-              employees={published.employees}
-              note={`Versão ${published.version.id} · ${published.version.violations_total} violações · criada em ${timeBr(published.version.created_at)}`}
-            />
+            <>
+              <ScheduleView
+                id="grade-publicada"
+                title="Grade publicada"
+                schedule={published.version.schedule}
+                employees={published.employees}
+                note={`Versão ${published.version.id} · ${published.version.violations_total} violações · criada em ${timeBr(published.version.created_at)}`}
+              />
+              <div className="flex flex-wrap items-center gap-3">
+                <Button onClick={planNextWeek} disabled={working} aria-busy={busy === "nextweek"}>
+                  {busy === "nextweek" ? "Preparando…" : "Planejar a próxima semana"}
+                </Button>
+                <Muted>Sem novo arquivo: o antes é esta escala levada para a semana seguinte.</Muted>
+              </div>
+            </>
           )}
 
           <TracePanel events={trace} />

@@ -1,7 +1,8 @@
 // Cliente da API FastAPI do mesmo host (rotas reais: `/auth/*` fora do prefixo `/api`; o resto em `/api/*`).
 
 import { networkFailure, readFailureBody, type Failure } from "./errors.ts";
-import type { Me, ProposedSchedule, PublishedSchedule, Role, RunState, TraceEvent } from "./types.ts";
+import { contentTypeFor } from "./files.ts";
+import type { ConfirmInput, Me, ProposedSchedule, PublishedSchedule, Role, Roster, RunState, TraceEvent } from "./types.ts";
 
 /** Erro HTTP da API, já traduzido. `exception` vem preenchido quando o corpo traz um cartão (RX-13, recusa de publicação). */
 export class ApiError extends Error {
@@ -51,13 +52,23 @@ export const api = {
   loginDemo: (role: Role) => post<Me>(`/auth/demo/${role}`),
   me: () => request<Me>("/api/me"),
   logout: () => post<void>("/auth/logout"),
-  startRun: (fileName: string, csv: Blob) =>
+  /** Corpo bruto (CSV, XLSX ou PDF) com o nome em `file_name`; o servidor decide o tipo pelos bytes e pela extensão. */
+  startRun: (fileName: string, file: Blob) =>
     request<RunState>(`/api/runs?file_name=${encodeURIComponent(fileName)}`, {
       method: "POST",
-      headers: { "Content-Type": "text/csv" },
-      body: csv,
+      headers: { "Content-Type": contentTypeFor(fileName) },
+      body: file,
     }),
-  confirm: (id: string) => post<RunState>(`/api/runs/${id}/confirm`),
+  nextWeek: () => post<RunState>("/api/runs/next-week"),
+  roster: () => request<Roster>("/api/roster"),
+  confirm: (id: string, input?: ConfirmInput) =>
+    input === undefined
+      ? post<RunState>(`/api/runs/${id}/confirm`)
+      : request<RunState>(`/api/runs/${id}/confirm`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(input),
+        }),
   schedule: (id: string) => request<ProposedSchedule>(`/api/runs/${id}/schedule`),
   approve: (id: string) => post<RunState>(`/api/runs/${id}/approve`),
   trace: (id: string) => request<TraceEvent[]>(`/api/runs/${id}/trace`),
