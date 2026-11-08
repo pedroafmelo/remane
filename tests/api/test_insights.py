@@ -53,6 +53,8 @@ def test_rules_view_groups_by_layer_in_plain_portuguese():
     view = rules_view(load_rule_card(RULES, DEMO_WEEK_START))
     assert [g.layer.value for g in view.groups] == ["lei", "convencao", "politica"]
     assert [g.title for g in view.groups] == ["Lei · EC 141/CLT", "Convenção fictícia", "Política fictícia"]
+    flags = [r.engine for r in view.groups[0].rules]
+    assert flags == sorted(flags, reverse=True)  # as que o motor usa vêm primeiro
     lei = {r.id: r for r in view.groups[0].rules}
     weekly = lei["jornada_semanal_max"]
     assert (weekly.limit, weekly.engine, weekly.status) == ("42 h por semana", True, "interpretacao")

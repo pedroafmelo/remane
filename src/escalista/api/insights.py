@@ -57,6 +57,7 @@ def rules_view(card: RuleCard) -> RulesView:
     groups = []
     for layer in RuleLayer:
         rules = [_rule_view(r, card) for r in card.rules if r.layer is layer]
+        rules.sort(key=lambda r: not r.engine)  # as que o motor usa primeiro; estável no resto
         groups.append(RuleGroup(layer=layer, title=LAYER_TITLES[layer], rules=rules))
     return RulesView(reference_date=card.reference_date, groups=groups)
 
