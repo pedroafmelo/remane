@@ -104,6 +104,44 @@ def rx12_punch_card(now: datetime, reason: str) -> ExceptionCard:
     )
 
 
+OVERTIME_DEADLINE_MIN = 1440
+OVERTIME_TITLE = "Hora extra acima do limite da política"
+OVERTIME_REPLAN_INDEX = 1  # "Pedir replanejamento dos próximos turnos"
+
+
+def overtime_card(*, now: datetime, name: str, observed: str, threshold: str) -> ExceptionCard:
+    """RF-27 (DEC-060): a pessoa passou do limite semanal de hora extra. Nenhuma opção muda a escala sozinha."""
+    return ExceptionCard(
+        code="HORA_EXTRA",
+        title=OVERTIME_TITLE,
+        reason=(
+            f"{name} passou do limite de hora extra da semana. Avisei a pessoa e você. "
+            "A escala publicada não muda sem a sua decisão."
+        ),
+        decider=Role.GESTOR,
+        deadline=now + timedelta(minutes=OVERTIME_DEADLINE_MIN),
+        evidence=[
+            f"Pessoa: {name}",
+            f"Batido no ponto: {observed}",
+            f"Política: {threshold} (pol_hora_extra); aviso a 80% (pol_aviso_hora_extra_estourando)",
+            "Fonte: Política fictícia, itens de hora extra",
+        ],
+        options=[
+            ExceptionOption(
+                label="Compensar no banco de horas",
+                effect="Registra a compensação no banco de horas; nada muda na escala.",
+            ),
+            ExceptionOption(
+                label="Pedir replanejamento dos próximos turnos",
+                effect="Registra o pedido de replanejamento da semana; a escala só muda com a sua validação.",
+            ),
+            ExceptionOption(label="Só registrar", effect="Fica registrado no rastro; nada muda na escala."),
+        ],
+        recommendation="Compensar no banco de horas.",
+        if_no_answer="Nada muda na escala; o aviso fica registrado.",
+    )
+
+
 def cobertura_card(
     *,
     now: datetime,

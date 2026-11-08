@@ -25,6 +25,19 @@ TEMPLATES: dict[str, str] = {
     "falta_coberta": "O seu turno de {turno} está coberto. Bom descanso.",
     "pergunta": "Você não bateu o ponto às {hora} ({turno}). Você vem hoje?",
     "pedir_comprovacao": "Não consegui confirmar o seu atestado de {turno}. Pode mandar uma nova foto ou o PDF?",
+    # RF-27 (DEC-060): sem turno; `observado` e `limite` vêm do gatilho.
+    "hora_extra_80": (
+        "Aviso de hora extra: {pessoa} já tem {observado} (a política avisa em {limite}). "
+        "Ainda dá para ajustar os próximos turnos."
+    ),
+    "hora_extra_limite": (
+        "Você passou do limite de hora extra: {observado}, acima do {limite} da política. "
+        "Avisei o gestor; ele decide os próximos passos."
+    ),
+    "hora_extra_limite_gestor": (
+        "{pessoa} passou do limite de hora extra: {observado}, acima do {limite} da política. "
+        "Abri um cartão para você decidir; nada muda na escala sem você."
+    ),
 }
 
 
@@ -51,9 +64,9 @@ def first_name(name: str) -> str:
     return name.split()[0] if name.strip() else name
 
 
-def render(template: str, *, shift: Shift, **fields: str) -> str:
+def render(template: str, *, shift: Shift | None = None, **fields: str) -> str:
     """Texto do modelo `template` com o turno já formatado. Campo ausente vira erro (modelo e chamada andam juntos)."""
-    values = {"turno": shift_label(shift), **fields}
+    values = {**({"turno": shift_label(shift)} if shift is not None else {}), **fields}
     if "hora_extra" in values:
         values.setdefault("hora_extra_cap", values["hora_extra"][:1].upper() + values["hora_extra"][1:])
     return TEMPLATES[template].format(**values)

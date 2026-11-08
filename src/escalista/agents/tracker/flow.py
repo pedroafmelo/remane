@@ -8,6 +8,13 @@ O rastro de cada caso é a execução `track-<case_id>`; payloads só com ids e 
 
 Atos de consequência (seção 7): o colega aceita (`respond_offer` só do próprio candidato); o gestor valida sempre
 (`on_decision` grava a aprovação e `aplicar_cobertura` a relê antes de publicar).
+
+Hora extra (RF-27, DEC-060): gatilhos sem caso, no rastro `track-sweep`. A 80% do limite semanal o gestor é avisado;
+acima do limite, colaborador e gestor são avisados e abre o cartão `HORA_EXTRA`. Idempotência: o `Tracker` guarda em
+memória a chave do gatilho e o id do `track.trigger.fired`, e só a conta como tratada enquanto a mensagem ao gestor
+com esse `decision_ref` existir no canal (`channel_message`). Assim o "Reiniciar" da demo, que apaga as mensagens,
+libera o aviso de novo. Limite conhecido: reiniciar o processo esquece as chaves, e o aviso da semana corrente pode
+sair mais uma vez (uma só).
 """
 
 from __future__ import annotations
@@ -17,6 +24,7 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
+from datetime import time as day_time
 from hashlib import sha256
 from typing import Any, Literal
 from uuid import uuid4
@@ -30,7 +38,7 @@ from escalista.agents.tracker import cards
 from escalista.agents.tracker.messages import deadline_label, first_name, overtime_label, render, shift_label
 from escalista.agents.tracker.replan import CoverFn, CoverOutcome, dispatch, request_for
 from escalista.agents.tracker.sweep import detect
-from escalista.agents.tracker.tools import GESTOR_PARTY, aplicar_cobertura, enviar, refuse
+from escalista.agents.tracker.tools import GESTOR_PARTY, aplicar_cobertura, enviar, enviar_sem_caso, refuse
 from escalista.domain.contracts import ExceptionCard, LLMUnavailableError, Role, TraceEvent
 from escalista.domain.ports import (
     AtestadoReader,
@@ -63,6 +71,7 @@ SWEEP_RUN = "track-sweep"  # rastro dos eventos sem caso (remetente rejeitado, v
 CLOSED: frozenset[str] = frozenset({"coberto", "descoberto", "atraso_registrado", "decidido"})
 COVER_FAILED = "rx12:cover"  # marca no `Case.handled`: o RX-12 aberto é o da busca de cobertura (bloqueia o caso)
 OVERTIME_RULE = "pol_aviso_necessidade_hora_extra"
+OVERTIME_KINDS: frozenset[str] = frozenset({"overtime_near_limit", "overtime_limit"})
 
 
 @dataclass(frozen=True)
@@ -148,6 +157,8 @@ class Tracker:
         self._searches: dict[str, CoverOutcome] = {}  # só cache: sem ele, a busca é refeita a partir das tabelas
         self._lock = threading.RLock()
         self._punch_card_open = False  # RX-12 do ponto já aberto (uma vez até o ponto voltar)
+        self._overtime_fired: dict[str, str] = {}  # `Trigger.key` de hora extra -> id do `track.trigger.fired`
+        self._overtime_last: str | None = None  # `ref` do último cartão HORA_EXTRA (sem `source` na decisão)
 
     # --- entrada do colaborador ---------------------------------------------------------------------------------
 
@@ -321,7 +332,14 @@ class Tracker:
                 return []
             self._punch_card_open = False
         cases = self._cases.list_cases()
-        triggers = detect(schedule=version.schedule, punches=punches, policy=self._policy, cases=cases, now=at)
+        triggers = detect(
+            schedule=version.schedule,
+            punches=punches,
+            policy=self._policy,
+            cases=cases,
+            now=at,
+            handled=self._overtime_handled(),
+        )
         if self._punches is None:
             triggers = [t for t in triggers if t.kind != "no_punch"]
         for trigger in triggers:
@@ -331,7 +349,51 @@ class Tracker:
                 self._on_no_answer(trigger)
             elif trigger.kind == "offer_expired":
                 self._on_offer_expired(trigger)
+            elif trigger.kind in OVERTIME_KINDS:
+                self._on_overtime(trigger, version, at)
         return triggers
+
+    def _overtime_handled(self) -> set[str]:
+        """Chaves de hora extra já tratadas: as que ainda têm a mensagem ao gestor no canal (ver o docstring do
+        módulo). Mensagem apagada (o "Reiniciar" da demo) libera a chave."""
+        if not self._overtime_fired:
+            return set()
+        sent = {m.decision_ref for m in self._channel.inbox(GESTOR_PARTY)}
+        self._overtime_fired = {k: ev for k, ev in self._overtime_fired.items() if ev in sent}
+        return set(self._overtime_fired)
+
+    def _on_overtime(self, trigger: Trigger, version: ScheduleVersion, at: datetime) -> None:
+        """RF-27: 80% avisa o gestor; acima do limite avisa a pessoa e o gestor e abre o cartão HORA_EXTRA."""
+        employee_id = trigger.employee_id or ""
+        name = self._name(self._world(version), employee_id)
+        fired = self._fired(SWEEP_RUN, trigger)
+        self._overtime_fired[trigger.key] = fired.id
+        fields = {"pessoa": first_name(name), "observado": trigger.observed, "limite": trigger.threshold}
+        if trigger.kind == "overtime_near_limit":
+            self._notify(employee_id, GESTOR_PARTY, "hora_extra_80", "hora_extra_80", fired.id, fields)
+            return
+        card = cards.overtime_card(now=at, name=name, observed=trigger.observed, threshold=trigger.threshold)
+        source = {"kind": "track", "case_id": None, "run_id": SWEEP_RUN, "employee_id": employee_id, "ref": trigger.ref}
+        item_id = self._queue.open(card, source)
+        self._overtime_last = trigger.ref
+        self._tracer.step(SWEEP_RUN, "exception.raised", payload={"exception_id": item_id, "code": card.code})
+        self._notify(employee_id, employee_id, "hora_extra_limite", "hora_extra_limite", fired.id, fields)
+        self._notify(employee_id, GESTOR_PARTY, "hora_extra_limite", "hora_extra_limite_gestor", fired.id, fields)
+
+    def _notify(
+        self, employee_id: str, to: str, template: str, text: str, decision_ref: str, fields: dict[str, str]
+    ) -> None:
+        enviar_sem_caso(
+            channel=self._channel,
+            tracer=self._tracer,
+            run_id=SWEEP_RUN,
+            employee_id=employee_id,
+            to=to,
+            template=template,
+            body=render(text, **fields),
+            decision_ref=decision_ref,
+            new_id=self._new_id,
+        )
 
     def _punch_failed(self, reason: str) -> None:
         self._tracer.step(SWEEP_RUN, "track.sweep.failed", payload={"reason": reason})
@@ -415,10 +477,14 @@ class Tracker:
         approver_id: str,
         role: Role,
         decision_event_id: str | None = None,
+        source: dict[str, Any] | None = None,
     ) -> str:
         """Efeito da decisão do gestor num cartão do acompanhamento (`source.kind == "track"`). Devolve o texto do
-        resultado. `decision_event_id`: o `exception.decided` gravado pela fila (sem ele, o último evento do caso)."""
+        resultado. `decision_event_id`: o `exception.decided` gravado pela fila (sem ele, o último evento do caso).
+        `source`: a origem do cartão na fila (o HORA_EXTRA lê dela a pessoa e a semana; sem ela, o último aberto)."""
         with self._lock:
+            if code == "HORA_EXTRA":
+                return self._decide_overtime(option_index, source, decision_event_id)
             if not case_id:  # cartão sem caso (RX-12 do ponto, run `track-sweep`): só o registro
                 return "Decisão registrada. Nesta demo, nada além do registro é feito automaticamente."
             case = self._load(case_id)
@@ -447,6 +513,37 @@ class Tracker:
                     return "Pedi ao colaborador uma nova comprovação; a mensagem ficou registrada."
                 return "Decisão registrada; o abono segue provisório."
             raise TrackerError(422, f"cartão sem efeito no acompanhamento: {code}")
+
+    def _decide_overtime(self, option_index: int, source: dict[str, Any] | None, decision_ref: str | None) -> str:
+        """Cartão HORA_EXTRA (RF-27): nenhuma opção muda a escala. Pedir replanejamento só registra o pedido (o
+        replanejamento da semana é do T3); a decisão em si já foi gravada pela fila (`exception.decided`)."""
+        if option_index == 0:
+            return "Compensação no banco de horas registrada; nada muda na escala."
+        if option_index == 2:
+            return "Hora extra registrada; nada muda na escala."
+        if option_index != cards.OVERTIME_REPLAN_INDEX:
+            raise TrackerError(422, "opção inexistente neste cartão")
+        ref = (source or {}).get("ref") or self._overtime_last
+        if not ref or "@" not in ref:
+            raise TrackerError(409, "não achei a pessoa e a semana deste cartão de hora extra")
+        employee_id, week = ref.split("@", 1)
+        window_end = datetime.combine(date.fromisoformat(week) + timedelta(days=7), day_time())
+        window_start = min(self._clock.now(), window_end)
+        if decision_ref:
+            self._tracer.follow(SWEEP_RUN, decision_ref)
+        self._tracer.step(
+            SWEEP_RUN,
+            "track.replan.requested",
+            payload={
+                "replan_id": f"rp-{self._new_id()}",
+                "case_id": None,
+                "window_start": window_start.isoformat(),
+                "window_end": window_end.isoformat(),
+                "absent_id": employee_id,
+                "reason": "overtime_limit",
+            },
+        )
+        return "Pedido de replanejamento dos próximos turnos registrado; a escala só muda com a sua validação."
 
     def _decide_cobertura(self, case: Case, option_index: int, approver_id: str, role: Role) -> str:
         self._require(case, "aguardando_gestor")
