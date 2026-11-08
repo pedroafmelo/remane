@@ -42,7 +42,7 @@ Navegador (gerente, DP, colaboradora, jurado)
 | Camada | Escolha | Origem |
 |---|---|---|
 | Backend | Python 3.12, FastAPI, pydantic v2, SQLAlchemy 2 sobre SQLite (portável a Postgres) | `pyproject.toml`; SQLAlchemy `[PROPOSTA]`, para a hospedagem não travar o banco |
-| Front-end | React + Vite (SPA), build servido pelo FastAPI no mesmo contêiner | [DEC-018](decisoes.md) |
+| Front-end | Next.js com export estático (antes React + Vite), build servido pelo FastAPI no mesmo contêiner | [DEC-018](decisoes.md), [DEC-035](decisoes.md) |
 | Agentes | LangGraph, um grafo por agente (três agentes) | [DEC-018](decisoes.md) |
 | Solver | OR-Tools CP-SAT | [DEC-005](decisoes.md) e fonte da seção 5 |
 | Inferência | Featherless, via SDK `openai` com `base_url` da Featherless | [DEC-005](decisoes.md), [DEC-020](decisoes.md) |
@@ -83,7 +83,7 @@ conferir: não adotado.
 | # | Tema | Situação |
 |---|---|---|
 | D1 | Três agentes, LangGraph nos três | **Decidido** ([DEC-018](decisoes.md)) |
-| D2 | Front-end React + Vite | **Decidido** ([DEC-018](decisoes.md)) |
+| D2 | Front-end Next.js com export estático (era React + Vite) | **Decidido** ([DEC-018](decisoes.md), [DEC-035](decisoes.md)) |
 | D3 | TDD no núcleo, fumaça no resto | **Decidido** ([DEC-018](decisoes.md)); exceção à regra global, registrada |
 | D4 | Ponte do WhatsApp: spike de 1 h com critério de abandono | **Decidido** ([DEC-019](decisoes.md)) |
 | D5 | Relógio simulado controlável e varredor | **Decidido** ([DEC-019](decisoes.md)) |
@@ -314,7 +314,7 @@ API oficial do WhatsApp Business. **Não pesquisei a política de bloqueio do Wh
 
 ## 12. Hospedagem do link público (Q3, requisito RE-07 e RN-10)
 
-**Escolhido na [DEC-030](decisoes.md) (07/11 16h22): Fly.io; depois, o usuário adiou "tudo do deploy" e a escolha ficou em suspenso, `[PREENCHER]` ([DEC-033](decisoes.md), [DEC-034](decisoes.md)); por enquanto só local.** Desenho: 1 máquina sempre ligada e 1 volume (`fly.toml` e deploy na C0b, [plano da C0](planos/camada-00-fundacao.md)). Antes, o usuário tinha dito "vamos ver isso depois" ([DEC-021](decisoes.md)). Restrições que a
+**Decidido na [DEC-037](decisoes.md) (08/11): Railway.** Histórico: escolhido na [DEC-030](decisoes.md) (07/11 16h22): Fly.io; depois, o usuário adiou "tudo do deploy" e a escolha ficou em suspenso, `[PREENCHER]` ([DEC-033](decisoes.md), [DEC-034](decisoes.md)); por enquanto só local.** Desenho: 1 máquina sempre ligada e 1 volume (`fly.toml` e deploy na C0b, [plano da C0](planos/camada-00-fundacao.md)). Antes, o usuário tinha dito "vamos ver isso depois" ([DEC-021](decisoes.md)). Restrições que a
 escolha precisa cumprir: no ar de dom 08/11 13h00 a 17h30; sem dormir; pelo menos 1 GB de RAM `[INFERÊNCIA]`; um contêiner com
 Dockerfile multi-stage (build do React e FastAPI); estado pequeno que sobreviva a reinício e a reset da demo.
 
@@ -402,7 +402,7 @@ src/escalista/
   audit/          trace_event, exportador Langfuse, máscara
   synth/          geradores de dados sintéticos
   evals/          cenários e relatório
-web/              SPA React + Vite
+web/              Next.js (landing Remane e plataforma), export estático em web/dist
 data/regras/      regras em YAML: lei/ (EC 141, CLT), convencao/ e politica/ (fictícias da demo); lidas por rules/
 tests/            núcleo com TDD; fumaça no resto
 ```

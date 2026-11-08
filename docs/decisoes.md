@@ -269,7 +269,7 @@ Formato:
 - **Contexto:** Gate 3 (técnica), rodada 1. Os três agentes são separados ([DEC-017](#dec-017--requisitos-adicionais-do-usuário-gate-de-negócio-fechado-e-início-da-etapa-técnica)).
 - **Decisão (o que o usuário escolheu entre as opções oferecidas):**
   - **Orquestração:** LangGraph nos três agentes (otimização, acompanhamento e assistente do gestor).
-  - **Front-end:** React + Vite (SPA).
+  - **Front-end:** React + Vite (SPA). **[Em parte substituída pela [DEC-035](#dec-035--marca-remane-landing-e-web-em-nextjs-com-export-estático): `web/` passa a Next.js com export estático, ainda servido pelo FastAPI.]**
   - **TDD:** TDD no núcleo, teste de fumaça no resto. Isto **relaxa, por decisão do usuário, o TDD das instruções globais** (o `CLAUDE.md` exige decisão registrada). O núcleo: regras do cartão, solver e verificador, leitura dos 3 formatos, privacidade do CID e da imagem (RN-06) e controle de acesso por papel.
 - **Motivo: [motivo não informado]** nas três escolhas.
 - **Alternativas consideradas (as oferecidas):** Python puro com eventos (recomendada pelo agente) ou híbrido; FastAPI com Jinja2 e HTMX (recomendada) ou Streamlit/Gradio; TDD pleno ou sem TDD.
@@ -452,6 +452,70 @@ Formato:
 - **Motivo: [motivo não informado].**
 - **Alternativas consideradas:** as duas perguntadas (manter o Fly.io; reabrir a hospedagem); o usuário respondeu "tudo do deploy", o que o agente leu como **reabrir a hospedagem**, e **não** como confirmar o Fly.io.
 - **Consequências:** a hospedagem volta a `[PREENCHER]` (a parte da [DEC-030](#dec-030--plano-da-c0-rodada-1-data-de-corte-nas-versões-flyio-c0b-com-a-frente-c-e-web-em-typescript) sobre o Fly.io fica **em suspenso**, não substituída; as demais partes da DEC-030 valem). A C0b e o G1 ficam parados sem data; `Dockerfile` e `fly.toml` ficam no repositório como material pronto, sem uso. O desenvolvimento e a demonstração rodam só localmente (`uv run uvicorn` e `npm run dev`). O risco de RE-07 e RN-10 (link público estável) continua e deve voltar a ser decidido antes do G6 (dom 11h30); o túnel do notebook segue como plano B.
+
+## DEC-035 · Marca Remane, landing e `web/` em Next.js com export estático
+
+- 2026-11-07 23:55 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** a landing foi construída fora do repositório (Next.js), a partir de um handoff de design com a marca **Remane**
+  ([docs/landing.md](landing.md)). Ao trazê-la para cá, o agente perguntou o nome público e a stack do `web/`, que até então era o
+  esqueleto React + Vite da C0a (T9).
+- **Decisão (o que o usuário disse):** "vamos manter remane, além de manter a nossa stack da parte web... é só um esqueleto, então
+  podemos manter o que nós fizemos". Ou seja: **Remane** é o nome público do produto (o pacote Python continua `escalista`), e o `web/`
+  passa a ser **Next.js (App Router) + Tailwind v4**, no lugar do Vite.
+- **Como o agente encaixou (`[PROPOSTA]`, sem confirmação):** `next build` gera **export estático** em `web/dist`, servido pelo FastAPI
+  como antes (imagem única; `Dockerfile` sem mudança). O `_serve_spa` passou a servir `rota/index.html` das pastas do export. No
+  `next dev`, `/api` e `/health` vão por proxy para a porta 8000. O botão "Testar a demo" leva a **`/entrar`**, placeholder onde a frente C
+  põe o login e os botões de demo da C4 ([arquitetura.md, seção 11](arquitetura.md)); a escolha entre botões por papel na landing,
+  `/entrar` com os papéis ou entrada direta como gerente **segue com o time**. A Vercel do handoff não é usada: vale a [DEC-034](#dec-034--tudo-do-deploy-fica-para-depois-por-enquanto-testar-e-rodar-localmente).
+- **Motivo: [motivo não informado]** além de "é só um esqueleto".
+- **Alternativas consideradas (as oferecidas):** nome Escalista; landing reescrita em React + Vite.
+- **Consequências:** limites do export estático para quem construir a plataforma em `web/`: sem rotas de API do Next, sem server actions,
+  sem rotas dinâmicas sem `generateStaticParams` (a API é o FastAPI). Vite e @vitejs/plugin-react saem da
+  [declaração](declaracao-ferramentas.md); entram next, tailwindcss, @tailwindcss/postcss, geist, qrcode.react, eslint e eslint-config-next,
+  sob a mesma data de corte da [DEC-030](#dec-030--plano-da-c0-rodada-1-data-de-corte-nas-versões-flyio-c0b-com-a-frente-c-e-web-em-typescript).
+
+## DEC-036 · Posicionamento da landing: "engenheiro de escala", sem a 6x1 no centro
+
+- 2026-11-08 00:36 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** revisão da landing do PR da [DEC-035](#dec-035--marca-remane-landing-e-web-em-nextjs-com-export-estático). O usuário não gostou de
+  frases como "Sua escala se remaneja sozinha" e do peso da escala 6x1. O agente notou que a landing girava em torno de cobrir falta,
+  enquanto o [produto.md](produto.md) põe no núcleo a escala ótima ("escala pronta, legal e ao menor custo").
+- **Decisão (o que o usuário disse):**
+  - "Evitar falar da escala 6 por 1. Não pode ser o nosso cerne." A seção "Fim da 6x1" e o link saem; a EC 141 fica só como uma regra entre outras.
+  - O Remane é "um engenheiro de escala de trabalho, que constrói a escala de forma ótima e acompanha os trabalhadores".
+    Título: "O engenheiro da sua escala de trabalho."; subtítulo (opção 2 de 4): "Do planejamento da semana à falta de última hora: o Remane
+    monta, confere e ajusta a escala, e só chama você para decidir." As demais frases propostas pelo agente foram aprovadas ("curti").
+  - A personagem da história do hero passa de Joana a **Patrick**.
+  - Os botões de demo por papel ficam **dentro do "Testar a demo"**, em `/entrar` (resolve a pergunta deixada na DEC-035).
+  - "A ligação com o WhatsApp tem que sair": a seção de teste pelo WhatsApp fica na landing. **Muda o produto.md**, que listava a ponte
+    real do WhatsApp (RF-21) como cortável.
+  - A história do hero ficou "muito comprida": a rolagem caiu de ~1,6 para ~0,8 tela.
+- **Motivo:** a 6x1 não pode ser o cerne; o restante sem motivo informado.
+- **Alternativas consideradas (as oferecidas):** títulos "A escala certa, montada e acompanhada por um agente." e "Escala ótima no papel e no
+  dia a dia."; mais três subtítulos; trocar a rolagem por uma história que toca sozinha; tirar a seção do WhatsApp.
+- **Consequências:** `[PREENCHER]` com o backend: o número do jurado não está no quadro e a regra atual (DEC-017) recusa número de fora; o
+  teste pelo WhatsApp precisa de um modo demo que trate número desconhecido como um funcionário de demonstração. [landing.md](landing.md)
+  guarda a copy antiga; vale a da `web/app/page.tsx`.
+
+## DEC-037 · Hospedagem no Railway (substitui o Fly.io em suspenso)
+
+- 2026-11-08 00:52 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** a hospedagem estava em `[PREENCHER]` desde a [DEC-034](#dec-034--tudo-do-deploy-fica-para-depois-por-enquanto-testar-e-rodar-localmente).
+  O usuário decidiu publicar já, com só a landing no ar, para testar o caminho do deploy enquanto o risco é baixo.
+- **Decisão (o que o usuário disse):** o Fly.io "foi uma decisão meio que sem querer"; o usuário já tem conta no **Railway**, no plano
+  Hobby de US$ 5, e topou usar "caso dê certo".
+- **Fatos conferidos ([FATO], docs do Railway, 08/11/2026):** o Hobby é uma assinatura de US$ 5 por mês que inclui US$ 5 de uso; o uso
+  acima disso é cobrado; o plano admite até 50 projetos (logo a assinatura é da conta, não do projeto); volume de até 5 GB no Hobby.
+  Fontes: [railway.com/pricing](https://railway.com/pricing), [Understanding your bill](https://docs.railway.com/pricing/understanding-your-bill).
+  **[INFERÊNCIA]** um app pequeno ligado o mês todo deve caber no uso incluído; conferir no painel de uso depois do primeiro dia.
+- **Como fica (`[PROPOSTA]` do agente):** o mesmo `Dockerfile` (imagem testada localmente em 08/11: `/`, `/entrar/` e `/health` com
+  200, SQLite criado no volume), `railway.json` com health check em `/health`, um volume montado em `/data` e domínio gerado apontando
+  para a porta 8080. Deploy automático a cada merge na `main`, pela integração com o GitHub. O `fly.toml` fica no repositório, sem uso.
+- **Motivo:** o usuário já tem conta e plano pagos no Railway.
+- **Alternativas consideradas (as oferecidas):** Fly.io (configurado, precisa de cartão), Render grátis (dorme e não tem disco), Vercel
+  (só a landing, não roda o backend).
+- **Consequências:** a hospedagem sai de `[PREENCHER]`; G1 pode acontecer. Quem faz o primeiro passo no painel é o dono da conta
+  (ligar o GitHub, criar o volume e o domínio). Segredos (chaves da Featherless, `DEMO_MODE`) entram como variáveis do serviço, nunca no repositório.
 
 ## DEC-038 · Plano da C5, rodada 1: G3 local, janela até 03h e de volta às 07h, o usuário em todas as frentes, contratos pela frente A
 

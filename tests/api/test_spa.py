@@ -53,3 +53,12 @@ def test_without_build_the_api_still_works_and_root_is_404(tmp_path):
     client = client_for(tmp_path, tmp_path / "nao-existe")
     assert client.get("/health").status_code == 200
     assert client.get("/").status_code == 404
+
+
+def test_exported_route_folder_serves_its_own_index(tmp_path, dist):
+    # Export estático do Next (trailingSlash): /entrar/ é a pasta entrar/ com o próprio index.html.
+    (dist / "entrar").mkdir()
+    (dist / "entrar" / "index.html").write_text("<html><body>pagina entrar</body></html>", encoding="utf-8")
+    client = client_for(tmp_path, dist)
+    for path in ("/entrar/", "/entrar"):
+        assert "pagina entrar" in client.get(path).text, path

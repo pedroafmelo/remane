@@ -12,5 +12,6 @@ docs
 tests
 web/node_modules
 web/dist
+web/.next
 *.md
 !README.md
