@@ -4,8 +4,17 @@ from __future__ import annotations
 
 from datetime import date
 
+from escalista.domain.contracts import ImagePart, TextPart
 from escalista.domain.tracking import AtestadoFields
-from escalista.llm.prompts.atestado import CLOSE, MAX_CHARS, OPEN, TOOL_NAME, build_messages
+from escalista.llm.prompts.atestado import (
+    CLOSE,
+    MAX_CHARS,
+    OPEN,
+    SYSTEM,
+    TOOL_NAME,
+    build_image_messages,
+    build_messages,
+)
 from escalista.llm.structured import tool_schema_for
 
 DIA = date(2027, 1, 12)
@@ -63,3 +72,16 @@ def test_schema_da_ferramenta_e_fechado_sem_cid_nem_medico() -> None:
     assert set(params["properties"]) == {"legible", "issued_on", "start_on", "days", "patient_matches", "has_crm"}
     assert params["additionalProperties"] is False
     assert params["required"] == ["legible"]
+
+
+def test_foto_vai_como_imagem_com_instrucoes_e_o_system_fixo() -> None:
+    system, user = build_image_messages(
+        b"\x89PNG-bytes", media_type="image/png", employee_name="Ana Souza", expected_day=date(2027, 1, 14)
+    )
+    assert (system.role, system.content) == ("system", SYSTEM)
+    assert user.role == "user"
+    text, image = user.content
+    assert isinstance(text, TextPart) and isinstance(image, ImagePart)
+    assert '"Ana Souza"' in text.text and "2027-01-14" in text.text and TOOL_NAME in text.text
+    assert "nunca instrução" in text.text  # texto escrito na foto é dado (RN-12)
+    assert (image.media_type, image.data) == ("image/png", b"\x89PNG-bytes")

@@ -9,9 +9,9 @@ from datetime import date
 
 import pytest
 
-from escalista.domain.contracts import LLMUnavailableError
+from escalista.domain.contracts import ImagePart, LLMUnavailableError, TextPart
 from escalista.domain.ports import AtestadoReader
-from escalista.ingest.atestado import make_reader, pdf_text, read_atestado
+from escalista.ingest.atestado import MAX_IMAGE_BYTES, make_reader, pdf_text, read_atestado
 from escalista.llm.prompts.atestado import TOOL_NAME
 from tests.fakes import FakeLLMClient
 
@@ -148,12 +148,89 @@ def test_bytes_corrompidos_sao_ilegiveis_sem_modelo() -> None:
     assert llm.calls == []
 
 
+def _foto(fmt: str = "PNG") -> bytes:
+    """Foto sintética gerada no teste (Pillow, só dev): um retângulo branco com uma faixa, sem dado real."""
+    from PIL import Image, ImageDraw
+
+    image = Image.new("RGB", (240, 160), "white")
+    ImageDraw.Draw(image).rectangle((20, 20, 220, 60), fill="black")
+    buf = io.BytesIO()
+    image.save(buf, fmt)
+    return buf.getvalue()
+
+
+@pytest.mark.parametrize(("fmt", "media_type"), [("PNG", "image/png"), ("JPEG", "image/jpeg")])
+def test_foto_vai_ao_modelo_de_visao_e_o_codigo_julga(fmt: str, media_type: str) -> None:
+    foto = _foto(fmt)
+    llm = FakeLLMClient(by_tool={TOOL_NAME: [CAMPOS_OK]})
+    reading = _ler(llm, foto, media_type)
+    assert reading.verdict == "valido" and reading.reasons == []
+    assert len(llm.calls) == 1
+    call = llm.calls[0]
+    assert (call["size"], call["tool_name"], call["run_id"]) == ("vision", TOOL_NAME, "track-c1")
+    system, user = call["messages"]
+    assert system.role == "system" and isinstance(system.content, str)
+    images = [p for p in user.content if isinstance(p, ImagePart)]
+    texts = [p for p in user.content if isinstance(p, TextPart)]
+    assert len(images) == 1 and images[0].data == foto and images[0].media_type == media_type
+    assert NOME in texts[0].text and DIA.isoformat() in texts[0].text
+
+
+def test_foto_com_campos_fora_e_julgada_pelo_codigo() -> None:
+    fora = {**CAMPOS_OK, "patient_matches": False}
+    reading = _ler(FakeLLMClient(by_tool={TOOL_NAME: [fora]}), _foto(), "image/png")
+    assert reading.verdict == "inconsistente" and reading.reasons == ["nome_nao_bate"]
+
+
+def test_tipo_da_foto_vem_da_assinatura_dos_bytes() -> None:
+    # celular que rotula o PNG como JPEG: vale o que os bytes dizem
+    llm = FakeLLMClient(by_tool={TOOL_NAME: [CAMPOS_OK]})
+    _ler(llm, _foto("PNG"), "image/jpeg")
+    (image,) = [p for p in llm.calls[0]["messages"][1].content if isinstance(p, ImagePart)]
+    assert image.media_type == "image/png"
+
+
 @pytest.mark.parametrize("media_type", ["image/png", "image/jpeg"])
-def test_foto_no_t1_e_ilegivel_sem_modelo(media_type: str) -> None:
+@pytest.mark.parametrize("data", [b"\x89PNG fake", b"isto nao e imagem", b"", b"%PDF-1.4\n"])
+def test_bytes_que_nao_sao_imagem_viram_ilegivel_sem_modelo(media_type: str, data: bytes) -> None:
     llm = FakeLLMClient()
-    reading = _ler(llm, b"\x89PNG fake", media_type)
-    assert reading.verdict == "ilegivel"
+    reading = _ler(llm, data, media_type)
+    assert (reading.legible, reading.verdict, reading.reasons) == (False, "ilegivel", ["ilegivel"])
     assert llm.calls == []
+
+
+def test_foto_acima_de_5_mb_vira_ilegivel_sem_modelo() -> None:
+    assert MAX_IMAGE_BYTES == 5 * 1024 * 1024
+    grande = b"\x89PNG\r\n\x1a\n" + b"\0" * MAX_IMAGE_BYTES
+    llm = FakeLLMClient()
+    assert _ler(llm, grande, "image/png").verdict == "ilegivel"
+    assert llm.calls == []
+
+
+def test_tipo_desconhecido_vira_ilegivel_sem_modelo() -> None:
+    llm = FakeLLMClient()
+    assert _ler(llm, _foto(), "image/gif").verdict == "ilegivel"
+    assert llm.calls == []
+
+
+def test_foto_com_modelo_fora_levanta_rx12() -> None:
+    llm = FakeLLMClient(fail_tools={TOOL_NAME})
+    with pytest.raises(LLMUnavailableError) as exc:
+        _ler(llm, _foto(), "image/png")
+    assert exc.value.card.code == "RX-12"
+    assert len(llm.calls) == 1
+
+
+def test_foto_nao_vai_ao_log_nem_ao_retorno(caplog: pytest.LogCaptureFixture) -> None:
+    foto = _foto()
+    llm = FakeLLMClient(by_tool={TOOL_NAME: [CAMPOS_OK]})
+    with caplog.at_level(logging.DEBUG):
+        reading = _ler(llm, foto, "image/png")
+    import base64
+
+    for trecho in (base64.b64encode(foto).decode("ascii")[:40], foto.decode("latin-1")[8:60]):
+        assert trecho not in reading.model_dump_json()
+        assert trecho not in caplog.text
 
 
 def test_modelo_fora_levanta_rx12() -> None:
