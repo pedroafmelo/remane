@@ -11,7 +11,7 @@ from typing import Literal, Self
 
 from pydantic import BaseModel, Field, NaiveDatetime, model_validator
 
-from escalista.domain.reading import CapacityCheck, ColumnMapping, IdentityCard
+from escalista.domain.reading import CapacityCheck, ColumnMapping, IdentityCard, ShiftEvidence
 
 
 class Store(BaseModel):
@@ -118,6 +118,8 @@ class ReadSummary(BaseModel):
     identity: list[IdentityCard] = Field(default_factory=list)
     capacity: CapacityCheck | None = None
     planned_week_start: date | None = None  # segunda-feira
+    store_ids: list[str] = Field(default_factory=list)  # lojas lidas: as chaves de `ConfirmInput.coverage_pct`
+    evidence_sample: list[ShiftEvidence] = Field(default_factory=list, max_length=5)  # de onde veio cada turno
 
     @model_validator(mode="after")
     def _planned_week_starts_on_monday(self) -> Self:

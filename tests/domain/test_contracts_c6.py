@@ -190,6 +190,7 @@ def test_read_summary_gains_fields_with_defaults():
     assert fields(ReadSummary) == {
         "file_name", "rows", "employees", "stores", "week_start", "total_hours", "issues", "ok",
         "format", "mapping", "mapping_source", "assumptions", "identity", "capacity", "planned_week_start",
+        "store_ids", "evidence_sample",
     }  # fmt: skip
     old = ReadSummary(
         file_name="escala.csv", rows=2, employees=1, stores=1, week_start=MONDAY, total_hours=Decimal("16"),
@@ -197,6 +198,12 @@ def test_read_summary_gains_fields_with_defaults():
     )  # fmt: skip
     assert old.format == "csv" and old.mapping is None and old.mapping_source == "csv_dec039"
     assert old.assumptions == [] and old.identity == [] and old.capacity is None and old.planned_week_start is None
+    assert old.store_ids == [] and old.evidence_sample == []
+    evidence = ShiftEvidence(shift_index=0, cells=[CellRef(table=0, row=1, col=0)], raw=["Ana"])
+    sample = old.model_copy(update={"store_ids": ["L1", "L2"], "evidence_sample": [evidence] * 5})
+    assert ReadSummary(**sample.model_dump()).store_ids == ["L1", "L2"]
+    with pytest.raises(ValidationError):
+        ReadSummary(**(old.model_dump() | {"evidence_sample": [evidence.model_dump()] * 6}))  # até 5
     new = old.model_copy(update={"format": "xlsx", "mapping": long_mapping(), "mapping_source": "modelo"})
     assert new.mapping.layout == "long"
     with pytest.raises(ValidationError):

@@ -178,6 +178,7 @@ def test_csv_issue_and_read_summary_fields():
     assert fields(ReadSummary) == {
         "file_name", "rows", "employees", "stores", "week_start", "total_hours", "issues", "ok",
         "format", "mapping", "mapping_source", "assumptions", "identity", "capacity", "planned_week_start",  # C6
+        "store_ids", "evidence_sample",  # C6 (A3)
     }  # fmt: skip
     summary = ReadSummary(
         file_name="escala.csv",
