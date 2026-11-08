@@ -140,53 +140,127 @@ mais rápido; mas criam o problema de dois aceites para um turno.
 ### 5.1 Modelos novos: `domain/tracking.py` [PROPOSTA]
 
 ```python
-class Attachment(BaseModel):          # só em memória; nunca persistido
-    data: bytes; media_type: Literal["application/pdf", "image/png", "image/jpeg"]; filename: str
+class Attachment(BaseModel):  # só em memória; nunca persistido
+    data: bytes
+    media_type: Literal["application/pdf", "image/png", "image/jpeg"]
+    filename: str
 
-class Punch(BaseModel):               # batida do ponto simulado
-    employee_id: str; shift_start: datetime; kind: Literal["in", "out"]; at: datetime
 
-class Deviation(BaseModel):           # desvio plantado
-    id: str; employee_id: str; shift_start: datetime; kind: Literal["falta", "atraso", "hora_extra"]; minutes: int = 0
+class Punch(BaseModel):  # batida do ponto simulado
+    employee_id: str
+    shift_start: datetime
+    kind: Literal["in", "out"]
+    at: datetime
 
-TriggerKind = Literal["no_punch", "no_answer", "offer_expired", "overtime_near_limit", "overtime_limit",
-                      "overtime_needed", "weekly_check"]
+
+class Deviation(BaseModel):  # desvio plantado
+    id: str
+    employee_id: str
+    shift_start: datetime
+    kind: Literal["falta", "atraso", "hora_extra"]
+    minutes: int = 0
+
+
+TriggerKind = Literal[
+    "no_punch", "no_answer", "offer_expired", "overtime_near_limit", "overtime_limit", "overtime_needed", "weekly_check"
+]
+
+
 class Trigger(BaseModel):
-    kind: TriggerKind; employee_id: str | None; ref: str; observed: str; threshold: str; rule_ref: str
+    kind: TriggerKind
+    employee_id: str | None
+    ref: str
+    observed: str
+    threshold: str
+    rule_ref: str
 
-class AtestadoFields(BaseModel):      # o que o modelo devolve (schema fechado; sem CID, sem médico, sem texto livre)
-    legible: bool; issued_on: date | None; start_on: date | None
-    days: int | None = Field(default=None, ge=1, le=30); patient_matches: bool | None; has_crm: bool | None
+
+class AtestadoFields(BaseModel):  # o que o modelo devolve (schema fechado; sem CID, sem médico, sem texto livre)
+    legible: bool
+    issued_on: date | None
+    start_on: date | None
+    days: int | None = Field(default=None, ge=1, le=30)
+    patient_matches: bool | None
+    has_crm: bool | None
+
 
 Reason = Literal["data_nao_bate", "sem_data", "sem_crm", "nome_nao_bate", "ilegivel", "dias_fora_da_faixa"]
-class AtestadoReading(AtestadoFields):
-    verdict: Literal["valido", "inconsistente", "ilegivel"]; reasons: list[Reason]
 
-class ReplanRequest(BaseModel):       # arquitetura, seção 4 e 8
-    id: str; case_id: str; window_start: datetime; window_end: datetime; absent_id: str
-    reason: Literal["falta", "atraso", "no_punch", "overtime_limit"]; origin_trace_id: str | None
+
+class AtestadoReading(AtestadoFields):
+    verdict: Literal["valido", "inconsistente", "ilegivel"]
+    reasons: list[Reason]
+
+
+class ReplanRequest(BaseModel):  # arquitetura, seção 4 e 8
+    id: str
+    case_id: str
+    window_start: datetime
+    window_end: datetime
+    absent_id: str
+    reason: Literal["falta", "atraso", "no_punch", "overtime_limit"]
+    origin_trace_id: str | None
+
 
 class Offer(BaseModel):
-    id: str; candidate_id: str; rank: int; status: Literal["enviada", "aceita", "recusada", "vencida"]
-    sent_at: datetime; deadline: datetime; overtime_hours: Decimal; added_cost: Decimal
+    id: str
+    candidate_id: str
+    rank: int
+    status: Literal["enviada", "aceita", "recusada", "vencida"]
+    sent_at: datetime
+    deadline: datetime
+    overtime_hours: Decimal
+    added_cost: Decimal
 
-CaseStatus = Literal["aguardando_colaborador", "oferta_enviada", "aguardando_gestor", "coberto", "descoberto",
-                     "atraso_registrado", "decidido"]
+
+CaseStatus = Literal[
+    "aguardando_colaborador",
+    "oferta_enviada",
+    "aguardando_gestor",
+    "coberto",
+    "descoberto",
+    "atraso_registrado",
+    "decidido",
+]
+
+
 class Case(BaseModel):
-    id: str; kind: Literal["falta", "atraso"]; origin: Literal["aviso", "ponto"]; employee_id: str; shift: Shift
-    status: CaseStatus; created_at: datetime; abono: Literal["provisorio", "nenhum"] = "nenhum"
-    reading: AtestadoReading | None = None; replan: ReplanRequest | None = None; offers: list[Offer] = []
-    exception_ids: list[str] = []; handled: list[str] = []   # "<kind>:<ref>" dos gatilhos já tratados (idempotência)
+    id: str
+    kind: Literal["falta", "atraso"]
+    origin: Literal["aviso", "ponto"]
+    employee_id: str
+    shift: Shift
+    status: CaseStatus
+    created_at: datetime
+    abono: Literal["provisorio", "nenhum"] = "nenhum"
+    reading: AtestadoReading | None = None
+    replan: ReplanRequest | None = None
+    offers: list[Offer] = []
+    exception_ids: list[str] = []
+    handled: list[str] = []  # "<kind>:<ref>" dos gatilhos já tratados (idempotência)
     closed_at: datetime | None = None
 
-class ChannelMessage(BaseModel):      # arquitetura, seção 8 (RH-06)
-    id: str; case_id: str | None; direction: Literal["in", "out"]; party: str   # employee_id ou "gestor"
-    template: str; body: str | None   # saída: texto nosso; entrada: sempre None (o texto do colaborador não é gravado)
-    has_text: bool = False; attachment_media_type: str | None = None; decision_ref: str | None; at: datetime
 
-class TrackPolicy(BaseModel):         # lido de politica_ficticia.yaml por rules/tracking_policy.py
-    late_tolerance_min: int; answer_deadline_min: int; offer_deadline_min: int; max_candidates: int
-    overtime_weekly_limit_h: Decimal; overtime_warn_pct: int
+class ChannelMessage(BaseModel):  # arquitetura, seção 8 (RH-06)
+    id: str
+    case_id: str | None
+    direction: Literal["in", "out"]
+    party: str  # employee_id ou "gestor"
+    template: str
+    body: str | None  # saída: texto nosso; entrada: sempre None (o texto do colaborador não é gravado)
+    has_text: bool = False
+    attachment_media_type: str | None = None
+    decision_ref: str | None
+    at: datetime
+
+
+class TrackPolicy(BaseModel):  # lido de politica_ficticia.yaml por rules/tracking_policy.py
+    late_tolerance_min: int
+    answer_deadline_min: int
+    offer_deadline_min: int
+    max_candidates: int
+    overtime_weekly_limit_h: Decimal
+    overtime_warn_pct: int
 ```
 
 `CaseView`, `OfferView`, `SweepResult` e `TrackMetrics` são modelos de saída do `agents/tracker/` (contrato, SAIDA-AC-03, 06, 12).
@@ -198,15 +272,20 @@ class Channel(Protocol):
     def send(self, message: ChannelMessage) -> None: ...
     def inbox(self, party: str) -> list[ChannelMessage]: ...
 
-class PunchSource(Protocol):
-    def punches(self, *, until: datetime) -> list[Punch]: ...      # levanta PunchUnavailableError -> RX-12
 
-class ExceptionQueue(Protocol):                                     # o agente abre cartões sem importar store/
+class PunchSource(Protocol):
+    def punches(self, *, until: datetime) -> list[Punch]: ...  # levanta PunchUnavailableError -> RX-12
+
+
+class ExceptionQueue(Protocol):  # o agente abre cartões sem importar store/
     def open(self, card: ExceptionCard, source: dict[str, Any]) -> str: ...
 
-class AtestadoReader(Protocol):                                    # a borda ingest/atestado.py implementa
-    def __call__(self, *, data: bytes, media_type: str, run_id: str, expected_day: date,
-                 employee_name: str) -> AtestadoReading: ...        # levanta LLMUnavailableError -> RX-12
+
+class AtestadoReader(Protocol):  # a borda ingest/atestado.py implementa
+    def __call__(
+        self, *, data: bytes, media_type: str, run_id: str, expected_day: date, employee_name: str
+    ) -> AtestadoReading: ...  # levanta LLMUnavailableError -> RX-12
+
 
 class TrackRepository(Protocol):
     def save_case(self, case: Case) -> None: ...
