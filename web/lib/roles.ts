@@ -1,6 +1,6 @@
 import type { Role } from "./types.ts";
 
-// DEC-044: na demo, o gestor reúne gerente e DP; o colaborador é quem trabalha na escala.
+/** Papéis da demo (DEC-044): o gestor reúne quem opera a loja e quem cuida das regras; o colaborador trabalha na escala. */
 export const ROLE_LABELS: Record<Role, string> = {
   gestor: "Gestor",
   colaborador: "Colaborador",

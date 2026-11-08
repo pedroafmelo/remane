@@ -1,4 +1,5 @@
-"""`SqlRepository`: implementa a porta `Repository` sobre as tabelas de `store.tables` (plano da C5, seção 3.2).
+"""`SqlRepository`: implementa as portas `Repository` e `RosterRepository` sobre as tabelas de
+`store.tables` (plano da C5, seção 3.2; quadro: C6, seção 5.2).
 
 Decisões:
 - `save_*` faz upsert pela chave (`run_id`, `id`).
@@ -6,6 +7,7 @@ Decisões:
   O histórico de quem aprovou fica no rastro (`approval.recorded`), não aqui.
 - `mark_published`: muda o status da versão para `published` e a coloca como a última publicada (ordem de gravação
   por `publish_seq`, não o relógio); versão desconhecida levanta `KeyError`.
+- `save_roster` só acrescenta: versão repetida levanta `ValueError` (igual ao falso); `latest_roster` é a maior versão.
 - Leitura devolve o modelo pydantic gravado, igual ao original (`Decimal` preservado).
 """
 
@@ -14,11 +16,13 @@ from __future__ import annotations
 from datetime import datetime
 
 from sqlalchemy import Engine, func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from escalista.clock.system import to_brasilia_naive
 from escalista.domain.results import Approval, RunState, ScheduleVersion
-from escalista.store.tables import ApprovalRow, RunStateRow, ScheduleVersionRow
+from escalista.domain.roster import Roster
+from escalista.store.tables import ApprovalRow, RosterVersionRow, RunStateRow, ScheduleVersionRow
 
 
 class SqlRepository:
@@ -95,3 +99,30 @@ class SqlRepository:
         with Session(self._engine) as session:
             row = session.scalars(stmt).first()
             return None if row is None else ScheduleVersion.model_validate(row.data)
+
+    def save_roster(self, r: Roster) -> None:
+        message = f"o quadro versão {r.version} já existe; cada confirmação acrescenta uma versão"
+        try:
+            with Session(self._engine) as session, session.begin():
+                if session.get(RosterVersionRow, r.version) is not None:
+                    raise ValueError(message)
+                session.add(
+                    RosterVersionRow(
+                        version=r.version,
+                        confirmed_at=to_brasilia_naive(r.confirmed_at),
+                        data=r.model_dump(mode="json"),
+                    )
+                )
+        except IntegrityError as exc:  # corrida entre duas gravações da mesma versão
+            raise ValueError(message) from exc
+
+    def latest_roster(self) -> Roster | None:
+        stmt = select(RosterVersionRow).order_by(RosterVersionRow.version.desc()).limit(1)
+        with Session(self._engine) as session:
+            row = session.scalars(stmt).first()
+            return None if row is None else Roster.model_validate(row.data)
+
+    def get_roster(self, version: int) -> Roster | None:
+        with Session(self._engine) as session:
+            row = session.get(RosterVersionRow, version)
+            return None if row is None else Roster.model_validate(row.data)

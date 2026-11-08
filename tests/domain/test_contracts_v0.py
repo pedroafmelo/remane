@@ -30,7 +30,11 @@ def fields(model):
 
 
 def test_role_values():
-    assert {r.value for r in Role} == {"gestor", "colaborador"}
+    """DEC-044: dois papéis. Linhas gravadas antes dela ainda dizem `gerente` ou `dp` e leem como `gestor`."""
+    assert [r.value for r in Role] == ["gestor", "colaborador"]
+    assert Role("gerente") is Role.GESTOR and Role("dp") is Role.GESTOR
+    with pytest.raises(ValueError):
+        Role("admin")
 
 
 def test_trace_event_fields():

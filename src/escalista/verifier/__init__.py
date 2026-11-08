@@ -14,6 +14,7 @@ from escalista.verifier.checks import (
     check_weekly_rest,
 )
 from escalista.verifier.coverage import coverage_gaps
+from escalista.verifier.requests import check_unavailability, check_weekly_hours_per_person
 
 Check = Callable[[Schedule, Rule], list[Violation]]
 
@@ -23,6 +24,9 @@ CHECKS: dict[str, Check] = {
     "jornada_diaria_max": check_daily_hours,
     "interjornada_min": check_rest_between_shifts,
     "repouso_semanal": check_weekly_rest,
+    # Camada `execucao` (C6): restrições duras pedidas pelo gestor. Cartão sem elas: relatório igual ao da C5.
+    "indisponibilidade": check_unavailability,
+    "jornada_semanal_max_pessoa": check_weekly_hours_per_person,
 }
 
 
@@ -40,7 +44,9 @@ __all__ = [
     "CHECKS",
     "check_daily_hours",
     "check_rest_between_shifts",
+    "check_unavailability",
     "check_weekly_hours",
+    "check_weekly_hours_per_person",
     "check_weekly_rest",
     "coverage_gaps",
     "verify",

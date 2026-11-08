@@ -55,7 +55,7 @@ class RulesView(BaseModel):
 
 def rules_view(card: RuleCard) -> RulesView:
     groups = []
-    for layer in RuleLayer:
+    for layer in LAYER_TITLES:  # a camada `execucao` (C6) nasce do pedido de cada execução, não do cartão em vigor
         rules = [_rule_view(r, card) for r in card.rules if r.layer is layer]
         rules.sort(key=lambda r: not r.engine)  # as que o motor usa primeiro; estável no resto
         groups.append(RuleGroup(layer=layer, title=LAYER_TITLES[layer], rules=rules))

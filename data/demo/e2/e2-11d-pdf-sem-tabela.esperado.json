@@ -1,0 +1,7 @@
+{
+  "file": "e2/e2-11d-pdf-sem-tabela.pdf",
+  "synthetic": true,
+  "week_start": "2027-01-11",
+  "expect": "RX-13",
+  "reason_hint": "PDF com texto corrido e nenhuma tabela de turnos"
+}

@@ -1,0 +1,7 @@
+{
+  "file": "e2/e2-11c-zip-bomba.xlsx",
+  "synthetic": true,
+  "week_start": "2027-01-11",
+  "expect": "RX-13",
+  "reason_hint": "ZIP que descompacta 32 MiB (limite de 20 MiB) a partir de poucas dezenas de KB; o resto do XLSX é válido, então só o limite o barra"
+}

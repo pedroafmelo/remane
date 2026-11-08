@@ -25,7 +25,7 @@ TOOL_NAME = "registrar_justificativa"
 MAX_LISTED = 20  # violações e lacunas listadas no prompt; o resto vira contagem
 
 SYSTEM = (
-    "Você escreve a justificativa de uma escala semanal de lojas, em português do Brasil, para o gerente. "
+    "Você escreve a justificativa de uma escala semanal de lojas, em português do Brasil, para o gestor. "
     "Use SOMENTE os fatos e as regras fornecidos. Não invente números, pessoas, regras nem datas. "
     "Cada item explica uma escolha ou um resultado e cita em `rule_refs` apenas ids da lista de regras; "
     "se o item se apoia só em números dos fatos, deixe `rule_refs` vazio. "

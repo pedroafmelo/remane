@@ -1,4 +1,4 @@
-"""Tabelas `run_state`, `schedule_version` e `approval` (plano da C5, seção 3.2).
+"""Tabelas `run_state`, `schedule_version`, `approval` (plano da C5, seção 3.2) e `roster_version` (C6, seção 5.2).
 
 O modelo pydantic inteiro fica em `data` (JSON, `model_dump(mode="json")`, `Decimal` como texto: sem perda). As demais
 colunas existem só para busca e ordenação. `publish_seq` é a ordem de publicação (não depende do relógio, que na demo
@@ -44,4 +44,14 @@ class ApprovalRow(Base):
     id: Mapped[str] = mapped_column(String, primary_key=True)
     version_id: Mapped[str] = mapped_column(String, nullable=False, unique=True)  # uma aprovação por versão
     at: Mapped[datetime] = mapped_column(DateTime, nullable=False)  # horário de Brasília, sem fuso
+    data: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+
+
+class RosterVersionRow(Base):
+    """Quadro guardado: uma linha por confirmação, nunca atualizada. O mais recente é a maior `version`."""
+
+    __tablename__ = "roster_version"
+
+    version: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
+    confirmed_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)  # horário de Brasília, sem fuso
     data: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)

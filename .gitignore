@@ -243,4 +243,9 @@ APIs.yaml
 
 # Design system: a pasta Cover não é relatório de cobertura (o padrão cover/ acima a pegava no macOS)
 !docs/design-system/components/Cover/
+
+# Dados sintéticos de leitura (C6, D1): os XLSX de data/ são versionados
+!data/**/*.xlsx
+
+# Worktrees locais do Claude Code
 .claude/worktrees/

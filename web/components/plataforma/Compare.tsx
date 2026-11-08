@@ -1,3 +1,4 @@
+import { savingsCaveat } from "@/lib/compare";
 import { hours, money, pct } from "@/lib/format";
 import type { Comparison, ScheduleMetrics } from "@/lib/types";
 import { ImpactStat } from "../ImpactStat";
@@ -19,10 +20,11 @@ export function ComparePanel({ comparison }: { comparison: Comparison }) {
   const clean = after.violations === 0;
   return (
     <Card title="Antes e depois" id="antes-depois">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-3">
         <ImpactStat size="sm" label="Violações depois" value={String(after.violations)} tone={clean ? "good" : "bad"} note={clean ? "meta 0 atingida" : "meta 0 não atingida"} />
         <ImpactStat size="sm" label="Violações antes" value={String(before.violations)} />
-        <ImpactStat size="sm" label="Economia" value={money(comparison.savings)} tone="good" />
+        <ImpactStat size="sm" label="Economia" value={money(comparison.savings)} tone="good" note={savingsCaveat(comparison) ?? undefined} />
+        <ImpactStat size="sm" label="Cobertura depois" value={pct(after.coverage_pct)} note={`antes: ${pct(before.coverage_pct)}`} />
         <ImpactStat size="sm" label="Horas extras evitadas" value={hours(comparison.overtime_hours_avoided)} />
         <ImpactStat size="sm" label="Violações evitadas" value={String(comparison.violations_avoided)} />
       </div>
@@ -40,7 +42,10 @@ export function ComparePanel({ comparison }: { comparison: Comparison }) {
         </DataTable>
       </div>
       <div className="mt-3">
-        <Muted>Custo e horas calculados pela mesma função nas duas escalas, sobre dados sintéticos.</Muted>
+        <Muted>
+          Custo e horas calculados pela mesma função nas duas escalas, sobre dados sintéticos. Leia a economia junto da cobertura: cobrir menos
+          custa menos.
+        </Muted>
       </div>
     </Card>
   );

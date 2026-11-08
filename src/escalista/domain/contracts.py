@@ -16,7 +16,8 @@ from pydantic import BaseModel, ConfigDict, Field, StrictInt
 
 
 class Role(StrEnum):
-    """Papéis de acesso (DEC-044): o gestor reúne gerente e DP; o colaborador é quem trabalha na escala."""
+    """Papéis de acesso (DEC-044). `gestor` aprova e publica a escala, valida coberturas, decide exceções e aprova o
+    cartão de regras; `colaborador` avisa falta, manda atestado e aceita ou recusa turno."""
 
     GESTOR = "gestor"
     COLABORADOR = "colaborador"

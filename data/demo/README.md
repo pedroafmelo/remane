@@ -27,6 +27,8 @@ uv run python -m escalista.synth --seed 42 --out data/demo
 | `defeitos_plantados.json` | `[{"line", "field", "reason"}]`. `line` é o número da linha física no arquivo (1-based, contando a marca e o cabeçalho). | Teste do validador |
 | `escala_violacoes.csv` | Escala **válida para leitura**, com violações plantadas e conhecidas. As outras pessoas ficam dentro de todas as regras. | Teste do verificador (RN-04: meta 0 violações não detectadas) |
 | `violacoes_plantadas.json` | `[{"rule_id", "kind", "employee_id", "day"}]`, a lista completa e exata das violações de `escala_violacoes.csv`. `kind` repete o `rule_id` (o tipo da primitiva). `day` é `null` nas regras de semana. | Gabarito do verificador |
+| `escala_exemplo_grade.xlsx` | A **mesma escala atual** de `escala_atual.csv` (60 pessoas, 3 lojas, 360 turnos) em **grade pessoa × dia**: aba e título SINTETICO, colunas "Colaborador", "Unidade" e uma por dia ("Seg 11/01/2027" a "Dom 17/01/2027"), célula "HH:MM-HH:MM" ou "Folga". Nomes iguais aos de `pessoas.json`. | "Usar escala de exemplo" da C6 |
+| `escala_exemplo_grade.esperado.json` | Gabarito do exemplo: os 360 turnos (com `person_id` e `store_id`). Formato em `e2/README.md`. | Teste e avaliador |
 
 Os turnos estão em CSV longo (DEC-039), um turno por linha. O `escala_violacoes.csv` e o `escala_atual.csv` começam com a
 marca `# SINTETICO - dados ficticios`, e o cabeçalho vem na linha 2.
@@ -85,3 +87,17 @@ Isto é uma conta de capacidade, e não prova que existe escala viável com 0 vi
   Não é calibrada para cobrir a demanda: serve para mostrar o "antes" e as violações.
 - Os turnos de `escala_violacoes.csv` e de `escala_defeito.csv` vêm de um padrão novo e compatível (5 dias, folga no
   domingo, turnos de 7h ou 8h, 12h de descanso no mínimo), com as 7 pessoas planejadas e os 5 defeitos alterados em cima.
+
+## Arquivos do E2 e exemplo em grade (C6)
+
+`e2/` tem os arquivos de leitura do eval E2 (CSV com `;` e cp1252, grades XLSX, título mesclado, colunas trocadas, datas
+mistas, duplicatas, grafias e homônimo, texto hostil, turno noturno e arquivos ilegíveis), cada um com um gabarito
+`*.esperado.json`. O formato do gabarito e a lista dos arquivos estão em [`e2/README.md`](e2/README.md). O exemplo em grade
+da demo, `escala_exemplo_grade.xlsx`, é a escala de `escala_atual.csv` em outro layout. Para regravar:
+
+```
+uv run python -m escalista.synth e2 --seed 42 --out data/demo
+```
+
+Código: `src/escalista/synth/e2.py`. Teste: `tests/synth/test_e2.py`. O `.gitignore` ignora `*.xlsx`, então os XLSX entram no
+git com `git add -f`.

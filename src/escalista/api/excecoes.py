@@ -18,9 +18,11 @@ no empate o menor id. Determinístico e documentado aqui.
 
 from __future__ import annotations
 
+import functools
 import threading
 import time
 from collections import Counter
+from collections.abc import Callable
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
@@ -170,6 +172,7 @@ class ExceptionDesk:
         stores: list[Store],
         employees: list[Employee],
         policy: dict[str, dict[str, Any]],
+        card_for_week: Callable[[date], RuleCard] | None = None,
         new_id=lambda: uuid4().hex,  # noqa: ANN001
     ) -> None:
         self._store = store
@@ -180,9 +183,27 @@ class ExceptionDesk:
         self._store_names = {s.id: s.name for s in stores}
         self._employees = list(employees)
         self._by_id = {e.id: e for e in employees}
+        self._demo_world = (card, dict(self._store_names), list(employees))  # a rede de `data/demo` (escala semeada)
+        self._card_for_week = card_for_week
         self._policy = policy
         self._new_id = new_id
         self._lock = threading.Lock()
+
+    def _use(self, version: ScheduleVersion | None) -> None:
+        """Pessoas, lojas e cartão da escala publicada. Uma escala da C6 traz os ids do quadro guardado na confirmação
+        (`n-<nome>` ou `m-<matrícula>`), não os de `data/demo`; a escala semeada de teste segue na rede de `data/demo`.
+        O cartão é o da semana da própria escala, o mesmo que o agente usou para otimizá-la e conferi-la."""
+        card, stores, employees = self._demo_world
+        roster = getattr(self._repo, "latest_roster", lambda: None)()
+        if version is not None and roster is not None:
+            ids = {e.id for e in roster.employees}
+            if any(s.employee_id in ids for s in version.schedule.shifts):
+                stores = {s.id: s.name for s in roster.stores}
+                employees = list(roster.employees)
+        if version is not None and self._card_for_week is not None:
+            card = self._card_for_week(version.schedule.week_start)
+        self._card, self._store_names = card, stores
+        self._employees, self._by_id = employees, {e.id: e for e in employees}
 
     # --- semente ---
 
@@ -258,6 +279,7 @@ class ExceptionDesk:
 
     def _covered_version(self, item: ExceptionItem, cover_id: str) -> ScheduleVersion:
         latest = self._repo.latest_published()
+        self._use(latest)
         shift = Shift.model_validate(item.source["shift"])
         if latest is None or shift not in latest.schedule.shifts:
             raise HTTPException(status.HTTP_409_CONFLICT, "a escala publicada mudou desde a falta; ela não se aplica")
@@ -329,6 +351,7 @@ class ExceptionDesk:
 
     def my_week(self) -> MyWeek:
         version = self._repo.latest_published()
+        self._use(version)
         emp_id = self.colaborador_id(version) if version else None
         if version is None or emp_id is None:
             return MyWeek(published=False)
@@ -362,6 +385,7 @@ class ExceptionDesk:
     def report_falta(self, day: date, has_text: bool) -> MyWeek:
         with self._lock:
             version = self._repo.latest_published()
+            self._use(version)
             emp_id = self.colaborador_id(version) if version else None
             if version is None or emp_id is None:
                 raise HTTPException(status.HTTP_409_CONFLICT, "a escala da semana ainda não foi publicada")
@@ -466,7 +490,7 @@ def build_desk(settings: Settings, engine: Engine) -> ExceptionDesk:
     from escalista.clock.system import SystemClock
     from escalista.db import init_db
     from escalista.ingest.demo_network import load_demo_network
-    from escalista.rules.loader import load_rule_card
+    from escalista.rules.loader import load_rule_card, load_rule_card_for_week
     from escalista.store.sql_repository import SqlRepository
 
     init_db(engine)
@@ -482,6 +506,7 @@ def build_desk(settings: Settings, engine: Engine) -> ExceptionDesk:
         stores=stores,
         employees=employees,
         policy=load_policy_exceptions(),
+        card_for_week=functools.partial(load_rule_card_for_week, Path(DEFAULT_RULES_DIR)),
     )
     desk.seed()
     return desk

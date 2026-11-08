@@ -56,6 +56,7 @@ test("rótulos de status, fase e papel", () => {
   assert.equal(phaseLabel("published"), "Publicada");
   assert.equal(phaseLabel("nova"), "nova");
   assert.equal(roleLabel("gestor"), "Gestor");
+  assert.equal(roleLabel("gerente"), "gerente"); // DEC-044: papel antigo sem alias
   assert.equal(canOperateSchedule("gestor"), true);
   assert.equal(canOperateSchedule("colaborador"), false);
 });

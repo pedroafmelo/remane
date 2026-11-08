@@ -18,12 +18,12 @@ from escalista.domain.schedule import CsvIssue, Employee, ReadSummary, Schedule,
 from escalista.rules.validation import COLUMNS, RawRow, validate_schedule_rows
 
 MAX_BYTES = 1024 * 1024  # 1 MB
-_IF_NO_ANSWER = "A otimização não começa sem uma escala lida e confirmada pelo gerente."
+_IF_NO_ANSWER = "A otimização não começa sem uma escala lida e confirmada pelo gestor."
 
 
 @dataclass(frozen=True)
 class CsvReadResult:
-    """`exception` não nulo pede ação do gerente (RX-13). `schedule` é `None` quando o arquivo é ilegível."""
+    """`exception` não nulo pede ação do gestor (RX-13). `schedule` é `None` quando o arquivo é ilegível."""
 
     schedule: Schedule | None
     summary: ReadSummary

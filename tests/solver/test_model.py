@@ -20,7 +20,7 @@ from escalista.domain.contracts import Role
 from escalista.domain.results import SolveRequest, SolveResult
 from escalista.domain.rules import Rule, RuleCard, RuleLayer, RuleStatus
 from escalista.domain.schedule import DemandSlot, Employee, Schedule, Store
-from escalista.solver.model import solve
+from escalista.solver.model import ModelStats, solve
 
 MONDAY = date(2027, 1, 11)
 DEMO = Path("data/demo")
@@ -235,12 +235,17 @@ def test_solver_60x7_within_time_limit():
     demand = TypeAdapter(list[DemandSlot]).validate_json((DEMO / "demanda.json").read_bytes())
     rc = card()
 
+    stats = ModelStats()
     t0 = wallclock.perf_counter()
-    result = solve(request(stores, employees, demand, rc, seed=42, workers=8, limit=TIME_LIMIT_S))
+    result = solve(request(stores, employees, demand, rc, seed=42, workers=8, limit=TIME_LIMIT_S), stats)
     elapsed = wallclock.perf_counter() - t0
 
     assert result.status in ("optimal", "feasible")
-    assert elapsed <= TIME_LIMIT_S + 5  # limite do solver + montagem do modelo
+    # O que se prova: o CP-SAT respeita o limite configurado (tempo que ele mesmo reporta, sem montar o modelo).
+    # As lojas dividem o limite, então a soma por loja fica em TIME_LIMIT_S mais uma folga pequena.
+    assert stats.solver_wall_s and sum(stats.solver_wall_s.values()) <= TIME_LIMIT_S + 2
+    # Tempo de parede total só como rede contra travamento: não depende de a máquina estar ociosa.
+    assert elapsed <= 3 * TIME_LIMIT_S
     assert result.schedule is not None and len({s.employee_id for s in result.schedule.shifts}) > 0
     assert _violations(result.schedule, rc, stores, employees) == []
     _check_uncovered_matches(result, demand)

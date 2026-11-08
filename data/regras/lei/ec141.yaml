@@ -84,7 +84,7 @@ regras:
     verificacao: >
       art. 3º lido no Planalto em 2026-11-07 por Claude: confere ("decorridos 2 meses da publicação"; vale para
       convenções e para acordos coletivos). O que é "incompatível" é interpretação. No conflito, o agente aplica
-      a regra mais restritiva de forma provisória e abre exceção ao DP (conflito 2 de docs/requisitos.md; P1 de
+      a regra mais restritiva de forma provisória e abre exceção ao gestor (conflito 2 de docs/requisitos.md; P1 de
       docs/produto.md). A data herda a pendência dos marcos.
 
 excecoes:   # o agente não decide sozinho; valores de acao em data/regras/README.md

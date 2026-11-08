@@ -69,7 +69,7 @@ regras:
 
   - id: pol_aviso_hora_extra_estourando
     dispara_em_percentual_do_limite: 80
-    destino: gerente
+    destino: gestor
     fonte: "Política fictícia, item 8"
     nota: "Aviso ao gestor quando alguém chega a 80% do limite semanal ou mensal de hora extra da política."
     status: interpretacao
@@ -79,8 +79,7 @@ regras:
     dispara_quando:
       - "a cobertura de uma falta só fecha com hora extra"
       - "a escala da semana seguinte só fecha com mais de 10 horas extras somadas na loja"
-    destino: gerente
-    copia: dp
+    destino: gestor
     fonte: "Política fictícia, item 9"
     nota: "Em aberto: o time ainda não decidiu o que dispara o aviso nem quem o recebe."
     status: interpretacao
@@ -98,11 +97,11 @@ regras:
 
   - id: pol_prazos_e_escalada
     aprovacao_escala_min: 1440              # 24h
-    cadeia: [gerente, dp]
+    cadeia: [gestor]                        # DEC-044: um único papel decide
     sem_decisor: turno_descoberto           # sem ação irreversível (produto.md, seção 5.4)
     remanejamento_ajuda_deslocamento_brl: 20
     fonte: "Política fictícia, item 11"
-    nota: "Prazo de cada exceção em excecoes_demo. Vencido o prazo, escala ao próximo da cadeia."
+    nota: "Prazo de cada exceção em excecoes_demo. Vencido o prazo, escala ao próximo da cadeia (hoje só o gestor: vencido, vale sem_decisor)."
     status: interpretacao
 
 # As 3 exceções da demo (Q6 de requisitos.md). Campos espelham ExceptionCard (src/escalista/domain/contracts.py):
@@ -148,7 +147,7 @@ excecoes_demo:
         efeito: "A cobertura cai na faixa do turno; fica registrado no painel."
         custo_base: nenhum
     recomendacao: "A opção de menor custo que mantém a cobertura; empate: remanejar, para não gerar hora extra."
-    sem_resposta: "Escala ao DP com mais 30 min; sem decisão, o turno fica descoberto."
+    sem_resposta: "Lembra o gestor com mais 30 min; sem decisão, o turno fica descoberto."
     acao: escalar
     fonte: "Política fictícia, item 13"
     status: interpretacao
@@ -161,7 +160,7 @@ excecoes_demo:
     prazo_min: 1440                          # 24h
     opcoes:
       - rotulo: "Manter o abono provisório e validar o original depois"
-        efeito: "O abono segue provisório até o DP confirmar (produto.md)."
+        efeito: "O abono segue provisório até o gestor confirmar (produto.md)."
         custo_base: nenhum
       - rotulo: "Pedir ao colaborador uma nova foto ou o PDF"
         efeito: "O agente envia a mensagem ao colaborador, registrada com a decisão que a gerou (RH-06)."
@@ -169,7 +168,7 @@ excecoes_demo:
     opcoes_vedadas:
       - "Recusar o atestado: só um humano decide, e fora do agente (RH-03)"
     recomendacao: "Pedir uma nova foto ou o PDF."
-    sem_resposta: "O abono segue provisório, e o agente lembra o DP no dia seguinte. Nunca há recusa automática."
+    sem_resposta: "O abono segue provisório, e o agente lembra o gestor no dia seguinte. Nunca há recusa automática."
     acao: escalar
     fonte: "Política fictícia, item 14"
     status: interpretacao

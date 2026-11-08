@@ -1,4 +1,4 @@
-"""Fusão das camadas: "a política só restringe"; conflito → mais restritiva provisória + exceção ao DP (RX-01)."""
+"""Fusão das camadas: "a política só restringe"; conflito → mais restritiva provisória + exceção ao gestor (RX-01)."""
 
 from datetime import date
 

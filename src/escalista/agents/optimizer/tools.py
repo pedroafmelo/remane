@@ -1,7 +1,8 @@
 """Ferramentas e portas injetadas do agente de otimização (arquitetura, seções 2.1 e 4).
 
 - As bordas entram como callables tipados só com contratos de `escalista.domain` (`ReadCsv`, `Justifier`,
-  `ListEvents`): `agents` não importa `ingest`, `llm` nem `audit`.
+  `ListEvents`; na C6, `ReadTables`, `MapColumns`, `Enrich`, `LoadCard` e `FormulateSpec`): `agents` não importa
+  `ingest`, `llm` nem `audit`. Os resultados das bordas entram como `Protocol` só com os campos que o agente lê.
 - `Tracer`: um `TraceEvent` por passo, com `cost_usd = 0` e `payload.cost_basis` nos passos sem modelo, latência
   medida com `time.perf_counter`, carimbo pelo `Clock` e `parent_id` encadeado no passo anterior da execução.
 - `publicar`: a única ferramenta com efeito da fatia. **Lê a aprovação no próprio código** (`repo.get_approval`) e
@@ -12,19 +13,24 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable, Iterable
-from datetime import datetime
+from datetime import date, datetime
+from datetime import time as Time
 from decimal import Decimal
 from typing import Any, Protocol
 
 from escalista.agents.optimizer.errors import PublishRefusedError
 from escalista.domain.contracts import ExceptionCard, Role, TraceEvent
-from escalista.domain.ports import Clock, Repository, TraceSink
+from escalista.domain.ports import Clock, Repository, RosterRepository, TraceSink
+from escalista.domain.reading import ColumnMapping, RawTable
 from escalista.domain.results import Comparison, Justification, ScheduleVersion, ViolationReport
 from escalista.domain.rules import RuleCard
-from escalista.domain.schedule import DemandSlot, ReadSummary, Schedule
+from escalista.domain.schedule import DemandSlot, Employee, ReadSummary, Schedule
+from escalista.domain.spec import SolveSpec
+from escalista.rules.identity import PersonDraft, StoreDraft
+from escalista.rules.spec import Screen
 
 NO_MODEL = "sem chamada de modelo"
-PUBLISHER_ROLES: frozenset[Role] = frozenset({Role.GESTOR})  # RH-01: o gerente aprova e publica
+PUBLISHER_ROLES: frozenset[Role] = frozenset({Role.GESTOR})  # RH-01: o gestor aprova e publica
 PERSONAL_KEYS = frozenset({"sex", "sexo", "name", "nome"})  # RN-13 e minimização: nada disso vai ao rastro
 
 
@@ -69,6 +75,117 @@ class Justifier(Protocol):
     ) -> Justification: ...
 
 
+class AgentRepository(Repository, RosterRepository, Protocol):
+    """O repositório do agente na C6: execução, versões e aprovações (`Repository`) mais o quadro (`RosterRepository`).
+    O `InMemoryRepository` dos testes e o `SqlRepository` (B1) implementam as duas portas."""
+
+
+# --- bordas da leitura por agente (C6) ------------------------------------------------------------------------------
+
+
+class TablesMetaLike(Protocol):
+    def as_dict(self) -> dict[str, object]: ...
+
+
+class TablesRead(Protocol):
+    """Resultado de `ingest.tables.read_tables` (o `TablesResult` satisfaz). `exception` não nulo é RX-13."""
+
+    @property
+    def format(self) -> str | None: ...
+
+    @property
+    def tables(self) -> list[RawTable]: ...
+
+    @property
+    def exception(self) -> ExceptionCard | None: ...
+
+    @property
+    def meta(self) -> TablesMetaLike: ...
+
+
+ReadTables = Callable[[str, bytes], TablesRead]
+"""`(file_name, content) -> TablesRead`: bytes do arquivo enviado em tabelas cruas (CSV ou XLSX)."""
+
+MapColumns = Callable[[list[RawTable], str, str | None], ColumnMapping]
+"""`(tables, run_id, parent_id) -> ColumnMapping` pelo modelo (nó 1), já conferido por `rules.mapping.check_mapping`.
+Levanta `LLMUnavailableError` (RX-12) quando o modelo falha ou insiste em mapeamento recusado: o agente cai na
+heurística de cabeçalhos."""
+
+LoadCard = Callable[[date], RuleCard]
+"""`week_start -> RuleCard` da semana (`rules.loader.load_rule_card_for_week` ligado ao diretório das regras)."""
+
+
+class EnrichOutcome(Protocol):
+    """Resultado de `ingest.cadastro.enrich` (o `EnrichResult` satisfaz)."""
+
+    @property
+    def employees(self) -> list[Employee]: ...
+
+    @property
+    def store_hours(self) -> dict[str, tuple[Time, Time]]: ...
+
+    @property
+    def matched_people(self) -> int: ...
+
+    @property
+    def matched_stores(self) -> int: ...
+
+    @property
+    def assumptions(self) -> list[str]: ...
+
+
+class FormulationOutcome(Protocol):
+    """Resultado da formulação (o `FormulationResult` de `llm.prompts.formulate` satisfaz). `spec=None`: sem entrada
+    para o modelo (o agente usa a especificação padrão). `rejected`: `(item descrito, motivo)` do que o `screen`
+    tirou da spec."""
+
+    @property
+    def spec(self) -> SolveSpec | None: ...
+
+    @property
+    def used_model(self) -> bool: ...
+
+    @property
+    def rejected(self) -> list[tuple[str, str]]: ...
+
+    @property
+    def cost_basis(self) -> str | None: ...
+
+
+class FormulateSpec(Protocol):
+    """Nó 2 pelo modelo: `functools.partial(llm.prompts.formulate.formulate, client)` satisfaz. Levanta
+    `LLMUnavailableError` (RX-12) quando o modelo falha ou insiste em saída recusada: o agente usa a especificação
+    padrão e avisa o gestor. O `screen` (de `rules.spec.make_screen`) é montado pelo agente com o quadro e a semana."""
+
+    def __call__(
+        self,
+        *,
+        people: list[tuple[str, str]],
+        week_start: date,
+        card: RuleCard,
+        note: str,
+        notes_cells: list[str],
+        run_id: str,
+        parent_id: str | None = None,
+        screen: Screen | None = None,
+    ) -> FormulationOutcome: ...
+
+
+class Enrich(Protocol):
+    """`ingest.cadastro.enrich`: completa as pessoas lidas com salário, cargo e carga (cadastro simulado, salário do
+    arquivo ou o valor confirmado pelo gestor). Levanta `ValueError` sem cadastro e sem `default_wage`."""
+
+    def __call__(
+        self,
+        people: list[PersonDraft],
+        stores: list[StoreDraft],
+        *,
+        cadastro: Any,
+        default_wage: Decimal | None,
+        default_contract_hours: int,
+    ) -> EnrichOutcome: ...
+
+
 # --- rastro --------------------------------------------------------------------------------------------------------
 
 
@@ -107,10 +224,12 @@ class Tracer:
         started: float | None = None,
         payload: dict[str, Any] | None = None,
         rule_ref: str | None = None,
+        cost_basis: str = NO_MODEL,
     ) -> TraceEvent:
-        """Passo sem modelo: `cost_usd = 0`, `cost_basis`, latência medida desde `started` (`perf_counter`)."""
+        """Passo sem modelo: `cost_usd = 0`, `cost_basis` (padrão: "sem chamada de modelo"), latência medida desde
+        `started` (`perf_counter`)."""
         latency_ms = 0 if started is None else max(0, round((time.perf_counter() - started) * 1000))
-        body = {**(payload or {}), "cost_basis": NO_MODEL}
+        body = {**(payload or {}), "cost_basis": cost_basis}
         _reject_personal(body)
         event = TraceEvent(
             id=self._new_id(),

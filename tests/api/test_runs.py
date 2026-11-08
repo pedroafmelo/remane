@@ -4,6 +4,7 @@
 Sempre `Settings(_env_file=None)` com `monkeypatch`: estes testes nunca leem o `.env` real.
 """
 
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -12,6 +13,7 @@ from fastapi.testclient import TestClient
 from escalista.api.app import create_app
 from escalista.api.fake_agent import FakeSliceAgent
 from escalista.api.optimizer_adapter import OptimizerSliceAgent
+from escalista.api.routes_runs import DEMO_FILES, XLSX_MEDIA_TYPE
 from escalista.api.wiring import MAX_UPLOAD_BYTES, SliceAgent, get_agent, get_demo_files_dir
 from escalista.config import Settings
 
@@ -125,7 +127,8 @@ def test_no_response_of_the_flow_carries_sex(tmp_path):
     call("GET", f"/api/runs/{run_id}/trace")
     call("GET", "/api/me")
     upload(call, content=b"# SINTETICO\n")  # execução que falha (RX-13 do agente)
-    upload(call, content=b"\xff\xfe\x00")  # recusa na porta
+    upload(call, content=b"\xff\xfe\x00")  # não decodifica: RX-13 do agente
+    upload(call, content=b"\xd0\xcf\x11\xe0", name="escala.xls")  # recusa na porta (tipo)
     assert len(call.bodies) >= 12
     for body in call.bodies:
         assert "sex" not in keys_of(body), body
@@ -179,13 +182,15 @@ def test_csv_of_exactly_1mb_is_accepted(tmp_path):
     assert upload(client.request, content=content).status_code == 201
 
 
-def test_non_utf8_csv_yields_rx13_without_500(tmp_path):
+def test_non_utf8_csv_reaches_the_agent_and_yields_rx13_without_500(tmp_path):
+    """C6: a API não confere mais a codificação; o leitor do agente decodifica e devolve RX-13 quando não consegue."""
     client, agent = make_client(tmp_path)
     response = upload(client.request, content="funcionário;loja\n".encode("latin-1"))
-    assert response.status_code == 422
-    card = response.json()["exception"]
-    assert card["code"] == "RX-13" and "UTF-8" in card["reason"]
-    assert agent._runs == {}
+    assert response.status_code == 201
+    body = response.json()
+    assert body["phase"] == "failed"
+    assert body["exception"]["code"] == "RX-13" and "UTF-8" in body["exception"]["reason"]
+    assert list(agent._runs) == [body["run_id"]]  # quem recusou foi o agente
 
 
 def test_defective_csv_is_failed_run_with_rx13(tmp_path):
@@ -232,6 +237,29 @@ def test_demo_file_is_served(tmp_path):
     response = client.get("/api/demo/files/escala_atual.csv")
     assert response.status_code == 200 and response.content == CSV
     assert response.headers["content-type"].startswith("text/csv")
+
+
+def test_demo_xlsx_is_served_as_binary_and_reaches_start_run_as_bytes(tmp_path):
+    """O XLSX de grade da demo sai com o tipo certo, byte a byte, e entra em `start_run` sem decodificar UTF-8."""
+    client, agent = make_client(tmp_path)
+    real = (Path(__file__).resolve().parents[2] / "data/demo/escala_exemplo_grade.xlsx").read_bytes()
+    demo_dir = tmp_path / "demo"
+    (demo_dir / "escala_exemplo_grade.xlsx").write_bytes(real)
+    response = client.get("/api/demo/files/escala_exemplo_grade.xlsx")
+    assert response.status_code == 200 and response.content == real
+    assert response.headers["content-type"] == XLSX_MEDIA_TYPE
+    assert "escala_exemplo_grade.xlsx" in response.headers["content-disposition"]
+    started = upload(client.request, content=response.content, name="escala_exemplo_grade.xlsx")
+    assert started.status_code == 201
+
+
+def test_demo_files_list_keeps_both_csv_and_labels_every_file():
+    assert {"escala_exemplo_grade.xlsx", "escala_atual.csv", "escala_defeito.csv"} == set(DEMO_FILES)
+    assert DEMO_FILES["escala_exemplo_grade.xlsx"] == (
+        XLSX_MEDIA_TYPE,
+        "Escala de exemplo em planilha (XLSX, grade)",
+    )
+    assert all(media and label for media, label in DEMO_FILES.values())
 
 
 @pytest.mark.parametrize(

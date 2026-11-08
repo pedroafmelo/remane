@@ -1,0 +1,2907 @@
+{
+  "file": "escala_exemplo_grade.xlsx",
+  "synthetic": true,
+  "week_start": "2027-01-11",
+  "expect": "shifts",
+  "shifts": [
+    {
+      "person_name": "Ana Dantas (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T20:00:00",
+      "person_id": "P037",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Ana Dantas (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P037",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Ana Dantas (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00",
+      "person_id": "P037",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Ana Dantas (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P037",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Ana Dantas (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00",
+      "person_id": "P037",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Ana Dantas (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T08:00:00",
+      "end": "2027-01-17T15:20:00",
+      "person_id": "P037",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Ana Nogueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00",
+      "person_id": "P003",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Ana Nogueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P003",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Ana Nogueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P003",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Ana Nogueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-14T12:40:00",
+      "end": "2027-01-14T20:00:00",
+      "person_id": "P003",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Ana Nogueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00",
+      "person_id": "P003",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Ana Nogueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-17T08:00:00",
+      "end": "2027-01-17T15:20:00",
+      "person_id": "P003",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Ana Oliveira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00",
+      "person_id": "P024",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Ana Oliveira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P024",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Ana Oliveira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00",
+      "person_id": "P024",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Ana Oliveira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P024",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Ana Oliveira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00",
+      "person_id": "P024",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Ana Oliveira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T12:40:00",
+      "end": "2027-01-17T20:00:00",
+      "person_id": "P024",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Ana Quintela (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00",
+      "person_id": "P018",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Ana Quintela (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P018",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Ana Quintela (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00",
+      "person_id": "P018",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Ana Quintela (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00",
+      "person_id": "P018",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Ana Quintela (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00",
+      "person_id": "P018",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Ana Quintela (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P018",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Ana Rezende (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00",
+      "person_id": "P017",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Ana Rezende (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P017",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Ana Rezende (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00",
+      "person_id": "P017",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Ana Rezende (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00",
+      "person_id": "P017",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Ana Rezende (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00",
+      "person_id": "P017",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Ana Rezende (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-17T12:40:00",
+      "end": "2027-01-17T20:00:00",
+      "person_id": "P017",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Bruno Cardoso (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T15:20:00",
+      "person_id": "P056",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Bruno Cardoso (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P056",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Bruno Cardoso (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00",
+      "person_id": "P056",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Bruno Cardoso (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P056",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Bruno Cardoso (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00",
+      "person_id": "P056",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Bruno Cardoso (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T12:40:00",
+      "end": "2027-01-17T20:00:00",
+      "person_id": "P056",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Carla Esteves (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00",
+      "person_id": "P014",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Esteves (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T15:20:00",
+      "person_id": "P014",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Esteves (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00",
+      "person_id": "P014",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Esteves (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00",
+      "person_id": "P014",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Esteves (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00",
+      "person_id": "P014",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Esteves (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-17T08:00:00",
+      "end": "2027-01-17T15:20:00",
+      "person_id": "P014",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Horta (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T15:20:00",
+      "person_id": "P019",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Horta (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P019",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Horta (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00",
+      "person_id": "P019",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Horta (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P019",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Horta (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-15T12:40:00",
+      "end": "2027-01-15T20:00:00",
+      "person_id": "P019",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Horta (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00",
+      "person_id": "P019",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T20:00:00",
+      "person_id": "P049",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Carla Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P049",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Carla Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P049",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Carla Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00",
+      "person_id": "P049",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Carla Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00",
+      "person_id": "P049",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Carla Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T08:00:00",
+      "end": "2027-01-17T15:20:00",
+      "person_id": "P049",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Carla Nogueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T18:00:00",
+      "person_id": "P010",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Nogueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00",
+      "person_id": "P010",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Nogueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-14T12:40:00",
+      "end": "2027-01-14T20:00:00",
+      "person_id": "P010",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Nogueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00",
+      "person_id": "P010",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Nogueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00",
+      "person_id": "P010",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Nogueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P010",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Siqueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T20:00:00",
+      "person_id": "P002",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Siqueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T15:20:00",
+      "person_id": "P002",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Siqueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00",
+      "person_id": "P002",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Siqueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T15:20:00",
+      "person_id": "P002",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Siqueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00",
+      "person_id": "P002",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Carla Siqueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-17T12:40:00",
+      "end": "2027-01-17T20:00:00",
+      "person_id": "P002",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Diego Dantas (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00",
+      "person_id": "P060",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Diego Dantas (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P060",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Diego Dantas (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00",
+      "person_id": "P060",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Diego Dantas (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T15:20:00",
+      "person_id": "P060",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Diego Dantas (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00",
+      "person_id": "P060",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Diego Dantas (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T12:40:00",
+      "end": "2027-01-17T20:00:00",
+      "person_id": "P060",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Diego Monteiro (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T15:20:00",
+      "person_id": "P008",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Diego Monteiro (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T15:20:00",
+      "person_id": "P008",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Diego Monteiro (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00",
+      "person_id": "P008",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Diego Monteiro (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T15:20:00",
+      "person_id": "P008",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Diego Monteiro (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00",
+      "person_id": "P008",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Diego Monteiro (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-17T08:00:00",
+      "end": "2027-01-17T15:20:00",
+      "person_id": "P008",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Diego Vasconcelos (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00",
+      "person_id": "P043",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Diego Vasconcelos (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00",
+      "person_id": "P043",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Diego Vasconcelos (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00",
+      "person_id": "P043",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Diego Vasconcelos (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P043",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Diego Vasconcelos (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00",
+      "person_id": "P043",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Diego Vasconcelos (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P043",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Elisa Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T15:20:00",
+      "person_id": "P040",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Elisa Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T15:20:00",
+      "person_id": "P040",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Elisa Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P040",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Elisa Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T12:40:00",
+      "end": "2027-01-14T20:00:00",
+      "person_id": "P040",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Elisa Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00",
+      "person_id": "P040",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Elisa Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T08:00:00",
+      "end": "2027-01-17T15:20:00",
+      "person_id": "P040",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Fábio Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T20:00:00",
+      "person_id": "P026",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Fábio Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T15:20:00",
+      "person_id": "P026",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Fábio Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00",
+      "person_id": "P026",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Fábio Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00",
+      "person_id": "P026",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Fábio Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00",
+      "person_id": "P026",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Fábio Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T08:00:00",
+      "end": "2027-01-17T15:20:00",
+      "person_id": "P026",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Fábio Lacerda (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P044",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Fábio Lacerda (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P044",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Fábio Lacerda (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T12:40:00",
+      "end": "2027-01-14T20:00:00",
+      "person_id": "P044",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Fábio Lacerda (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T15:20:00",
+      "person_id": "P044",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Fábio Lacerda (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00",
+      "person_id": "P044",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Fábio Lacerda (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P044",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Fábio Monteiro (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T20:00:00",
+      "person_id": "P020",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Fábio Monteiro (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P020",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Fábio Monteiro (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00",
+      "person_id": "P020",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Fábio Monteiro (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00",
+      "person_id": "P020",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Fábio Monteiro (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T15:20:00",
+      "person_id": "P020",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Fábio Monteiro (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00",
+      "person_id": "P020",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Fábio Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T20:00:00",
+      "person_id": "P031",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Fábio Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P031",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Fábio Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00",
+      "person_id": "P031",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Fábio Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P031",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Fábio Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T15:20:00",
+      "person_id": "P031",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Fábio Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00",
+      "person_id": "P031",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Fábio Pacheco (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T15:20:00",
+      "person_id": "P007",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Fábio Pacheco (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00",
+      "person_id": "P007",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Fábio Pacheco (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P007",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Fábio Pacheco (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-15T12:40:00",
+      "end": "2027-01-15T20:00:00",
+      "person_id": "P007",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Fábio Pacheco (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T18:00:00",
+      "person_id": "P007",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Fábio Pacheco (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-17T08:00:00",
+      "end": "2027-01-17T15:20:00",
+      "person_id": "P007",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Fábio Vasconcelos (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T20:00:00",
+      "person_id": "P021",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Fábio Vasconcelos (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00",
+      "person_id": "P021",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Fábio Vasconcelos (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00",
+      "person_id": "P021",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Fábio Vasconcelos (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-15T12:40:00",
+      "end": "2027-01-15T20:00:00",
+      "person_id": "P021",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Fábio Vasconcelos (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00",
+      "person_id": "P021",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Fábio Vasconcelos (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P021",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Gabriela Freitas (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T15:20:00",
+      "person_id": "P006",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Gabriela Freitas (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00",
+      "person_id": "P006",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Gabriela Freitas (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P006",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Gabriela Freitas (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00",
+      "person_id": "P006",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Gabriela Freitas (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00",
+      "person_id": "P006",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Gabriela Freitas (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-17T08:00:00",
+      "end": "2027-01-17T15:20:00",
+      "person_id": "P006",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Gabriela Quintela (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00",
+      "person_id": "P054",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Gabriela Quintela (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00",
+      "person_id": "P054",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Gabriela Quintela (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00",
+      "person_id": "P054",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Gabriela Quintela (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00",
+      "person_id": "P054",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Gabriela Quintela (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T12:40:00",
+      "end": "2027-01-15T20:00:00",
+      "person_id": "P054",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Gabriela Quintela (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T08:00:00",
+      "end": "2027-01-17T15:20:00",
+      "person_id": "P054",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Hugo Almeida (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T15:20:00",
+      "person_id": "P005",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Hugo Almeida (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T15:20:00",
+      "person_id": "P005",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Hugo Almeida (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00",
+      "person_id": "P005",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Hugo Almeida (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P005",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Hugo Almeida (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00",
+      "person_id": "P005",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Hugo Almeida (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P005",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Hugo Cardoso (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T15:20:00",
+      "person_id": "P034",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Hugo Cardoso (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P034",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Hugo Cardoso (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T12:40:00",
+      "end": "2027-01-14T20:00:00",
+      "person_id": "P034",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Hugo Cardoso (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00",
+      "person_id": "P034",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Hugo Cardoso (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00",
+      "person_id": "P034",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Hugo Cardoso (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P034",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Iara Nogueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00",
+      "person_id": "P047",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Iara Nogueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P047",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Iara Nogueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P047",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Iara Nogueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T12:40:00",
+      "end": "2027-01-14T22:10:00",
+      "person_id": "P047",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Iara Nogueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T15:20:00",
+      "person_id": "P047",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Iara Nogueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00",
+      "person_id": "P047",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Iara Pacheco (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T20:00:00",
+      "person_id": "P042",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Iara Pacheco (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T18:00:00",
+      "person_id": "P042",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Iara Pacheco (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P042",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Iara Pacheco (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T12:40:00",
+      "end": "2027-01-14T20:00:00",
+      "person_id": "P042",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Iara Pacheco (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00",
+      "person_id": "P042",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Iara Pacheco (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P042",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Iara Rezende (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00",
+      "person_id": "P052",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Iara Rezende (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P052",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Iara Rezende (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00",
+      "person_id": "P052",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Iara Rezende (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T15:20:00",
+      "person_id": "P052",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Iara Rezende (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00",
+      "person_id": "P052",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Iara Rezende (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P052",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "João Dantas (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00",
+      "person_id": "P050",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "João Dantas (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T15:20:00",
+      "person_id": "P050",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "João Dantas (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00",
+      "person_id": "P050",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "João Dantas (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T12:40:00",
+      "end": "2027-01-14T20:00:00",
+      "person_id": "P050",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "João Dantas (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00",
+      "person_id": "P050",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "João Dantas (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P050",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "João Pacheco (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T20:00:00",
+      "person_id": "P048",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "João Pacheco (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00",
+      "person_id": "P048",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "João Pacheco (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T18:00:00",
+      "person_id": "P048",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "João Pacheco (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T12:40:00",
+      "end": "2027-01-14T20:00:00",
+      "person_id": "P048",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "João Pacheco (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00",
+      "person_id": "P048",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "João Pacheco (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P048",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Karina Pacheco (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00",
+      "person_id": "P030",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Karina Pacheco (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P030",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Karina Pacheco (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P030",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Karina Pacheco (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P030",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Karina Pacheco (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-15T12:40:00",
+      "end": "2027-01-15T20:00:00",
+      "person_id": "P030",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Karina Pacheco (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00",
+      "person_id": "P030",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Karina Rezende (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00",
+      "person_id": "P016",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Karina Rezende (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00",
+      "person_id": "P016",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Karina Rezende (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00",
+      "person_id": "P016",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Karina Rezende (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00",
+      "person_id": "P016",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Karina Rezende (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00",
+      "person_id": "P016",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Karina Rezende (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-17T12:40:00",
+      "end": "2027-01-17T20:00:00",
+      "person_id": "P016",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Lucas Junqueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T23:30:00",
+      "person_id": "P032",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Lucas Junqueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P032",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Lucas Junqueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P032",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Lucas Junqueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P032",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Lucas Junqueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00",
+      "person_id": "P032",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Lucas Junqueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P032",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Lucas Quintela (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00",
+      "person_id": "P058",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Lucas Quintela (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00",
+      "person_id": "P058",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Lucas Quintela (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00",
+      "person_id": "P058",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Lucas Quintela (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T12:40:00",
+      "end": "2027-01-14T20:00:00",
+      "person_id": "P058",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Lucas Quintela (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00",
+      "person_id": "P058",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Lucas Quintela (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P058",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Mariana Teixeira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T15:20:00",
+      "person_id": "P022",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Mariana Teixeira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T15:20:00",
+      "person_id": "P022",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Mariana Teixeira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P022",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Mariana Teixeira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T15:20:00",
+      "person_id": "P022",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Mariana Teixeira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00",
+      "person_id": "P022",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Mariana Teixeira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T08:00:00",
+      "end": "2027-01-17T15:20:00",
+      "person_id": "P022",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Nelson Pacheco (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00",
+      "person_id": "P059",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Nelson Pacheco (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T15:20:00",
+      "person_id": "P059",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Nelson Pacheco (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00",
+      "person_id": "P059",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Nelson Pacheco (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00",
+      "person_id": "P059",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Nelson Pacheco (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00",
+      "person_id": "P059",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Nelson Pacheco (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00",
+      "person_id": "P059",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Nelson Vasconcelos (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T20:00:00",
+      "person_id": "P013",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Nelson Vasconcelos (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00",
+      "person_id": "P013",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Nelson Vasconcelos (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P013",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Nelson Vasconcelos (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T15:20:00",
+      "person_id": "P013",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Nelson Vasconcelos (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00",
+      "person_id": "P013",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Nelson Vasconcelos (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-17T12:40:00",
+      "end": "2027-01-17T20:00:00",
+      "person_id": "P013",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Olívia Horta (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00",
+      "person_id": "P025",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Olívia Horta (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P025",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Olívia Horta (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00",
+      "person_id": "P025",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Olívia Horta (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P025",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Olívia Horta (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-15T12:40:00",
+      "end": "2027-01-15T20:00:00",
+      "person_id": "P025",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Olívia Horta (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00",
+      "person_id": "P025",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Paulo Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00",
+      "person_id": "P033",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Paulo Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00",
+      "person_id": "P033",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Paulo Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P033",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Paulo Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-15T12:40:00",
+      "end": "2027-01-15T20:00:00",
+      "person_id": "P033",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Paulo Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00",
+      "person_id": "P033",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Paulo Barros (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T12:40:00",
+      "end": "2027-01-17T20:00:00",
+      "person_id": "P033",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Paulo Cardoso (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P015",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Paulo Cardoso (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00",
+      "person_id": "P015",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Paulo Cardoso (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P015",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Paulo Cardoso (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T15:20:00",
+      "person_id": "P015",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Paulo Cardoso (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00",
+      "person_id": "P015",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Paulo Cardoso (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-17T12:40:00",
+      "end": "2027-01-17T20:00:00",
+      "person_id": "P015",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Paulo Ivo (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00",
+      "person_id": "P023",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Paulo Ivo (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P023",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Paulo Ivo (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P023",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Paulo Ivo (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00",
+      "person_id": "P023",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Paulo Ivo (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T15:20:00",
+      "person_id": "P023",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Paulo Ivo (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P023",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Paulo Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T20:00:00",
+      "person_id": "P053",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Paulo Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00",
+      "person_id": "P053",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Paulo Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00",
+      "person_id": "P053",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Paulo Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T12:40:00",
+      "end": "2027-01-15T20:00:00",
+      "person_id": "P053",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Paulo Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00",
+      "person_id": "P053",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Paulo Junqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P053",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Quitéria Horta (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T20:00:00",
+      "person_id": "P001",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Quitéria Horta (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P001",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Quitéria Horta (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P001",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Quitéria Horta (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00",
+      "person_id": "P001",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Quitéria Horta (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00",
+      "person_id": "P001",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Quitéria Horta (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-17T08:00:00",
+      "end": "2027-01-17T15:20:00",
+      "person_id": "P001",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Quitéria Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T20:00:00",
+      "person_id": "P028",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Quitéria Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00",
+      "person_id": "P028",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Quitéria Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P028",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Quitéria Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T12:40:00",
+      "end": "2027-01-14T20:00:00",
+      "person_id": "P028",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Quitéria Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00",
+      "person_id": "P028",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Quitéria Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00",
+      "person_id": "P028",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Rafael Galvão (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T20:00:00",
+      "person_id": "P011",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Rafael Galvão (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P011",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Rafael Galvão (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00",
+      "person_id": "P011",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Rafael Galvão (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00",
+      "person_id": "P011",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Rafael Galvão (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00",
+      "person_id": "P011",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Rafael Galvão (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-17T12:40:00",
+      "end": "2027-01-17T20:00:00",
+      "person_id": "P011",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Rafael Siqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T20:00:00",
+      "person_id": "P041",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Rafael Siqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P041",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Rafael Siqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00",
+      "person_id": "P041",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Rafael Siqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P041",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Rafael Siqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T15:20:00",
+      "person_id": "P041",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Rafael Siqueira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00",
+      "person_id": "P041",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Rafael Vasconcelos (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00",
+      "person_id": "P029",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Rafael Vasconcelos (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00",
+      "person_id": "P029",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Rafael Vasconcelos (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00",
+      "person_id": "P029",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Rafael Vasconcelos (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P029",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Rafael Vasconcelos (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00",
+      "person_id": "P029",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Rafael Vasconcelos (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P029",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Sílvia Galvão (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T22:10:00",
+      "person_id": "P027",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Sílvia Galvão (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T15:20:00",
+      "person_id": "P027",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Sílvia Galvão (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P027",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Sílvia Galvão (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T12:40:00",
+      "end": "2027-01-14T20:00:00",
+      "person_id": "P027",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Sílvia Galvão (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00",
+      "person_id": "P027",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Sílvia Galvão (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T12:40:00",
+      "end": "2027-01-17T20:00:00",
+      "person_id": "P027",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Sílvia Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T18:00:00",
+      "person_id": "P057",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Sílvia Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T15:20:00",
+      "person_id": "P057",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Sílvia Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00",
+      "person_id": "P057",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Sílvia Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T12:40:00",
+      "end": "2027-01-15T20:00:00",
+      "person_id": "P057",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Sílvia Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00",
+      "person_id": "P057",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Sílvia Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P057",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Sílvia Siqueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T15:20:00",
+      "person_id": "P009",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Sílvia Siqueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00",
+      "person_id": "P009",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Sílvia Siqueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-14T12:40:00",
+      "end": "2027-01-14T20:00:00",
+      "person_id": "P009",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Sílvia Siqueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T15:20:00",
+      "person_id": "P009",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Sílvia Siqueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00",
+      "person_id": "P009",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Sílvia Siqueira (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-17T12:40:00",
+      "end": "2027-01-17T20:00:00",
+      "person_id": "P009",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Sílvia Vasconcelos (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P004",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Sílvia Vasconcelos (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P004",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Sílvia Vasconcelos (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00",
+      "person_id": "P004",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Sílvia Vasconcelos (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T15:20:00",
+      "person_id": "P004",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Sílvia Vasconcelos (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00",
+      "person_id": "P004",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Sílvia Vasconcelos (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P004",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Tiago Ivo (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T12:40:00",
+      "end": "2027-01-11T20:00:00",
+      "person_id": "P038",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Tiago Ivo (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T15:20:00",
+      "person_id": "P038",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Tiago Ivo (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T12:40:00",
+      "end": "2027-01-14T20:00:00",
+      "person_id": "P038",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Tiago Ivo (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00",
+      "person_id": "P038",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Tiago Ivo (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00",
+      "person_id": "P038",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Tiago Ivo (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P038",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Tiago Lacerda (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P046",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Tiago Lacerda (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P046",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Tiago Lacerda (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T12:40:00",
+      "end": "2027-01-14T20:00:00",
+      "person_id": "P046",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Tiago Lacerda (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T15:20:00",
+      "person_id": "P046",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Tiago Lacerda (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00",
+      "person_id": "P046",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Tiago Lacerda (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T12:40:00",
+      "end": "2027-01-17T20:00:00",
+      "person_id": "P046",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Vitor Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T15:20:00",
+      "person_id": "P051",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Vitor Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T15:20:00",
+      "person_id": "P051",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Vitor Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P051",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Vitor Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P051",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Vitor Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T12:40:00",
+      "end": "2027-01-15T20:00:00",
+      "person_id": "P051",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Vitor Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00",
+      "person_id": "P051",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Wagner Freitas (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T15:20:00",
+      "person_id": "P036",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Wagner Freitas (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P036",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Wagner Freitas (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00",
+      "person_id": "P036",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Wagner Freitas (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00",
+      "person_id": "P036",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Wagner Freitas (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-15T12:40:00",
+      "end": "2027-01-15T20:00:00",
+      "person_id": "P036",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Wagner Freitas (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T12:40:00",
+      "end": "2027-01-17T20:00:00",
+      "person_id": "P036",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Wagner Rezende (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T15:20:00",
+      "person_id": "P012",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Wagner Rezende (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00",
+      "person_id": "P012",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Wagner Rezende (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P012",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Wagner Rezende (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-14T14:00:00",
+      "end": "2027-01-14T22:00:00",
+      "person_id": "P012",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Wagner Rezende (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00",
+      "person_id": "P012",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Wagner Rezende (sintético)",
+      "store": "Loja Sintética Centro",
+      "start": "2027-01-17T14:00:00",
+      "end": "2027-01-17T22:00:00",
+      "person_id": "P012",
+      "store_id": "L1"
+    },
+    {
+      "person_name": "Zé Lacerda (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00",
+      "person_id": "P045",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Zé Lacerda (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P045",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Zé Lacerda (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T14:00:00",
+      "end": "2027-01-13T22:00:00",
+      "person_id": "P045",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Zé Lacerda (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00",
+      "person_id": "P045",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Zé Lacerda (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00",
+      "person_id": "P045",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Zé Lacerda (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T12:40:00",
+      "end": "2027-01-17T20:00:00",
+      "person_id": "P045",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Úrsula Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T14:00:00",
+      "end": "2027-01-11T22:00:00",
+      "person_id": "P039",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Úrsula Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T14:00:00",
+      "end": "2027-01-12T22:00:00",
+      "person_id": "P039",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Úrsula Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00",
+      "person_id": "P039",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Úrsula Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-15T08:00:00",
+      "end": "2027-01-15T15:20:00",
+      "person_id": "P039",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Úrsula Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T08:00:00",
+      "end": "2027-01-16T15:20:00",
+      "person_id": "P039",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Úrsula Nogueira (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T12:40:00",
+      "end": "2027-01-17T20:00:00",
+      "person_id": "P039",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Úrsula Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T15:20:00",
+      "person_id": "P055",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Úrsula Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-12T12:40:00",
+      "end": "2027-01-12T20:00:00",
+      "person_id": "P055",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Úrsula Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-13T12:40:00",
+      "end": "2027-01-13T20:00:00",
+      "person_id": "P055",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Úrsula Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-15T14:00:00",
+      "end": "2027-01-15T22:00:00",
+      "person_id": "P055",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Úrsula Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-16T12:40:00",
+      "end": "2027-01-16T20:00:00",
+      "person_id": "P055",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Úrsula Oliveira (sintético)",
+      "store": "Loja Sintética Sul",
+      "start": "2027-01-17T12:40:00",
+      "end": "2027-01-17T20:00:00",
+      "person_id": "P055",
+      "store_id": "L3"
+    },
+    {
+      "person_name": "Úrsula Pacheco (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-11T08:00:00",
+      "end": "2027-01-11T15:20:00",
+      "person_id": "P035",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Úrsula Pacheco (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-12T08:00:00",
+      "end": "2027-01-12T15:20:00",
+      "person_id": "P035",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Úrsula Pacheco (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-13T08:00:00",
+      "end": "2027-01-13T15:20:00",
+      "person_id": "P035",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Úrsula Pacheco (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-14T08:00:00",
+      "end": "2027-01-14T15:20:00",
+      "person_id": "P035",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Úrsula Pacheco (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-16T14:00:00",
+      "end": "2027-01-16T22:00:00",
+      "person_id": "P035",
+      "store_id": "L2"
+    },
+    {
+      "person_name": "Úrsula Pacheco (sintético)",
+      "store": "Loja Sintética Norte",
+      "start": "2027-01-17T08:00:00",
+      "end": "2027-01-17T15:20:00",
+      "person_id": "P035",
+      "store_id": "L2"
+    }
+  ],
+  "mapping_hint": {
+    "layout": "grid",
+    "sheet": "SINTETICO - Escala",
+    "header_row": 2,
+    "person_column": "Colaborador",
+    "store_column": "Unidade",
+    "day_columns": [
+      "Seg 11/01/2027",
+      "Ter 12/01/2027",
+      "Qua 13/01/2027",
+      "Qui 14/01/2027",
+      "Sex 15/01/2027",
+      "Sáb 16/01/2027",
+      "Dom 17/01/2027"
+    ],
+    "cell_format": "HH:MM-HH:MM (turno que vira a noite termina no dia seguinte)",
+    "off_marker": "Folga"
+  },
+  "expected_issues": []
+}

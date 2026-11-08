@@ -1,6 +1,6 @@
 """Mesmos comportamentos contra o `InMemoryRepository` (falso) e o `SqlRepository`: o falso não pode divergir."""
 
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
 
 import pytest
@@ -8,7 +8,8 @@ from sqlalchemy import inspect
 
 from escalista.db import init_db, make_engine
 from escalista.domain.contracts import ExceptionCard, ExceptionOption, Role
-from escalista.domain.ports import Repository
+from escalista.domain.ports import Repository, RosterRepository
+from escalista.domain.reading import DemandPattern
 from escalista.domain.results import (
     Approval,
     Comparison,
@@ -20,7 +21,9 @@ from escalista.domain.results import (
     Violation,
     ViolationReport,
 )
-from escalista.domain.schedule import CsvIssue, ReadSummary, Schedule, Shift
+from escalista.domain.roster import Roster
+from escalista.domain.schedule import CsvIssue, Employee, ReadSummary, Schedule, Shift, Store
+from escalista.domain.spec import MaxWeeklyHoursConstraint, PreferredDayOffConstraint, SolveSpec, UnavailableConstraint
 from escalista.store.sql_repository import SqlRepository
 from tests.fakes import InMemoryRepository
 
@@ -123,8 +126,69 @@ def approval(version_id: str = "v1", aid: str = "a1", by: str = "u1") -> Approva
     return Approval(id=aid, version_id=version_id, approved_by=by, role=Role.GESTOR, at=T0)
 
 
-def test_sql_repository_satisfies_port(engine):
-    assert isinstance(SqlRepository(engine), Repository)
+def roster(n: int = 1, **kw) -> Roster:
+    base = {
+        "version": n,
+        "stores": [Store(id="s1", name="Loja 1", opens=time(8, 0), closes=time(22, 0))],
+        "employees": [
+            Employee(id="e1", name="Ana", store_id="s1", job="caixa", hourly_wage=Decimal("12.34"), contract_hours=44),
+            Employee(
+                id="e2",
+                name="Bia",
+                store_id="s1",
+                job="repositora",
+                hourly_wage=Decimal("10.05"),
+                contract_hours=30,
+                sex="F",
+                profile="aprendiz",
+            ),
+        ],
+        "demand": [DemandPattern(store_id="s1", weekday=0, start=time(8, 30), required=2)],
+        "source_run_id": "run-1",
+        "confirmed_by": "u1",
+        "confirmed_at": T0 + timedelta(minutes=n),
+    }
+    return Roster(**{**base, **kw})
+
+
+def big_schedule(shifts: int = 600) -> Schedule:
+    return Schedule(
+        week_start=MONDAY,
+        shifts=[
+            Shift(
+                employee_id=f"e{i % 40}",
+                store_id=f"s{i % 5}",
+                start=datetime(2026, 11, 2 + i % 7, 8, 0),
+                end=datetime(2026, 11, 2 + i % 7, 14, 30),
+            )
+            for i in range(shifts)
+        ],
+    )
+
+
+def card(code: str) -> ExceptionCard:
+    return ExceptionCard(
+        code=code,
+        title="Aviso",
+        reason="motivo",
+        decider=Role.GESTOR,
+        deadline=datetime(2026, 11, 8, 9, 0),
+        evidence=["linha 3"],
+        options=[ExceptionOption(label="seguir", cost_usd=Decimal("0.07"), effect="nada muda")],
+        recommendation="seguir",
+        if_no_answer="segue",
+        trace_id="t9",
+    )
+
+
+def test_sql_repository_satisfies_ports(engine):
+    repo = SqlRepository(engine)
+    assert isinstance(repo, Repository)
+    assert isinstance(repo, RosterRepository)
+
+
+def test_roster_table_has_search_columns(engine):
+    assert {"version", "confirmed_at", "data"} <= {c["name"] for c in inspect(engine).get_columns("roster_version")}
 
 
 def test_tables_have_search_columns(engine):
@@ -248,3 +312,89 @@ def test_sql_data_persists_across_instances(engine):
     assert second.get_version("v1").status == "published"
     assert second.get_approval("v1") == approval()
     assert second.latest_published().id == "v1"
+
+
+def test_roster_roundtrip_preserves_decimal_and_optional_sex(repo):
+    r = roster()
+    repo.save_roster(r)
+    got = repo.get_roster(1)
+    assert got == r
+    assert got.employees[0].sex is None
+    assert got.employees[1].sex == "F"
+    assert got.employees[0].hourly_wage == Decimal("12.34")
+    assert isinstance(got.employees[0].hourly_wage, Decimal)
+
+
+def test_get_roster_unknown_and_latest_empty(repo):
+    assert repo.latest_roster() is None
+    assert repo.get_roster(1) is None
+    repo.save_roster(roster(1))
+    assert repo.get_roster(2) is None
+
+
+def test_latest_roster_is_the_highest_version(repo):
+    repo.save_roster(roster(1))
+    repo.save_roster(roster(3))
+    repo.save_roster(roster(2))
+    assert repo.latest_roster().version == 3
+    assert repo.get_roster(2).version == 2
+
+
+def test_save_roster_repeated_version_raises_and_keeps_first(repo):
+    repo.save_roster(roster(1, confirmed_by="u1"))
+    with pytest.raises(ValueError):
+        repo.save_roster(roster(1, confirmed_by="u2"))
+    assert repo.get_roster(1).confirmed_by == "u1"
+    assert repo.latest_roster().confirmed_by == "u1"
+
+
+def test_roster_with_aware_confirmed_at_roundtrips(repo):
+    r = roster(confirmed_at=datetime(2026, 11, 7, 15, 0, tzinfo=UTC))
+    repo.save_roster(r)
+    assert repo.get_roster(1) == r
+
+
+def test_sql_roster_persists_across_instances(engine):
+    SqlRepository(engine).save_roster(roster(1))
+    assert SqlRepository(engine).latest_roster() == roster(1)
+
+
+def test_run_roundtrip_c6_fields(repo):
+    before = big_schedule()
+    spec = SolveSpec(
+        shortfall_weight=120,
+        stability_weight=7,
+        constraints=[
+            UnavailableConstraint(employee_id="e1", day=date(2026, 11, 3), start=time(8), end=time(12), evidence="x"),
+            MaxWeeklyHoursConstraint(employee_id="e2", hours=30, evidence="y"),
+            PreferredDayOffConstraint(employee_id="e3", day=date(2026, 11, 4), evidence="z"),
+        ],
+    )
+    state = RunState(
+        run_id="run-2",
+        phase="optimized",
+        mode="continuidade",
+        before=before,
+        week_start=MONDAY,
+        spec=spec,
+        notices=[card("RX-02"), card("RX-12")],
+        roster_version=3,
+        attempts=2,
+        comparison=full_run().comparison,
+    )
+    repo.save_run(state)
+    got = repo.get_run("run-2")
+    assert got == state
+    assert len(got.before.shifts) == 600
+    assert got.before == before
+    assert got.spec == spec
+    assert [n.code for n in got.notices] == ["RX-02", "RX-12"]
+    assert got.notices[0].options[0].cost_usd == Decimal("0.07")
+    assert (got.mode, got.week_start, got.roster_version, got.attempts) == ("continuidade", MONDAY, 3, 2)
+
+
+def test_run_c6_defaults_when_absent(repo):
+    repo.save_run(RunState(run_id="run-3", phase="read"))
+    got = repo.get_run("run-3")
+    assert (got.mode, got.before, got.week_start, got.spec, got.notices) == ("upload", None, None, None, [])
+    assert (got.roster_version, got.attempts) == (None, 0)

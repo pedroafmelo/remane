@@ -1,6 +1,6 @@
 # Plano da C6 repensada · Leitura por agente e formulação do problema de otimização
 
-Última atualização: 2026-11-08 02:28 (Recife) · Situação: **proposta, aguarda o "aprovado" do usuário** · Planejado por Claude
+Última atualização: 2026-11-08 02:52 (DECs renumeradas de 043 a 050 para 046 a 053; papéis `gestor` e `colaborador` da DEC-044; tarefa R0). Antes: 2026-11-08 02:28 (Recife) · Situação: **aprovado pelo usuário em 2026-11-08 02:54** (Recife; prompt de orquestração da C6) · Planejado por Claude
 (Opus 5.5, [DEC-028](../decisoes.md)) numa sessão só de planejamento: sem código, sem `uv add`, sem commit. As DECs propostas (seção 18)
 **não foram gravadas** em [decisoes.md](../decisoes.md): outra sessão pode estar editando o arquivo.
 
@@ -11,6 +11,11 @@ agente. **[INFERÊNCIA]** é dedução sem medição. **[HIPÓTESE]** é premiss
 **O que muda em relação à C6 do [plano macro](../plano-implementacao.md) (seção 5.6):** esta C6 cobre o resto do **FT-02**: leitura de
 formato livre por agente, persistência do quadro e das semanas seguintes, e formulação do problema pelo modelo. O **FT-01** (convenção em
 PDF, tela do cartão, aprovação do DP) **fica fora**: vira C6b depois do G4 ou o corte 5 do produto (o cartão continua vindo dos YAMLs).
+
+**Papéis (DEC-044, mergeada depois que este plano foi escrito):** a demo tem **`gestor`** (gerente + DP) e **`colaborador`**. Onde este plano
+diz "gerente" ou "DP", leia **gestor**. Isso exige uma tarefa nova, **R0** (seção 14), feita **antes de tudo e sozinha**, porque o contrato `Role`
+(`domain/contracts.py`), `require_role`, `POST /auth/demo/{papel}`, o `decider` dos cartões, `PUBLISHER_ROLES` e a SPA ainda usam `gerente` e `dp`
+[FATO: a PR #12 só mudou docs; confira com `git grep -n "gerente\|Role\."`].
 
 ## 0. Como o trabalho roda
 
@@ -81,6 +86,10 @@ O jurado, no link público, como gerente:
   60 × mín(42, 5 × 8) = **2.400 pessoa-hora**. A demanda sintética de hoje (`demanda.json`, com o teto da D2b) soma **1.676**. Picos
   observados por faixa: 14 (L1), 13 (L2), 13 (L3). **Consequência:** com a demanda inferida a 100%, faltam **pelo menos 376 pessoa-hora
   (13,5%)** e o RX-02 sai sempre.
+- **Errata (medida na execução, A3 às 03h53 e B4a às 04h19; o texto acima fica como foi escrito):** contando faixas de 30 min
+  **alinhadas**, a demanda inferida do exemplo é **2.777** pessoa-hora (não 2.776), os picos por faixa são **20 (L1), 20 (L2), 19 (L3)**
+  (o script do planejamento não alinhava as faixas) e o "ajustar para caber" dá **80%** (não ~86%: o arredondamento para cima por faixa
+  infla a demanda escalada). Com o horário das lojas vindo do cadastro simulado (08h às 22h), o agente mostra **2.774,5** contra 2.400.
 - [FATO, `data/regras/lei/ec141.yaml`] `jornada_semanal_max`: 44h até 15/12/2026, 42h de 16/12/2026, 40h de 16/12/2027. A ampliação
   diária de 9h da convenção (`cct_jornada_diaria_ampliada`, 16/12/2026) **ainda é `info`** e não alimenta o motor
   ([data/regras/README.md](../../data/regras/README.md)).
@@ -325,6 +334,12 @@ truncada; e um falso que devolve o mapeamento "envenenado" (fim no lugar de iní
 Verificação de toda tarefa antes de integrar: `uv run pytest -q && uv run ruff check .`, mais a específica. Donos exclusivos como na C5:
 `domain/`, `tests/fakes.py` e `tests/architecture/` → A; `pyproject.toml` e `uv.lock` → ninguém.
 
+### R0 · papéis `gestor` e `colaborador` (DEC-044), antes de tudo e sozinha (Opus 5.5)
+
+| Id | Tarefa | Depende | Horas | Verificação |
+|---|---|---|---|---|
+| R0 | **Uma única tarefa transversal, com permissão de editar todas as pastas** (exceção ao dono exclusivo, porque trocar o enum quebra tudo ao mesmo tempo): `Role` passa a `gestor` e `colaborador` (some `gerente` e `dp`); `require_role`, `POST /auth/demo/{papel}` (e o 404 de papel desconhecido), `PUBLISHER_ROLES`, o `decider` dos cartões (RX-02, RX-12, RX-13 e os demais: quem era gerente ou DP vira gestor), a matriz rota × papel (de três para dois), os textos da SPA e `/entrar` (**dois** botões: "Entrar como gestor" e "Entrar como colaborador"), `data/` e testes, e2e e evals E1 que citem `gerente` ou `dp`. Teste de contrato dos papéis. Sem aliases de compatibilidade (a DEC-044 não pede). Antes de começar, ler a DEC-044 em `docs/decisoes.md` | — | 0,25–0,5 | `pytest`, `ruff`, `evals --suite e1` (10/10), `npm --prefix web run typecheck && npm --prefix web run build`; `git grep -n -i "gerente\|\bdp\b"` só no que for texto histórico de docs |
+
 ### Frente A · núcleo e contratos (Opus 5.5 em tudo: o custo do erro aqui é alto)
 
 | Id | Tarefa | Depende | Horas | Verificação específica |
@@ -378,11 +393,11 @@ A0 ─┬─► A1 ─┐                    D1 ──────────�
     └─► C1 ─► C2 ───┴───────────────────────────────────┘
 ```
 
-- **Caminho crítico [PROPOSTA]:** A0 (0,5–0,75) → A1 (0,75–1,25) → B4 (1–1,5) → C3 + e2e (0,5–0,75) → à mão (0,25) = **3 a 4,5 h**.
+- **Caminho crítico [PROPOSTA]:** A0 (0,5–0,75) → A1 (0,75–1,25) → B4 (1–1,5) → C3 + e2e (0,5–0,75) → à mão (0,25) = **3 a 4,5 h** (mais 0,25 a 0,5 h da R0, `[PROPOSTA]`).
   Referência medida: a C5 foi estimada em 3,25 a 5 h e levou ~45 min de relógio com o orquestrador
   ([estado](../estado-do-projeto.md), Métricas medidas). [INFERÊNCIA] Aqui pode levar de 1 a 2 h, mas B4 e o laço do solver têm mais risco
   de depuração que a C5.
-- **Ordem de integração em `c6/integra`:** A0 → D1, D2, D3, D4, B1, C1 (em qualquer ordem) → A1, A2, A3, A4 → B2, B3, A5, D7 → C2 → **B4
+- **Ordem de integração em `c6/integra`:** **R0 (sozinha, com todas as frentes paradas)** → A0 → D1, D2, D3, D4, B1, C1 (em qualquer ordem) → A1, A2, A3, A4 → B2, B3, A5, D7 → C2 → **B4
   (com as outras frentes paradas)** → C3 (idem) → D5. Rebase de cada branch curta (`c6/<frente>-<tarefa>`) sobre `c6/integra` e
   `merge --ff-only`.
 - **Marcos (só eles vão ao `main`, e quem faz o merge é o usuário):**
@@ -426,25 +441,25 @@ leem o `main`.
    de qualquer forma, porque a demanda passa a ser a inferida). Contra: é mais um elemento simulado a declarar na
    submissão; sem ele, a economia vira só horas × um salário único.
 
-## 18. DECs propostas (não gravadas; o número final é o próximo livre em [decisoes.md](../decisoes.md), hoje DEC-043, salvo se o PR #9 usou)
+## 18. DECs propostas (não gravadas; o número final é o próximo livre em [decisoes.md](../decisoes.md), hoje **DEC-046**: a DEC-043 é o WhatsApp (Cloud API), a DEC-044 são os dois papéis e a DEC-045 é o mascote)
 
-- **DEC-043 · C6 repensada:** o FT-02 lê formato livre por agente (nó 1, mapeamento em schema fechado aplicado pelo código), formula a
+- **DEC-046 · C6 repensada:** o FT-02 lê formato livre por agente (nó 1, mapeamento em schema fechado aplicado pelo código), formula a
   `SolveSpec` (nó 2) e chama o solver com laço limitado (nó 3). O FT-01 (convenção em PDF e tela do cartão) sai da C6 e vai para C6b ou para
   o corte 5. Execução em `c6/integra`, com o `main` só nos marcos M1, M2 e M3, por merge do usuário.
-- **DEC-044 · Continuidade e persistência:** a 1ª execução lê um arquivo e grava, na confirmação, um `Roster` versionado (lojas, pessoas,
+- **DEC-047 · Continuidade e persistência:** a 1ª execução lê um arquivo e grava, na confirmação, um `Roster` versionado (lojas, pessoas,
   padrão de demanda por dia da semana). As seguintes partem da última escala publicada, deslocada 1 semana, sem upload. A porta
   `Repository` ganha `save_roster`, `latest_roster` e `get_roster`, e o `RunState` passa a guardar o "antes".
-- **DEC-045 · Identidade das pessoas:** id por matrícula ou por nome normalizado; homônimo e grafia parecida viram cartão ao gerente, nunca
+- **DEC-048 · Identidade das pessoas:** id por matrícula ou por nome normalizado; homônimo e grafia parecida viram cartão ao gerente, nunca
   fusão automática por parecença.
-- **DEC-046 · Semana e vigência por execução:** o cartão é montado pela semana planejada, com a mais restritiva na semana em que a vigência
+- **DEC-049 · Semana e vigência por execução:** o cartão é montado pela semana planejada, com a mais restritiva na semana em que a vigência
   muda (aviso em `provisional`). A semana fixa da demo deixa de existir fora dos evals E1.
-- **DEC-047 · Demanda inferida** (depende da pergunta 1): demanda = cobertura do arquivo por faixa, corrigida pela cobertura-alvo por loja,
+- **DEC-050 · Demanda inferida** (depende da pergunta 1): demanda = cobertura do arquivo por faixa, corrigida pela cobertura-alvo por loja,
   com `CapacityCheck` antes do solver.
-- **DEC-048 · Limites do modelo:** o modelo não devolve linhas, só o mapeamento; não toca no cartão; a `SolveSpec` só restringe
+- **DEC-051 · Limites do modelo:** o modelo não devolve linhas, só o mapeamento; não toca no cartão; a `SolveSpec` só restringe
   (`extra="forbid"`, lista fechada, evidência literal); o laço relaxa só preferências, em código, no máximo 2 chamadas ao solver.
-- **DEC-049 · Reserva sem modelo:** a falha do modelo nunca bloqueia: o nó 1 cai para a heurística de aliases e depois para o leitor da
+- **DEC-052 · Reserva sem modelo:** a falha do modelo nunca bloqueia: o nó 1 cai para a heurística de aliases e depois para o leitor da
   DEC-039; o nó 2 cai para a especificação padrão; o aviso RX-12 fica visível em `notices`.
-- **DEC-050 · Campo de sexo opcional no contrato** (consequência da decisão 2 do usuário): `Employee.sex` passa a `None` por padrão; nenhuma
+- **DEC-053 · Campo de sexo opcional no contrato** (consequência da decisão 2 do usuário): `Employee.sex` passa a `None` por padrão; nenhuma
   regra o usa nesta camada.
 
 ## 19. Critério de pronto (comandos)
@@ -484,12 +499,185 @@ medidas.
 
 Cada sessão escreve só na sua subseção: início, fim (`date`), hash, desvios e métricas medidas.
 
+**Como rodou (08/11, a partir de 02h54):** uma sessão orquestradora (Claude, Opus 5.5) delegou cada tarefa a um subagente no worktree da
+frente (`cc61-c6-{a,b,c,d}`), conferiu diff, donos, suíte, ruff e E1, fez o rebase e integrou em `c6/integra` (worktree `cc61-c6-integra`)
+com `merge --ff-only`, **sem push e sem tocar no `main`**. Os hashes abaixo são os de `c6/integra` depois do rebase. Horários por `date`
+nos relatórios dos subagentes.
+
 ### Sessão A
+- **R0** (opus) 02:57–03:03, `12e2570`: papéis `gestor` e `colaborador` em todo o código ([DEC-044](../decisoes.md)); 477 → 468 testes
+  (casos parametrizados do papel `dp` saíram com a matriz de 3 para 2 papéis). Desvios: id `hora_extra_autorizacao_dp` mantido; a
+  `cadeia` da política ficou `[gestor]` (a RX-05 vencida cai em `sem_decisor`); a landing (`HowItWorks.tsx`) ainda cita o DP (fora do escopo).
+- **A0** (opus) 03:05–03:12, `1e9b482`: contratos da seção 5 em `domain/reading.py`, `spec.py`, `roster.py`. **Desvio:** o quadro ganhou
+  uma porta à parte, `RosterRepository`, porque estender `Repository` quebraria o `isinstance` do `SqlRepository` da C5.
+- **A1** (opus) 03:17–03:25, `29bab01`: `rules/mapping.py` (`check_mapping`, `apply_mapping`, `verify_evidence`); teste de propriedade
+  com 200 tabelas aleatórias. Duplicata e sobreposição contam por pessoa **dentro da mesma loja** (o homônimo em duas lojas fica para a A2).
+- **A2** (opus) 03:34–03:40, `3f0403d`: `rules/identity.py`. Medido: **0 cartões** entre os 60 nomes do quadro sintético; E2-08 igual ao
+  gabarito. Regra de grafia parecida por token (a comparação do nome inteiro dava ~22 cartões falsos, achado da D1); distância de edição 1
+  para tokens de 5 letras ou mais.
+- **A3** (opus) 03:44–03:53, `256a285`: `rules/week.py`, `load_rule_card_for_week`, `rules/demand.py`; `ReadSummary.store_ids` e
+  `evidence_sample` (pedidos da C2). Medido: 2.777 pessoa-hora, 2.400 de capacidade, `max_fitting_pct` 80 (errata na seção 3).
+- **A4** (opus) 04:00–04:04, `8104570`: `rules/spec.py` (`default_spec`, `validate_spec`, `make_screen`, `card_with_spec`).
+- **A5** (opus) 04:08–04:18, branch `c6/a-a5` (fora do M1, entra no M2): solver com `SolveSpec`; sem spec, hash e escala iguais aos da
+  C5. Bench sob carga (load 6 a 7,7, outras sessões rodando): antes 18,24 s / 29,68 s; depois, sem spec, 19,80 s / 24,72 s; com a spec
+  padrão, 22,21 s / 28,28 s (1 thread / 8 threads). **Medir de novo com a máquina ociosa.**
+- **A5 integrada** em `c6/integra` às 04:53 (`3976807`), depois do corte do M1.
+- **Teste de tempo do solver** (`test_solver_60x7_within_time_limit`): falhou uma vez por carga (sozinho passa em 22 s); correção em andamento.
 
 ### Sessão B
+- **B1** (sonnet) 03:17–03:19, `31726a0`: tabela `roster_version` e `SqlRepository` com as duas portas.
+- **B2** (opus) 03:21–03:26, `9a568ec`: `llm/prompts/map_columns.py`; amostra do exemplo em grade com 3.741 caracteres (estimativa ~1,6 mil
+  tokens de entrada: **não medido**). Teste do adversário sem chave.
+- **B3** (sonnet) 03:34–03:37, `c9c5aad`: `llm/prompts/formulate.py`; sem pedido e sem observação, não chama o modelo (escolha 3).
+  Incidente sem efeito: o subagente tentou por engano `rm -rf /dev/null`; o ambiente negou e nada mudou.
+- **B4a** (opus) 04:00–04:19, `50c4889`: nó 1 com reservas, confirmação grava o `Roster`, `start_next_week`. **Desvios:** a reserva final é
+  a heurística de aliases (ela já lê o CSV da DEC-039), não o leitor da DEC-039 citado na [DEC-052](../decisoes.md); RX-02 e RX-12 que não
+  bloqueiam passam para `notices`; `confirmed_by` fixo em "gestor"; contexto da leitura em memória entre a leitura e a confirmação
+  (reinício → "envie de novo", limite já aceito na C5).
+- **B4a-fix** (opus) 04:37–04:46, `28c0ec5`: linhas com problema viram RX-13 em `notices` (sem nomes na evidência), sem bloquear.
+  O 2º commit (`summary.ok = False`) **não** foi levado: a tela esconde o confirmar com `ok` falso.
+- **B4b** (opus) 04:53–05:04, `f77e5cf`: nó `formular` e laço do solver (no máx. 2 chamadas, critério de 5%); o "antes" é verificado sem as
+  regras de pedido; recusados aparecem em `summary.assumptions`; "preferências atendidas" só no rastro. Medido nos testes (8 pessoas): com
+  "todos preferem a manhã", 2 tentativas e fica a 2ª (116 contra 136 pessoa-faixas descobertas); 0,6 a 0,85 s por chamada ao solver.
 
 ### Sessão C
+- **C1** (opus) 03:17–03:27, `e15e9e6`: upload binário por extensão e magic bytes (recusa em 422 com RX-13), `next-week`, `confirm` com
+  `ConfirmInput`, `GET /api/roster`; protocolo `SliceAgentC6` à parte.
+- **C2** (sonnet) 03:34–03:39, `c1776bc`: telas do resumo (mapeamento, suposições, identidade, capacidade com cobertura-alvo por loja,
+  salário-hora, semana, pedido), `notices`, cobertura no antes e depois, "Planejar a próxima semana". **Sem verificação visual.**
+- **C2b** (sonnet) 03:44–03:48, `052c52f`: o XLSX em grade como primeiro exemplo da demo.
+- **C3** (sonnet) 04:25–04:33, `e69d025`: `build_agent` no caminho C6; e2e `tests/e2e/test_c6.py`. Medido (modelo falso, dados sintéticos,
+  cobertura-alvo 80%): antes 158 violações, R$ 33.989,15, cobertura 97,04%; depois 0 violações, R$ 28.381,60, cobertura 98,5%; semana
+  seguinte sem upload com 0 violações.
+- **C3-bis** (sonnet) 05:08–05:16, `6e53c98`: formulação ligada no wiring; e2e com "Ana Dantas não pode na quarta" (restrição aplicada,
+  0 violações), pedido que afrouxa recusado, modelo falhando com RX-12; card "O que o Pat aplicou do seu pedido".
 
 ### Sessão D
+- **D1** (sonnet) 03:05–03:13, `ae4bb21`: arquivos E2-01 a E2-11 e gabaritos (~228 KB), exemplo em grade com 360 turnos. Orquestrador:
+  `!data/**/*.xlsx` no `.gitignore` (`bf68c5b`).
+- **D2** (opus) 03:17–03:22, `393aa29`: `ingest/tables.py`. O openpyxl 3.1.5 usa `defusedxml` (`DEFUSEDXML=True`); título mesclado em
+  `read_only` fica só na primeira célula.
+- **D3** (sonnet) 03:24–03:29, `cab0d22`: `rules/header_aliases.py`.
+- **D4** (opus) 03:34–03:36, `cccb76f`: verificador confere `indisponibilidade` e `jornada_semanal_max_pessoa`, sem importar o solver.
+- **D7** (sonnet) 03:44–03:49, `1bbf186`: cadastro simulado. Medido: o exemplo casa 60/60 pessoas e 3/3 lojas; com `demanda.json`, antes
+  R$ 33.989,15 e depois R$ 20.014,00 com 0 violações.
+- **D5** (sonnet) 04:01–04:09, `e9462b0`: suíte E2 (`--suite e2`, `--with-model`).
+- **Teste instável** (sonnet) 04:25–04:28, `f5c94cc`: `test_regression_after_cost_of_the_example` rodava o solver com 30 s e, com a
+  máquina carregada, deu R$ 20.014,70; agora 60 s, `optimal` exige o valor exato e `feasible` aceita até +0,5% com 0 violações.
+- **D6** (sonnet) 04:13–04:23, branch `c6/d-d6` (fora do M1 e do M2, entra no M3): PDF digital por `pdfplumber`, E2-12 escrito à mão em bytes.
 
 ### Integração (`c6/integra`) e marcos
+- **Preparação (02:54–02:57):** `c6/integra` a partir de `origin/main` `086a17a`, upstream removido; plano commitado (`15934d3`);
+  pré-requisito verde (477 testes, ruff, E1 10/10, front).
+- **Falha de processo do orquestrador (03:53):** a D7 foi integrada com 1 teste falhando, porque `| tail -1` mascarou o código de saída do
+  pytest. A nova rodada passou (1.135); o instável foi identificado depois (ver Sessão D). Daqui em diante, integração só por um script
+  que confere o código de saída.
+- **Medido pelo orquestrador em `c6/integra` (04:12):** `uv run python -m escalista.evals --suite e2` sem modelo: **15/15 arquivos;
+  747/747 turnos corretos, 0 inventados, 0 perdidos; problemas 6/6, 0 extras; RX-13 4/4.**
+- **M1 cortado às 04:49** (`c6/m1` = `28c0ec5`, worktree `cc61-c6-m1`). Seção 19 no `c6/m1` (04:50–04:55): 1.225 testes, ruff, E1 10/10,
+  E2 15/15 (747/747, 0 inventados, RX-13 4/4), e2e 7 + 10, front verde; bench com load 13: 18,14 s (1 thread, ótimo, R$ 20.014,00) e
+  22,23 s (8 threads, viável, R$ 20.018,30), **não comparável** com os 9,46 s de referência. Entregue ao usuário para push e PR.
+- **Conflitos previstos (simulação às 04:50):** `origin/feat/plataforma-impacto-regras` (outra sessão) conflita em 9 arquivos com a C6
+  (também troca os papéis); `origin/fix/solver-contract-hours` conflita só com a A5 (`solver/model.py`). Ordem de merge: decisão do usuário.
+- **2026-11-08 06:06:** M2 (A5, B4b, C3-bis) integrado em `c6/integra`.
+- **2026-11-08 06:14:** D6 (PDF digital) integrada em `c6/integra` (`f79d7f6`). Medido pelo orquestrador: `--suite e2` sem modelo **16/16 arquivos;
+  795/795 turnos, 0 inventados, 0 perdidos; RX-13 4/4**. `c6/m2` cortado em `d441127` (antes da D6); o M3 é `c6/integra` a partir daqui.
+- **Seção 19 no `c6/m2`** (`d441127`, 06:12–06:16): 1.263 testes, ruff, E1 10/10, E2 15/15, e2e 20, front verde. **Bench com load 6,8:**
+  sem spec 9,27 s (1 thread) e 14,04 s (8), com a spec padrão 9,32 s e 11,27 s, ótimo, R$ 20.014,00: sem piora contra os 9,46 s de referência.
+- **Seção 19 no `c6/m3`** (06:16–06:19): 1.274 testes, ruff, E1 10/10, E2 16/16 (795/795, 0 inventados), e2e 20, typecheck e build.
+- **Pendências do usuário:** push e PR de `c6/m1`, `c6/m2` e `c6/m3` (nessa ordem, merge commit); G3 da C6 à mão com a chave (seção 19) e
+  `--suite e2 --with-model` (custo e latência de `llm.map_columns` e `llm.formulate` **não medidos**); ordem de merge com as branches da outra
+  sessão; o `/sync-docs` não foi rodado porque opera no diretório principal, que não é do orquestrador.
+
+### Integração com o `main` (`c6/final`, [DEC-054](../decisoes.md))
+
+Pedido do usuário: uma única integração (um PR, merge commit, sem squash) no lugar de M1, M2 e M3. Executada em 08/11/2026, **07:56 a ~08:15**
+(Recife), num worktree próprio (`cc61-c6-final`), sem tocar no diretório principal nem no `main`. Sem push e sem PR até o "pode" do usuário.
+`c6/final` parte de `c6/m3` (`08c1677`); o merge de `origin/main` (`be360d9`: PRs #15, #17, #18 e #19) é o commit `5b6aa4a`. **O `main` andou durante a verificação** (PR #20, `29fcbfd`, 08:15): segundo merge, `eec0d53` (abaixo). As pontas
+`c6/m1` (`28c0ec5`) e `c6/m2` (`d441127`) seguem como pontos de reversão. **O PR #16 (carga do contrato no solver) ficou de fora.**
+
+**Linha de base de `c6/final` antes de fundir** (= `c6/m3`; código de saída conferido): pytest 1.274 passados em 138 s, ruff e format ok, E1 10/10,
+E2 16/16 (795/795, 0 inventados), front com typecheck, lint, 44 testes e build ok.
+
+**Os 14 arquivos em conflito, como foram resolvidos:**
+
+| Arquivo em conflito | Resolução | Teste que prova |
+|---|---|---|
+| `.gitignore` | união: `!data/**/*.xlsx` (C6) e `.claude/worktrees/` (time) | `git check-ignore data/demo/escala_exemplo_grade.xlsx` sai com 1 (não ignorado); a imagem o serve (`/api/demo/files/escala_exemplo_grade.xlsx` 200, 7.685 B) |
+| `docs/estado-do-projeto.md` | união das linhas do registro (a da C6 em cima, as do time embaixo) e cabeçalho novo | `/sync-docs` abaixo |
+| `domain/contracts.py` | `Role` do time com o `_missing_` (linhas antigas `gerente` e `dp` leem como `gestor`); docstring da C6 | `tests/domain/test_contracts_v0.py::test_role_values` (valores, `Role("gerente") is GESTOR`, `Role("admin")` levanta) |
+| `tests/domain/test_contracts_v0.py` | o teste de contrato fixa os dois: só dois valores e o `_missing_` | o mesmo |
+| `agents/optimizer/tools.py` | `PUBLISHER_ROLES = {GESTOR}` (idêntico nos dois lados; ficou o comentário da C6) | `tests/agents/test_tools.py::test_publish_refusals` (recusas da publicação, inclusive de papel sem permissão) |
+| `agents/optimizer/graph.py` | a C6 como base: o trecho do time era o código antigo, que a C6 moveu e já usa `Role.GESTOR` nos 7 pontos; nenhum `GERENTE` ou `DP` sobrou em `src/` | `tests/agents/test_graph.py` e `tests/agents/test_graph_c6.py` |
+| `api/routes_runs.py` | a C6 como base (`gestor = require_role(Role.GESTOR)`; rotas `next-week`, `roster`, binário) | matriz abaixo |
+| `api/app.py` | os dois conjuntos de rotas (`install_runs`, `install_excecoes`, `install_insights`); `_serve_spa` por último; `create_app(settings, agent=, desk=)` | `tests/api/test_spa.py::test_unknown_api_path_is_a_json_404` e `test_health_still_wins_over_the_spa_fallback` (a SPA não engole a API), e `test_every_api_route_is_in_the_matrix` |
+| `tests/api/test_access.py` | matriz única com as rotas do time (`/api/rules`, `/api/simulate/vigencia`, `/api/impact`, `/api/exceptions*`, `/api/colaborador/*`) **e** as da C6 (`/api/runs/next-week`, `/api/roster`, upload e o XLSX de exemplo); `/auth/demo/gerente`, `dp` e `GESTOR` continuam 404 | o próprio arquivo: 401 sem sessão, 403 por papel e sucesso por papel em cada linha |
+| `web/lib/roles.ts` | `ROLE_LABELS`, `HOME_BY_ROLE` e as descrições do time; comentário da C6 | `web/lib/platform.test.ts` |
+| `web/lib/platform.test.ts` | união dos casos; fica o `roleLabel("gerente") === "gerente"` (papel antigo sem alias na tela) | `npm test` (48 passam) |
+| `web/components/plataforma/Summary.tsx` | a C6 como base (mapeamento, identidade, capacidade, salário, semana, texto, `ConfirmInput`); a mudança do time era só um comentário | `npm run typecheck` e `npm test` |
+| `web/components/plataforma/Upload.tsx` | o texto da C6 (CSV, XLSX e PDF, exemplos) com a propriedade `title` do time (o título muda para "Planejar uma nova escala" quando já há escala vigente) | `npm run typecheck` e build |
+| `web/app/plataforma/page.tsx` | a página do time como base (`useSession`, `SessionGate`, menu das 4 áreas, "escala vigente" primeiro, Pat trabalhando) com a C6 por cima: `NoticeList`, `SpecApplied`, `SummaryPanel` com `mode` e `ConfirmInput`, `planNextWeek` | `npm run typecheck`, lint e build; **sem verificação visual** |
+
+**O que o merge limpo não pegou e precisou de correção** (nenhum teste do time falhava no `main`; falhou a união):
+
+1. `api/wiring.py`: a C6 removeu `DEMO_WEEK_START`, que Regras, a simulação e a fila de exceções importam. **Restaurada** (11/01/2027), com comentário.
+2. `api/insights.py`: o `rules_view` percorria todas as camadas e a C6 criou a `execucao` (nasce do pedido de cada execução, não do cartão em vigor);
+   `KeyError` em `GET /api/rules`. Agora percorre só as camadas com título, e a tela de Regras fica idêntica.
+3. `api/excecoes.py` (a mais importante): a fila e o celular do colaborador usavam o quadro de `data/demo` (`P001…`) e um cartão fixo. A C6 publica com os
+   ids do quadro guardado (`n-<nome>`) e em qualquer semana; sem a correção, o colaborador não achava a própria escala e a falta dava erro. Agora
+   `ExceptionDesk._use(version)` pega pessoas e lojas do `latest_roster` quando a escala publicada é da C6 (a escala semeada de teste segue em `data/demo`),
+   e o cartão é o da semana da própria escala (`load_rule_card_for_week`). **Testes novos:**
+   `tests/api/test_excecoes_c6.py` (escala publicada pela C6 na semana seguinte: o colaborador vê a semana, a falta acha cobertura no quadro, o verificador
+   tira quem violaria a interjornada, a decisão republica pelo `publicar` e a identidade não muda); **os dois falham sem a correção** (conferido).
+
+**Cartão por execução × Regras e simulação.** `GET /api/rules` e a simulação seguem usando `load_rule_card(DEMO_WEEK_START)`. O agente usa
+`load_rule_card_for_week`. Na semana da demo (nenhuma vigência muda no meio dela) os dois cartões são **iguais**: teste
+`tests/api/test_insights.py::test_rules_screen_and_simulation_use_the_same_card_the_agent_builds_for_the_demo_week` (mesmas regras na tela, nenhuma regra
+de `execucao`, e o regime de 42 h da simulação é o cartão do agente). Como o `input_hash` do solver inclui o cartão, a simulação parte da mesma entrada.
+
+**Gates em `c6/final` (código de saída conferido), 08:06 a 08:10:**
+
+| Gate | Resultado |
+|---|---|
+| `uv run pytest -q` | **1.313 passados** em 103 s, exit 0 (1.274 da linha de base, 3 testes novos desta integração e o restante vindo do `main`) |
+| `ruff check` e `ruff format --check` | ok (206 arquivos) |
+| E1 | 10/10 |
+| E2 sem modelo | 16/16; 795/795 turnos; 0 inventados; 0 perdidos; RX-13 4/4 |
+| `uv run pytest tests/e2e -q` | 20 passados em 24 s |
+| front | typecheck, lint e build ok; 48 testes |
+| solver 60 × 7, seed 42 | 1 thread 9,27 s; 8 threads 13,06 s; ótimo nas 3 lojas; R$ 20.014,00; load médio 3,9. Sem piora contra os ~9,3 s |
+| `docker build` (SHA `5b6aa4a`) | ok, 35 s |
+| imagem com `DEMO_MODE=1`, sem chave (porta 8080) | `/health` 200 com `version` `5b6aa4a`; `/`, `/entrar/`, `/plataforma/`, `/colaborador/` e as 3 áreas 200; `/api/me` sem sessão 401; `/auth/demo/gerente` 404; login de gestor e de colaborador 200; `/api/rules`, `/api/impact`, `/api/exceptions` 200 para o gestor; colaborador 403 em `/api/rules` e no XLSX; `/api/roster` 404 antes da 1ª confirmação; `next-week` 409 sem escala publicada; **nenhum `.env` na imagem** |
+
+**Antes e depois da escala de exemplo, pelo fluxo completo na imagem** (XLSX de exemplo, mapeamento pela **heurística**, porque não havia chave; sem
+justificativa; cobertura-alvo de 80% por loja = "ajustar para caber"; dados sintéticos): antes **158 violações, R$ 33.989,15, 216,5 h de hora extra,
+cobertura 97,04%**; depois **0 violações, R$ 28.381,60, 0 h de hora extra, cobertura 98,5%**. **Esses números ainda incluem o efeito que o PR #16 aponta**
+(horas de contrato não trabalhadas: o custo da escala otimizada conta salário que o mensalista recebe de qualquer jeito); eles mudam se o usuário decidir
+incorporá-lo. Em seguida, no mesmo fluxo: aprovação e publicação (`approve` 200), o colaborador vê a semana de 11/01/2027 (5 turnos, id `n-ana-dantas-sintetico`) e
+avisa falta.
+
+**Observação de demo, medida:** na escala otimizada do exemplo, **nenhuma falta teve cobertura** (5 dias testados: seg, ter, qua, qui e dom; todos RX-05, com 4 a 7 colegas
+avaliados em cada dia). A otimização usa toda a capacidade das pessoas, então ninguém cobre sem estourar 42 h ou o repouso. É o comportamento correto do verificador, mas o
+caminho com candidatos (cartão de cobertura e republicação) só aparece no teste e na escala semeada de teste, não no fluxo do XLSX de exemplo. Se a demo precisar
+mostrar a cobertura, é preciso uma escala com folga (por exemplo cobertura-alvo menor); isso é decisão do usuário.
+
+**Onde o PR #16 vai tocar o solver da C6 (A5), sem tê-lo incluído:** ele acrescenta, em `solver/model.py::_solve_store`, um piso de horas
+(`week_minutes >= min(contract_hours * 60, limits.per_person_week_min)`) logo depois da linha do teto `<= limits.weekly_min`, que é onde a C6 já pendura
+o teto por pessoa da formulação (`person.weekly_cap_min`). **Conflito textual certo** (`git merge-tree` com `c6/final` dá conflito em `solver/model.py`), e conflito de
+lógica provável: o piso não considera as restrições duras da `SolveSpec` (um `jornada_semanal_max_pessoa` abaixo da carga do contrato, ou indisponibilidades que
+tiram dias, deixaria o modelo inviável). Ele também reverte `Role.GESTOR` para `Role.DP` em `_rx02`, porque nasceu antes da troca de papéis. Não medido: o efeito dele sobre o
+tempo do solver e sobre as 158 violações / R$ 28.381,60 acima.
+
+**O que não foi verificado:** (1) nada foi visto no navegador (o front foi conferido por tipos, lint, testes e build; a página `plataforma/page.tsx`
+reconciliada **não foi aberta**); (2) o teste à mão com a chave e o modelo real, e `--suite e2 --with-model` (custo e latência de `llm.map_columns` e
+`llm.formulate` **seguem não medidos**; é do usuário); (3) o deploy no Railway (volume com linhas antigas, `/health` e login na URL pública), que só existe depois do merge;
+(4) o G3 da C6 à mão; (5) o efeito do PR #16.
+
+**Segundo merge: PR #20 do time (`29fcbfd`, "textos das regras sem referências internas"), commit `eec0d53`, 08:13 a 08:17.** O `main` mudou depois do primeiro merge e o PR passou a
+conflitar em 5 arquivos. Resolução: `data/regras/politica/autorizacao_hora_extra.yaml` e `politica_ficticia.yaml`, os textos do time (inclusive o id novo
+`hora_extra_autorizacao_previa`, que a tela de Regras mostra); `data/regras/README.md` e o docstring de `solver/model.py`, a redação da DEC-044 (gestor; o lado do time ainda dizia "DP")
+com o id novo; `docs/estado-do-projeto.md`, união em ordem de hora. Os gates rodaram de novo com o merge no índice: pytest **1.313 passados** (107 s), E1 10/10, E2 16/16
+(795/795, 0 inventados), e2e 20, bench 1 thread 9,37 s e 8 threads 12,25 s (ótimo, R$ 20.014,00); o ruff pegou uma linha de 121 colunas no docstring (o id novo), corrigida
+antes do commit (`ruff` e `format` ok, e os 555 testes de `solver`, `rules` e `insights` de novo). Front: sem arquivo da `web/` no PR #20; os gates do front são os da primeira rodada.
+Imagem refeita com o SHA `eec0d53`: `/health` 200, `/` 200, `/api/me` 401, a tela de Regras mostra `hora_extra_autorizacao_previa` e não a `_dp`, nenhum `.env` na imagem.
+`git merge-tree origin/main c6/final` sem conflito (43 commits à frente do `main`).

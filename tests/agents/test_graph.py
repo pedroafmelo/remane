@@ -10,7 +10,7 @@ import pytest
 
 from escalista.agents.optimizer.errors import PublishRefusedError, RunNotFoundError, RunPhaseError
 from escalista.agents.optimizer.tools import NO_MODEL
-from escalista.api.wiring import SliceAgent
+from escalista.api.wiring import SliceAgent, SliceAgentC6
 from escalista.audit.sink import SqlTraceSink
 from escalista.db import init_db, make_engine
 from escalista.domain.contracts import Role
@@ -136,12 +136,14 @@ def test_uncovered_demand_yields_rx02_and_the_flow_goes_on() -> None:
     state = _confirmed(h)
 
     assert state.phase == "awaiting_approval"
-    assert state.exception.code == "RX-02"
+    assert state.exception is None  # RX-02 é aviso (C6): não bloqueia
+    [notice] = state.notices
+    assert notice.code == "RX-02"
     assert state.report.total == 0 and state.version_id is not None
     assert state.comparison.after.uncovered_slots > 0
     raised = [e for e in h.events(state.run_id) if e.kind == "exception.raised"]
     assert [e.payload["code"] for e in raised] == ["RX-02"]
-    assert state.exception.trace_id == raised[0].id
+    assert notice.trace_id == raised[0].id
 
 
 @pytest.mark.parametrize(
@@ -154,9 +156,9 @@ def test_llm_failure_yields_rx12_not_text(kwargs) -> None:
 
     state = _confirmed(h)
 
-    assert state.phase == "awaiting_approval"  # a escala é válida; o gerente pode aprovar
+    assert state.phase == "awaiting_approval"  # a escala é válida; o gestor pode aprovar
     assert state.justification is None
-    assert state.exception.code == "RX-12"
+    assert state.exception is None and [n.code for n in state.notices] == ["RX-12"]  # aviso (C6), não bloqueia
     assert state.report.total == 0 and state.version_id is not None
     events = h.events(state.run_id)
     [raised] = [e for e in events if e.kind == "exception.raised"]
@@ -288,7 +290,9 @@ def test_confirm_after_restart_asks_for_the_file_again() -> None:
 
 
 def test_agent_satisfies_the_api_protocol() -> None:
-    assert isinstance(Harness().agent, SliceAgent)
+    agent = Harness().agent
+    assert isinstance(agent, SliceAgent)
+    assert isinstance(agent, SliceAgentC6)
 
 
 def test_flow_with_sql_repository_and_trace_sink() -> None:

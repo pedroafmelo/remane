@@ -17,7 +17,7 @@ from escalista.db import init_db, make_engine
 from escalista.domain.contracts import Role, TraceEvent
 from escalista.domain.results import Approval, Comparison, RunState, ScheduleMetrics, ScheduleVersion
 from escalista.domain.schedule import DemandSlot, Employee, Schedule, Store
-from escalista.rules.loader import load_rule_card
+from escalista.rules.loader import load_rule_card, load_rule_card_for_week
 from escalista.store.sql_repository import SqlRepository
 from tests.fakes import ListTraceSink
 
@@ -65,6 +65,19 @@ def test_rules_view_groups_by_layer_in_plain_portuguese():
     assert convencao["cct_adicional_hora_extra"].limit == "adicional de 60% na hora extra"
     assert convencao["cct_folgas_dominicais"].status == "pendente"
     assert {r.status for r in view.groups[2].rules} >= {"ficticia"}
+
+
+def test_rules_screen_and_simulation_use_the_same_card_the_agent_builds_for_the_demo_week():
+    """C6: o agente monta o cartão por execução (`load_rule_card_for_week`); Regras e a simulação seguem usando o
+    cartão da semana da demo. Na semana da demo (nenhuma vigência muda no meio dela) os dois são o mesmo cartão: as
+    mesmas regras na tela e, como o `input_hash` do solver inclui o cartão, a simulação parte da mesma entrada."""
+    shown = load_rule_card(RULES, DEMO_WEEK_START)
+    built = load_rule_card_for_week(RULES, DEMO_WEEK_START)
+    assert built == shown
+    assert rules_view(built) == rules_view(shown)
+    assert not [r for r in built.rules if r.layer.value == "execucao"]  # sem pedido de gestor, sem camada de execução
+    simulator = tiny_simulator()
+    assert simulator._cards["42h"] == built  # o regime atual da simulação é o cartão do agente
 
 
 # --- simulação ---

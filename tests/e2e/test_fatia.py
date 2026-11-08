@@ -2,7 +2,11 @@
 
 `TestClient` + falso de LLM (emite `llm.justify` com custo falso, como o cliente real) + SQLite em memória + o **agente
 real** ligado pela mesma fábrica da produção (`build_agent`, com `engine` e `llm_factory` injetados). Dados sintéticos
-de `data/demo/`. Sempre `Settings(_env_file=None)`: nunca lê o `.env` real.
+de `data/demo/`.
+
+C6 (C3 do plano): `build_agent` liga o caminho da C6. O falso de LLM só sabe justificar; o pedido de mapeamento volta
+com saída inválida e o agente lê o `escala_atual.csv` (formato da DEC-039) pela heurística de aliases, com o aviso
+RX-12. O fluxo com modelo de mapeamento está em `test_c6.py`. Sempre `Settings(_env_file=None)`: nunca lê o `.env` real.
 
 O solver leva ~12 s por fluxo com 1 thread: o fluxo feliz e o fluxo com LLM falhando rodam uma vez cada, em fixtures de
 módulo, e os casos só leem o resultado.
@@ -24,7 +28,7 @@ from sqlalchemy.pool import StaticPool
 from escalista.agents.optimizer.tools import PUBLISHER_ROLES, publicar
 from escalista.api.accounts import SEEDED_ACCOUNTS
 from escalista.api.app import create_app
-from escalista.api.routes_runs import gerente
+from escalista.api.routes_runs import gestor
 from escalista.api.wiring import build_agent
 from escalista.config import Settings
 from escalista.domain.contracts import Role
@@ -34,7 +38,8 @@ from tests.agents.support import FAKE_COST, GOOD_JUSTIFICATION, JustifyLLM
 DEMO = Path("data/demo")
 SEX_VALUES = {e["sex"] for e in __import__("json").loads((DEMO / "pessoas.json").read_text())}
 STEP_KINDS = (
-    "csv.validate",
+    "ingest.parse",
+    "ingest.apply_mapping",
     "read.summary",
     "read.confirmed",
     "solver.run",
@@ -201,11 +206,11 @@ def test_publish_refused_for_wrong_role_returns_403_and_traces_the_refusal(rx12:
     dependência de acesso; `publicar` relê a aprovação gravada no SQL e recusa."""
     stack = rx12.stack
     colaborador = next(a for a in SEEDED_ACCOUNTS if a.role is Role.COLABORADOR)
-    stack.app.dependency_overrides[gerente] = lambda: colaborador
+    stack.app.dependency_overrides[gestor] = lambda: colaborador
     try:
         response = stack.call("POST", f"/api/runs/{rx12.run_id}/approve")
     finally:
-        del stack.app.dependency_overrides[gerente]
+        del stack.app.dependency_overrides[gestor]
 
     assert response.status_code == 403, response.text
     assert "colaborador" in response.json()["detail"]
@@ -266,20 +271,25 @@ def test_every_step_has_a_trace_event_with_cost(happy: Flow) -> None:
 # --- 4. CSV com defeito ---------------------------------------------------------------------------------------------
 
 
-def test_defect_csv_raises_rx13_with_the_lines(clean_env) -> None:
+def test_defect_csv_lists_the_issues_with_their_lines(clean_env) -> None:
+    """C6: o defeito do `escala_defeito.csv` já não vira RX-13 (que ficou para o arquivo ilegível, teste 7). O leitor
+    de tabelas lê o que dá e devolve os problemas com a linha no resumo; quem decide é o gestor."""
     stack = make_stack()
     response = stack.upload("escala_defeito.csv")
 
     assert response.status_code == 201, response.text
     body = response.json()
-    assert body["phase"] == "failed" and body["exception"]["code"] == "RX-13"
+    assert body["phase"] == "awaiting_confirm" and body["exception"] is None
     issues = body["summary"]["issues"]
-    assert body["summary"]["ok"] is False and issues and all(i["line"] > 0 for i in issues)
+    assert issues and all(i["line"] > 0 for i in issues)
+    assert {i["line"] for i in issues} >= {48, 59, 69}  # hora ilegível, turno sobreposto, fim vazio
+    rx13 = [n for n in body["notices"] if n["code"] == "RX-13"]  # RX-13 com as linhas, como aviso (não bloqueia)
+    assert len(rx13) == 1
+    evidence_lines = {int(e.split(":")[0].split(",")[0].removeprefix("linha ")) for e in rx13[0]["evidence"]}
+    assert evidence_lines >= {48, 59, 69}
     run_id = body["run_id"]
-    assert stack.call("POST", f"/api/runs/{run_id}/confirm").status_code == 409  # nada de otimizar um arquivo ruim
     kinds = [e["kind"] for e in stack.trace(run_id)]
-    assert kinds[:2] == ["csv.validate", "read.summary"] and "exception.raised" in kinds
-    assert "solver.run" not in kinds
+    assert kinds[0] == "ingest.parse" and kinds[-1] == "read.summary" and "solver.run" not in kinds
 
 
 # --- 5. LLM falhando ------------------------------------------------------------------------------------------------
@@ -287,8 +297,11 @@ def test_defect_csv_raises_rx13_with_the_lines(clean_env) -> None:
 
 def test_llm_failure_shows_rx12_and_no_justification_text(rx12: Flow) -> None:
     confirmed = rx12.confirmed
-    assert confirmed["phase"] == "awaiting_approval"  # a escala é válida e o gerente ainda decide
-    assert confirmed["exception"]["code"] == "RX-12"
+    assert confirmed["phase"] == "awaiting_approval"  # a escala é válida e o gestor ainda decide
+    assert confirmed["exception"] is None  # C6: RX-12 da justificativa é aviso, não bloqueia
+    codes = [n["code"] for n in confirmed["notices"]]
+    # RX-12 do mapeamento (heurística), RX-12 da justificativa e RX-02 (a demanda do cadastro excede a capacidade)
+    assert codes.count("RX-12") == 2 and set(codes) <= {"RX-12", "RX-02"}
     assert confirmed["justification"] is None
     assert confirmed["report"]["total"] == 0
     dump = str(rx12.stack.bodies)
@@ -309,3 +322,32 @@ def test_no_response_carries_sex(happy: Flow, rx12: Flow) -> None:
         assert len(flow.stack.bodies) >= 5
         assert "sex" not in keys_of(flow.stack.bodies)
         assert not any(k in keys_of(flow.stack.bodies) for k in ("sexo", "gender"))
+
+
+# --- 7. Upload da C6: a codificação é do leitor do agente ------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("name", "content"),
+    [
+        # bytes que não decodificam nem em UTF-8 nem em cp1252 (0x81, 0x8D, 0x8F não existem no cp1252)
+        ("escala.csv", b"funcion\x81rio,loja,dia,inicio,fim\nE01,L\x8d01,2027-01-11,08:00,16:\x8f00\n"),
+        ("escala.xlsx", b"PK\x03\x04" + b"\x00" * 64),  # ZIP truncado: o leitor recusa, a API não abre
+    ],
+)
+def test_unreadable_file_is_rx13_from_the_agent(clean_env, name: str, content: bytes) -> None:
+    """A API não confere mais UTF-8 (C6, C1): o agente real recebe o arquivo e devolve `failed` com RX-13, sem 500."""
+    stack = make_stack()
+    response = stack.call("POST", "/api/runs", params={"file_name": name}, content=content)
+    assert response.status_code == 201, response.text
+    body = response.json()
+    assert body["phase"] == "failed" and body["exception"]["code"] == "RX-13"
+    assert body["summary"] is None  # C6: o arquivo ilegível não chega a ter resumo, só o cartão
+    assert "solver.run" not in [e["kind"] for e in stack.trace(body["run_id"])]
+
+
+def test_next_week_and_roster_without_a_first_schedule(clean_env) -> None:
+    """Banco vazio: 409 para planejar a próxima semana e 404 para o quadro, com o agente de hoje e com o da B4a."""
+    stack = make_stack()
+    assert stack.call("POST", "/api/runs/next-week").status_code == 409
+    assert stack.call("GET", "/api/roster").status_code == 404

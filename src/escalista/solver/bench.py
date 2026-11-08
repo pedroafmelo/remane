@@ -1,6 +1,7 @@
 """Benchmark do solver na instância 60 × 7 de `data/demo/` (plano da C5, A2; G3).
 
     uv run python -m escalista.solver.bench --seed 42 [--threads 1 8] [--time-limit 30] [--data data/demo]
+        [--spec none|default]
 
 Roda o mesmo `solve` com 1 thread e com várias, imprime e grava em `var/bench/solver_seed<seed>.json` o tempo de
 parede, o status, o custo (pela mesma `compute_metrics` de `cost.py`), as faixas descobertas e o tamanho do modelo.
@@ -8,6 +9,10 @@ parede, o status, o custo (pela mesma `compute_metrics` de `cost.py`), as faixas
 O `solver` é núcleo e não importa `escalista.rules`: o cartão daqui é montado à mão por `bench_rule_card`, com os
 valores das 5 primitivas da fatia, e `tests/solver/test_bench.py` confere que ele bate com o cartão carregado de
 `data/regras/` na mesma data.
+
+`--spec default` mede o caminho da C6 com a spec padrão (a de `rules.spec.default_spec()`, igual a `SolveSpec()`; o
+`solver` não importa `rules`, e `tests/solver/test_bench.py` confere a igualdade). O relatório vai para
+`solver_seed<seed>_spec-default.json`.
 """
 
 from __future__ import annotations
@@ -23,6 +28,7 @@ from pydantic import TypeAdapter
 from escalista.domain.results import SolveRequest
 from escalista.domain.rules import Rule, RuleCard, RuleLayer, RuleStatus
 from escalista.domain.schedule import DemandSlot, Employee, Store
+from escalista.domain.spec import SolveSpec
 from escalista.solver.cost import compute_metrics
 from escalista.solver.model import ModelStats, solve
 
@@ -75,6 +81,11 @@ def bench_rule_card(reference_date: date = WEEK_START) -> RuleCard:
     )
 
 
+def bench_spec(name: str) -> SolveSpec | None:
+    """`none` = sem spec (C5); `default` = a spec padrão da C6."""
+    return {"none": None, "default": SolveSpec()}[name]
+
+
 def load_demo(data_dir: Path) -> tuple[list[Store], list[Employee], list[DemandSlot]]:
     stores = TypeAdapter(list[Store]).validate_json((data_dir / "lojas.json").read_bytes())
     employees = TypeAdapter(list[Employee]).validate_json((data_dir / "pessoas.json").read_bytes())
@@ -90,6 +101,7 @@ def run_once(
     seed: int,
     threads: int,
     time_limit_s: float,
+    spec: SolveSpec | None = None,
 ) -> dict:
     card = bench_rule_card()
     req = SolveRequest(
@@ -101,11 +113,13 @@ def run_once(
         seed=seed,
         time_limit_s=time_limit_s,
         num_workers=threads,
+        spec=spec,
     )
     stats = ModelStats()
     result = solve(req, stats)
     row: dict = {
         "threads": threads,
+        "spec": None if spec is None else spec.model_dump(mode="json"),
         "time_limit_s": time_limit_s,
         "wall_ms": result.wall_ms,
         "status": result.status,
@@ -138,12 +152,21 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--time-limit", type=float, default=30.0)
     parser.add_argument("--data", type=Path, default=Path("data/demo"))
     parser.add_argument("--out", type=Path, default=Path("var/bench"))
+    parser.add_argument("--spec", choices=["none", "default"], default="none")
     args = parser.parse_args(argv)
 
     stores, employees, demand = load_demo(args.data)
     runs = []
     for threads in args.threads:
-        row = run_once(stores, employees, demand, seed=args.seed, threads=threads, time_limit_s=args.time_limit)
+        row = run_once(
+            stores,
+            employees,
+            demand,
+            seed=args.seed,
+            threads=threads,
+            time_limit_s=args.time_limit,
+            spec=bench_spec(args.spec),
+        )
         runs.append(row)
         print(
             f"threads={threads:<2} status={row['status']:<8} wall={row['wall_ms'] / 1000:.2f}s "
@@ -154,13 +177,15 @@ def main(argv: list[str] | None = None) -> int:
 
     report = {
         "seed": args.seed,
+        "spec": args.spec,
         "week_start": WEEK_START.isoformat(),
         "instance": {"stores": len(stores), "employees": len(employees), "demand_slots": len(demand)},
         "machine": {"platform": platform.platform(), "python": platform.python_version()},
         "runs": runs,
     }
     args.out.mkdir(parents=True, exist_ok=True)
-    path = args.out / f"solver_seed{args.seed}.json"
+    suffix = "" if args.spec == "none" else f"_spec-{args.spec}"
+    path = args.out / f"solver_seed{args.seed}{suffix}.json"
     path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"gravado em {path}")
     return 0

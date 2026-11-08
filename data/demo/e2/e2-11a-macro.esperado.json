@@ -1,0 +1,7 @@
+{
+  "file": "e2/e2-11a-macro.xlsm",
+  "synthetic": true,
+  "week_start": "2027-01-11",
+  "expect": "RX-13",
+  "reason_hint": "arquivo .xlsm (com macros) é recusado; o conteúdo é um XLSX comum renomeado"
+}

@@ -23,7 +23,7 @@ def client_for(tmp_path, dist_dir) -> TestClient:
 
 def test_root_and_client_routes_serve_index(tmp_path, dist):
     client = client_for(tmp_path, dist)
-    for path in ("/", "/gerente", "/gerente/escala/42"):
+    for path in ("/", "/gestor", "/gestor/escala/42"):
         response = client.get(path)
         assert response.status_code == 200 and "dados sintéticos" in response.text, path
 
