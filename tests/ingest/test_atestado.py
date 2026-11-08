@@ -276,3 +276,27 @@ def test_make_reader_satisfaz_a_porta() -> None:
     )
     assert reading.verdict == "valido"
     assert len(llm.calls) == 1
+
+
+@pytest.mark.parametrize("stem", ["at-05-foto-legivel", "at-06-foto-ruidosa", "at-07-foto-ilegivel"])
+def test_fotos_sinteticas_da_demo_vao_ao_modelo_e_o_codigo_julga_como_o_gabarito(stem: str) -> None:
+    """Com o falso devolvendo os campos do gabarito, o veredito do código bate com o gabarito (sem modelo real)."""
+    import json
+    from pathlib import Path
+
+    folder = Path("data/demo/acompanhamento/atestados")
+    gabarito = json.loads((folder / f"{stem}.esperado.json").read_text(encoding="utf-8"))
+    foto = (folder / f"{stem}.png").read_bytes()
+    campos = {k: v for k, v in gabarito["expect"].items() if k not in ("verdict", "reasons")}
+    llm = FakeLLMClient(by_tool={TOOL_NAME: [campos]})
+    reading = read_atestado(
+        data=foto,
+        media_type="image/png",
+        llm=llm,
+        run_id="track-c1",
+        expected_day=date.fromisoformat(gabarito["expected_day"]),
+        employee_name=gabarito["employee_name"],
+    )
+    assert (reading.verdict, reading.reasons) == (gabarito["expect"]["verdict"], gabarito["expect"]["reasons"])
+    assert [c["size"] for c in llm.calls] == ["vision"]
+    assert [p.data for p in llm.calls[0]["messages"][1].content if isinstance(p, ImagePart)] == [foto]
