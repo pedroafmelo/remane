@@ -2,7 +2,18 @@
 
 import { request } from "./api.ts";
 import { attachmentType } from "./tracker.ts";
-import type { AdvanceMinutes, AdvanceResult, CaseView, DemoClock, Inbox, PeopleList, ReportBody, ReportInput } from "./types-tracker.ts";
+import type {
+  AdvanceMinutes,
+  AdvanceResult,
+  AssistantReply,
+  CaseView,
+  ChatReply,
+  DemoClock,
+  Inbox,
+  PeopleList,
+  ReportBody,
+  ReportInput,
+} from "./types-tracker.ts";
 
 const postJson = <T>(path: string, body: unknown) =>
   request<T>(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -35,4 +46,6 @@ export const trackerApi = {
     postJson<CaseView>(`/api/colaborador/oferta/${encodeURIComponent(offerId)}`, { as, accept }),
   answerQuestion: (as: string, caseId: string, coming: boolean) =>
     postJson<CaseView>("/api/colaborador/resposta", { as, case_id: caseId, coming }),
+  message: (as: string, text: string) => postJson<ChatReply>("/api/colaborador/mensagem", { as, text }),
+  ask: (text: string) => postJson<AssistantReply>("/api/assistente/mensagem", { text }),
 };

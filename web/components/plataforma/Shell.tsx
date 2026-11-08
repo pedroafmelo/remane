@@ -5,12 +5,13 @@ import { Logo } from "../Logo";
 import { DemoClockBar } from "./DemoClockBar";
 import { SyntheticBadge } from "./ui";
 
-/** As quatro áreas do gestor (design system: Regras, Escala, Exceções, Impacto), na ordem do trabalho. */
+/** As áreas do gestor (design system: Regras, Escala, Exceções, Impacto), na ordem do trabalho, e o assistente (C7b N2). */
 export const AREAS = [
   { key: "escala", label: "Escala", href: "/plataforma/" },
   { key: "excecoes", label: "Exceções", href: "/plataforma/excecoes/" },
   { key: "impacto", label: "Impacto", href: "/plataforma/impacto/" },
   { key: "regras", label: "Regras", href: "/plataforma/regras/" },
+  { key: "assistente", label: "Assistente", href: "/plataforma/assistente/" },
 ] as const;
 
 export type Area = (typeof AREAS)[number]["key"];
