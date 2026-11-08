@@ -86,6 +86,10 @@ O jurado, no link público, como gerente:
   60 × mín(42, 5 × 8) = **2.400 pessoa-hora**. A demanda sintética de hoje (`demanda.json`, com o teto da D2b) soma **1.676**. Picos
   observados por faixa: 14 (L1), 13 (L2), 13 (L3). **Consequência:** com a demanda inferida a 100%, faltam **pelo menos 376 pessoa-hora
   (13,5%)** e o RX-02 sai sempre.
+- **Errata (medida na execução, A3 às 03h53 e B4a às 04h19; o texto acima fica como foi escrito):** contando faixas de 30 min
+  **alinhadas**, a demanda inferida do exemplo é **2.777** pessoa-hora (não 2.776), os picos por faixa são **20 (L1), 20 (L2), 19 (L3)**
+  (o script do planejamento não alinhava as faixas) e o "ajustar para caber" dá **80%** (não ~86%: o arredondamento para cima por faixa
+  infla a demanda escalada). Com o horário das lojas vindo do cadastro simulado (08h às 22h), o agente mostra **2.774,5** contra 2.400.
 - [FATO, `data/regras/lei/ec141.yaml`] `jornada_semanal_max`: 44h até 15/12/2026, 42h de 16/12/2026, 40h de 16/12/2027. A ampliação
   diária de 9h da convenção (`cct_jornada_diaria_ampliada`, 16/12/2026) **ainda é `info`** e não alimenta o motor
   ([data/regras/README.md](../../data/regras/README.md)).
@@ -495,12 +499,66 @@ medidas.
 
 Cada sessão escreve só na sua subseção: início, fim (`date`), hash, desvios e métricas medidas.
 
+**Como rodou (08/11, a partir de 02h54):** uma sessão orquestradora (Claude, Opus 5.5) delegou cada tarefa a um subagente no worktree da
+frente (`cc61-c6-{a,b,c,d}`), conferiu diff, donos, suíte, ruff e E1, fez o rebase e integrou em `c6/integra` (worktree `cc61-c6-integra`)
+com `merge --ff-only`, **sem push e sem tocar no `main`**. Os hashes abaixo são os de `c6/integra` depois do rebase. Horários por `date`
+nos relatórios dos subagentes.
+
 ### Sessão A
+- **R0** (opus) 02:57–03:03, `12e2570`: papéis `gestor` e `colaborador` em todo o código ([DEC-044](../decisoes.md)); 477 → 468 testes
+  (casos parametrizados do papel `dp` saíram com a matriz de 3 para 2 papéis). Desvios: id `hora_extra_autorizacao_dp` mantido; a
+  `cadeia` da política ficou `[gestor]` (a RX-05 vencida cai em `sem_decisor`); a landing (`HowItWorks.tsx`) ainda cita o DP (fora do escopo).
+- **A0** (opus) 03:05–03:12, `1e9b482`: contratos da seção 5 em `domain/reading.py`, `spec.py`, `roster.py`. **Desvio:** o quadro ganhou
+  uma porta à parte, `RosterRepository`, porque estender `Repository` quebraria o `isinstance` do `SqlRepository` da C5.
+- **A1** (opus) 03:17–03:25, `29bab01`: `rules/mapping.py` (`check_mapping`, `apply_mapping`, `verify_evidence`); teste de propriedade
+  com 200 tabelas aleatórias. Duplicata e sobreposição contam por pessoa **dentro da mesma loja** (o homônimo em duas lojas fica para a A2).
+- **A2** (opus) 03:34–03:40, `3f0403d`: `rules/identity.py`. Medido: **0 cartões** entre os 60 nomes do quadro sintético; E2-08 igual ao
+  gabarito. Regra de grafia parecida por token (a comparação do nome inteiro dava ~22 cartões falsos, achado da D1); distância de edição 1
+  para tokens de 5 letras ou mais.
+- **A3** (opus) 03:44–03:53, `256a285`: `rules/week.py`, `load_rule_card_for_week`, `rules/demand.py`; `ReadSummary.store_ids` e
+  `evidence_sample` (pedidos da C2). Medido: 2.777 pessoa-hora, 2.400 de capacidade, `max_fitting_pct` 80 (errata na seção 3).
+- **A4** (opus) 04:00–04:04, `8104570`: `rules/spec.py` (`default_spec`, `validate_spec`, `make_screen`, `card_with_spec`).
+- **A5** (opus) 04:08–04:18, branch `c6/a-a5` (fora do M1, entra no M2): solver com `SolveSpec`; sem spec, hash e escala iguais aos da
+  C5. Bench sob carga (load 6 a 7,7, outras sessões rodando): antes 18,24 s / 29,68 s; depois, sem spec, 19,80 s / 24,72 s; com a spec
+  padrão, 22,21 s / 28,28 s (1 thread / 8 threads). **Medir de novo com a máquina ociosa.**
 
 ### Sessão B
+- **B1** (sonnet) 03:17–03:19, `31726a0`: tabela `roster_version` e `SqlRepository` com as duas portas.
+- **B2** (opus) 03:21–03:26, `9a568ec`: `llm/prompts/map_columns.py`; amostra do exemplo em grade com 3.741 caracteres (estimativa ~1,6 mil
+  tokens de entrada: **não medido**). Teste do adversário sem chave.
+- **B3** (sonnet) 03:34–03:37, `c9c5aad`: `llm/prompts/formulate.py`; sem pedido e sem observação, não chama o modelo (escolha 3).
+  Incidente sem efeito: o subagente tentou por engano `rm -rf /dev/null`; o ambiente negou e nada mudou.
+- **B4a** (opus) 04:00–04:19, `50c4889`: nó 1 com reservas, confirmação grava o `Roster`, `start_next_week`. **Desvios:** a reserva final é
+  a heurística de aliases (ela já lê o CSV da DEC-039), não o leitor da DEC-039 citado na [DEC-052](../decisoes.md); RX-02 e RX-12 que não
+  bloqueiam passam para `notices`; `confirmed_by` fixo em "gestor"; contexto da leitura em memória entre a leitura e a confirmação
+  (reinício → "envie de novo", limite já aceito na C5).
 
 ### Sessão C
+- **C1** (opus) 03:17–03:27, `e15e9e6`: upload binário por extensão e magic bytes (recusa em 422 com RX-13), `next-week`, `confirm` com
+  `ConfirmInput`, `GET /api/roster`; protocolo `SliceAgentC6` à parte.
+- **C2** (sonnet) 03:34–03:39, `c1776bc`: telas do resumo (mapeamento, suposições, identidade, capacidade com cobertura-alvo por loja,
+  salário-hora, semana, pedido), `notices`, cobertura no antes e depois, "Planejar a próxima semana". **Sem verificação visual.**
+- **C2b** (sonnet) 03:44–03:48, `052c52f`: o XLSX em grade como primeiro exemplo da demo.
 
 ### Sessão D
+- **D1** (sonnet) 03:05–03:13, `ae4bb21`: arquivos E2-01 a E2-11 e gabaritos (~228 KB), exemplo em grade com 360 turnos. Orquestrador:
+  `!data/**/*.xlsx` no `.gitignore` (`bf68c5b`).
+- **D2** (opus) 03:17–03:22, `393aa29`: `ingest/tables.py`. O openpyxl 3.1.5 usa `defusedxml` (`DEFUSEDXML=True`); título mesclado em
+  `read_only` fica só na primeira célula.
+- **D3** (sonnet) 03:24–03:29, `cab0d22`: `rules/header_aliases.py`.
+- **D4** (opus) 03:34–03:36, `cccb76f`: verificador confere `indisponibilidade` e `jornada_semanal_max_pessoa`, sem importar o solver.
+- **D7** (sonnet) 03:44–03:49, `1bbf186`: cadastro simulado. Medido: o exemplo casa 60/60 pessoas e 3/3 lojas; com `demanda.json`, antes
+  R$ 33.989,15 e depois R$ 20.014,00 com 0 violações.
+- **D5** (sonnet) 04:01–04:09, `e9462b0`: suíte E2 (`--suite e2`, `--with-model`).
+- **Teste instável** (sonnet) 04:25–04:28, `f5c94cc`: `test_regression_after_cost_of_the_example` rodava o solver com 30 s e, com a
+  máquina carregada, deu R$ 20.014,70; agora 60 s, `optimal` exige o valor exato e `feasible` aceita até +0,5% com 0 violações.
+- **D6** (sonnet) 04:13–04:23, branch `c6/d-d6` (fora do M1 e do M2, entra no M3): PDF digital por `pdfplumber`, E2-12 escrito à mão em bytes.
 
 ### Integração (`c6/integra`) e marcos
+- **Preparação (02:54–02:57):** `c6/integra` a partir de `origin/main` `086a17a`, upstream removido; plano commitado (`15934d3`);
+  pré-requisito verde (477 testes, ruff, E1 10/10, front).
+- **Falha de processo do orquestrador (03:53):** a D7 foi integrada com 1 teste falhando, porque `| tail -1` mascarou o código de saída do
+  pytest. A nova rodada passou (1.135); o instável foi identificado depois (ver Sessão D). Daqui em diante, integração só por um script
+  que confere o código de saída.
+- **Medido pelo orquestrador em `c6/integra` (04:12):** `uv run python -m escalista.evals --suite e2` sem modelo: **15/15 arquivos;
+  747/747 turnos corretos, 0 inventados, 0 perdidos; problemas 6/6, 0 extras; RX-13 4/4.**
