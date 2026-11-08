@@ -19,20 +19,21 @@ from __future__ import annotations
 
 import argparse
 import json
-import shutil
 import time as wallclock
 from collections import Counter
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from escalista.domain.contracts import LLMUnavailableError, TraceEvent
+from escalista.domain.contracts import LLMUnavailableError
 from escalista.domain.ports import LLMClient, TraceSink
 from escalista.domain.reading import ColumnMapping
 from escalista.domain.schedule import CsvIssue
+from escalista.evals.common import MemorySink, ModelUse, model_use
+from escalista.evals.common import write_report as common_write_report
 from escalista.ingest.tables import TablesResult, read_tables
 from escalista.rules.header_aliases import guess_mapping
 from escalista.rules.identity import resolve_identities
@@ -44,50 +45,10 @@ SOURCE_MODEL = "modelo"
 SOURCE_FALLBACK = "heuristica (reserva)"
 SOURCE_NONE = "nenhuma"
 MODEL_EVENT_KIND = "llm.map_columns"
-FAILURE_EVENT_KIND = "exception.raised"
 DEMO_EXAMPLE = "escala_exemplo_grade.esperado.json"
 
 ShiftKey = tuple[str, datetime, datetime]  # pessoa como escrita no arquivo, início, fim (ao minuto)
 ClientFactory = Callable[[TraceSink], LLMClient]
-
-
-class MemorySink:
-    """`TraceSink` em memória: guarda os eventos do cliente para ler tokens, custo e latência de cada chamada."""
-
-    def __init__(self) -> None:
-        self.events: list[TraceEvent] = []
-
-    def emit(self, event: TraceEvent) -> None:
-        self.events.append(event)
-
-
-@dataclass(frozen=True)
-class ModelUse:
-    """O que o modelo gastou neste arquivo (medido nos eventos; `cost_usd` é `None` se faltar o custo de alguma
-    chamada, nunca estimado)."""
-
-    calls: int
-    models: list[str]
-    tokens_in: int | None
-    tokens_out: int | None
-    cost_usd: Decimal | None
-    latency_ms: int | None
-    fell_back: bool
-    fallback_reason: str | None
-    same_as_heuristic: bool | None
-
-    def as_json(self) -> dict[str, Any]:
-        return {
-            "chamadas": self.calls,
-            "modelos": self.models,
-            "tokens_entrada": self.tokens_in,
-            "tokens_saida": self.tokens_out,
-            "cost_usd": None if self.cost_usd is None else format(self.cost_usd, "f"),
-            "latencia_ms": self.latency_ms,
-            "reserva": self.fell_back,
-            "motivo_reserva": self.fallback_reason,
-            "igual_a_heuristica": self.same_as_heuristic,
-        }
 
 
 @dataclass
@@ -243,25 +204,8 @@ def _identity_check(gold_identity: dict[str, Any], gold: dict[str, Any], result:
 def _model_use(
     sink: MemorySink, run_id: str, fell_back: bool, reason: str | None, same_as_heuristic: bool | None
 ) -> ModelUse:
-    events = [e for e in sink.events if e.run_id == run_id and e.kind in (MODEL_EVENT_KIND, FAILURE_EVENT_KIND)]
-    complete = [e for e in events if e.kind == MODEL_EVENT_KIND]
-
-    def total(values: list[int | None]) -> int | None:
-        return None if not values or any(v is None for v in values) else sum(v for v in values if v is not None)
-
-    costs = [e.cost_usd for e in events]
-    cost = None if not costs or any(c is None for c in costs) else sum((c for c in costs if c is not None), Decimal(0))
-    return ModelUse(
-        calls=len(events),
-        models=sorted({e.model for e in events if e.model}),
-        tokens_in=total([e.tokens_in for e in complete]) if complete else None,
-        tokens_out=total([e.tokens_out for e in complete]) if complete else None,
-        cost_usd=cost,
-        latency_ms=total([e.latency_ms for e in events]),
-        fell_back=fell_back,
-        fallback_reason=reason,
-        same_as_heuristic=same_as_heuristic,
-    )
+    use = model_use(sink, run_id, (MODEL_EVENT_KIND,))
+    return replace(use, fell_back=fell_back, fallback_reason=reason, same_as_heuristic=same_as_heuristic)
 
 
 def _fallback_reason(exc: LLMUnavailableError) -> str:
@@ -541,11 +485,7 @@ def format_table(results: Sequence[FileResult], report: dict[str, Any]) -> str:
 
 
 def write_report(report: dict[str, Any], out_dir: Path, generated_at: datetime) -> Path:
-    out_dir.mkdir(parents=True, exist_ok=True)
-    path = out_dir / f"{SUITE}-{generated_at:%Y%m%dT%H%M%S}.json"
-    path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    shutil.copyfile(path, out_dir / f"{SUITE}-latest.json")
-    return path
+    return common_write_report(report, out_dir, generated_at, suite=SUITE)
 
 
 def run_suite(

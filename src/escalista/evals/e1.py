@@ -12,27 +12,22 @@ from __future__ import annotations
 
 import argparse
 import json
-import shutil
-import time as wallclock
 from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import date, datetime, time, timedelta
+from datetime import datetime, time, timedelta
 from decimal import Decimal
-from functools import cached_property
 from pathlib import Path
 
 from escalista.domain.results import SolveRequest
-from escalista.domain.rules import RuleCard
 from escalista.domain.schedule import DemandSlot, Employee, Schedule, Shift, Store
+from escalista.evals import common
+from escalista.evals.common import WEEK_START, EvalContext, Outcome, Scenario, ScenarioResult, write_report
 from escalista.ingest.csv_schedule import read_schedule_csv
-from escalista.ingest.demo_network import load_demo_network
-from escalista.rules.loader import load_rule_card
 from escalista.solver.cost import compute_metrics
 from escalista.solver.model import solve
 from escalista.verifier import coverage_gaps, verify
 
-WEEK_START = date(2027, 1, 11)  # segunda; semana de referência da demo, já sob a EC 141
 SOLVER_SEED = 42
 SOLVER_TIME_LIMIT_S = 60.0
 SOLVER_WORKERS = 1
@@ -43,59 +38,6 @@ WEEKLY, DAILY, REST_GAP, WEEKLY_REST = (
     "interjornada_min",
     "repouso_semanal",
 )
-
-
-@dataclass(frozen=True)
-class Outcome:
-    """O que um cenário devolve: esperado e obtido em texto, e o veredito."""
-
-    expected: str
-    obtained: str
-    passed: bool
-
-
-@dataclass(frozen=True)
-class ScenarioResult:
-    id: str
-    description: str
-    expected: str
-    obtained: str
-    passed: bool
-    elapsed_ms: int
-
-    def as_json(self) -> dict:
-        return {
-            "id": self.id,
-            "descricao": self.description,
-            "esperado": self.expected,
-            "obtido": self.obtained,
-            "passou": self.passed,
-            "tempo_ms": self.elapsed_ms,
-        }
-
-
-@dataclass
-class EvalContext:
-    """Entradas compartilhadas, lidas uma vez e só se algum cenário as pedir."""
-
-    data_dir: Path = Path("data/demo")
-    rules_dir: Path = Path("data/regras")
-    reference_date: date = WEEK_START
-
-    @cached_property
-    def card(self) -> RuleCard:
-        return load_rule_card(self.rules_dir, self.reference_date)
-
-    @cached_property
-    def network(self) -> tuple[list[Store], list[Employee], list[DemandSlot]]:
-        return load_demo_network(self.data_dir)
-
-
-@dataclass(frozen=True)
-class Scenario:
-    id: str
-    description: str
-    run: Callable[[EvalContext], Outcome]
 
 
 # Auxiliares -------------------------------------------------------------------------------------------------------
@@ -360,24 +302,12 @@ SCENARIOS: tuple[Scenario, ...] = (
 def run_scenarios(
     scenarios: tuple[Scenario, ...] | list[Scenario], ctx: EvalContext | None = None
 ) -> list[ScenarioResult]:
-    """Roda os cenários em ordem. Exceção dentro de um cenário é falha dele (com a causa), não aborta o resto."""
-    ctx = ctx if ctx is not None else EvalContext()
-    results = []
-    for scenario in scenarios:
-        t0 = wallclock.perf_counter()
-        try:
-            outcome = scenario.run(ctx)
-        except Exception as exc:  # noqa: BLE001 - qualquer erro do cenário vira falha no placar
-            outcome = Outcome(
-                expected="cenário roda sem erro", obtained=f"erro: {type(exc).__name__}: {exc}", passed=False
-            )
-        elapsed_ms = int((wallclock.perf_counter() - t0) * 1000)
-        results.append(
-            ScenarioResult(
-                scenario.id, scenario.description, outcome.expected, outcome.obtained, outcome.passed, elapsed_ms
-            )
-        )
-    return results
+    """Roda os cenários em ordem (harness comum). Exceção dentro de um cenário é falha dele, não aborta o resto."""
+    return common.run_scenarios(scenarios, ctx)
+
+
+# Chaves de cada cenário no relatório do `--suite e1` (as de antes do harness comum; o relatório all usa todas).
+E1_ROW_KEYS = ("id", "descricao", "esperado", "obtido", "passou", "tempo_ms")
 
 
 def scoreboard(results: list[ScenarioResult]) -> str:
@@ -393,17 +323,8 @@ def build_report(results: list[ScenarioResult], generated_at: datetime, suite: s
         "passaram": sum(r.passed for r in results),
         "total": len(results),
         "tempo_total_ms": sum(r.elapsed_ms for r in results),
-        "cenarios": [r.as_json() for r in results],
+        "cenarios": [{k: r.as_json()[k] for k in E1_ROW_KEYS} for r in results],
     }
-
-
-def write_report(report: dict, out_dir: Path, generated_at: datetime, suite: str = "e1") -> Path:
-    """Grava `<suite>-<timestamp>.json` e `<suite>-latest.json` em `out_dir`; devolve o primeiro."""
-    out_dir.mkdir(parents=True, exist_ok=True)
-    path = out_dir / f"{suite}-{generated_at:%Y%m%dT%H%M%S}.json"
-    path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    shutil.copyfile(path, out_dir / f"{suite}-latest.json")
-    return path
 
 
 def render_table(results: list[ScenarioResult]) -> str:
