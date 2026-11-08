@@ -568,7 +568,7 @@ Formato:
   - **D1:** `convencao/demo.yaml` e `politica/demo.yaml` removidos; a autorização prévia do DP para hora extra, sem equivalente no Pedro, ficou em `politica/autorizacao_hora_extra.yaml`.
 - **Consequências:** em vigor na demo, vêm do Pedro: hora extra a 60% (`cct_adicional_hora_extra`) e interjornada de 12 h (`pol_interjornada`). Os números da demo não mudaram (medidos pelo subagente: 158 violações e R$ 33.989,15 antes; 0 e R$ 20.014,00 depois). Os cenários E1-03 e E1-10 mudaram o controle "no limite" de 11 h para 12 h. O `rule_id` das violações de interjornada plantadas passou a `pol_interjornada`. **Ficam abertos:** WhatsApp (adiado); RX-01 e RX-11 plantados pelo Pedro **não** saem do cartão (`cct_repouso_semanal` não tem `restringe` e `cct_folgas_dominicais` é `info`); o personagem da landing (DEC-036), que se chamava Patrick, se confundia com o agente **Pat**: **o usuário mandou trocar para "Pedro"** (2026-11-08 01:47; "use Pedro ao invés de patrick"); a troca foi feita em `web/` (hero, história e grade), e o texto da DEC-036 acima fica como foi decidido; o app completo ainda não está no Railway (precisa de `SESSION_SECRET`, `DEMO_MODE` e chaves como variáveis do serviço).
 
-## DEC-038 · WhatsApp: ponte não oficial abandonada; simulador para os jurados e Cloud API de teste no pitch
+## DEC-043 · WhatsApp: ponte não oficial abandonada; simulador para os jurados e Cloud API de teste no pitch
 
 - 2026-11-08 02:05 · Decidido por: usuário da sessão · Status: aceita
 - **Contexto:** o spike do WhatsApp ([DEC-019](#dec-019--gate-3-rodada-2-spike-do-whatsapp-relógio-simulado-e-30-evals)) foi feito em 08/11

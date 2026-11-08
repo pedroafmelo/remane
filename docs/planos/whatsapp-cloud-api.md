@@ -1,10 +1,10 @@
 # WhatsApp real no pitch: Cloud API da Meta em modo de teste
 
-Última atualização: 2026-11-08 02:05 · Decisão: [DEC-038](../decisoes.md)
+Última atualização: 2026-11-08 02:05 · Decisão: [DEC-043](../decisoes.md)
 
 **Para quê.** Os jurados testam o atendimento pelo **celular simulado** no link (caminho garantido, C7). O WhatsApp de verdade aparece
 só no **pitch**, com os celulares do time, pelo número de teste da Cloud API oficial. A ponte não oficial (`whatsapp-web.js`) foi
-abandonada: o WhatsApp recusa parear um navegador automatizado ([DEC-038](../decisoes.md)).
+abandonada: o WhatsApp recusa parear um navegador automatizado ([DEC-043](../decisoes.md)).
 
 ## 1. Na Meta (quem tem a conta Facebook; ~15 min)
 
