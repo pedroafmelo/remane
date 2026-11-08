@@ -1,6 +1,6 @@
 # Plano da C7 · Acompanhamento de escala (FT-03): passivo, oferta ao colega e gatilhos ativos
 
-Última atualização: 2026-11-08 09:24 (Recife; contrato v1.1 incorporado) · Situação: **proposta, aguarda o aprovado do usuário** · Planejado por Claude (Opus 5.5)
+Última atualização: 2026-11-08 09:31 (Recife) · Situação: **aprovado pelo usuário às 09:22 (pedido de execução); em execução** (DECs gravadas como [DEC-056](../decisoes.md) a [DEC-065](../decisoes.md)). Antes: 09:24, contrato v1.1 incorporado · Planejado por Claude (Opus 5.5)
 numa sessão só de planejamento (worktree `cc61-plan-acomp`, branch `plan/acompanhamento`, a partir de `origin/main` `b6f4a01`): sem
 código, sem `uv add`, sem commit. As DECs propostas (seção 16) **não foram gravadas** em [decisoes.md](../decisoes.md) nem no
 [estado](../estado-do-projeto.md): outras sessões editam esses arquivos ao mesmo tempo.
