@@ -1,6 +1,6 @@
 # Pitch, vídeo e descrição da submissão
 
-Última atualização: 2026-11-08 11:33 (Recife), por Claude (Opus 5.5): declaração sem WhatsApp, chat no app ([DEC-069](decisoes.md)). Antes: 08:50, por Claude (Sonnet 5.5): economia do exemplo com o PR #16 já no `main` ([DEC-055](decisoes.md)). **Rascunho para o time revisar.** Os slides vão ser montados no
+Última atualização: 2026-11-08 15:08 (Recife), por Claude (Opus 5.5): descrição da submissão passa a morar em [descricao.md](descricao.md). Antes: 11:33, por Claude (Opus 5.5): declaração sem WhatsApp, chat no app ([DEC-069](decisoes.md)). Antes: 08:50, por Claude (Sonnet 5.5): economia do exemplo com o PR #16 já no `main` ([DEC-055](decisoes.md)). **Rascunho para o time revisar.** Os slides vão ser montados no
 Canva pela manhã; este arquivo traz só o texto de cada slide, a fala e o que mostrar.
 
 **Modelo:** a apresentação "Sprint Pitch: como criar um pitch de alto impacto", de Erica Marques (PDF na pasta do projeto, fora do
@@ -198,40 +198,7 @@ segundo, para não parecer truque. Sem música alta. Legenda "dados sintéticos"
 
 ## 3. Descrição da submissão (texto pronto para colar)
 
-> **Remane: o engenheiro da sua escala de trabalho.** Responde ao **Desafio Tako** (Digital Workers para RH, frente de
-> departamento pessoal).
->
-> **Problema.** Em redes de varejo, food service e farmácia, a escala da semana é montada à mão em planilha e consertada no
-> improviso pelo WhatsApp do gerente. O resultado é hora extra que ninguém planejou, turno descoberto no pico e regra trabalhista
-> furada sem ninguém ver. A EC 141 muda a jornada para 42 h com dois repousos semanais a partir de dezembro de 2026, e a maioria das
-> empresas ainda não sabe como vai se adaptar.
->
-> **Para quem.** Gestores de loja e o departamento pessoal de redes com 5 a 200 lojas.
->
-> **Solução.** O Remane é um agente (o Pat) que monta a escala ótima e acompanha a semana. O gestor envia a escala que já usa. O
-> agente lê o arquivo e mostra o que entendeu. Depois otimiza a semana com um solver de programação por restrições (OR-Tools CP-SAT)
-> dentro da lei, da convenção e da política da empresa, que entram como dados, com a origem de cada regra. Um verificador independente
-> confere regra por regra, a mesma função de custo compara o antes e o depois, e um modelo de linguagem escreve a justificativa
-> citando as regras. **Nada é publicado sem a aprovação do gestor.** Durante a semana, o colaborador avisa uma falta pelo celular
-> simulado; o agente procura quem cobre sem hora extra e leva ao gestor um cartão de exceção com opções, custo e recomendação.
->
-> **Como o agente funciona.** Grafo LangGraph com paradas humanas: ler → (gestor confirma) → otimizar → verificar → comparar →
-> justificar → (gestor aprova) → publicar. A ferramenta de publicar recusa sem aprovação, e isso é conferido em código. Falha do
-> modelo vira exceção visível (nunca texto inventado). Cada passo vai para um rastro auditável com custo e latência, visível na
-> plataforma.
->
-> **Medido** (dados sintéticos, link público, 08/11/2026): na escala de exemplo (3 lojas, 60 pessoas), 158 violações → 0, 216,5 h
-> de hora extra → 0, economia de R$ 5.533 (16,3%) na semana; a escala antiga cobria 95,7% da demanda à custa de hora extra e
-> violação, e o Pat mostra que, dentro da regra, o quadro só aguenta ~80% dela (2.400 de 2.774,5 pessoa-hora). Execução completa em
-> ~61 s, com US$ 0,007 de modelo. Evals sem modelo: 10/10.
->
-> **Teste:** `https://remane.up.railway.app` → "Testar a demo" → entrar como gestor ou como colaborador,
-> sem senha.
->
-> **Declarações.** Todos os dados são sintéticos, gerados pelo time. A convenção coletiva e a política da empresa são fictícias. O
-> colaborador conversa com o agente por um chat dentro do app, num celular simulado. Decisões sobre pessoas ficam sempre com humanos. Ferramentas, modelos e APIs de
-> terceiros: Featherless (Qwen3.5-9B e Gemma 4 31B), OR-Tools, LangGraph, FastAPI, Next.js, SQLite e Railway. A lista completa com
-> licenças está em `docs/declaracao-ferramentas.md`. O código foi escrito durante o evento, com apoio do Claude Code.
+O texto em vigor está em [descricao.md](descricao.md) (substituído em 2026-11-08 15:08 pelo texto enviado pelo usuário). Este arquivo não guarda cópia, para não haver duas versões.
 
 Antes de colar: conferir cada número com a versão publicada, trocar o `[DECIDIR]` e confirmar se o Gemma 4 31B foi mesmo usado (hoje
 o rastro só mostra o Qwen3.5-9B). Se não foi, tirar da lista.
