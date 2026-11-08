@@ -10,7 +10,7 @@ export function stepFromProgress(p: number, thresholds = STORY_THRESHOLDS): numb
 
 export const STORY_CAPTIONS = [
   "Role para ver uma falta sendo resolvida",
-  "07:02 · Joana avisa a falta pelo WhatsApp",
+  "07:02 · Patrick avisa a falta pelo WhatsApp",
   "A escala marca o atestado e o turno das 14h fica descoberto",
   "O agente confirma o atestado e procura quem pode cobrir",
   "Carlos aceita ir para as 14h, sem hora extra",
@@ -25,13 +25,13 @@ const off: Cell = { kind: "off", label: "folga" };
 
 // Grade da Loja Boa Viagem no passo `step` da história (quarta = índice 2).
 export function storyRows(step: number) {
-  const joanaWed: Cell = step >= 2 ? { kind: "sick", label: "atestado", alert: step < 4 } : s("14–22h");
+  const patrickWed: Cell = step >= 2 ? { kind: "sick", label: "atestado", alert: step < 4 } : s("14–22h");
   const carlosWed: Cell = step >= 4 ? { kind: "moved", label: "14–22h" } : s("7–15h");
   return [
     { name: "Ana", cells: [s("7–15h"), s("7–15h"), off, s("7–15h"), s("7–15h"), s("7–15h"), off] },
     { name: "Bruno", cells: [s("14–22h"), s("14–22h"), s("14–22h"), off, s("14–22h"), s("14–22h"), off] },
     { name: "Carlos", cells: [s("7–15h"), off, carlosWed, s("7–15h"), s("7–15h"), off, s("7–15h")] },
-    { name: "Joana", cells: [s("14–22h"), s("14–22h"), joanaWed, off, s("14–22h"), s("14–22h"), off] },
+    { name: "Patrick", cells: [s("14–22h"), s("14–22h"), patrickWed, off, s("14–22h"), s("14–22h"), off] },
     { name: "Diego", cells: [off, s("14–22h"), s("7–15h"), s("14–22h"), s("14–22h"), off, s("7–15h")] },
   ];
 }

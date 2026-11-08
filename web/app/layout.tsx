@@ -4,9 +4,9 @@ import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Remane · sua escala se remaneja sozinha",
+  title: "Remane · o engenheiro da sua escala de trabalho",
   description:
-    "Um agente que monta a escala dentro da lei e cobre faltas pelo WhatsApp antes de o gestor abrir o celular.",
+    "Do planejamento da semana à falta de última hora: o Remane monta, confere e ajusta a escala, e só chama você para decidir.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

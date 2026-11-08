@@ -2,7 +2,7 @@
 
 > Handoff original da landing, mantido como referência de marca, tokens, copy e movimento. **Onde diverge do repositório, vale a
 > [DEC-035](decisoes.md):** a landing fica em `web/` com export estático servido pelo FastAPI (não Vercel), e o botão "Testar a demo"
-> leva a `/entrar` (não `/app`). Código: `web/app/page.tsx` e `web/components/`.
+> leva a `/entrar` (não `/app`). **A copy e a seção "Fim da 6x1" abaixo foram substituídas pela [DEC-036](decisoes.md)**; o texto em vigor está no código. Código: `web/app/page.tsx` e `web/components/`.
 
 
 Leia este arquivo inteiro antes de começar.
