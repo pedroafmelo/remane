@@ -32,7 +32,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
 
 ## Próximas ações
 
-- [ ] **C6 (leitura por agente e formulação), M1 pronto em `c6/integra`** ([plano](planos/camada-06-leitura-e-formulacao.md), seção 21): CSV e XLSX com cabeçalhos livres, nó 1 com reservas, quadro guardado, próxima semana sem upload. **Falta (usuário):** `git push origin c6/integra`, PR com merge commit, conferir `/health` e o login no Railway depois do merge; o G3 da C6 à mão com a chave (seção 19 do plano) e `uv run python -m escalista.evals --suite e2 --with-model` (custo e latência de `llm.map_columns` e `llm.formulate` **não medidos**). M2 (formulação e laço) e M3 (PDF) seguem em `c6/integra`.
+- [ ] **C6: M2 (formulação do pedido do gestor pelo modelo e laço do solver) integrado em `c6/integra` (2026-11-08 06:06)**; pacote M2 em preparo. **M1 pronto em `c6/m1`** ([plano](planos/camada-06-leitura-e-formulacao.md), seção 21): CSV e XLSX com cabeçalhos livres, nó 1 com reservas, quadro guardado, próxima semana sem upload. **Falta (usuário):** `git push origin c6/integra`, PR com merge commit, conferir `/health` e o login no Railway depois do merge; o G3 da C6 à mão com a chave (seção 19 do plano) e `uv run python -m escalista.evals --suite e2 --with-model` (custo e latência de `llm.map_columns` e `llm.formulate` **não medidos**). M2 (formulação e laço) e M3 (PDF) seguem em `c6/integra`.
 - [x] ~~Time alinhar restrições e semear o backlog ([como-ideiar.md](ideacao/como-ideiar.md), passos 1 e 2)~~: superada, a ideia
       foi escolhida pela [DEC-003](decisoes.md) sem esse passo (auditoria de 14:42).
 - [x] Filtrar e pontuar a IDEA-002 com [criterios.md](ideacao/criterios.md): feito às 13:18 e refeito às 14:47 com o produto

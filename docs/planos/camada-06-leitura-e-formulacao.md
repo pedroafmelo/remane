@@ -521,6 +521,8 @@ nos relatórios dos subagentes.
 - **A5** (opus) 04:08–04:18, branch `c6/a-a5` (fora do M1, entra no M2): solver com `SolveSpec`; sem spec, hash e escala iguais aos da
   C5. Bench sob carga (load 6 a 7,7, outras sessões rodando): antes 18,24 s / 29,68 s; depois, sem spec, 19,80 s / 24,72 s; com a spec
   padrão, 22,21 s / 28,28 s (1 thread / 8 threads). **Medir de novo com a máquina ociosa.**
+- **A5 integrada** em `c6/integra` às 04:53 (`3976807`), depois do corte do M1.
+- **Teste de tempo do solver** (`test_solver_60x7_within_time_limit`): falhou uma vez por carga (sozinho passa em 22 s); correção em andamento.
 
 ### Sessão B
 - **B1** (sonnet) 03:17–03:19, `31726a0`: tabela `roster_version` e `SqlRepository` com as duas portas.
@@ -532,6 +534,11 @@ nos relatórios dos subagentes.
   a heurística de aliases (ela já lê o CSV da DEC-039), não o leitor da DEC-039 citado na [DEC-052](../decisoes.md); RX-02 e RX-12 que não
   bloqueiam passam para `notices`; `confirmed_by` fixo em "gestor"; contexto da leitura em memória entre a leitura e a confirmação
   (reinício → "envie de novo", limite já aceito na C5).
+- **B4a-fix** (opus) 04:37–04:46, `28c0ec5`: linhas com problema viram RX-13 em `notices` (sem nomes na evidência), sem bloquear.
+  O 2º commit (`summary.ok = False`) **não** foi levado: a tela esconde o confirmar com `ok` falso.
+- **B4b** (opus) 04:53–05:04, `f77e5cf`: nó `formular` e laço do solver (no máx. 2 chamadas, critério de 5%); o "antes" é verificado sem as
+  regras de pedido; recusados aparecem em `summary.assumptions`; "preferências atendidas" só no rastro. Medido nos testes (8 pessoas): com
+  "todos preferem a manhã", 2 tentativas e fica a 2ª (116 contra 136 pessoa-faixas descobertas); 0,6 a 0,85 s por chamada ao solver.
 
 ### Sessão C
 - **C1** (opus) 03:17–03:27, `e15e9e6`: upload binário por extensão e magic bytes (recusa em 422 com RX-13), `next-week`, `confirm` com
@@ -539,6 +546,11 @@ nos relatórios dos subagentes.
 - **C2** (sonnet) 03:34–03:39, `c1776bc`: telas do resumo (mapeamento, suposições, identidade, capacidade com cobertura-alvo por loja,
   salário-hora, semana, pedido), `notices`, cobertura no antes e depois, "Planejar a próxima semana". **Sem verificação visual.**
 - **C2b** (sonnet) 03:44–03:48, `052c52f`: o XLSX em grade como primeiro exemplo da demo.
+- **C3** (sonnet) 04:25–04:33, `e69d025`: `build_agent` no caminho C6; e2e `tests/e2e/test_c6.py`. Medido (modelo falso, dados sintéticos,
+  cobertura-alvo 80%): antes 158 violações, R$ 33.989,15, cobertura 97,04%; depois 0 violações, R$ 28.381,60, cobertura 98,5%; semana
+  seguinte sem upload com 0 violações.
+- **C3-bis** (sonnet) 05:08–05:16, `6e53c98`: formulação ligada no wiring; e2e com "Ana Dantas não pode na quarta" (restrição aplicada,
+  0 violações), pedido que afrouxa recusado, modelo falhando com RX-12; card "O que o Pat aplicou do seu pedido".
 
 ### Sessão D
 - **D1** (sonnet) 03:05–03:13, `ae4bb21`: arquivos E2-01 a E2-11 e gabaritos (~228 KB), exemplo em grade com 360 turnos. Orquestrador:
@@ -562,3 +574,9 @@ nos relatórios dos subagentes.
   que confere o código de saída.
 - **Medido pelo orquestrador em `c6/integra` (04:12):** `uv run python -m escalista.evals --suite e2` sem modelo: **15/15 arquivos;
   747/747 turnos corretos, 0 inventados, 0 perdidos; problemas 6/6, 0 extras; RX-13 4/4.**
+- **M1 cortado às 04:49** (`c6/m1` = `28c0ec5`, worktree `cc61-c6-m1`). Seção 19 no `c6/m1` (04:50–04:55): 1.225 testes, ruff, E1 10/10,
+  E2 15/15 (747/747, 0 inventados, RX-13 4/4), e2e 7 + 10, front verde; bench com load 13: 18,14 s (1 thread, ótimo, R$ 20.014,00) e
+  22,23 s (8 threads, viável, R$ 20.018,30), **não comparável** com os 9,46 s de referência. Entregue ao usuário para push e PR.
+- **Conflitos previstos (simulação às 04:50):** `origin/feat/plataforma-impacto-regras` (outra sessão) conflita em 9 arquivos com a C6
+  (também troca os papéis); `origin/fix/solver-contract-hours` conflita só com a A5 (`solver/model.py`). Ordem de merge: decisão do usuário.
+- **2026-11-08 06:06:** M2 (A5, B4b, C3-bis) integrado em `c6/integra`.
