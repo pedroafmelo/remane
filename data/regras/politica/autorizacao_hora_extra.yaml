@@ -7,9 +7,9 @@
 norma: "Politica FICTICIA da empresa da demo (dados de demonstracao)"
 
 excecoes:   # o agente nao decide sozinho; valores de acao em data/regras/README.md
-  - id: hora_extra_autorizacao_dp
-    descricao: "hora extra so com autorizacao previa do DP; o agente nao escala hora extra sozinho"
-    fonte: "FICTICIO - politica da empresa da demo"
+  - id: hora_extra_autorizacao_previa
+    descricao: "Hora extra só com autorização prévia do gestor; o agente não escala hora extra sozinho."
+    fonte: "Política fictícia da empresa da demo"
     acao: escalar
     nota: "Na fatia, a escala enviada pode ter hora extra; ela entra como custo e violacao, nunca como escala feita pelo solver."
     status: ficticia
