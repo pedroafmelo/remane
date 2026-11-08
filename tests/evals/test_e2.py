@@ -26,6 +26,7 @@ EXPECTED_IDS = [
     "E2-11b",
     "E2-11c",
     "E2-11d",
+    "E2-12",
     "EXEMPLO",
 ]
 
@@ -85,10 +86,10 @@ def test_suite_without_model_scores_every_file_with_no_invented_shift(tmp_path: 
     assert [(r.id, r.failures) for r in run.results if not r.passed] == []
     totals = run.report["totais"]
     assert totals["inventados"] == 0
-    assert totals["turnos_esperados"] == totals["corretos"] == 747
+    assert totals["turnos_esperados"] == totals["corretos"] == 795
     assert totals["perdidos"] == 0
     assert totals["rx13_certos"] == "4/4"
-    assert run.report["placar"] == "15/15" == e2.scoreboard(run.results)
+    assert run.report["placar"] == "16/16" == e2.scoreboard(run.results)
     assert run.all_passed
     assert {r.source for r in run.results if r.expect == "shifts"} == {e2.SOURCE_HEURISTIC}
     assert all(r.model is None for r in run.results)
@@ -117,8 +118,8 @@ def test_with_model_uses_the_fake_and_records_model_cost_and_latency(tmp_path: P
     assert run.all_passed, run.table
     assert run.report["modo"] == "com_modelo"
     readable = [r for r in run.results if r.model is not None]
-    assert len(readable) == 11  # os 4 RX-13 não chegam ao modelo
-    assert len(shared.calls) == 11
+    assert len(readable) == 12  # os 4 RX-13 não chegam ao modelo
+    assert len(shared.calls) == 12
     assert {r.source for r in readable} == {e2.SOURCE_MODEL}
     for r in readable:
         m = r.model
@@ -133,12 +134,12 @@ def test_with_model_uses_the_fake_and_records_model_cost_and_latency(tmp_path: P
         )
         assert not m.fell_back and m.same_as_heuristic is True
     assert run.report["modelo"] == {
-        "chamadas": 11,
+        "chamadas": 12,
         "arquivos_com_reserva": 0,
-        "tokens_entrada": 110,
-        "tokens_saida": 55,
-        "cost_usd": "0.0011",
-        "latencia_ms": 77,
+        "tokens_entrada": 120,
+        "tokens_saida": 60,
+        "cost_usd": "0.0012",
+        "latencia_ms": 84,
     }
     saved = json.loads((tmp_path / "e2-latest.json").read_text())
     assert saved["arquivos"][0]["modelo"]["cost_usd"] == "0.0001"
@@ -152,7 +153,7 @@ def test_with_model_that_fails_falls_back_to_the_heuristic_and_records_why(tmp_p
     )
 
     readable = [r for r in run.results if r.model is not None]
-    assert len(readable) == 11
+    assert len(readable) == 12
     for r in readable:
         m = r.model
         assert m is not None and m.fell_back
@@ -160,7 +161,7 @@ def test_with_model_that_fails_falls_back_to_the_heuristic_and_records_why(tmp_p
         assert m.fallback_reason is not None and m.fallback_reason.startswith("RX-12")
         assert m.calls == 1  # falha do cliente propaga sem reenvio
     assert run.all_passed, run.table  # a reserva leu tudo
-    assert run.report["modelo"]["arquivos_com_reserva"] == 11
+    assert run.report["modelo"]["arquivos_com_reserva"] == 12
     assert "RESERVA: RX-12" in run.table
 
 

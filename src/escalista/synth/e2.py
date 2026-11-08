@@ -1,7 +1,7 @@
 """Arquivos de leitura do E2 e gabaritos (plano da C6, seção 12, tarefa D1). Tudo sintético e determinístico por seed.
 
 `gerar_e2(seed)` devolve `{caminho relativo a data/demo: bytes}`. Cada arquivo de leitura tem um gabarito irmão
-(`<nome sem extensão>.esperado.json`); o formato está em `data/demo/e2/README.md`. O E2-12 (PDF com tabela) fica fora.
+(`<nome sem extensão>.esperado.json`); o formato está em `data/demo/e2/README.md`.
 """
 
 from __future__ import annotations
@@ -589,6 +589,79 @@ def _pdf_sem_tabela() -> bytes:
     return pdf
 
 
+def _pdf_tabela(titulo: str, cabecalho: list[str], linhas: list[list[str]], larguras: list[int]) -> bytes:
+    """PDF digital escrito à mão: título e uma tabela com grade desenhada (operadores `m`, `l`, `S`) e o texto de cada
+    célula posicionado com `Tj`. As linhas da grade é que fazem o `extract_tables` do pdfplumber achar a tabela.
+    Sem data, sem id: os bytes dependem só do conteúdo. Fonte Helvetica com WinAnsi (acentos em octal)."""
+    altura, fonte, margem, topo = 14, 8, 40, 800
+    x = [margem]
+    for largura in larguras:
+        x.append(x[-1] + largura)
+    todas = [cabecalho, *linhas]
+    base = topo - 30 - altura * len(todas)  # y da última linha da grade
+    if base < 30:
+        raise ValueError("a tabela não cabe em uma página")
+
+    def texto_pdf(valor: str) -> str:
+        octal = "".join(f"\\{b:03o}" if b > 127 else chr(b) for b in valor.encode("cp1252"))
+        return octal.replace("(", "\\(").replace(")", "\\)")
+
+    ops = [f"BT /F1 9 Tf {margem} {topo} Td ({texto_pdf(titulo)}) Tj ET", "0.5 w"]
+    for i in range(len(todas) + 1):
+        y = topo - 30 - altura * i
+        ops.append(f"{x[0]} {y} m {x[-1]} {y} l S")
+    for xi in x:
+        ops.append(f"{xi} {topo - 30} m {xi} {base} l S")
+    for i, linha in enumerate(todas):
+        y = topo - 30 - altura * (i + 1) + 4
+        for xi, celula in zip(x[:-1], linha, strict=True):
+            ops.append(f"BT /{'F2' if i == 0 else 'F1'} {fonte} Tf {xi + 3} {y} Td ({texto_pdf(celula)}) Tj ET")
+    fluxo = "\n".join(ops)
+    objetos = [
+        b"<< /Type /Catalog /Pages 2 0 R >>",
+        b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R "
+        b"/Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> >>",
+        f"<< /Length {len(fluxo)} >>\nstream\n{fluxo}\nendstream".encode("ascii"),
+        b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>",
+        b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>",
+    ]
+    pdf = b"%PDF-1.4\n"
+    posicoes = []
+    for numero, corpo in enumerate(objetos, start=1):
+        posicoes.append(len(pdf))
+        pdf += f"{numero} 0 obj\n".encode("ascii") + corpo + b"\nendobj\n"
+    xref = len(pdf)
+    pdf += f"xref\n0 {len(objetos) + 1}\n0000000000 65535 f \n".encode("ascii")
+    pdf += b"".join(f"{p:010d} 00000 n \n".encode("ascii") for p in posicoes)
+    pdf += f"trailer\n<< /Size {len(objetos) + 1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n".encode("ascii")
+    return pdf
+
+
+def _e2_12(d: Dados) -> tuple[bytes, bytes]:
+    """A tabela do E2-01 (mesmas pessoas, datas e horários) em um PDF digital."""
+    turnos = _turnos(d, "L1", 0, 4) + _turnos(d, "L2", 0, 4)
+    linhas = [[t.nome, _data_br(t.inicio), _hm(t.inicio), _hm(t.fim), t.loja] for t in turnos]
+    cabecalho = ["Colaborador", "Dia", "Entrada", "Saída", "Unidade"]
+    dados = _pdf_tabela(f"{MARCA} - escala semanal ficticia", cabecalho, linhas, [150, 70, 55, 55, 185])
+    nome = "e2/e2-12-pdf-tabela.pdf"
+    hint = {
+        "layout": "long",
+        "format": "pdf",
+        "table": "página 1, tabela 1",
+        "header_row": 1,
+        "columns": {
+            "person_name": "Colaborador",
+            "date": "Dia",
+            "start": "Entrada",
+            "end": "Saída",
+            "store": "Unidade",
+        },
+        "date_format": "dd/mm/aaaa",
+    }
+    return dados, _gabarito(nome, _de(turnos), mapping_hint=hint, expected_issues=[])
+
+
 def _zip_bomba(xlsx_valido: bytes) -> bytes:
     """XLSX válido mais uma entrada de zeros que descompacta além do limite. Comprime para poucas dezenas de KB."""
     saida = io.BytesIO()
@@ -654,6 +727,7 @@ def gerar_e2(seed: int = 42) -> dict[str, bytes]:
         "e2/e2-08-identidade.csv": _e2_08(),
         "e2/e2-09-adversario.xlsx": _e2_09(d),
         "e2/e2-10-turno-noturno.csv": _e2_10(d),
+        "e2/e2-12-pdf-tabela.pdf": _e2_12(d),
         EXEMPLO: _exemplo(d),
     }
     arquivos: dict[str, bytes] = {}

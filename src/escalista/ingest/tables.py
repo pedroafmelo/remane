@@ -14,14 +14,17 @@ Contrato com o mapeamento:
 - Células como texto aparado: data `2027-01-11` (datetime às 00:00 vira só data), datetime `2027-01-11T08:00`, hora
   `08:00` (com segundos só se houver), duração `32:00`, inteiro sem `.0`, decimal com ponto, booleano `true`/`false`,
   vazio `""`.
-- Um XLSX vira uma `RawTable` por aba (nome = nome da aba); um CSV vira uma (nome = nome do arquivo). Num XLSX, célula
-  mesclada traz o valor só na célula superior esquerda (o modo `read_only` do openpyxl não propaga).
+- Um XLSX vira uma `RawTable` por aba (nome = nome da aba); um CSV vira uma (nome = nome do arquivo); um PDF vira uma
+  por tabela achada pelo `pdfplumber` ("página N, tabela K"), com a quebra de linha interna da célula trocada por
+  espaço. Num XLSX, célula mesclada traz o valor só na célula superior esquerda (o modo `read_only` do openpyxl não
+  propaga).
 
 Segurança (arquitetura, seção 6): tipo pelo conteúdo (magic bytes) e pela extensão; `.xlsm`, `.xls` e ZIP com
 `xl/vbaProject.bin` são recusados; antes de abrir o XLSX, soma descompactada do ZIP ≤ 20 MiB e no máximo 2000
 entradas (o `zipfile` não entrega mais bytes que o `file_size` declarado, então a soma é um teto real); `openpyxl` com
 `read_only=True` e `data_only=True` (fórmula nunca é avaliada; vale o valor em cache) e com `defusedxml` quando
-instalado; no máximo 5000 linhas e 60 colunas com valor por tabela. Tudo que não passa vira RX-13 com o motivo,
+instalado; PDF só digital (camada de texto), com `pdfplumber`, até 5 páginas e sem tabela = RX-13 ("talvez escaneado");
+no máximo 5000 linhas e 60 colunas com valor por tabela. Tudo que não passa vira RX-13 com o motivo,
 decidido pelo gestor.
 """
 
@@ -47,6 +50,7 @@ MAX_UNZIPPED_BYTES = 20 * 1024 * 1024  # 20 MiB descompactados
 MAX_ZIP_ENTRIES = 2000
 MAX_ROWS = 5000
 MAX_COLS = 60
+MAX_PDF_PAGES = 5
 
 Format = Literal["csv", "xlsx", "pdf"]
 
@@ -111,8 +115,9 @@ def read_tables(file_name: str, content: bytes) -> TablesResult:
     try:
         fmt = _detect(file_name, content)
         if fmt == "pdf":
-            raise _Unreadable("PDF ainda não é lido nesta versão; envie CSV ou XLSX")
-        if fmt == "xlsx":
+            tables = _read_pdf(content)
+            meta = _meta(content, tables, started)
+        elif fmt == "xlsx":
             tables = _read_xlsx(content)
             meta = _meta(content, tables, started)
         else:
@@ -325,6 +330,47 @@ def _cell_text(value: object) -> str:
 
 def _clock(t: time) -> str:
     return t.strftime("%H:%M:%S") if t.second or t.microsecond else t.strftime("%H:%M")
+
+
+# --- PDF -----------------------------------------------------------------------------------------------------------
+
+
+def _read_pdf(content: bytes) -> list[RawTable]:
+    """PDF digital (com camada de texto): `pdfplumber.extract_tables` em até `MAX_PDF_PAGES` páginas. Cada tabela
+    achada vira uma `RawTable` ("página N, tabela K"). PDF escaneado (imagem) não tem tabela extraível: vira RX-13."""
+    import pdfplumber  # importado só aqui: a borda de CSV/XLSX não paga o custo
+
+    tables: list[RawTable] = []
+    try:
+        with pdfplumber.open(io.BytesIO(content)) as pdf:
+            pages = len(pdf.pages)
+            if pages == 0:
+                raise _Unreadable("o PDF não tem páginas")
+            if pages > MAX_PDF_PAGES:
+                raise _Unreadable(f"o PDF tem {pages} páginas, acima do limite de {MAX_PDF_PAGES}")
+            for number, page in enumerate(pdf.pages, start=1):
+                found = [rows for rows in page.extract_tables() if any(any(cell for cell in row) for row in rows)]
+                for k, raw in enumerate(found, start=1):
+                    name = f"página {number}, tabela {k}"
+                    tables.append(RawTable(name=name, rows=_pdf_rows(name, raw)))
+    except _Unreadable:
+        raise
+    except Exception as exc:  # borda: PDF corrompido, criptografado ou fora do padrão vira RX-13 com o detalhe
+        raise _Unreadable(
+            f"o PDF está corrompido, protegido por senha ou fora do padrão ({type(exc).__name__})"
+        ) from None
+
+    if not tables:
+        raise _Unreadable("o PDF não tem tabela legível (talvez seja escaneado); envie CSV ou XLSX")
+    return tables
+
+
+def _pdf_rows(name: str, raw: list[list[str | None]]) -> list[list[str]]:
+    rows = [[_LINE_BREAK.sub(" ", cell or "").strip() for cell in row] for row in raw]
+    width = max((len(r) for r in rows), default=0)
+    rows = _trim_trailing_empty([r + [""] * (width - len(r)) for r in rows])
+    _check_limits(name, rows)
+    return rows
 
 
 # --- comum ---------------------------------------------------------------------------------------------------------

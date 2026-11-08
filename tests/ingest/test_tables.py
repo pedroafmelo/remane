@@ -11,11 +11,12 @@ import openpyxl
 import pytest
 
 from escalista.domain.contracts import Role
-from escalista.ingest.tables import MAX_COLS, MAX_FILE_BYTES, MAX_ROWS, MAX_ZIP_ENTRIES, read_tables
+from escalista.ingest.tables import MAX_COLS, MAX_FILE_BYTES, MAX_PDF_PAGES, MAX_ROWS, MAX_ZIP_ENTRIES, read_tables
 
 DEMO = Path(__file__).resolve().parents[2] / "data" / "demo"
 E2 = DEMO / "e2"
 READABLE = sorted(p for p in E2.glob("e2-*") if p.suffix != ".json" and not p.name.startswith("e2-11"))
+FORMATS = {".xlsx": "xlsx", ".csv": "csv", ".pdf": "pdf"}
 UNREADABLE = sorted(p for p in E2.glob("e2-11*") if p.suffix != ".json")
 
 
@@ -49,7 +50,7 @@ def _assert_rx13(result, *fragments: str) -> None:
 
 
 def test_e2_files_are_all_present():
-    assert len(READABLE) == 10
+    assert len(READABLE) == 11
     assert len(UNREADABLE) == 4
 
 
@@ -60,7 +61,7 @@ def test_e2_readable_file_yields_tables_with_header_at_the_answer_key_row(path):
 
     assert key["expect"] == "shifts"
     assert result.exception is None
-    assert result.format == ("xlsx" if path.suffix == ".xlsx" else "csv")
+    assert result.format == FORMATS[path.suffix]
     assert len(result.tables) == 1
     table = result.tables[0]
     header = table.rows[key["mapping_hint"]["header_row"] - 1]  # índice 0-based + 1 = linha do arquivo
@@ -153,11 +154,132 @@ def test_e2_11_unreadable_file_is_rx13_with_reason_and_no_tables(path):
         ("e2-11a-macro.xlsm", "macro"),
         ("e2-11b-corrompido.xlsx", "corrompida"),
         ("e2-11c-zip-bomba.xlsx", "descompacta"),
-        ("e2-11d-pdf-sem-tabela.pdf", "PDF ainda não é lido"),
+        ("e2-11d-pdf-sem-tabela.pdf", "não tem tabela legível"),
     ],
 )
 def test_e2_11_reason_names_the_problem(name, fragment):
     _assert_rx13(_read(E2 / name), fragment)
+
+
+# --- PDF ------------------------------------------------------------------------------------------------------------
+
+
+def _pdf_pages(*pages: list[str]) -> bytes:
+    """PDF digital mínimo de várias páginas, uma linha de texto por item (sem grade: não tem tabela)."""
+    objects: list[bytes] = [b"<< /Type /Catalog /Pages 2 0 R >>"]
+    first_page = 4
+    kids = " ".join(f"{first_page + 2 * i} 0 R" for i in range(len(pages)))
+    objects.append(f"<< /Type /Pages /Kids [{kids}] /Count {len(pages)} >>".encode())
+    objects.append(b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>")
+    for i, lines in enumerate(pages):
+        stream = "BT /F1 12 Tf 72 760 Td 18 TL\n" + "\n".join(f"({ln}) Tj T*" for ln in lines) + "\nET"
+        number = first_page + 2 * i
+        objects.append(
+            f"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents {number + 1} 0 R "
+            f"/Resources << /Font << /F1 3 0 R >> >> >>".encode()
+        )
+        objects.append(f"<< /Length {len(stream)} >>\nstream\n{stream}\nendstream".encode())
+    pdf = b"%PDF-1.4\n"
+    offsets = []
+    for number, body in enumerate(objects, start=1):
+        offsets.append(len(pdf))
+        pdf += f"{number} 0 obj\n".encode() + body + b"\nendobj\n"
+    xref = len(pdf)
+    pdf += f"xref\n0 {len(objects) + 1}\n0000000000 65535 f \n".encode()
+    pdf += b"".join(f"{o:010d} 00000 n \n".encode() for o in offsets)
+    pdf += f"trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n".encode()
+    return pdf
+
+
+def test_pdf_with_table_yields_one_table_with_the_header_and_all_rows():
+    path = E2 / "e2-12-pdf-tabela.pdf"
+    result = _read(path)
+    key = _key(path)
+
+    assert result.exception is None
+    assert result.format == "pdf"
+    assert [t.name for t in result.tables] == ["página 1, tabela 1"]
+    rows = result.tables[0].rows
+    assert rows[0] == ["Colaborador", "Dia", "Entrada", "Saída", "Unidade"]
+    assert len(rows) == 1 + len(key["shifts"])
+    assert all(len(r) == 5 and all(c == c.strip() and "\n" not in c for c in r) for r in rows)
+    first = key["shifts"][0]
+    assert any(r[0] == first["person_name"] and r[4] == first["store"] for r in rows)
+    assert (result.meta.sheets, result.meta.rows, result.meta.cols) == (1, len(rows), 5)
+    assert result.meta.bytes == path.stat().st_size
+    assert result.meta.encoding is None
+
+
+def test_pdf_detected_by_content_even_with_another_extension():
+    result = read_tables("escala.bin", (E2 / "e2-12-pdf-tabela.pdf").read_bytes())
+
+    assert result.format == "pdf"
+    assert result.exception is None
+
+
+def test_pdf_without_table_is_rx13_maybe_scanned():
+    result = read_tables("p.pdf", _pdf_pages(["Comunicado interno", "Sem tabela nenhuma"]))
+
+    _assert_rx13(result, "não tem tabela legível", "escaneado", "CSV ou XLSX")
+
+
+def test_pdf_above_page_limit_is_rx13():
+    pages = [["pagina"]] * (MAX_PDF_PAGES + 1)
+
+    _assert_rx13(read_tables("p.pdf", _pdf_pages(*pages)), f"{MAX_PDF_PAGES + 1} páginas", f"limite de {MAX_PDF_PAGES}")
+
+
+def test_pdf_at_page_limit_is_opened_and_still_needs_a_table():
+    result = read_tables("p.pdf", _pdf_pages(*[["pagina"]] * MAX_PDF_PAGES))
+
+    _assert_rx13(result, "não tem tabela legível")
+
+
+def test_pdf_truncated_is_rx13():
+    content = (E2 / "e2-12-pdf-tabela.pdf").read_bytes()
+
+    _assert_rx13(read_tables("p.pdf", content[:200]), "corrompido")
+
+
+def test_pdf_cells_have_line_breaks_replaced_and_none_as_empty(monkeypatch):
+    class FakePage:
+        def extract_tables(self):
+            return [[["Nome\nCompleto ", None], [" Ana ", ""]], [[None, None]]]
+
+    class FakePdf:
+        pages = [FakePage()]
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+    monkeypatch.setattr("pdfplumber.open", lambda _: FakePdf())
+
+    result = read_tables("p.pdf", b"%PDF-1.4 stub")
+
+    assert result.exception is None
+    assert [t.rows for t in result.tables] == [[["Nome Completo", ""], ["Ana", ""]]]  # tabela só de vazios é ignorada
+
+
+def test_pdf_above_column_limit_is_rx13(monkeypatch):
+    class FakePage:
+        def extract_tables(self):
+            return [[["x"] * (MAX_COLS + 1)]]
+
+    class FakePdf:
+        pages = [FakePage()]
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+    monkeypatch.setattr("pdfplumber.open", lambda _: FakePdf())
+
+    _assert_rx13(read_tables("p.pdf", b"%PDF-1.4 stub"), f"limite: {MAX_COLS}")
 
 
 # --- CSV ------------------------------------------------------------------------------------------------------------

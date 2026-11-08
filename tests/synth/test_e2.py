@@ -13,6 +13,7 @@ import zipfile
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
+import pdfplumber
 import pytest
 from openpyxl import load_workbook
 
@@ -108,8 +109,32 @@ def _ler_xlsx_grade(dados: bytes, hint: dict) -> set[ModeloTurno]:
     return saida
 
 
+def _ler_pdf(dados: bytes, hint: dict) -> set[ModeloTurno]:
+    """Leitor de referência do E2-12: o `pdfplumber` direto, sem passar por `ingest/`."""
+    with pdfplumber.open(io.BytesIO(dados)) as pdf:
+        assert len(pdf.pages) == 1
+        tabelas = pdf.pages[0].extract_tables()
+    assert len(tabelas) == 1
+    cabecalho, *linhas = tabelas[0]
+    colunas = {papel: cabecalho.index(nome) for papel, nome in hint["columns"].items()}
+    saida = set()
+    for linha in linhas:
+        dia = linha[colunas["date"]]
+        saida.add(
+            _turno(
+                linha[colunas["person_name"]],
+                linha[colunas["store"]],
+                _momento(dia, linha[colunas["start"]]),
+                _momento(dia, linha[colunas["end"]]),
+            )
+        )
+    return saida
+
+
 def _ler(nome: str, dados: bytes, gabarito: dict) -> set[ModeloTurno]:
     hint = gabarito["mapping_hint"]
+    if nome.endswith(".pdf"):
+        return _ler_pdf(dados, hint)
     if hint["layout"] == "grid":
         return _ler_xlsx_grade(dados, hint)
     return _ler_xlsx_longo(dados, hint) if nome.endswith(".xlsx") else _ler_csv(dados, hint)
@@ -133,10 +158,10 @@ def test_seed_muda_o_conteudo_sorteado(arquivos: dict[str, bytes]) -> None:
 def test_cada_arquivo_tem_gabarito_e_o_inverso(arquivos: dict[str, bytes]) -> None:
     gabaritos = _gabaritos(arquivos)
     fontes = [n for n in arquivos if not n.endswith(".esperado.json")]
-    assert len(fontes) == len(gabaritos) == 15  # E2-01 a E2-11 (E2-11 tem 4 arquivos) mais o exemplo em grade
+    assert len(fontes) == len(gabaritos) == 16  # E2-01 a E2-12 (E2-11 tem 4 arquivos) mais o exemplo em grade
     for g in gabaritos:
         assert _fonte(g, arquivos) in fontes
-    assert {re.search(r"e2-(\d\d)", f).group(1) for f in fontes if "e2-" in f} == {f"{i:02d}" for i in range(1, 12)}
+    assert {re.search(r"e2-(\d\d)", f).group(1) for f in fontes if "e2-" in f} == {f"{i:02d}" for i in range(1, 13)}
 
 
 def test_gabaritos_tem_o_formato_documentado(arquivos: dict[str, bytes]) -> None:
@@ -162,7 +187,7 @@ def test_todo_gabarito_de_turnos_bate_com_o_conteudo_do_arquivo(arquivos: dict[s
         fonte = _fonte(nome, arquivos)
         assert _ler(fonte, arquivos[fonte], g) == _esperados(g), fonte
         conferidos += 1
-    assert conferidos == 11
+    assert conferidos == 12
 
 
 def test_marca_sintetico_em_todos_os_arquivos_legiveis(arquivos: dict[str, bytes]) -> None:
@@ -320,3 +345,20 @@ def test_e2_04_titulo_mesclado_e_cabecalho_na_linha_4(arquivos: dict[str, bytes]
     ws = load_workbook(io.BytesIO(arquivos["e2/e2-04-titulo-mesclado.xlsx"])).active
     assert [str(r) for r in ws.merged_cells.ranges] == ["A1:E1"]
     assert ws["A4"].value == "Nome do colaborador"
+
+
+def test_e2_12_pdf_tem_a_mesma_tabela_do_e2_01(arquivos: dict[str, bytes]) -> None:
+    pdf = arquivos["e2/e2-12-pdf-tabela.pdf"]
+    g12 = json.loads(arquivos["e2/e2-12-pdf-tabela.esperado.json"])
+    g01 = json.loads(arquivos["e2/e2-01-csv-cp1252.esperado.json"])
+    assert pdf.startswith(b"%PDF-1.") and pdf.rstrip().endswith(b"%%EOF")
+    assert g12["expect"] == "shifts"
+    assert g12["shifts"] == g01["shifts"]  # as mesmas pessoas, datas e horários
+    assert g12["mapping_hint"]["columns"] == g01["mapping_hint"]["columns"]
+    assert g12["mapping_hint"]["header_row"] == 1
+    with pdfplumber.open(io.BytesIO(pdf)) as pagina:
+        assert "SINTETICO" in pagina.pages[0].extract_text().splitlines()[0]  # a marca fica no topo
+
+
+def test_e2_12_pdf_e_deterministico() -> None:
+    assert gerar_e2(42)["e2/e2-12-pdf-tabela.pdf"] == gerar_e2(42)["e2/e2-12-pdf-tabela.pdf"]
