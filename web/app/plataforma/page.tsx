@@ -193,7 +193,7 @@ export default function PlataformaPage() {
       {run && (
         <>
           <p className="text-sm text-ink-muted">
-            Execução <span className="tabular font-medium text-ink">{run.run_id}</span> · {phaseLabel(run.phase)}
+            Execução: <span className="font-medium text-ink">{phaseLabel(run.phase)}</span>
           </p>
 
           {run.summary && (

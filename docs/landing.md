@@ -78,7 +78,7 @@ Remane é um digital worker que monta a escala de trabalho de lojas dentro da CL
 - Títulos em Geist 700 com tracking negativo (hero: 72px, -0.055em, line-height 0.98; seções: 48px, -0.045em). Texto em Geist 400. Rótulos 12–13px peso 500. Números com `tabular`.
 - `accent` (verde-menta) só marca o que o agente fez (turno remanejado, mensagens do agente). Texto sobre accent é sempre `ink`. Nunca use accent como fundo de botão nem como cor de texto (para verde em texto: `accent-strong`).
 - O painel vivo (`panel-live animate-drift`) aparece uma vez por página: no hero.
-- Movimento só onde tem propósito: painel em deriva, turno remanejado com `animate-pop`, mensagens com `animate-rise` em sequência (~0,9s entre elas), bloco do logo deslizando (`slide`, 4s) só no logo do topo.
+- Movimento só onde tem propósito: painel em deriva, turno remanejado com `animate-pop`, mensagens com `animate-rise` em sequência (~0,9s entre elas), olhar do logo indo de um lado ao outro (`logo-look`, 6s) só no logo do topo ([DEC-056](decisoes.md)).
 - Responsivo até 375px: a grade de escala rola na horizontal dentro do próprio cartão; a página nunca rola de lado. Foco visível em tudo que é clicável.
 - Nada de emoji, nada de degradê roxo-azul, nada de cartão com borda colorida na lateral.
 
@@ -92,7 +92,7 @@ Remane é um digital worker que monta a escala de trabalho de lojas dentro da CL
 - Protótipo de referência (descartável) validado com o Pedro antes de construir.
 
 ## Logo
-Símbolo SVG (viewBox "0 0 70 64"): quadrados 16x16 com rx 5 em ink nas posições (4,4) (24,4) (44,4) (4,24) (24,24) (4,44) (24,44) (44,44); o nono em accent em (50,18) (deslocado). Na versão animada, o accent começa em (44,24) com um contorno tracejado line-strong no lugar vazio, e desliza com `slide`. Ao lado: "remane" em minúsculas, Geist 500, tracking -0.06em. Favicon: fundo ink com cantos arredondados e o símbolo em branco + accent.
+**Substituído pela [DEC-056](decisoes.md):** o símbolo agora é o rosto do Pat (quadrado accent, óculos redondos, olhos e bigode em ink, viewBox 64 x 64); a geometria está em `web/components/Logo.tsx` e os arquivos em `design-system/assets/logos/`. Na versão animada, as pupilas olham para os lados e piscam. Ao lado: "remane" em minúsculas, Geist 500, tracking -0.06em. Favicon: o próprio símbolo.
 
 ## Seções da landing (copy pronta, pode ajustar)
 1. **Nav**: Logo animado · links "Como funciona", "Fim da 6x1", "WhatsApp" (âncoras) · botão "Testar a demo" (ink, pílula) → `/app`.

@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { api } from "@/lib/api";
 import { dateBr } from "@/lib/format";
 import { buildGrid } from "@/lib/grid";
 import type { EmployeePublic, Schedule } from "@/lib/types";
@@ -13,6 +14,15 @@ export function ScheduleView({ title, schedule, employees, note, id }: { title: 
   const grid = useMemo(() => buildGrid(schedule, employees), [schedule, employees]);
   const [picked, setPicked] = useState(0);
   const store = grid.stores[Math.min(picked, Math.max(grid.stores.length - 1, 0))];
+  const [names, setNames] = useState<Map<string, string>>(new Map());
+  useEffect(() => {
+    // sem quadro guardado (404 num banco novo) ou com ids que não batem, a loja aparece pelo id
+    api.roster().then((r) => setNames(new Map(r.stores.map((s) => [s.id, s.name]))), () => {});
+  }, [schedule]);
+  const storeName = (id: string) => {
+    const name = names.get(id);
+    return name && name !== id ? name : `Loja ${id}`; // o CSV padrão grava o id como nome
+  };
   return (
     <Card title={title} id={id} aside={`semana de ${dateBr(schedule.week_start)}`}>
       {note && (
@@ -32,14 +42,14 @@ export function ScheduleView({ title, schedule, employees, note, id }: { title: 
                 i === picked ? "border-ink bg-ink text-white" : "border-line-strong bg-surface text-ink hover:border-ink-subtle"
               }`}
             >
-              Loja {s.storeId}
+              {storeName(s.storeId)}
             </button>
           ))}
         </div>
       )}
       {store ? (
         <ScheduleGrid
-          title={`Loja ${store.storeId}`}
+          title={storeName(store.storeId)}
           chip={<StatusChip tone="neutral">{store.rows.length} pessoas</StatusChip>}
           days={grid.days}
           rows={store.rows}

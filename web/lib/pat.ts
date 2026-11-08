@@ -1,17 +1,17 @@
-/** Estados do Pat, o agente do Remane. O mascote é o bloco remanejado do logo, com olhos. */
+/** Estados do Pat, o agente do Remane. O mascote é o rosto do logo (óculos e bigode); o olhar muda por estado. */
 export const PAT_ESTADOS = ["parado", "trabalhando", "digitando", "resolveu", "excecao"] as const;
 export type PatEstado = (typeof PAT_ESTADOS)[number];
 
 export type PatPose = {
   /** olhos: abertos olhando em frente, concentrado (olhos estreitos, sobrancelhas franzidas, olhando para o lado do movimento), para baixo, para cima, ou fechados em arco (feliz) */
   eyes: "frente" | "concentrado" | "baixo" | "cima" | "feliz";
-  /** contorno tracejado no lugar de onde o bloco saiu (como no logo animado) */
+  /** contorno tracejado no lugar de onde o Pat saiu (ele desliza para remanejar) */
   ghost: boolean;
   /** três pontinhos de "digitando" */
   dots: boolean;
   /** contorno warning: precisa de uma pessoa */
   ring: boolean;
-  /** movimento: slide (logo animado), pop (turno remanejado), blink (pisca parado) */
+  /** movimento: slide (sai do lugar), pop (turno remanejado), blink (pisca parado) */
   motion: "blink" | "slide" | "pop" | "none";
 };
 
