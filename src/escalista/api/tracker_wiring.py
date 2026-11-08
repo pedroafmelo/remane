@@ -186,6 +186,7 @@ def build_tracker(
     from escalista.api.excecoes import load_policy_exceptions
     from escalista.channel.simulated import SimulatedPhone
     from escalista.ingest.atestado import make_reader
+    from escalista.ingest.chat import make_interpreter
     from escalista.rules.tracking_policy import load_track_policy
     from escalista.store.exceptions import ExceptionStore
     from escalista.store.sql_repository import SqlRepository
@@ -218,6 +219,7 @@ def build_tracker(
         reader=make_reader(llm),
         punches=punches,
         cover_fn=cover_fn or find_cover,
+        interpreter=make_interpreter(llm),
     )
 
 

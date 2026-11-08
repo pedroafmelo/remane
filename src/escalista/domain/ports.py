@@ -116,9 +116,7 @@ class MessageInterpreter(Protocol):
     """Classifica a mensagem livre do colaborador (borda `ingest/chat.py`, C7b). Só classifica, em schema fechado;
     levanta `LLMUnavailableError` quando o modelo falha ou não entrega o schema."""
 
-    def __call__(
-        self, *, text: str, employee_name: str, context: ChatContext, run_id: str
-    ) -> ChatInterpretation: ...
+    def __call__(self, *, text: str, employee_name: str, context: ChatContext, run_id: str) -> ChatInterpretation: ...
 
 
 @runtime_checkable

@@ -33,7 +33,10 @@ def test_late_cover_threshold_is_a_fictional_proposal():
 
 
 def test_missing_late_cover_threshold_means_never(tmp_path):
-    assert load_track_policy(_write_without(tmp_path, "pol_atraso", "cobertura_a_partir_de_min")).late_cover_from_min is None
+    assert (
+        load_track_policy(_write_without(tmp_path, "pol_atraso", "cobertura_a_partir_de_min")).late_cover_from_min
+        is None
+    )
 
 
 def test_non_integer_late_cover_threshold_is_rejected(tmp_path):

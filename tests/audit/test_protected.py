@@ -163,6 +163,25 @@ def test_find_leaks_ignores_empty_planted_strings():
     assert find_leaks({"log": "qualquer"}, [""], pattern_surfaces=set()) == []
 
 
+@pytest.mark.parametrize(
+    "typed",
+    ["não vou, j11.1", "estou com a09 desde ontem", "cid j11", "CID: J11", "diagnóstico z99.9 hoje"],
+)
+def test_strip_cid_any_case_cuts_lowercase_codes_typed_in_the_chat(typed):
+    from escalista.audit.protected import strip_cid_any_case
+
+    cut = strip_cid_any_case(typed)
+    assert CID_PATTERN.search(cut.upper()) is None or "[CID REMOVIDO]" in cut.upper()
+    assert all(code not in cut.lower() for code in ("j11", "a09", "z99"))
+
+
+def test_strip_cid_any_case_keeps_ordinary_text():
+    from escalista.audit.protected import strip_cid_any_case
+
+    text = "vou me atrasar 40 min, chego às 14h30 na loja 2"
+    assert strip_cid_any_case(text) == text
+
+
 def test_leak_is_frozen():
     with pytest.raises(dataclasses.FrozenInstanceError):
         Leak("log", "planted").surface = "x"  # type: ignore[misc]

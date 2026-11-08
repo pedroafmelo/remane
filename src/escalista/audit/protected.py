@@ -3,7 +3,8 @@
 CID, diagnóstico, texto livre do colaborador, imagem e anexo nunca vão ao rastro, a tabela, a log nem ao modelo (no
 caminho PDF). Este módulo é a única fonte da lista e das três operações sobre ela:
 
-- `strip_cid(text)`: corta o CID do texto do atestado **antes** de ir ao modelo.
+- `strip_cid(text)`: corta o CID do texto do atestado **antes** de ir ao modelo; `strip_cid_any_case` faz o mesmo
+  também com código em minúscula, para o texto do chat (C7b), antes do modelo e antes de gravar.
 - `scrub(payload, kind=...)`: aplicado pelo `SqlTraceSink` antes de gravar. Por **nome de campo** em todo evento; pelo
   **padrão de CID** só em `track.*` e `channel_message`, porque o padrão também casa referência de célula de planilha
   (`B12`) que a evidência da leitura do E2 cita (achado da sessão B no contrato com os evals).
@@ -59,6 +60,14 @@ def strip_cid(text: str) -> str:
     """Troca por `[CID removido]` o valor depois de um rótulo de CID e todo código no formato CID-10."""
     text = _CID_LABEL.sub(lambda m: m.group(1) + CID_REMOVED, text)
     return CID_PATTERN.sub(CID_REMOVED, text)
+
+
+_CID_ANY_CASE: re.Pattern[str] = re.compile(r"\b[A-TV-Za-tv-z][0-9]{2}(?:\.[0-9])?\b")
+
+
+def strip_cid_any_case(text: str) -> str:
+    """`strip_cid` também para código em minúscula (`j11.1`), como o colaborador digita no chat (C7b)."""
+    return _CID_ANY_CASE.sub(CID_REMOVED, strip_cid(text))
 
 
 def _applies_pattern(kind: str) -> bool:

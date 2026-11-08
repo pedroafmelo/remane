@@ -197,7 +197,9 @@ class TrackPolicy(BaseModel):
     max_candidates: int
     overtime_weekly_limit_h: Decimal
     overtime_warn_pct: int
-    late_cover_from_min: int | None = None  # `pol_atraso.cobertura_a_partir_de_min`; `None` = atraso nunca abre cobertura
+    late_cover_from_min: int | None = (
+        None  # `pol_atraso.cobertura_a_partir_de_min`; `None` = atraso nunca abre cobertura
+    )
 
     def late_opens_cover(self, minutes_late: int | None) -> bool:
         """O atraso abre a busca de cobertura (C7b, seção 5)? Sem limite na política ou sem minutos, nunca."""

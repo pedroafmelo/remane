@@ -38,6 +38,44 @@ TEMPLATES: dict[str, str] = {
         "{pessoa} passou do limite de hora extra: {observado}, acima do {limite} da política. "
         "Abri um cartão para você decidir; nada muda na escala sem você."
     ),
+    # C7b: atraso acima do limite da política abre a busca de cobertura, como a falta.
+    "atraso_recebido_cobertura": (
+        "Recebi o seu aviso de atraso de {minutos} min em {turno}. Pela política, vou procurar quem cubra e avisei o "
+        "gestor."
+    ),
+    "atraso_aviso_cobertura": (
+        "{pessoa} avisou atraso de {minutos} min em {turno}. Pela política, comecei a busca de cobertura; a escala só "
+        "muda com a sua validação."
+    ),
+    # C7b: respostas do chat. Texto nosso; o modelo só classifica e nunca escreve aqui.
+    "chat_fora_escopo": "Só posso ajudar com falta, atraso, atestado, hora extra e a sua escala.",
+    "chat_nao_entendi": (
+        'Não entendi. Pode escrever de outro jeito? Por exemplo: "amanhã não vou", "vou me atrasar 40 min" ou '
+        '"qual é a minha escala?".'
+    ),
+    "chat_recusa": "{motivo}",
+    "chat_escala": "Seus turnos nesta semana: {dias}.",
+    "chat_caso": "{estado}",
+}
+
+# Motivos fixos da recusa no chat (`track.chat.refused {reason}` → texto ao colaborador).
+CHAT_REFUSAL_TEXT: dict[str, str] = {
+    "sem_oferta": "Não há oferta de cobertura aberta para você agora.",
+    "oferta_ambigua": 'Você tem mais de uma oferta aberta. Diga o dia, por exemplo "aceito a de quinta".',
+    "sem_pergunta": "Não há pergunta minha esperando a sua resposta agora.",
+    "dia_invalido": "Não achei turno seu nesse dia. Seus turnos nesta semana: {dias}.",
+    "sem_dia": "Para qual dia? Seus turnos nesta semana: {dias}.",
+    "acao_recusada": "Não consegui registrar: {motivo}.",
+}
+
+CASE_STATE_TEXT: dict[str, str] = {
+    "aguardando_colaborador": "O seu caso de {turno} espera a sua resposta.",
+    "oferta_enviada": "O seu aviso de {turno}: ofereci o turno a um colega e espero a resposta.",
+    "aguardando_gestor": "O seu aviso de {turno} está com o gestor para decidir.",
+    "coberto": "O seu turno de {turno} está coberto.",
+    "descoberto": "O seu turno de {turno} ficou descoberto, por decisão do gestor.",
+    "atraso_registrado": "O seu atraso em {turno} está registrado.",
+    "decidido": "O gestor já decidiu o seu caso de {turno}.",
 }
 
 
