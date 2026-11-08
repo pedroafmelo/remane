@@ -1,7 +1,7 @@
-import { AreaPlaceholder } from "@/components/plataforma/AreaPlaceholder";
+import { ImpactoArea } from "@/components/plataforma/ImpactoArea";
 
 export const metadata = { title: "Remane · Impacto" };
 
 export default function Page() {
-  return <AreaPlaceholder area="impacto" title="Impacto" text="O painel com os números medidos e a auditoria chega aqui." />;
+  return <ImpactoArea />;
 }
