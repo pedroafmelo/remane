@@ -286,7 +286,8 @@ Adaptador com dois métodos, `send_message(destino, texto, anexos)` e `on_messag
 
 - **`SimulatedPhone`** (caminho garantido): o celular simulado na SPA. O jurado escolhe uma pessoa do quadro, então o número já é
   válido. **Rotulado como simulado.**
-- **`WhatsAppBridge`** (spike de 1 h): microserviço Node (`whatsapp-web.js`, não oficial, contra os termos do WhatsApp) com chip
+- **`CloudApiChannel`** ([DEC-043](decisoes.md)): número de teste da Cloud API oficial, só para o pitch; webhook e contrato em [planos/whatsapp-cloud-api.md](planos/whatsapp-cloud-api.md).
+- ~~**`WhatsAppBridge`**~~ (**abandonado**, [DEC-043](decisoes.md): o WhatsApp recusa parear o cliente automatizado) (spike de 1 h): microserviço Node (`whatsapp-web.js`, não oficial, contra os termos do WhatsApp) com chip
   dedicado, **só no notebook, nunca no servidor público** (`[PROPOSTA]`: o plano de hospedagem não promete Chromium).
 
 **Critério de abandono do spike `[PROPOSTA]`, a confirmar:** em 1 hora, a ponte recebe uma mensagem e responde a um número de teste de
@@ -306,7 +307,7 @@ API oficial do WhatsApp Business. **Não pesquisei a política de bloqueio do Wh
 
 - **Contas semeadas** nos dados sintéticos (gerente, DP e colaboradores). Senhas com `hashlib.scrypt` da stdlib (sem dependência);
   sessão por cookie assinado (`SessionMiddleware` do Starlette, que usa `itsdangerous`: confirmar licença na declaração).
-- **Papéis:** `gerente`, `dp`, `colaborador`, e `[PREENCHER]` o "gestor de RH" do usuário (é o gerente, o DP ou um papel novo: pergunta 15).
+- **Papéis ([DEC-044](decisoes.md)): `gestor` (gerente + DP) e `colaborador`.** Antes: `gerente`, `dp`, `colaborador`, e `[PREENCHER]` o "gestor de RH" do usuário (é o gerente, o DP ou um papel novo: pergunta 15).
   Controle de acesso por **dependência da rota** (`require_role`), com **teste automático** por rota e papel; a SPA só esconde, não protege.
 - **Botões de demo** da landing: `POST /auth/demo/{papel}` cria sessão de uma conta semeada, sem digitar nada (RE-07), ativo só com
   `DEMO_MODE=1`, limitado por taxa. Rotulam "dados sintéticos" e "tempo simulado". O colaborador usa o celular simulado.
