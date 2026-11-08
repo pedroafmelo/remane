@@ -44,7 +44,7 @@
 > *Teste:* https://remane.up.railway.app → "Testar a demo" → entrar como gestor ou como colaborador, sem senha. A conversa com
 > o colaborador acontece num celular simulado dentro do próprio app.
 >
-> *Declarações.* Todos os dados são sintéticos, gerados pelo time. A convenção coletiva e a política da empresa são fictícias. O
+> *Declarações:* Todos os dados são sintéticos, gerados pelo time. A convenção coletiva e a política da empresa são fictícias. O
 > celular do colaborador é simulado, não é WhatsApp. Decisões sobre pessoas ficam sempre com humanos. Ferramentas, modelos e APIs de
 > terceiros: Featherless (Qwen3.5-9B e Gemma 4 31B), OR-Tools, LangGraph, FastAPI, Next.js, SQLite e Railway. A lista completa com
 > licenças está em docs/declaracao-ferramentas.md. O código foi escrito durante o evento, com apoio do Claude Code.
