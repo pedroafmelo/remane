@@ -224,6 +224,10 @@ def _fmt(value: Any) -> str:
     return NOT_MEASURED if value is None else str(value)
 
 
+def _ms(value: Any) -> str:
+    return NOT_MEASURED if value is None else f"{value} ms"
+
+
 def _reading(at: dict[str, Any]) -> str:
     if not at["n_atestados"]:
         return NOT_MEASURED
@@ -256,7 +260,7 @@ def footer(report: dict[str, Any]) -> str:
             else NOT_MEASURED
         ),
         f"Modelo: {m['chamadas']} chamada(s); custo {('US$ ' + m['cost_usd']) if m['cost_usd'] else NOT_MEASURED}; "
-        f"latência p50 {_fmt(m['latencia_ms_p50'])} ms, máx {_fmt(m['latencia_ms_max'])} ms; teto US$ {m['teto_usd']}",
+        f"latência p50 {_ms(m['latencia_ms_p50'])}, máx {_ms(m['latencia_ms_max'])}; teto US$ {m['teto_usd']}",
     ]
     return "\n".join(lines)
 
