@@ -1,7 +1,7 @@
 # Plano por camadas: o que falta da interface web (Remane)
 
 Última atualização: 2026-11-08 09:37 (Recife), por Claude (Opus 5.5). **Status: aprovado pelo usuário em 08/11.** W2 no PR #23;
-W8 em andamento (link trocado nos docs, pitch revisto com a medição local; falta a verificação no link público, que espera o deploy).
+W8: link trocado nos docs e pitch com a medição do link público (09:44). Falta o percurso no celular no link público e limpar o banco.
 
 Base: `origin/main` em **b6f4a01** (merge do PR #22, depois de #16, #20 e #21), buscado por HTTPS às 09:05 (o SSH do GitHub recusou
 a conexão). Branch local `docs/web-camadas`.
@@ -45,7 +45,7 @@ Exceções; Impacto; Regras; colaborador avisa falta; landing.
 | L2 | O id longo da execução aparece no cabeçalho: "Execução run-1f67…". | `web/app/plataforma/page.tsx:188` | [FATO] |
 | L3 | Com a main atual, o exemplo XLSX dá economia de **R$ 5.533,15**, mas a cobertura **cai de 95,69% para 84,39%** (faixas sem cobertura de 42 para 401). O painel de capacidade avisa que o quadro só cobre cerca de 80% da demanda inferida. O `docs/pitch.md` (vídeo, cena 5) ainda diz "cobertura de 95 para 100%". A tela é honesta ("cobrir menos custa menos"); o problema é a narrativa. | tela Antes e depois; `docs/pitch.md`, seção 2 | [FATO] local, sem modelo; no Railway, com modelo, **não verificado** |
 | L3b | A régua da cobertura mudou: antes do C6, 1.704 h normais cobriam 100% da demanda; agora 2.400 h cobrem 84,39%. A demanda passou a ser inferida da escala antiga (2.774,5 pessoa-hora), então a queda parece vir dessa régua nova, e não só do piso de contrato do #16. | tela Antes e depois de hoje cedo × a de agora | [INFERÊNCIA] |
-| L3c | Medição dos 3 cenários pela API (main local b6f4a01, sem modelo, texto livre vazio, 08/11 09:40). Ver a tabela abaixo. O custo e as horas são **iguais** nos três: a economia não depende do alvo. | `scratchpad/measure.py` | [FATO] local; no link público, **não medido** (deploy pendente) |
+| L3c | Medição dos 3 cenários pela API (main local b6f4a01, sem modelo, texto livre vazio, 08/11 09:40). Ver a tabela abaixo. O custo e as horas são **iguais** nos três: a economia não depende do alvo. | `scratchpad/measure.py` | [FATO] local; **confirmado no link público em 08/11 09:44** (com modelo): mesmos custos e coberturas, 393 faixas em vez de 401; XLSX completo em ~61 s e US$ 0,0069 de modelo |
 | L4 | Os docs ainda apontam o link antigo (`escalista-converge-production.up.railway.app`, que agora responde 404 "Application not found"). | `docs/entrega.md`, `docs/estado-do-projeto.md`, `docs/pitch.md`, `docs/plano-implementacao.md`, `docs/planos/whatsapp-cloud-api.md` | [FATO] |
 | L5 | O deploy de b6f4a01 no link novo não estava concluído às 09:11. | status do commit no GitHub: `pending`; bundle sem os textos do C6 | [FATO] às 09:11; o estado atual não foi conferido |
 | L6 | O banco do link público guarda dados de teste: escala publicada antes do #16 (R$ 13.975, cobertura 100%), uma falta decidida e uma execução parada em "Aguardando a aprovação". O Impacto mostra esses números até alguém publicar de novo. | `remane.up.railway.app/plataforma/` às 09:10 | [FATO] |

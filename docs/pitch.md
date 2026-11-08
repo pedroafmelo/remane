@@ -21,13 +21,13 @@ Os slides de cada bloco seguem o desenho dela: uma frase grande, um visual e pou
 
 | Número | Valor | Como foi medido | Quando |
 |---|---|---|---|
-| Custo do modelo por execução | **US$ 0,001** (US$ 0,001047) | rastro da execução no link público (`llm.justify`, Qwen3.5-9B na Featherless) | 08/11, 03:00 |
-| Tempo da execução completa | **~36 s**: solver 19,6 s + justificativa 16,3 s | rastro da mesma execução, no Railway | 08/11, 03:00 |
+| Custo do modelo por execução | **US$ 0,007** (US$ 0,006891) no exemplo XLSX; US$ 0,002 (0,001967) no CSV | soma do rastro de cada execução (leitura das colunas + justificativa), link público, exemplo XLSX, alvo 100%, Qwen3.5-9B na Featherless | 08/11, 09:44 |
+| Tempo da execução completa | **~61 s** no exemplo XLSX (leitura com o modelo ~31 s; otimização e justificativa ~36 s); ~20 s no CSV | soma das latências no rastro (Impacto) e cronômetro do script de medição, no Railway | 08/11, 09:44 |
 | Violações das regras na escala enviada → na proposta | **158 → 0** | verificador independente, mesma escala de exemplo (sintética) | 08/11 |
 | Horas extras na escala enviada → na proposta | **216,5 h → 0 h** | mesma função de custo nas duas escalas | 08/11 |
-| Cobertura da demanda (alvo 100%, o padrão da tela) | **95,7% → 84,4%** (faixas sem cobertura: 42 → 401) | mesma função nas duas escalas, contra a demanda inferida do arquivo; **main local b6f4a01, sem modelo** (confirmar no link público depois do deploy) | 08/11, 09:40 |
-| Demanda da semana × o que o quadro aguenta | **2.774,5 × 2.400 pessoa-hora** (cabe ~80%) | painel "A demanda cabe no quadro?", mesma medição | 08/11, 09:40 |
-| Economia na semana do exemplo | **R$ 5.533** (16,3%): R$ 33.989,15 → R$ 28.456,00 | mesma função de custo nas duas escalas, **solver direto, medido localmente** (não pelo link público: confirmar depois do deploy); o PR #16 corrige a carga do contrato (ver nota) | 08/11, 08:40 |
+| Cobertura da demanda (alvo 100%, o padrão da tela) | **95,7% → 84,4%** (faixas sem cobertura: 42 → 393) | mesma função nas duas escalas, contra a demanda inferida do arquivo; link público, exemplo XLSX, alvo 100%, Qwen3.5-9B na Featherless; a main local sem modelo dá o mesmo (401 faixas em vez de 393) | 08/11, 09:44 |
+| Demanda da semana × o que o quadro aguenta | **2.774,5 × 2.400 pessoa-hora** (cabe ~80%) | painel "A demanda cabe no quadro?", mesma medição | 08/11, 09:44 |
+| Economia na semana do exemplo | **R$ 5.533** (16,3%): R$ 33.989,15 → R$ 28.456,00 | mesma função de custo nas duas escalas, link público, exemplo XLSX, alvo 100%, Qwen3.5-9B na Featherless, igual nos três cenários medidos (XLSX 100%, XLSX 80%, CSV); o PR #16 corrige a carga do contrato (ver nota) | 08/11, 09:44 |
 | Evals sem modelo (E1) | **10/10** | `uv run python -m escalista.evals --suite e1` | 08/11 |
 | Rede da demo | 3 lojas, 60 pessoas, 1 semana | dados sintéticos gerados pelo time | — |
 
@@ -37,7 +37,7 @@ trabalhou, não recebe?", e agora a resposta é que ninguém fica com 0 h. **Res
 contratadas e não trabalhadas (R$ 2.845,60): pela folha completa a economia está **entre R$ 2.688 e R$ 5.533**, e as horas ociosas do "antes"
 não foram medidas; (2) **na demo o custo não varia com a cobertura-alvo** (R$ 28.456 em 50%, 80%, 100% e 120%): não prometer "escolha a
 cobertura e veja o custo cair" no vídeo nem ao vivo, e sim "a cobertura-alvo ajusta cobertura e contratação"; (3) o tempo do solver caiu para ~3 s (bench local), mas
-o "~36 s" acima é do rastro do deploy antigo: **remedir depois do deploy** e trocar o número.
+o tempo e o custo acima já são do deploy com o C6 (08/11, 09:44): a leitura das colunas pelo modelo soma ~31 s no XLSX.
 
 **Nota sobre a cobertura (08/11, 09:40):** com o C6, a demanda passou a ser inferida da própria escala enviada, e a frase antiga "cobertura de 95 para 100%" deixou de valer. A escala antiga cobria 95,7% **porque usava 216,5 h de hora extra e tinha 158 violações**; dentro da regra, as 60 pessoas dão 2.400 pessoa-hora para uma demanda de 2.774,5, e a proposta cobre 84,4%. **A história honesta é: zero violação, zero hora extra, R$ 5.533 a menos, e o Remane mostra que o quadro não fecha a semana.** Não usar o alvo "Ajustar para caber (80%)" para dizer "98,5% de cobertura": é a cobertura de uma demanda reduzida de propósito, e cai numa pergunta da banca. Medição completa dos três cenários em [planos/web-camadas.md](planos/web-camadas.md).
 
@@ -126,11 +126,11 @@ Dois slides, no formato do modelo: título claro, subtítulo de como funciona e 
     empresa é trocar dados, não código.
   - **O agente prepara, o humano decide:** nada é publicado sem a aprovação do gestor, e decisões sobre pessoas ficam sempre com
     pessoas.
-  - **Tudo auditável e medido:** cada passo fica no rastro, com custo e tempo. Uma execução completa custou **US$ 0,001 de modelo** e
-    levou ~36 s.
+  - **Tudo auditável e medido:** cada passo fica no rastro, com custo e tempo. Uma execução completa custou **menos de 1 centavo de dólar de modelo** (US$ 0,007) e
+    levou cerca de 1 minuto.
 - **Fala:**
   > "O que nos diferencia é a confiança. Cada regra tem origem: artigo da lei, cláusula da convenção ou item da política. O agente
-  > nunca publica sozinho. E tudo fica num rastro auditável: uma execução completa custou um décimo de centavo de dólar em modelo."
+  > nunca publica sozinho. E tudo fica num rastro auditável: uma execução completa custou menos de um centavo de dólar em modelo."
 
 ### Slide 4c · Negócio (2:20 – 2:40)
 
@@ -165,7 +165,7 @@ parte do bloco 4, em "Relações / Parcerias".
 | "Isso não é só um solver? Onde está o agente?" | O agente conduz o processo: lê o arquivo, chama o otimizador, confere, explica, acompanha a falta, monta as opções da exceção e pede a decisão. O solver é uma ferramenta dele. |
 | "E se o modelo errar a regra?" | O modelo não decide regra nem publica: um verificador independente confere em código, e o gestor aprova. |
 | "Os dados são reais?" | Não: dados sintéticos e convenção fictícia, declarados. O próximo passo é o piloto. |
-| "Quanto custa rodar?" | US$ 0,001 de modelo por execução, medido no rastro. O solver roda no nosso servidor. |
+| "Quanto custa rodar?" | Menos de 1 centavo de dólar de modelo por execução (US$ 0,007 no exemplo XLSX), medido no rastro. O solver roda no nosso servidor. |
 | "Concorrentes?" | Existem apps de escala com CLT (ex.: Escala Jornadas). O nosso ângulo é convenção e política como regras citadas, exceção com decisão humana e rastro. Nunca dizer "ninguém faz". |
 
 ---
@@ -183,12 +183,12 @@ Impacto/Regras) e, se o time decidir, o #16. Cenas que dependem de PR ainda aber
 | 1 | 0:00 – 0:10 | Landing, rolando a história do hero | "O Remane é o engenheiro da escala de trabalho. Tudo aqui usa dados sintéticos." |
 | 2 | 0:10 – 0:20 | `/entrar` → "Entrar como gestor" | "O jurado entra sem senha, como gestor ou como colaborador." |
 | 3 | 0:20 – 0:40 | Escala → "Usar escala de exemplo" → resumo da leitura | "O gestor envia a escala que já usa. O Pat lê: 60 pessoas, 3 lojas, 360 turnos, e mostra o que entendeu antes de seguir." |
-| 4 | 0:40 – 1:00 | "Confirmar a leitura" → Pat trabalhando (cortar a espera de ~36 s na edição) | "Ele otimiza a semana dentro da lei, da convenção e da política, confere com um verificador independente e escreve a justificativa." |
+| 4 | 0:40 – 1:00 | "Confirmar a leitura" → Pat trabalhando (cortar a espera de ~1 min na edição) | "Ele otimiza a semana dentro da lei, da convenção e da política, confere com um verificador independente e escreve a justificativa." |
 | 5 | 1:00 – 1:25 | Antes e depois + painel "A demanda cabe no quadro?" + grade proposta | "158 violações viram zero; 216 horas extras viram zero; R$ 5.533 a menos, pela mesma função de custo nas duas escalas. E o Pat mostra o que a escala antiga escondia: ela só cobria a demanda com hora extra e violação. Dentro da regra, este quadro não fecha a semana, e o gestor vê o tamanho do buraco." |
 | 6 | 1:25 – 1:35 | "Aprovar e publicar" → escala vigente | "Nada é publicado sem o gestor. A aprovação fica gravada com quem e quando." |
 | 7 | 1:35 – 2:00 | **(PR de Exceções)** Sair → entrar como colaborador → celular simulado → "Avisar falta" | "No celular simulado, a colaboradora avisa a falta. O Pat procura quem cobre sem hora extra e respeitando o descanso." |
 | 8 | 2:00 – 2:15 | **(PR de Exceções)** Gestor → Exceções → cartão com opções e custo → escolhe | "O gestor recebe a exceção com as opções, o custo e a recomendação, e decide. A escala é atualizada." |
-| 9 | 2:15 – 2:25 | **(PR de Impacto/Regras)** Regras (origem de cada regra) e Impacto (rastro com custo) | "Cada regra tem a origem, e cada passo tem custo e tempo medidos: US$ 0,001 de modelo nesta execução." |
+| 9 | 2:15 – 2:25 | **(PR de Impacto/Regras)** Regras (origem de cada regra) e Impacto (rastro com custo) | "Cada regra tem a origem, e cada passo tem custo e tempo medidos: menos de um centavo de dólar de modelo nesta execução." |
 | 10 | 2:25 – 2:30 | Tela final com o link | "Teste você mesmo no link." |
 
 Dicas: gravar em 1440 × 900 ou maior, com zoom do navegador em 110%. Cortar as esperas e manter o cronômetro do Pat visível por um
@@ -222,9 +222,8 @@ segundo, para não parecer truque. Sem música alta. Legenda "dados sintéticos"
 >
 > **Medido** (dados sintéticos, link público, 08/11/2026): na escala de exemplo (3 lojas, 60 pessoas), 158 violações → 0, 216,5 h
 > de hora extra → 0, economia de R$ 5.533 (16,3%) na semana; a escala antiga cobria 95,7% da demanda à custa de hora extra e
-> violação, e o Pat mostra que, dentro da regra, o quadro só aguenta ~80% dela (2.400 de 2.774,5 pessoa-hora). Medido localmente, a
-> confirmar na versão publicada. Execução completa em ~36
-> s, com US$ 0,001 de modelo. Evals sem modelo: 10/10.
+> violação, e o Pat mostra que, dentro da regra, o quadro só aguenta ~80% dela (2.400 de 2.774,5 pessoa-hora). Execução completa em
+> ~61 s, com US$ 0,007 de modelo. Evals sem modelo: 10/10.
 >
 > **Teste:** `https://remane.up.railway.app` → "Testar a demo" → entrar como gestor ou como colaborador,
 > sem senha.
@@ -246,5 +245,5 @@ o rastro só mostra o Qwen3.5-9B). Se não foi, tirar da lista.
 - `[DECIDIR]` A chamada para ação: piloto ou "teste agora".
 - `[DECIDIR]` Quem fala cada bloco. Sugestão: uma pessoa nos blocos 1 a 3 e outra nos blocos 4 e 5.
 - Gravar o vídeo depois do merge dos PRs da plataforma e do deploy.
-- Remedir no link público, com o modelo ligado, a economia, a cobertura e o tempo da execução (as linhas de 08/11 09:40 são da main local).
+- ~~Remedir no link público~~ feito em 08/11 09:44 (economia, cobertura, custo e tempo); remedir só se o código do solver ou da leitura mudar.
 - Imprimir ou ter à mão o QR code do link.
