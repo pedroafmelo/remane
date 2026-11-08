@@ -18,3 +18,12 @@ def test_bench_card_matches_loaded_card_on_five_primitives():
     assert len(PRIMITIVE_KINDS) == 5
     for r in built.rules:
         assert (r.id, r.layer, r.params) == loaded[r.kind], r.kind
+
+
+def test_bench_spec_option_none_or_default():
+    from escalista.domain.spec import SolveSpec
+    from escalista.rules.spec import default_spec
+    from escalista.solver.bench import bench_spec
+
+    assert bench_spec("none") is None
+    assert bench_spec("default") == default_spec() == SolveSpec()
