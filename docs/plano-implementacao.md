@@ -313,11 +313,11 @@ puxado. Não há sessão própria.
 | Camada | Frente | Status | Plano |
 |---|---|---|---|
 | C0 Fundação e deploy de teste | 1 pessoa, depois C | C0a concluída (G0 às 16h41); C0b parada: Docker pronto, deploy adiado ([DEC-033](decisoes.md), [DEC-034](decisoes.md)) | [camada-00-fundacao.md](planos/camada-00-fundacao.md) |
-| C1 Domínio, regras e rede sintética | A | a planejar | — |
-| C2 Solver, verificador e custo | A | a planejar | — |
-| C3 Cliente LLM, pool de chaves e rastro | B | a planejar | — |
-| C4 API, login, papéis e SPA base | C | a planejar | — |
-| C5 Primeira fatia vertical | todas | a planejar | — |
+| C1 Domínio, regras e rede sintética | A | a planejar (subconjunto planejado na C5) | subconjunto em [camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md) |
+| C2 Solver, verificador e custo | A | a planejar (subconjunto planejado na C5) | subconjunto em [camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md) |
+| C3 Cliente LLM, pool de chaves e rastro | B | a planejar (subconjunto planejado na C5) | subconjunto em [camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md) |
+| C4 API, login, papéis e SPA base | C | a planejar (subconjunto planejado na C5) | subconjunto em [camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md) |
+| C5 Primeira fatia vertical | todas | **planejada** (aprovada, [DEC-037](decisoes.md)) | [camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md) |
 | C6 Leitura completa e FT-01 | B, D | a planejar | — |
 | C7 Acompanhamento (FT-03) | B, C | a planejar | — |
 | C8 Exceções, painel, auditoria e FT-07 | A, C | a planejar | — |

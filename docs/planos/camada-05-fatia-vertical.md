@@ -1,6 +1,6 @@
 # Plano da C5 · Primeira fatia vertical (com os subconjuntos de C1 a C4)
 
-Última atualização: 2026-11-07 23:41 (Recife) · Situação: **aguardando o "aprovado" do usuário** · Decisões desta etapa:
+Última atualização: 2026-11-07 23:41 (Recife) · Situação: **aprovado pelo usuário em 2026-11-07 23:49** ([DEC-037](../decisoes.md)) · Decisões desta etapa:
 [DEC-035](../decisoes.md) e [DEC-036](../decisoes.md). Planejado pelo Opus 5.5 ([DEC-028](../decisoes.md)).
 
 **Rótulos:** sem rótulo é decisão do usuário (com a DEC). **[PROPOSTA]** é sugestão do agente, ainda não confirmada. `[PREENCHER]` é o que
@@ -290,7 +290,7 @@ C1 acesso (sem dependência)   D1 YAMLs (sem dependência)
   [estado](../estado-do-projeto.md) e as Métricas medidas, só o usuário (ou a sessão A, a pedido dele) no merge. O hook `docs_sync.py`
   vai cobrar doc em cada sessão: a resposta é a linha no registro deste plano.
 - **Commits:** em inglês, Conventional Commits, terminando com `Co-Authored-By` do modelo que executou. **Só quando o usuário pedir**
-  (CLAUDE.md): se o "aprovado" deste plano vale como pedido de commit por tarefa nas 4 sessões é `[PREENCHER]`, e você decide.
+  (CLAUDE.md): se o "aprovado" deste plano vale como pedido de commit por tarefa nas 4 sessões **foi autorizado na [DEC-037](../decisoes.md)**, só na branch do worktree.
   Sequência sugerida: `feat(domain): add slice contracts and repository port` → `feat(rules): load and merge rule layers` →
   `feat(audit): persist trace events with masking` → `feat(api): add demo session and role guard` → `feat(rules): add fictitious demo
   convention and policy` (D1, mesmo sendo dado) → `feat(synth): generate seeded network, demand and schedules` → `feat(ingest): validate
@@ -349,14 +349,14 @@ Os outros 3 integrantes não programam nesta madrugada. O que podem fazer está 
 
 ## 11. Pendências que bloqueiam
 
-- `[PREENCHER]` Se o "aprovado" deste plano autoriza commits por tarefa nas 4 sessões (CLAUDE.md: "commits só quando o usuário pedir").
+- `Commits por tarefa nas 4 sessões: **autorizados** na branch do worktree, sem push e sem commit no `main` ([DEC-037](../decisoes.md)).
 - `[PREENCHER]` O que fazer com C6, C7 e C8 diante do G4 (seção 9).
 - `[PREENCHER]` Política e convenção do Pedro Veloso (G2 venceu às 19h sem entrega; D1 cobre a fatia).
 - `[PREENCHER]` Valor da ampliação diária da convenção fictícia (pergunta 17); a fatia não depende dele.
 - `[PREENCHER]` "Gestor de RH" (pergunta 15): a fatia usa só o gerente; resolver antes da C8.
 - Chave 1 da Featherless e o resgate da 4ª pessoa (ação humana; B4 depende).
 - Os itens `[PROPOSTA]` deste plano (nomes de contratos, quinta primitiva, semana de 11/01/2027, hora extra só com autorização, `store/`,
-  verificador na sessão D, fluxo sem PR) entram no "aprovado" ou mudam por nova DEC.
+  verificador na sessão D, fluxo sem PR) entraram no "aprovado" ([DEC-037](../decisoes.md)) ou mudam por nova DEC.
 
 ## 12. Registro de execução
 

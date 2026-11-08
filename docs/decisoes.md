@@ -470,3 +470,12 @@ Formato:
 - **Motivo: [motivo não informado].**
 - **Alternativas consideradas (as oferecidas):** (1) o time programa e o usuário coordena; uma sessão, frente a frente. (2) grade pessoa × dia. (3) `conferida`; `interpretacao`. (4) visível na grade; fora do contrato agora.
 - **Consequências:** a atenção do usuário vira o gargalo `[INFERÊNCIA]`; o fluxo de git usa worktrees e merge local (plano da C5, seção 7). O schema do carregador ganha o valor `ficticia`, aceito só em `convencao/` e `politica/` `[PROPOSTA]`; a tela mostra "fictícia (demo)". A primitiva `domingo_mulher` fica para depois da fatia, mas o contrato `Employee` já nasce com `sex`.
+
+## DEC-037 · Plano da C5 aprovado; commits autorizados nas branches dos worktrees
+
+- 2026-11-07 23:49 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** o plano da C5 ([planos/camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md)) esperava o "aprovado" e a decisão sobre commits por tarefa nas 4 sessões ([DEC-035](#dec-035--plano-da-c5-rodada-1-g3-local-janela-até-03h-e-de-volta-às-07h-o-usuário-em-todas-as-frentes-contratos-pela-frente-a), [DEC-036](#dec-036--plano-da-c5-rodada-2-4-sessões-do-claude-em-paralelo-csv-longo-status-ficticia-e-campo-sexo-fora-da-tela)).
+- **Decisão (o que o usuário disse):** "Aprovo o plano." e, sobre os commits, "Autorizados."
+- **Motivo: [motivo não informado].**
+- **Alternativas consideradas (as oferecidas):** commits autorizados por tarefa concluída, na branch do worktree e nunca no `main`; ou não autorizados.
+- **Consequências:** os itens `[PROPOSTA]` do plano entram na aprovação e seguem rotulados (nomes de contratos, quinta primitiva `jornada_diaria_max`, semana de 11 a 17/01/2027, hora extra só com autorização, pacote `store/`, verificador na sessão D, fluxo sem PR); qualquer um muda por nova DEC. **Commits autorizados** para as 4 sessões, por tarefa concluída, **na branch do worktree** (`c5/<frente>-<tarefa>`), **sem push e sem commit no `main`**: o `main` só recebe o que o usuário integra com `merge --ff-only`. Esta autorização vale só para as sessões da C5. **Segue `[PREENCHER]`:** o que fazer com C6, C7 e C8 diante do G4 (plano da C5, seção 9). Os worktrees foram criados às 23h47 (`/Users/pedrohmv/Projetos/cc61-a` a `cc61-d`, branches `c5/a-contracts`, `c5/b-trace`, `c5/c-access` e `c5/d-data`) a partir de `d6c10c7`.
