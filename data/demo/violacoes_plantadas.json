@@ -42,13 +42,13 @@
     "day": "2027-01-13"
   },
   {
-    "rule_id": "interjornada_min",
+    "rule_id": "pol_interjornada",
     "kind": "interjornada_min",
     "employee_id": "P006",
     "day": "2027-01-12"
   },
   {
-    "rule_id": "interjornada_min",
+    "rule_id": "pol_interjornada",
     "kind": "interjornada_min",
     "employee_id": "P007",
     "day": "2027-01-14"

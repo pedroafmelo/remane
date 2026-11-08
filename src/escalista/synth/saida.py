@@ -12,7 +12,7 @@ from pydantic import TypeAdapter
 
 from escalista.domain.schedule import DemandSlot, Employee, Shift, Store
 from escalista.synth.demanda import make_demanda
-from escalista.synth.escalas import PLANTADAS, escala_atual, escala_base, escala_violacoes
+from escalista.synth.escalas import PLANTADAS, REGRA_APLICADA, escala_atual, escala_base, escala_violacoes
 from escalista.synth.rede import SEMANA_INICIO, make_rede
 
 CABECALHO_CSV = ["loja_id", "pessoa_id", "nome", "data", "inicio", "fim"]
@@ -120,8 +120,13 @@ def gerar(seed: int) -> dict[str, str]:
         "escala_violacoes.csv": _csv([_linha(t, nomes) for t in _ordenar(violacoes)]),
         "violacoes_plantadas.json": json.dumps(
             [
-                {"rule_id": regra, "kind": regra, "employee_id": pessoa, "day": dia.isoformat() if dia else None}
-                for regra, pessoa, dia in PLANTADAS
+                {
+                    "rule_id": REGRA_APLICADA.get(tipo, tipo),
+                    "kind": tipo,
+                    "employee_id": pessoa,
+                    "day": dia.isoformat() if dia else None,
+                }
+                for tipo, pessoa, dia in PLANTADAS
             ],
             ensure_ascii=False,
             indent=2,

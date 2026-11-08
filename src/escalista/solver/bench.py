@@ -37,7 +37,7 @@ PRIMITIVE_KINDS = (
 
 
 def bench_rule_card(reference_date: date = WEEK_START) -> RuleCard:
-    """Cartão explícito com as 5 primitivas da fatia (EC 141 e convenção fictícia), sem ler `data/regras/`."""
+    """Cartão explícito com as 5 primitivas (EC 141, convenção e política fictícias), sem ler `data/regras/`."""
 
     def lei(kind: str, **params: float) -> Rule:
         return Rule(
@@ -54,14 +54,21 @@ def bench_rule_card(reference_date: date = WEEK_START) -> RuleCard:
         rules=[
             lei("jornada_semanal_max", hours=42),
             lei("jornada_diaria_max", hours=8),
-            lei("interjornada_min", hours=11),
             lei("repouso_semanal", days=2),
             Rule(
-                id="adicional_hora_extra",
+                id="pol_interjornada",
+                kind="interjornada_min",
+                layer=RuleLayer.POLITICA,
+                params={"hours": 12},
+                status=RuleStatus.INTERPRETACAO,
+                source="benchmark: política fictícia de data/regras/politica (a CLT pede 11h)",
+            ),
+            Rule(
+                id="cct_adicional_hora_extra",
                 kind="adicional_hora_extra",
                 layer=RuleLayer.CONVENCAO,
                 params={"percent": 60},
-                status=RuleStatus.FICTICIA,
+                status=RuleStatus.INTERPRETACAO,
                 source="benchmark: convenção fictícia de data/regras/convencao",
             ),
         ],

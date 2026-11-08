@@ -16,7 +16,7 @@ from pydantic import TypeAdapter
 from escalista.domain.schedule import DemandSlot, Employee, Shift, Store
 from escalista.synth.__main__ import main
 from escalista.synth.demanda import make_demanda
-from escalista.synth.escalas import PLANTADAS
+from escalista.synth.escalas import PLANTADAS, REGRA_APLICADA
 from escalista.synth.rede import SEMANA_INICIO
 from escalista.synth.saida import MARCA, gerar
 
@@ -142,10 +142,11 @@ def test_escala_atual_tem_violacoes_pelas_regras_novas(arquivos: dict[str, str])
 
 def test_violacoes_plantadas_sao_exatas(arquivos: dict[str, str]) -> None:
     planejadas = json.loads(arquivos["violacoes_plantadas.json"])
-    esperado = {(v["rule_id"], v["employee_id"], v["day"]) for v in planejadas}
+    esperado = {(v["kind"], v["employee_id"], v["day"]) for v in planejadas}
     assert esperado == {(r, p, d.isoformat() if d else None) for r, p, d in PLANTADAS}
     assert _checar(_turnos(arquivos["escala_violacoes.csv"])) == esperado
-    contagem = Counter(v["rule_id"] for v in planejadas)
+    assert all(v["rule_id"] == REGRA_APLICADA.get(v["kind"], v["kind"]) for v in planejadas)
+    contagem = Counter(v["kind"] for v in planejadas)
     assert all(contagem[r] >= 2 for r in ("jornada_semanal_max", "jornada_diaria_max", "interjornada_min"))
     assert contagem["repouso_semanal"] >= 2
     assert all(set(v) == {"rule_id", "kind", "employee_id", "day"} for v in planejadas)

@@ -4,17 +4,31 @@
 
 Formato normalizado de `kind` e `params` (o que solver, verificador e custo leem):
 
-| `kind` (= `id` do YAML)  | campo do YAML     | `params`              | sentido do "mais restritivo" |
-|--------------------------|-------------------|-----------------------|------------------------------|
-| `jornada_semanal_max`    | `horas`           | `{"hours": 42}`       | menor                        |
-| `jornada_diaria_max`     | `horas`           | `{"hours": 8}`        | menor                        |
-| `interjornada_min`       | `horas`           | `{"hours": 11}`       | maior                        |
-| `repouso_semanal`        | `dias`            | `{"days": 2}`         | maior (dias por semana)      |
-| `adicional_hora_extra`   | `percentual_min`  | `{"percent": 60}`     | maior (mais protetivo)       |
+| `kind`                 | campo pelo `id`  | campo pelo alvo | `params`          | "mais restritivo"       |
+|------------------------|------------------|-----------------|-------------------|-------------------------|
+| `jornada_semanal_max`  | `horas`          | `horas`         | `{"hours": 42}`   | menor                   |
+| `jornada_diaria_max`   | `horas`          | `horas`         | `{"hours": 8}`    | menor                   |
+| `interjornada_min`     | `horas`          | `horas`         | `{"hours": 11}`   | maior                   |
+| `repouso_semanal`      | `dias`           | `dias`          | `{"days": 2}`     | maior (dias por semana) |
+| `adicional_hora_extra` | `percentual_min` | `percentual`    | `{"percent": 60}` | maior (mais protetivo)  |
 
-Os valores saem como vieram do YAML (`int` ou `float`). Qualquer outra regra, e toda entrada de `excecoes:`, vira
-`kind="info"`, mantendo o status; seus `params` são os campos restantes do YAML, crus (sem `id`, `fonte`, `status`,
-`nota`, `acao`, `verificacao` e vigência). `acao` (`escalar` ou `verificar_convencao`) vai para `Rule.action`.
+Uma regra vira primitiva de dois jeitos:
+
+- **pelo `id`**: o `id` é o nome da primitiva (como em `lei/`); o campo é o da coluna "pelo `id`" e é obrigatório;
+- **pelo alvo**: `restringe: <primitiva>` (formato da convenção e da política fictícias de Pedro Veloso); o `id` da
+  regra é mantido e o campo é o da coluna "pelo alvo" (ou o "pelo `id`"). Sem um desses campos, a regra fica `info`:
+  o carregador não inventa valor. Quem decide qual valor vale entre as camadas é a fusão (`merge.py`).
+
+`amplia: <primitiva>` **não** vira primitiva: fica `info`. A fusão trataria a ampliação como camada "mais frouxa" e
+abriria um RX-01 espúrio, embora a EC 141 (art. 7º) a permita. Por isso a ampliação diária da convenção fictícia
+(`cct_jornada_diaria_ampliada`, 9h a partir de 16/12/2026) ainda não alimenta o motor; a fatia não precisa dela
+(5 × 8h = 40h < 42h).
+
+Os valores saem como vieram do YAML (`int` ou `float`). Qualquer outra regra (inclusive `restringe` para algo fora das
+5 primitivas, e todo `amplia`), e toda entrada de `excecoes:`, vira `kind="info"`, mantendo o status; seus `params`
+são os campos restantes do YAML, crus (sem `id`, `fonte`, `status`, `nota`, `acao`, `verificacao` e vigência).
+`acao` (`escalar` ou `verificar_convencao`) vai para `Rule.action`. Campos extras de uma primitiva (por exemplo
+`percentual_domingo_feriado`) não entram em `params`: só o valor da primitiva alimenta solver, verificador e custo.
 
 Vigência: `vigencia` (ou `de`) é `valid_from`; `ate` é `valid_to`. Uma regra com `valores: [{de, ate, <campo>}, ...]`
 vira uma `Rule` por período, com o mesmo `id`; um período sem `ate` termina na véspera do `de` seguinte.
@@ -39,6 +53,15 @@ YAML_FIELDS: dict[str, str] = {
     "repouso_semanal": "dias",
     "adicional_hora_extra": "percentual_min",
 }
+# Campo aceito quando a regra aponta para a primitiva por `restringe:` (formato de Pedro Veloso). `amplia:` fica `info`.
+TARGET_FIELDS: dict[str, tuple[str, ...]] = {
+    "jornada_semanal_max": ("horas",),
+    "jornada_diaria_max": ("horas",),
+    "interjornada_min": ("horas",),
+    "repouso_semanal": ("dias",),
+    "adicional_hora_extra": ("percentual", "percentual_min"),
+}
+TARGET_KEY = "restringe"
 INFO = "info"
 SECTIONS = ("regras", "excecoes")
 ACTIONS = ("escalar", "verificar_convencao")
@@ -101,7 +124,7 @@ def _parse_entry(
     if action is not None and action not in ACTIONS:
         raise RuleFileError(file_name, "acao", f"{where}: '{action}' fora de {', '.join(ACTIONS)}")
 
-    kind = INFO if is_exception or rule_id not in PRIMITIVES else rule_id
+    kind, field = _kind_and_field(raw, rule_id, is_exception=is_exception)
     base = {
         "id": rule_id,
         "kind": kind,
@@ -116,7 +139,7 @@ def _parse_entry(
 
     periods = raw.get("valores")
     if periods is None:
-        params = _params(raw, kind, file_name, where)
+        params = _params(raw, kind, field, file_name, where)
         return [Rule(**base, params=params, valid_from=rule_from, valid_to=rule_to)]
     if not isinstance(periods, list) or not all(isinstance(p, dict) for p in periods) or not periods:
         raise RuleFileError(file_name, "valores", f"{where}: precisa ser uma lista de mapas com 'de'/'ate'")
@@ -127,15 +150,28 @@ def _parse_entry(
         valid_to = _date(period.get("ate"), file_name, "valores.ate", where)
         if valid_to is None and i + 1 < len(periods) and starts[i + 1] is not None:
             valid_to = starts[i + 1] - timedelta(days=1)
-        params = _params({**raw, **period}, kind, file_name, where)
+        params = _params({**raw, **period}, kind, field, file_name, where)
         out.append(Rule(**base, params=params, valid_from=starts[i] or rule_from, valid_to=valid_to or rule_to))
     return out
 
 
-def _params(raw: dict[str, Any], kind: str, file_name: str, where: str) -> dict[str, Any]:
-    if kind == INFO:
+def _kind_and_field(raw: dict[str, Any], rule_id: str, *, is_exception: bool) -> tuple[str, str | None]:
+    """`(kind, campo do valor)`: pelo `id` exato, pelo alvo de `restringe` com campo conhecido, ou `info`."""
+    if is_exception:
+        return INFO, None
+    if rule_id in PRIMITIVES:
+        return rule_id, YAML_FIELDS[rule_id]
+    target = raw.get(TARGET_KEY)
+    if not isinstance(target, str) or target not in PRIMITIVES:
+        return INFO, None
+    sources = [*raw, *(k for p in raw.get("valores") or [] if isinstance(p, dict) for k in p)]
+    field = next((f for f in TARGET_FIELDS[target] if f in sources), None)
+    return (target, field) if field else (INFO, None)
+
+
+def _params(raw: dict[str, Any], kind: str, field: str | None, file_name: str, where: str) -> dict[str, Any]:
+    if kind == INFO or field is None:
         return {k: v for k, v in raw.items() if k not in META_FIELDS}
-    field = YAML_FIELDS[kind]
     value = raw.get(field)
     if isinstance(value, bool) or not isinstance(value, int | float):
         raise RuleFileError(file_name, field, f"{where}: precisa de um número")
