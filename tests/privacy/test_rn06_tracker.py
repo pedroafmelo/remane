@@ -11,6 +11,10 @@ com texto livre plantado no aviso, e procura esses valores em todas as superfíc
 - `http:<método> <rota>`: o corpo de cada resposta do roteiro (inclusive a rota de rastro do gestor);
 - `llm:read_atestado`: tudo o que foi enviado ao modelo falso (no caminho PDF o CID sai antes do modelo).
 
+Foto do atestado (C7 T2): a imagem vai ao modelo (DEC-020 permite), então ali ela **deve** aparecer (controle positivo)
+e em todas as outras superfícies não pode aparecer nem em bytes crus nem em base64 (SAIDA-AC-14, superfícies 1 a 4). A
+foto entra pela rota de anexo (`image/png` no corpo bruto), como no celular simulado.
+
 `find_leaks` devolve só a superfície e o tipo; a mensagem de falha nunca imprime o valor plantado.
 
 Ids determinísticos, só com dígitos: `find_leaks` compara sem caixa, e `A09` casaria `a09` dentro de um id hexadecimal
@@ -20,6 +24,8 @@ mudar o que o sistema grava.
 
 from __future__ import annotations
 
+import base64
+import io
 import itertools
 import json
 import logging
@@ -28,6 +34,7 @@ import sys
 import tempfile
 import uuid
 from collections import Counter
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -41,6 +48,7 @@ from escalista.api.app import create_app
 from escalista.api.fake_agent import FakeSliceAgent
 from escalista.audit.protected import CID_REMOVED, Leak, find_leaks
 from escalista.config import Settings
+from escalista.domain.contracts import ImagePart, LLMMessage
 from escalista.ingest.atestado import pdf_text
 from tests.fakes import TOOL_ATESTADO, FakeLLMClient
 
@@ -338,3 +346,170 @@ def test_upload_keeps_the_pdf_in_memory(tmp_path, monkeypatch):
 
     assert _pdf_files_under(temp_root, new) == []
     assert calls == []
+
+
+# --- foto do atestado (C7 T2) -----------------------------------------------------------------------------------------
+
+
+def _photo() -> bytes:
+    """Foto SINTÉTICA: ruído aleatório em PNG (Pillow, só dev); o ruído torna qualquer trecho inconfundível."""
+    from PIL import Image
+
+    buf = io.BytesIO()
+    Image.frombytes("RGB", (64, 64), os.urandom(64 * 64 * 3)).save(buf, "PNG")
+    return buf.getvalue()
+
+
+def photo_planted(photo: bytes) -> list[str]:
+    """Trechos da foto que não podem aparecer fora da mensagem ao modelo: base64 (começo e meio), bytes crus (latin-1,
+    como `db:arquivo` é lido) e o prefixo do data URI."""
+    b64 = base64.b64encode(photo).decode("ascii")
+    raw = photo.decode("latin-1")
+    middle, raw_middle = len(b64) // 2, len(raw) // 2
+    return [b64[:64], b64[middle : middle + 64], raw[raw_middle : raw_middle + 32], "data:image/png;base64"]
+
+
+def photo_script(api: Recorder, photo: bytes) -> str:
+    """Reset, aviso da Ana (P101), a foto no corpo bruto da rota de anexo e as leituras do gestor e do colaborador."""
+    api.login("gestor")
+    assert api.call("POST", "/api/demo/reset").status_code == 200
+    api.login("colaborador")
+    case = api.call("POST", "/api/colaborador/aviso", json={"as": "P101", "day": THURSDAY, "kind": "falta"})
+    assert case.status_code == 200, case.status_code
+    case_id = case.json()["case_id"]
+    response = api.call(
+        "POST",
+        f"/api/colaborador/caso/{case_id}/anexo",
+        params={"as": "P101", "file_name": "foto.png"},
+        content=photo,
+        headers={"Content-Type": "image/png"},
+    )
+    assert response.status_code == 200, response.status_code
+    api.call("GET", "/api/colaborador/caixa", params={"as": "P101"})
+    api.login("gestor")
+    api.call("GET", "/api/exceptions")
+    api.call("GET", f"/api/runs/track-{case_id}/trace")
+    api.call("GET", "/api/impact")
+    return case_id
+
+
+def _attach_body(api: Recorder) -> dict:
+    key = next(k for k in api.bodies if k.startswith("http:POST /api/colaborador/caso/"))
+    return json.loads(api.bodies[key])
+
+
+def photo_surfaces(api: Recorder, tmp_path: Path, caplog, capsys) -> dict[str, str]:
+    """Superfícies 1 a 4 da SAIDA-AC-14 (sem a mensagem ao modelo, onde a imagem pode estar)."""
+    captured = capsys.readouterr()
+    return {
+        **db_surfaces(api.client.app.state.engine, tmp_path / "app.db"),
+        "log": caplog.text,
+        "stdout": captured.out,
+        "stderr": captured.err,
+        **api.bodies,
+    }
+
+
+def assert_photo_not_leaked(blobs: dict[str, str], photo: bytes) -> None:
+    leaks = find_leaks(blobs, photo_planted(photo), pattern_surfaces=set())
+    assert leaks == [], f"vazamento RN-06 da foto em: {describe(leaks)}"
+
+
+def test_photo_goes_only_to_the_model(tmp_path, caplog, capsys):
+    caplog.set_level(logging.DEBUG)
+    photo = _photo()
+    llm = FakeLLMClient(by_tool={TOOL_ATESTADO: [READING]})
+    api = make_api(tmp_path, llm)
+
+    photo_script(api, photo)
+
+    assert _attach_body(api)["reading"]["verdict"] == "valido"
+    images = [
+        part
+        for call in llm.calls
+        if call["tool_name"] == TOOL_ATESTADO
+        for message in call["messages"]
+        if not isinstance(message.content, str)
+        for part in message.content
+        if isinstance(part, ImagePart)
+    ]
+    went_to_model = [part.data for part in images] == [photo]
+    assert went_to_model, "a foto não chegou ao modelo (controle positivo)"
+    assert_photo_not_leaked(photo_surfaces(api, tmp_path, caplog, capsys), photo)
+
+
+class _LateClient:
+    """Delegado: o app é montado antes do `FeatherlessClient`, que precisa do `engine` do app para o rastro."""
+
+    target: Any = None
+
+    def complete(self, **kwargs: Any) -> Any:
+        return self.target.complete(**kwargs)
+
+
+def test_photo_through_featherless_client_trace_keeps_only_size_and_type(tmp_path, caplog, capsys):
+    """Com o cliente real (transporte falso, nunca a rede): o corpo enviado leva o data URI; o `trace_event`
+    `track.llm.read_atestado` leva só `media_type` e tamanho; log do SDK em DEBUG, banco e respostas, nada da foto."""
+    import httpx2
+    from pydantic import SecretStr
+
+    from escalista.audit.sink import SqlTraceSink
+    from escalista.llm.client import FeatherlessClient, ModelChoice
+    from escalista.llm.pool import KeyPool
+    from tests.fakes import FixedClock
+
+    caplog.set_level(logging.DEBUG)
+    photo = _photo()
+    bodies: list[str] = []
+
+    def server(request: httpx2.Request) -> httpx2.Response:
+        bodies.append(request.content.decode("utf-8"))
+        call = {"id": "c1", "type": "function", "function": {"name": TOOL_ATESTADO, "arguments": json.dumps(READING)}}
+        return httpx2.Response(
+            200,
+            json={
+                "id": "cmpl-1",
+                "object": "chat.completion",
+                "created": 0,
+                "model": "modelo/visao",
+                "choices": [
+                    {"index": 0, "message": {"role": "assistant", "content": None, "tool_calls": [call]},
+                     "finish_reason": "tool_calls"}
+                ],
+                "usage": {"prompt_tokens": 900, "completion_tokens": 40, "total_tokens": 940, "cost": 0.0002},
+            },
+        )  # fmt: skip
+
+    late = _LateClient()
+    api = make_api(tmp_path, late)  # type: ignore[arg-type]
+    late.target = FeatherlessClient(
+        pool=KeyPool([(1, SecretStr("chave-de-teste"))], sleep=lambda _s: None),
+        models={m: ModelChoice(f"modelo/{m}") for m in ("small", "large")} | {"vision": ModelChoice("modelo/visao")},
+        trace_sink=SqlTraceSink(api.client.app.state.engine),
+        clock=FixedClock(datetime(2027, 1, 13, 14, 0)),
+        base_url="https://featherless.test/v1",
+        http_client=httpx2.Client(transport=httpx2.MockTransport(server)),
+    )
+
+    photo_script(api, photo)
+
+    assert _attach_body(api)["reading"]["verdict"] == "valido"
+    data_uri = f"data:image/png;base64,{base64.b64encode(photo).decode('ascii')}"
+    assert len(bodies) == 1 and data_uri in bodies[0], "a foto não chegou ao provedor (controle positivo)"
+    detects = find_leaks({"provedor": bodies[0]}, photo_planted(photo), pattern_surfaces=set()) != []
+    assert detects, "a varredura não reconhece a foto em base64 (controle positivo)"
+    with api.client.app.state.engine.connect() as conn:
+        rows = conn.execute(text("SELECT model, payload FROM trace_event WHERE kind = 'track.llm.read_atestado'")).all()
+    assert [r.model for r in rows] == ["modelo/visao"]
+    payload = rows[0].payload if isinstance(rows[0].payload, dict) else json.loads(rows[0].payload)
+    assert payload["images"] == [{"media_type": "image/png", "bytes": len(photo)}]
+    blobs = photo_surfaces(api, tmp_path, caplog, capsys)
+    assert blobs["log"] and blobs["trace:track"], "superfície vazia: a varredura não teria o que olhar"
+    assert_photo_not_leaked(blobs, photo)
+
+
+def test_llm_message_with_photo_has_no_bytes_in_repr():
+    photo = _photo()
+    message = LLMMessage(role="user", content=[ImagePart(media_type="image/png", data=photo)])
+    shown = {"repr": repr(message), "str": str(message)}
+    assert_photo_not_leaked(shown, photo)
