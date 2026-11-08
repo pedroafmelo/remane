@@ -16,7 +16,7 @@ from escalista.synth.rede import SEMANA_INICIO
 
 PADROES_NOVOS = {"manha": ("08:00", "15:00"), "tarde": ("13:00", "20:00"), "integral": ("09:00", "17:00")}
 PADROES_44H = (("08:00", "15:20"), ("12:40", "20:00"), ("14:00", "22:00"))
-# (rule_id, employee_id, day): `day` é None para regras de semana (jornada semanal e repouso)
+# (kind, employee_id, day): `day` é None para regras de semana (jornada semanal e repouso)
 PLANTADAS: tuple[tuple[str, str, date | None], ...] = (
     ("jornada_semanal_max", "P001", None),
     ("repouso_semanal", "P001", None),
@@ -28,6 +28,9 @@ PLANTADAS: tuple[tuple[str, str, date | None], ...] = (
     ("interjornada_min", "P006", date(2027, 1, 12)),
     ("interjornada_min", "P007", date(2027, 1, 14)),
 )
+# `rule_id` que o verificador cita: o `id` da regra vencedora no cartão da demo. Só a interjornada vem de outra
+# camada (`pol_interjornada`, 12h, da política fictícia); as demais vêm da lei, com `id` igual ao `kind`.
+REGRA_APLICADA: dict[str, str] = {"interjornada_min": "pol_interjornada"}
 
 
 def _dia(indice: int) -> date:

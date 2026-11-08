@@ -145,8 +145,8 @@ def _s02_daily(ctx: EvalContext) -> Outcome:
 
 def _s03_rest_gap(ctx: EvalContext) -> Outcome:
     bad = _schedule(_shift(0, "14:00", 8), _shift(1, "08:00", 8))  # termina 22h, volta 08h: 10h
-    control = _schedule(_shift(0, "14:00", 8), _shift(1, "09:00", 8))  # 11h exatas
-    return _primitive_outcome(ctx, REST_GAP, bad, control, "10h de descanso contra o mínimo de 11h")
+    control = _schedule(_shift(0, "14:00", 8), _shift(1, "10:00", 8))  # 12h exatas (pol_interjornada; a CLT pede 11h)
+    return _primitive_outcome(ctx, REST_GAP, bad, control, "10h de descanso contra o mínimo de 12h")
 
 
 def _s04_weekly_rest(ctx: EvalContext) -> Outcome:
@@ -323,7 +323,7 @@ def _s10_overnight(ctx: EvalContext) -> Outcome:
             "noturno.csv", "\n".join(rows).encode(), employees=employees, stores=stores, week_start=WEEK_START
         ).schedule
 
-    bad, control = read("08:00", "16:00"), read("11:00", "19:00")
+    bad, control = read("08:00", "16:00"), read("12:00", "20:00")  # controle: 12h exatas (pol_interjornada)
     if bad is None or control is None:
         return _outcome("CSV do turno noturno legível", "leitura falhou", False)
     night = bad.shifts[0]
@@ -333,9 +333,9 @@ def _s10_overnight(ctx: EvalContext) -> Outcome:
     passed = ends_next_day and len(found) == 1 and found[0].employee_id == person.id and not ok
     return _outcome(
         "turno 16:00-00:00 termina na quinta (8h); recomeço às 08:00 = 8h de descanso -> 1 violação; "
-        "às 11:00 = 11h -> 0",
+        "às 12:00 = 12h (mínimo da política) -> 0",
         f"fim do turno {night.end:%d/%m %H:%M}; {len(found)} violação ({found[0].detail if found else '-'}); "
-        f"controle às 11:00: {len(ok)}",
+        f"controle às 12:00: {len(ok)}",
         passed,
     )
 
@@ -343,7 +343,7 @@ def _s10_overnight(ctx: EvalContext) -> Outcome:
 SCENARIOS: tuple[Scenario, ...] = (
     Scenario("E1-01", "Primitiva: jornada semanal acima de 42h", _s01_weekly),
     Scenario("E1-02", "Primitiva: jornada diária acima de 8h", _s02_daily),
-    Scenario("E1-03", "Primitiva: interjornada abaixo de 11h", _s03_rest_gap),
+    Scenario("E1-03", "Primitiva: interjornada abaixo de 12h", _s03_rest_gap),
     Scenario("E1-04", "Primitiva: menos de 2 repousos na semana", _s04_weekly_rest),
     Scenario("E1-05", "Cobertura é métrica, não violação", _s05_coverage),
     Scenario("E1-06", "Escala enviada em 44h julgada sob 42h tem violações", _s06_current_schedule),
