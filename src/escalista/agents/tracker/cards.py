@@ -84,6 +84,26 @@ def rx12_cover_card(now: datetime, shift: Shift, store: str) -> ExceptionCard:
     )
 
 
+def rx12_punch_card(now: datetime, reason: str) -> ExceptionCard:
+    """RX-12 do ponto simulado: a varredura não inventa gatilho; nada muda até o ponto voltar."""
+    return ExceptionCard(
+        code="RX-12",
+        title="Ponto simulado indisponível",
+        reason="A varredura não conseguiu ler o ponto. Nenhum gatilho foi disparado sem as batidas.",
+        decider=Role.GESTOR,
+        deadline=now + timedelta(minutes=COVER_DEADLINE_MIN),
+        evidence=[f"Falha: {reason}", "Registrada no rastro da varredura (track-sweep)."],
+        options=[
+            ExceptionOption(
+                label="Tentar de novo na próxima varredura", effect="O agente lê o ponto no próximo avanço."
+            ),
+            ExceptionOption(label="Seguir sem o ponto", effect="Faltas só entram por aviso do colaborador."),
+        ],
+        recommendation="Tentar de novo na próxima varredura.",
+        if_no_answer="A varredura segue tentando; nada é feito sem as batidas.",
+    )
+
+
 def cobertura_card(
     *,
     now: datetime,

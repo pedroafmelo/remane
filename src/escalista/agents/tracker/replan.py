@@ -29,8 +29,10 @@ class CoverOutcome:
 
     @property
     def overtime_needed(self) -> bool:
-        """RF-28: há candidato e o primeiro da ordem gera hora extra."""
-        return bool(self.candidates) and self.candidates[0].overtime_hours > 0
+        """RF-28: o primeiro da ordem gera hora extra, ou ninguém cobre dentro das regras (a cobertura só fecharia com
+        hora extra ou remanejamento: é quando o RX-05 oferece "Hora extra de um colega"). `find_cover` nunca devolve
+        candidato com hora extra numa escala válida (achado da D1), então o segundo caso é o que acontece na demo."""
+        return not self.candidates or self.candidates[0].overtime_hours > 0
 
 
 def request_for(case: Case, *, reason: ReplanReason, request_id: str, origin_trace_id: str | None) -> ReplanRequest:

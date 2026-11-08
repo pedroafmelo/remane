@@ -17,15 +17,13 @@ TEMPLATES: dict[str, str] = {
     "recebido": "Recebi o seu aviso de falta em {turno}. Vou procurar quem cubra e aviso o gestor. Melhoras!",
     "atraso_recebido": "Recebi o seu aviso de atraso em {turno}. Já avisei o gestor.",
     "atraso_aviso": "{pessoa} avisou que vai se atrasar em {turno}. Registrei o atraso; nenhuma cobertura foi pedida.",
-    "aviso_hora_extra": (
-        "A cobertura de {turno} só sai com hora extra ({hora_extra}). A validação continua com você antes de publicar."
-    ),
+    "aviso_hora_extra": "A cobertura de {turno} precisa de hora extra: {hora_extra}. Nada muda sem a sua validação.",
     "oferta": "Você pode cobrir {turno}? {hora_extra_cap}. Responda até {prazo}.",
     "aceite_recebido": "Obrigado! Recebi o seu aceite para {turno}. O gestor vai validar e eu confirmo aqui.",
     "recusa_recebida": "Tudo bem, registrei que você não pode cobrir {turno}.",
     "cobertura_confirmada": "Confirmado: você cobre {turno}. A escala publicada já mostra o turno.",
     "falta_coberta": "O seu turno de {turno} está coberto. Bom descanso.",
-    "pergunta": "Não vi a sua entrada em {turno}. Está tudo bem? Você vem ou vai faltar?",
+    "pergunta": "Você não bateu o ponto às {hora} ({turno}). Você vem hoje?",
     "pedir_comprovacao": "Não consegui confirmar o seu atestado de {turno}. Pode mandar uma nova foto ou o PDF?",
 }
 

@@ -16,10 +16,12 @@ import threading
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from hashlib import sha256
 from typing import Any, Literal
 from uuid import uuid4
+
+from pydantic import BaseModel, Field
 
 from escalista.agents.cover import CoverCandidate, find_cover
 from escalista.agents.optimizer.errors import PublishRefusedError
@@ -27,8 +29,9 @@ from escalista.agents.optimizer.tools import Tracer
 from escalista.agents.tracker import cards
 from escalista.agents.tracker.messages import deadline_label, first_name, overtime_label, render, shift_label
 from escalista.agents.tracker.replan import CoverFn, CoverOutcome, dispatch, request_for
+from escalista.agents.tracker.sweep import detect
 from escalista.agents.tracker.tools import GESTOR_PARTY, aplicar_cobertura, enviar, refuse
-from escalista.domain.contracts import ExceptionCard, LLMUnavailableError, Role
+from escalista.domain.contracts import ExceptionCard, LLMUnavailableError, Role, TraceEvent
 from escalista.domain.ports import (
     AtestadoReader,
     Channel,
@@ -71,6 +74,37 @@ class World:
     card: RuleCard
 
 
+class SweepResult(BaseModel):
+    """Resultado de uma varredura (SAIDA-AC-06): o instante, os gatilhos tratados e os eventos gravados nela."""
+
+    at: datetime
+    triggers: list[Trigger] = Field(default_factory=list)
+    events: list[TraceEvent] = Field(default_factory=list)
+
+
+class _Recorder(Tracer):
+    """O `Tracer` do caso, que também guarda os eventos emitidos durante uma varredura (`SweepResult.events`)."""
+
+    def __init__(self, inner: Tracer) -> None:  # sem `super().__init__`: delega tudo ao `inner`
+        self._inner = inner
+        self.recorded: list[TraceEvent] | None = None
+
+    def now(self) -> datetime:
+        return self._inner.now()
+
+    def parent(self, run_id: str) -> str | None:
+        return self._inner.parent(run_id)
+
+    def follow(self, run_id: str, event_id: str) -> None:
+        self._inner.follow(run_id, event_id)
+
+    def step(self, run_id: str, kind: str, **kwargs: Any) -> TraceEvent:
+        event = self._inner.step(run_id, kind, **kwargs)
+        if self.recorded is not None:
+            self.recorded.append(event)
+        return event
+
+
 class TrackerError(Exception):
     """Erro de uso do acompanhamento; a API mapeia `status` para HTTP (404, 409, 422, 403)."""
 
@@ -102,7 +136,7 @@ class Tracker:
         self._cases = cases
         self._queue = queue
         self._channel = channel
-        self._tracer = tracer
+        self._tracer: Tracer = _Recorder(tracer)
         self._clock = clock
         self._policy = policy
         self._policy_cards = policy_cards
@@ -113,6 +147,7 @@ class Tracker:
         self._new_id = new_id
         self._searches: dict[str, CoverOutcome] = {}  # só cache: sem ele, a busca é refeita a partir das tabelas
         self._lock = threading.RLock()
+        self._punch_card_open = False  # RX-12 do ponto já aberto (uma vez até o ponto voltar)
 
     # --- entrada do colaborador ---------------------------------------------------------------------------------
 
@@ -216,12 +251,165 @@ class Tracker:
         self._tracer.step(SWEEP_RUN, "track.channel.rejected", payload={"sender_hash": digest})
         return False
 
+    def answer(self, *, case_id: str, employee_id: str, coming: bool) -> CaseView:
+        """Resposta à pergunta do agente (sem batida de ponto): `coming=True` registra o atraso; `False` vira falta e
+        começa a busca de cobertura. Só o dono do caso responde."""
+        with self._lock:
+            case = self._load(case_id)
+            if employee_id != case.employee_id:
+                refused = refuse(self._tracer, case, "answer", "quem respondeu não é o colaborador do caso")
+                raise TrackerError(403, refused.reason) from refused
+            self._require(case, "aguardando_colaborador")
+            kind: Literal["falta", "atraso"] = "atraso" if coming else "falta"
+            received = self._tracer.step(
+                case.run_id,
+                "track.report.received",
+                payload={
+                    "case_id": case.id,
+                    "employee_id": employee_id,
+                    "kind": kind,
+                    "day": case.shift.start.date().isoformat(),
+                    "channel": CHANNEL,
+                    "has_text": False,
+                    "has_attachment": False,
+                    "media_type": None,
+                },
+            )
+            case.kind = kind
+            if coming:
+                self._send(case, employee_id, "atraso_recebido", received.id)
+                world = self._world(self._published())
+                name = first_name(self._name(world, employee_id))
+                self._send(case, GESTOR_PARTY, "atraso_aviso", received.id, pessoa=name)
+                case.status = "atraso_registrado"
+                self._close(case, "atraso_registrado")
+                return self._save(case)
+            self._send(case, employee_id, "recebido", received.id)
+            version = self._published()
+            self._replan(case, version, self._world(version), reason="falta", origin=received.id)
+            return self._save(case)
+
+    # --- varredura ---------------------------------------------------------------------------------------------
+
+    def run_sweep(self, now: datetime | None = None) -> SweepResult:
+        """Varre o instante `now` (padrão: o relógio injetado) e aplica os efeitos dos gatilhos (SAIDA-AC-06).
+
+        Idempotente: cada `Trigger.key` tratado vai para `Case.handled` (e o `no_punch` só dispara sem caso no turno).
+        Ponto fora do ar: `track.sweep.failed` e RX-12 (uma vez), sem gatilho inventado. Sem fonte de ponto, só os
+        gatilhos de casos (`no_answer`, `offer_expired`)."""
+        with self._lock:
+            at = now or self._clock.now()
+            recorder = self._tracer
+            assert isinstance(recorder, _Recorder)
+            recorder.recorded = []
+            try:
+                triggers = self._sweep(at)
+                return SweepResult(at=at, triggers=triggers, events=list(recorder.recorded))
+            finally:
+                recorder.recorded = None
+
+    def _sweep(self, at: datetime) -> list[Trigger]:
+        version = self._repo.latest_published()
+        if version is None:
+            return []
+        punches = []
+        if self._punches is not None:
+            try:
+                punches = self._punches.punches(until=at)
+            except Exception as exc:  # noqa: BLE001 -- ponto fora vira RX-12, nunca erro solto (RN-05)
+                self._punch_failed(type(exc).__name__)
+                return []
+            self._punch_card_open = False
+        cases = self._cases.list_cases()
+        triggers = detect(schedule=version.schedule, punches=punches, policy=self._policy, cases=cases, now=at)
+        if self._punches is None:
+            triggers = [t for t in triggers if t.kind != "no_punch"]
+        for trigger in triggers:
+            if trigger.kind == "no_punch":
+                self._on_no_punch(trigger, version, at)
+            elif trigger.kind == "no_answer":
+                self._on_no_answer(trigger)
+            elif trigger.kind == "offer_expired":
+                self._on_offer_expired(trigger)
+        return triggers
+
+    def _punch_failed(self, reason: str) -> None:
+        self._tracer.step(SWEEP_RUN, "track.sweep.failed", payload={"reason": reason})
+        if self._punch_card_open:
+            return
+        self._punch_card_open = True
+        item_id = self._queue.open(
+            cards.rx12_punch_card(self._clock.now(), reason), {"kind": "track", "case_id": None, "run_id": SWEEP_RUN}
+        )
+        self._tracer.step(SWEEP_RUN, "exception.raised", payload={"exception_id": item_id, "code": "RX-12"})
+
+    def _fired(self, run_id: str, trigger: Trigger) -> TraceEvent:
+        return self._tracer.step(
+            run_id,
+            "track.trigger.fired",
+            rule_ref=trigger.rule_ref,
+            payload={
+                "trigger": trigger.kind,
+                "employee_id": trigger.employee_id,
+                "ref": trigger.ref,
+                "observed": trigger.observed,
+                "threshold": trigger.threshold,
+            },
+        )
+
+    def _on_no_punch(self, trigger: Trigger, version: ScheduleVersion, at: datetime) -> None:
+        """Abre o caso do turno sem batida e pergunta ao colaborador (ato do agente sozinho)."""
+        shift = next((s for s in version.schedule.shifts if shift_ref(s) == trigger.ref), None)
+        if shift is None:
+            return
+        case = Case(
+            id=self._new_id(),
+            kind="falta",
+            origin="ponto",
+            employee_id=shift.employee_id,
+            shift=shift,
+            status="aguardando_colaborador",
+            created_at=at,
+            asked_at=at,
+            handled=[trigger.key],
+        )
+        self._cases.save_case(case)
+        fired = self._fired(case.run_id, trigger)
+        self._ask(case, fired.id)
+        self._save(case)
+
+    def _on_no_answer(self, trigger: Trigger) -> None:
+        case = self._load(trigger.ref)
+        case.handled.append(trigger.key)
+        self._fired(case.run_id, trigger)
+        world = self._world(self._published())
+        evidence = [
+            f"Turno: {shift_label(case.shift)}, {self._store(world, case)}",
+            f"Pergunta às {case.asked_at:%H:%M}, sem resposta em {self._policy.answer_deadline_min} min.",
+        ]
+        card = cards.policy_card(self._policy_cards["RX-09"], self._clock.now(), evidence)
+        self._open_card(case, self._titled(card, case, world))
+        case.status = "aguardando_gestor"
+        self._save(case)
+
+    def _on_offer_expired(self, trigger: Trigger) -> None:
+        case = next((c for c in self._cases.list_cases() if any(o.id == trigger.ref for o in c.offers)), None)
+        if case is None:
+            self._fired(SWEEP_RUN, trigger)
+            return
+        case.handled.append(trigger.key)
+        self._fired(case.run_id, trigger)
+        self.advance_offer(case, outcome="vencida")
+
+    def _ask(self, case: Case, decision_ref: str) -> None:
+        self._send(case, case.employee_id, "pergunta", decision_ref, hora=f"{case.shift.start:%H:%M}")
+
     # --- decisão do gestor --------------------------------------------------------------------------------------
 
     def on_decision(
         self,
         *,
-        case_id: str,
+        case_id: str | None,
         code: str,
         option_index: int,
         approver_id: str,
@@ -231,6 +419,8 @@ class Tracker:
         """Efeito da decisão do gestor num cartão do acompanhamento (`source.kind == "track"`). Devolve o texto do
         resultado. `decision_event_id`: o `exception.decided` gravado pela fila (sem ele, o último evento do caso)."""
         with self._lock:
+            if not case_id:  # cartão sem caso (RX-12 do ponto, run `track-sweep`): só o registro
+                return "Decisão registrada. Nesta demo, nada além do registro é feito automaticamente."
             case = self._load(case_id)
             ref = decision_event_id or self._tracer.parent(case.run_id) or ""
             if code == "COBERTURA":
@@ -290,7 +480,8 @@ class Tracker:
         if option_index == 1:
             case.asked_at = self._clock.now()
             case.status = "aguardando_colaborador"
-            self._send(case, case.employee_id, "pergunta", ref)
+            case.handled = [k for k in case.handled if k != f"no_answer:{case.id}"]  # o prazo de resposta recomeça
+            self._ask(case, ref)
             self._save(case)
             return "Perguntei de novo ao colaborador; espero mais um prazo de resposta."
         case.status = "atraso_registrado"
@@ -478,6 +669,7 @@ class Tracker:
             },
         )
         if not outcome.candidates:
+            self._overtime_needed(case, None)
             evidence = [
                 f"Turno: {shift_label(case.shift)}, {self._store(world, case)}",
                 f"Avaliados {outcome.evaluated} colegas de folga; nenhum cobre sem violar regra.",
@@ -491,13 +683,13 @@ class Tracker:
             self._overtime_needed(case, best)
         self._offer(case, best, 1)
 
-    def _overtime_needed(self, case: Case, best: CoverCandidate) -> None:
-        """RF-28: o melhor candidato gera hora extra; o gestor é avisado antes de qualquer aceite."""
+    def _overtime_needed(self, case: Case, best: CoverCandidate | None) -> None:
+        """RF-28: o melhor candidato gera hora extra, ou ninguém cobre dentro das regras; o gestor é avisado antes."""
         trigger = Trigger(
             kind="overtime_needed",
-            employee_id=best.employee.id,
+            employee_id=best.employee.id if best else None,
             ref=shift_ref(case.shift),
-            observed=f"{best.overtime_hours}h",
+            observed=f"{best.overtime_hours}h" if best else "nenhum candidato dentro das regras",
             threshold="0h",
             rule_ref=OVERTIME_RULE,
         )
@@ -516,7 +708,12 @@ class Tracker:
                 "threshold": trigger.threshold,
             },
         )
-        self._send(case, GESTOR_PARTY, "aviso_hora_extra", fired.id, hora_extra=overtime_label(best.overtime_hours))
+        detail = (
+            f"{overtime_label(best.overtime_hours)} do 1º da lista"
+            if best
+            else "nenhum colega cobre dentro das regras, só com hora extra ou remanejamento (RX-05)"
+        )
+        self._send(case, GESTOR_PARTY, "aviso_hora_extra", fired.id, hora_extra=detail)
 
     def _outcome(self, case: Case) -> CoverOutcome | None:
         """A busca do caso: do cache ou refeita sobre a escala publicada (determinística). `None` se falhar."""

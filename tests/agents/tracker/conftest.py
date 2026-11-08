@@ -111,11 +111,9 @@ def build_env(*, employees: list[Employee] = EMPLOYEES, schedule: Schedule = SCH
         channel=channel,
         tracer=tracer,
         clock=clock,
-        policy=POLICY,
-        policy_cards=POLICY_CARDS,
         world=lambda _version: world,
         new_id=new_id,
-        **kwargs,
+        **{"policy": POLICY, "policy_cards": POLICY_CARDS, **kwargs},
     )
     return Env(tracker, repo, cases, queue, channel, sink, clock, repo.get_version(version.id))
 
