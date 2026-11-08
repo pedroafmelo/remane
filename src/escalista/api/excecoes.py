@@ -349,6 +349,7 @@ class ExceptionDesk:
                     approver_id=account.id,
                     role=account.role,
                     decision_event_id=event.id,
+                    source=dict(item.source),
                 )
             except TrackerError as exc:
                 raise HTTPException(exc.status, exc.message) from exc
