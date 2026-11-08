@@ -269,7 +269,7 @@ Formato:
 - **Contexto:** Gate 3 (técnica), rodada 1. Os três agentes são separados ([DEC-017](#dec-017--requisitos-adicionais-do-usuário-gate-de-negócio-fechado-e-início-da-etapa-técnica)).
 - **Decisão (o que o usuário escolheu entre as opções oferecidas):**
   - **Orquestração:** LangGraph nos três agentes (otimização, acompanhamento e assistente do gestor).
-  - **Front-end:** React + Vite (SPA).
+  - **Front-end:** React + Vite (SPA). **[Em parte substituída pela [DEC-035](#dec-035--marca-remane-landing-e-web-em-nextjs-com-export-estático): `web/` passa a Next.js com export estático, ainda servido pelo FastAPI.]**
   - **TDD:** TDD no núcleo, teste de fumaça no resto. Isto **relaxa, por decisão do usuário, o TDD das instruções globais** (o `CLAUDE.md` exige decisão registrada). O núcleo: regras do cartão, solver e verificador, leitura dos 3 formatos, privacidade do CID e da imagem (RN-06) e controle de acesso por papel.
 - **Motivo: [motivo não informado]** nas três escolhas.
 - **Alternativas consideradas (as oferecidas):** Python puro com eventos (recomendada pelo agente) ou híbrido; FastAPI com Jinja2 e HTMX (recomendada) ou Streamlit/Gradio; TDD pleno ou sem TDD.
@@ -452,3 +452,24 @@ Formato:
 - **Motivo: [motivo não informado].**
 - **Alternativas consideradas:** as duas perguntadas (manter o Fly.io; reabrir a hospedagem); o usuário respondeu "tudo do deploy", o que o agente leu como **reabrir a hospedagem**, e **não** como confirmar o Fly.io.
 - **Consequências:** a hospedagem volta a `[PREENCHER]` (a parte da [DEC-030](#dec-030--plano-da-c0-rodada-1-data-de-corte-nas-versões-flyio-c0b-com-a-frente-c-e-web-em-typescript) sobre o Fly.io fica **em suspenso**, não substituída; as demais partes da DEC-030 valem). A C0b e o G1 ficam parados sem data; `Dockerfile` e `fly.toml` ficam no repositório como material pronto, sem uso. O desenvolvimento e a demonstração rodam só localmente (`uv run uvicorn` e `npm run dev`). O risco de RE-07 e RN-10 (link público estável) continua e deve voltar a ser decidido antes do G6 (dom 11h30); o túnel do notebook segue como plano B.
+
+## DEC-035 · Marca Remane, landing e `web/` em Next.js com export estático
+
+- 2026-11-07 23:55 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** a landing foi construída fora do repositório (Next.js), a partir de um handoff de design com a marca **Remane**
+  ([docs/landing.md](landing.md)). Ao trazê-la para cá, o agente perguntou o nome público e a stack do `web/`, que até então era o
+  esqueleto React + Vite da C0a (T9).
+- **Decisão (o que o usuário disse):** "vamos manter remane, além de manter a nossa stack da parte web... é só um esqueleto, então
+  podemos manter o que nós fizemos". Ou seja: **Remane** é o nome público do produto (o pacote Python continua `escalista`), e o `web/`
+  passa a ser **Next.js (App Router) + Tailwind v4**, no lugar do Vite.
+- **Como o agente encaixou (`[PROPOSTA]`, sem confirmação):** `next build` gera **export estático** em `web/dist`, servido pelo FastAPI
+  como antes (imagem única; `Dockerfile` sem mudança). O `_serve_spa` passou a servir `rota/index.html` das pastas do export. No
+  `next dev`, `/api` e `/health` vão por proxy para a porta 8000. O botão "Testar a demo" leva a **`/entrar`**, placeholder onde a frente C
+  põe o login e os botões de demo da C4 ([arquitetura.md, seção 11](arquitetura.md)); a escolha entre botões por papel na landing,
+  `/entrar` com os papéis ou entrada direta como gerente **segue com o time**. A Vercel do handoff não é usada: vale a [DEC-034](#dec-034--tudo-do-deploy-fica-para-depois-por-enquanto-testar-e-rodar-localmente).
+- **Motivo: [motivo não informado]** além de "é só um esqueleto".
+- **Alternativas consideradas (as oferecidas):** nome Escalista; landing reescrita em React + Vite.
+- **Consequências:** limites do export estático para quem construir a plataforma em `web/`: sem rotas de API do Next, sem server actions,
+  sem rotas dinâmicas sem `generateStaticParams` (a API é o FastAPI). Vite e @vitejs/plugin-react saem da
+  [declaração](declaracao-ferramentas.md); entram next, tailwindcss, @tailwindcss/postcss, geist, qrcode.react, eslint e eslint-config-next,
+  sob a mesma data de corte da [DEC-030](#dec-030--plano-da-c0-rodada-1-data-de-corte-nas-versões-flyio-c0b-com-a-frente-c-e-web-em-typescript).

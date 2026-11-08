@@ -22,6 +22,7 @@ Hackathon de AI Agents (**tema aberto**), 07 e 08/11/2026, Porto Digital, Recife
 | Conferir as regras do evento | [docs/regras-e-integridade.md](docs/regras-e-integridade.md) · [docs/contexto-hackathon.md](docs/contexto-hackathon.md) · [guia oficial](docs/guia-converge-challenge.md) |
 | Planejar as horas | [docs/plano-de-horas.md](docs/plano-de-horas.md) |
 | Preparar submissão, pitch e demo | [docs/entrega.md](docs/entrega.md) |
+| Marca, copy e movimento da landing Remane | [docs/landing.md](docs/landing.md) |
 | Listar ferramentas e modelos usados | [docs/declaracao-ferramentas.md](docs/declaracao-ferramentas.md) |
 | Consultar a ideia anterior (arquivada) | [docs/ideacao/ideias/IDEA-001-recuperacao-depositos.md](docs/ideacao/ideias/IDEA-001-recuperacao-depositos.md) |
 
@@ -34,9 +35,9 @@ Requisitos: uv, Node 22.12 ou mais. Copie `.env.example` para `.env` (ignorado p
 uv sync                                    # dependências Python (travadas pela data de corte, DEC-030)
 uv run pytest && uv run ruff check .       # testes e lint
 npm --prefix web ci                        # dependências do front-end
-npm --prefix web run build                 # gera web/dist
+npm --prefix web run build                 # gera web/dist (export estático do Next.js, DEC-035)
 uv run uvicorn escalista.api.app:create_app --factory --port 8000   # API + SPA em http://localhost:8000
-npm --prefix web run dev                   # opcional: SPA com recarga em http://localhost:5173 (proxy para a API)
+npm --prefix web run dev                   # opcional: front com recarga em http://localhost:3000 (proxy de /api para a 8000)
 ```
 
 `GET /health` confirma que o app e o banco (SQLite em `var/`, ignorado pelo git) estão de pé. Docker é opcional: `docker build .`.
