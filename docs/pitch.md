@@ -1,6 +1,6 @@
 # Pitch, vídeo e descrição da submissão
 
-Última atualização: 2026-11-08 03:20 (Recife), por Claude (Opus 5.5). **Rascunho para o time revisar.** Os slides vão ser montados no
+Última atualização: 2026-11-08 08:50 (Recife), por Claude (Sonnet 5.5): economia do exemplo com o PR #16 já no `main` ([DEC-055](decisoes.md)). **Rascunho para o time revisar.** Os slides vão ser montados no
 Canva pela manhã; este arquivo traz só o texto de cada slide, a fala e o que mostrar.
 
 **Modelo:** a apresentação "Sprint Pitch: como criar um pitch de alto impacto", de Erica Marques (PDF na pasta do projeto, fora do
@@ -26,13 +26,17 @@ Os slides de cada bloco seguem o desenho dela: uma frase grande, um visual e pou
 | Violações das regras na escala enviada → na proposta | **158 → 0** | verificador independente, mesma escala de exemplo (sintética) | 08/11 |
 | Horas extras na escala enviada → na proposta | **216,5 h → 0 h** | mesma função de custo nas duas escalas | 08/11 |
 | Cobertura da demanda | **95,2% → 100%** | idem | 08/11 |
-| Economia na semana do exemplo | `[DECIDIR]`: **R$ 13.975** hoje, ou **~R$ 5.533** com o PR #16 | idem; o PR #16 corrige a carga do contrato (ver nota) | 08/11 |
+| Economia na semana do exemplo | **R$ 5.533** (16,3%): R$ 33.989,15 → R$ 28.456,00 | mesma função de custo nas duas escalas, **solver direto, medido localmente** (não pelo link público: confirmar depois do deploy); o PR #16 corrige a carga do contrato (ver nota) | 08/11, 08:40 |
 | Evals sem modelo (E1) | **10/10** | `uv run python -m escalista.evals --suite e1` | 08/11 |
 | Rede da demo | 3 lojas, 60 pessoas, 1 semana | dados sintéticos gerados pelo time | — |
 
-**Nota sobre a economia:** hoje o solver deixa duas pessoas com 0 h, e a economia conta como ganho salário que continua sendo pago
-(R$ 9.864,80 medidos). O PR #16 corrige isso. **Recomendação:** mergear o #16 antes do pitch e dizer o número menor. Um jurado de RH
-pergunta "e a Quitéria, que não trabalhou, não recebe?", e o número maior não se sustenta.
+**Nota sobre a economia:** o PR #16 entrou no `main` e passa a valer o número menor (R$ 5.533 em vez de R$ 13.975). Antes, o solver
+deixava duas pessoas com 0 h e a economia contava salário que continua sendo pago. Um jurado de RH pergunta "e a Quitéria, que não
+trabalhou, não recebe?", e agora a resposta é que ninguém fica com 0 h. **Ressalvas honestas:** (1) o "depois" ainda tem 240 h
+contratadas e não trabalhadas (R$ 2.845,60): pela folha completa a economia está **entre R$ 2.688 e R$ 5.533**, e as horas ociosas do "antes"
+não foram medidas; (2) **na demo o custo não varia com a cobertura-alvo** (R$ 28.456 em 50%, 80%, 100% e 120%): não prometer "escolha a
+cobertura e veja o custo cair" no vídeo nem ao vivo, e sim "a cobertura-alvo ajusta cobertura e contratação"; (3) o tempo do solver caiu para ~3 s (bench local), mas
+o "~36 s" acima é do rastro do deploy antigo: **remedir depois do deploy** e trocar o número.
 
 **Números de mercado com fonte** (da [ficha da IDEA-002](ideacao/ideias/IDEA-002-escalista.md)):
 
@@ -213,7 +217,7 @@ segundo, para não parecer truque. Sem música alta. Legenda "dados sintéticos"
 > plataforma.
 >
 > **Medido** (dados sintéticos, link público, 08/11/2026): na escala de exemplo (3 lojas, 60 pessoas), 158 violações → 0, 216,5 h
-> de hora extra → 0, cobertura de 95,2% → 100%, economia de `[DECIDIR: R$ 5.533 com o PR #16]` na semana. Execução completa em ~36
+> de hora extra → 0, cobertura de 95,2% → 100%, economia de R$ 5.533 (16,3%) na semana, medida localmente, a confirmar na versão publicada. Execução completa em ~36
 > s, com US$ 0,001 de modelo. Evals sem modelo: 10/10.
 >
 > **Teste:** `https://escalista-converge-production.up.railway.app` → "Testar a demo" → entrar como gestor ou como colaborador,
@@ -232,7 +236,7 @@ o rastro só mostra o Qwen3.5-9B). Se não foi, tirar da lista.
 ## 4. Pendências
 
 - `[PREENCHER]` Equipe: nomes completos, mini-títulos, logos e a frase do "por que nós".
-- `[DECIDIR]` O PR #16 (carga do contrato) e, com ele, o número da economia no slide 4a, no vídeo e na descrição.
+- ~~`[DECIDIR]` O PR #16 (carga do contrato)~~ **decidido: entrou no `main` ([DEC-055](decisoes.md))**. Falta trocar o número da economia no slide 4a, no vídeo e na descrição por R$ 5.533, depois do deploy, e remedir o tempo da execução completa.
 - `[DECIDIR]` A chamada para ação: piloto ou "teste agora".
 - `[DECIDIR]` Quem fala cada bloco. Sugestão: uma pessoa nos blocos 1 a 3 e outra nos blocos 4 e 5.
 - Gravar o vídeo depois do merge dos PRs da plataforma e do deploy.
