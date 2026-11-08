@@ -567,3 +567,20 @@ Formato:
   - **Regras:** o carregador lê `restringe: <primitiva>` com o campo do valor do Pedro (`percentual`, `horas`, `dias`) e **não** lê `amplia:` (fica `info`): tratá-lo como primitiva faz a fusão ver a jornada de 9h da convenção como "mais frouxa" que a lei e abrir um RX-01 espúrio na semana da demo. **Efeito:** a ampliação diária (9h a partir de 16/12/2026) ainda **não** alimenta o motor; a fatia não precisa dela (5 x 8 h = 40 h < 42 h). Isso é um recorte da opção B, **a confirmar** pelo usuário.
   - **D1:** `convencao/demo.yaml` e `politica/demo.yaml` removidos; a autorização prévia do DP para hora extra, sem equivalente no Pedro, ficou em `politica/autorizacao_hora_extra.yaml`.
 - **Consequências:** em vigor na demo, vêm do Pedro: hora extra a 60% (`cct_adicional_hora_extra`) e interjornada de 12 h (`pol_interjornada`). Os números da demo não mudaram (medidos pelo subagente: 158 violações e R$ 33.989,15 antes; 0 e R$ 20.014,00 depois). Os cenários E1-03 e E1-10 mudaram o controle "no limite" de 11 h para 12 h. O `rule_id` das violações de interjornada plantadas passou a `pol_interjornada`. **Ficam abertos:** WhatsApp (adiado); RX-01 e RX-11 plantados pelo Pedro **não** saem do cartão (`cct_repouso_semanal` não tem `restringe` e `cct_folgas_dominicais` é `info`); o personagem da landing (DEC-036), que se chamava Patrick, se confundia com o agente **Pat**: **o usuário mandou trocar para "Pedro"** (2026-11-08 01:47; "use Pedro ao invés de patrick"); a troca foi feita em `web/` (hero, história e grade), e o texto da DEC-036 acima fica como foi decidido; o app completo ainda não está no Railway (precisa de `SESSION_SECRET`, `DEMO_MODE` e chaves como variáveis do serviço).
+
+## DEC-039 · Dois papéis na demo: gestor e colaborador
+
+- 2026-11-08 02:34 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** o [produto.md](produto.md) (seção 1) e a [arquitetura, seção 11](arquitetura.md) tinham três papéis com login de demo
+  (gerente, DP e colaborador), e a pergunta 15 ("gestor de RH": gerente, DP ou papel novo) bloqueava a C4. O usuário perguntou por que
+  três; o agente explicou a separação entre quem opera a loja (gerente) e quem define as regras (DP) e ofereceu juntar os dois.
+- **Decisão (o que o usuário disse):** "Eu acho melhor deixar só gestor ou colaborador."
+  - **Gestor** = gerente + DP: aprova e publica a escala, valida coberturas, decide exceções, aprova o cartão de regras e as comprovações.
+  - **Colaborador**: avisa falta ou atraso, manda o atestado, aceita ou recusa turno, pelo celular simulado.
+  - **Resolve a pergunta 15 `[INFERÊNCIA]`:** o "gestor de RH" é o gestor.
+- **Motivo:** [motivo não informado]; o agente apontou menos login, menos permissões a testar e um jurado que não precisa entender a
+  diferença.
+- **Alternativas consideradas (as oferecidas):** manter os três papéis.
+- **Consequências:** `/entrar` tem dois botões de demo ("Entrar como gestor", "Entrar como colaborador"); a matriz de testes rota ×
+  papel da C4 cai para dois papéis. A separação entre operar e definir regras vira uma frase do pitch, não uma tela. **Avisar a
+  frente do backend (C4) antes de escrever o login.** Substitui, nesse ponto, a [DEC-017](#dec-017--requisitos-adicionais-do-usuário-gate-de-negócio-fechado-e-início-da-etapa-técnica) e a seção 1 do [produto.md](produto.md).

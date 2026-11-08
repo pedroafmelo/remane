@@ -27,6 +27,8 @@ cada cobertura e decide as exceções.
 | **Colaborador** | Pessoa escalada | Avisa falta ou atraso, envia a comprovação, confirma ou recusa um turno | Celular simulado |
 | **Jurado** | Quem testa o link | Escolhe uma persona (gerente, DP ou colaboradora), sem login | App público |
 
+**Atualização ([DEC-039](decisoes.md), 08/11):** na demo, **gerente e DP viram um papel só, o gestor**; ficam gestor e colaborador.
+
 ## 2. Lista de features, prioridade e ordem de corte
 
 A lista nasceu das features que o usuário escreveu (resumo na seção 11) e foi fechada na [DEC-013](decisoes.md) e na
