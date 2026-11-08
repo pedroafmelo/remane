@@ -226,6 +226,8 @@ def test_demanda_cabe_na_capacidade(arquivos: dict[str, str], pessoas: list[Empl
     for loja in ("L1", "L2", "L3"):
         por_loja = sum(s.required for s in demanda if s.store_id == loja) / 2
         assert por_loja <= 0.85 * 20 * 40
+        # nenhum pico pede mais do que a equipe consegue cobrir (teto de 40% da equipe de 20)
+        assert max(s.required for s in demanda if s.store_id == loja) <= 8
 
 
 def test_demanda_e_deterministica_e_sem_global() -> None:

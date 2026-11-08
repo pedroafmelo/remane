@@ -85,7 +85,7 @@ def escala_violacoes(base: dict[str, list[Shift]], pessoas: list[Employee]) -> l
     planos: dict[str, list[tuple[int, str, str]]] = {
         "P001": [(i, "08:00", "15:30") for i in range(6)],  # 45h na semana, 1 folga
         "P002": [(i, "08:00", "15:00") for i in range(6)],  # 42h (no limite), 1 folga
-        "P003": [(i, "08:00", "15:40") for i in range(6)],  # 46h40, 1 folga
+        "P003": [(i, "08:00", "15:40") for i in range(6)],  # 46h (6 × 7h40), 1 folga
         "P004": [(0, "08:00", "17:00")] + [(i, "08:00", "15:00") for i in range(1, 5)],  # 9h na segunda
         "P005": [(2, "08:00", "18:00")] + [(i, "08:00", "15:00") for i in (0, 1, 3, 4)],  # 10h na quarta
         "P006": [  # 10h de descanso entre segunda e terça

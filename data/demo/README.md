@@ -53,7 +53,7 @@ Em `escala_violacoes.csv`, as violações plantadas são (ver `violacoes_plantad
 
 | Regra | Pessoas | Dias |
 |---|---|---|
-| `jornada_semanal_max` | P001 (45h), P003 (46h40) | semana |
+| `jornada_semanal_max` | P001 (45h), P003 (46h) | semana |
 | `repouso_semanal` | P001, P002, P003 | semana (1 folga) |
 | `jornada_diaria_max` | P004 (9h na segunda), P005 (10h na quarta) | 11/01 e 13/01 |
 | `interjornada_min` | P006 (10h entre seg e ter), P007 (8h entre o turno noturno de qua e qui) | 12/01 e 14/01 |
@@ -63,9 +63,15 @@ P002 faz exatamente 42h, o que não viola o limite. A regra semanal só é quebr
 
 ## Demanda e capacidade
 
-- Demanda total: 1.742 pessoa-horas na semana (3 lojas).
+- Demanda total: 1.676 pessoa-horas na semana (3 lojas): L1 562, L2 514,5 e L3 599,5.
+- Pico por faixa de 30 min: no máximo 8 pessoas simultâneas em cada loja (teto de 40% da equipe de 20). O perfil
+  (almoço, fim de tarde, fim de semana mais forte) é o mesmo; só os picos acima do teto foram achatados. Sem o teto, os
+  picos de L1 e L3 (11 e 12 pessoas) deixavam 9,5 pessoa-horas descobertas no ótimo do solver, e a demo caía sempre
+  em RX-02. O RX-02 tem cenário próprio nos evals.
 - Capacidade: 60 pessoas × 40h = 2.400 pessoa-horas. Com 2 folgas e no máximo 8h por dia, a pessoa não passa de 40h na
-  semana, mesmo com o limite de 42h. Sobra cerca de 27% de folga no total, e a loja mais carregada (L3) usa cerca de 80%.
+  semana, mesmo com o limite de 42h. Sobra cerca de 30% de folga no total, e a loja mais carregada (L3) usa cerca de 75%.
+- Medido (solver CP-SAT, seed 42, `python -m escalista.solver.bench`): cobertura de 100%, 0 faixas descobertas, status
+  ótimo nas 3 lojas, com 1 e com 8 threads.
 - Teste: `pedidas <= 0,85 × 60 × 42` (2.142), e também `<= 0,85 × 60 × 40` (2.040).
 
 Isto é uma conta de capacidade, e não prova que existe escala viável com 0 violações. Essa prova é do solver.
