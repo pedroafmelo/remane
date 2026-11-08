@@ -47,7 +47,9 @@ testar a leitura do turno noturno e a interjornada. Horário de loja não é pri
 ## Regras que as escalas exercitam
 
 Valores das regras novas, da fatia (plano da C5, seção 3.1): `jornada_semanal_max` 42h, `jornada_diaria_max` 8h,
-`interjornada_min` 11h, `repouso_semanal` 2 dias por semana.
+`interjornada_min` 12h (`pol_interjornada`, da política fictícia de `data/regras/politica/`; a CLT pede 11h),
+`repouso_semanal` 2 dias por semana. Em `violacoes_plantadas.json`, `kind` é a primitiva e `rule_id` é o `id` da regra
+que o verificador cita (`pol_interjornada` para a interjornada; as demais vêm da lei, com `id` igual ao `kind`).
 
 Em `escala_violacoes.csv`, as violações plantadas são (ver `violacoes_plantadas.json`):
 
