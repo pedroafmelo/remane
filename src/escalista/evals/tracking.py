@@ -21,6 +21,7 @@ from __future__ import annotations
 import io
 import json
 import logging
+import uuid
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
@@ -234,12 +235,45 @@ class Rig:
             return [_to_event(row) for row in session.scalars(stmt)]
 
     def open_cards(self, code: str | None = None, case_id: str | None = None) -> list[Any]:
-        items = list(self.tracker.desk.queue().open)
+        """Cartões abertos na fila do gestor: `tracker.desk.queue()` (contrato) ou, sem a mesa no `Tracker`, a tabela
+        `exception_item` do mesmo engine (código real da C7 em `d7be9fc`: o `Tracker` só tem a porta `open`)."""
+        desk = getattr(self.tracker, "desk", None)
+        if desk is not None:
+            items = list(desk.queue().open)
+        else:
+            from escalista.store.exceptions import ExceptionStore
+
+            items = [i for i in ExceptionStore(self.engine).list() if i.status == "open"]
         if code is not None:
             items = [i for i in items if i.card.code == code]
         if case_id is not None:
             items = [i for i in items if i.source.get("case_id") == case_id]
         return items
+
+    def decide(self, item: Any, option_index: int) -> Any:
+        """Decisão do gestor: pela mesa (contrato) ou por `Tracker.on_decision` (código real da C7)."""
+        from escalista.api.accounts import SEEDED_ACCOUNTS
+        from escalista.domain.contracts import Role
+
+        gestor = next(a for a in SEEDED_ACCOUNTS if a.role == Role.GESTOR)
+        desk = getattr(self.tracker, "desk", None)
+        if desk is not None:
+            return desk.decide(item.id, option_index, gestor)
+        return self.tracker.on_decision(
+            case_id=item.source.get("case_id"),
+            code=item.card.code,
+            option_index=option_index,
+            approver_id=gestor.id,
+            role=gestor.role,
+        )
+
+    def tracer(self) -> Any:
+        """Um `Tracer` sobre o `trace_event` do mesmo engine (para chamar as ferramentas do portão direto)."""
+        from escalista.agents.optimizer.tools import Tracer
+        from escalista.audit.sink import SqlTraceSink
+
+        sink = SqlTraceSink(self.engine)
+        return Tracer(sink, self.clock, new_id=lambda: uuid.uuid4().hex, list_events=sink.list_events)
 
     def rows(self, table: str) -> list[dict[str, Any]]:
         from sqlalchemy import text

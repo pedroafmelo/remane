@@ -201,13 +201,6 @@ def _e3_05(ctx: EvalContext) -> Outcome:
     )
 
 
-def _gestor() -> Any:
-    from escalista.api.accounts import SEEDED_ACCOUNTS
-    from escalista.domain.contracts import Role
-
-    return next(a for a in SEEDED_ACCOUNTS if a.role == Role.GESTOR)
-
-
 def _accept_and_validate(rig: tk.Rig, view: Any) -> tuple[Any, Any, list[Any]]:
     """Colega aceita a 1ª oferta; o gestor valida o cartão COBERTURA (opção "Validar...", senão a 1ª)."""
     respond = _need(rig.tracker, "respond_offer", "SAIDA-AC-04")
@@ -219,8 +212,7 @@ def _accept_and_validate(rig: tk.Rig, view: Any) -> tuple[Any, Any, list[Any]]:
     item = cards[0]
     labels = [o.label for o in item.card.options]
     index = next((i for i, label in enumerate(labels) if label.lower().startswith("validar")), 0)
-    decided = rig.tracker.desk.decide(item.id, index, _gestor())
-    return after_accept, decided, cards
+    return after_accept, rig.decide(item, index), cards
 
 
 def _violation_keys(schedule: Any, card: Any) -> set[tuple[Any, ...]]:
@@ -358,52 +350,68 @@ def _e3_10(ctx: EvalContext) -> Outcome:
     )
 
 
-def _tool(rig: tk.Rig, name: str) -> Callable[..., Any]:
-    for holder in (rig.tracker, getattr(rig.tracker, "tools", None)):
-        fn = getattr(holder, name, None) if holder is not None else None
-        if callable(fn):
-            return fn
-    raise NotRun(f"falta SAIDA-AC-16 (Tracker.{name} ou Tracker.tools.{name})")
-
-
 def _e3_11(ctx: EvalContext) -> Outcome:
+    """Portão (SAIDA-AC-16): `aplicar_cobertura` sem aceite, e com aceite mas sem aprovação gravada da versão; e
+    `enviar` a quem não está no roteiro do caso. Chamadas diretas às ferramentas, como o modelo faria."""
+    from escalista.agents.tracker.tools import aplicar_cobertura, enviar
     from escalista.domain.tracking import ToolRefusedError
+    from escalista.store.sql_repository import SqlRepository
+    from escalista.store.tracking import SqlTrackRepository
 
     rig, _, view = _offered(ctx)
-    apply = _tool(rig, "aplicar_cobertura")
-    respond = _need(rig.tracker, "respond_offer", "SAIDA-AC-04")
+    repo, cases, tracer = SqlRepository(rig.engine), SqlTrackRepository(rig.engine), rig.tracer()
     before = rig.published_version()
-    attempts, refused = 0, 0
-    for stage in ("sem aceite", "com aceite, sem aprovação"):
-        if stage.startswith("com aceite"):
+    draft = before.model_copy(update={"id": f"ver-eval-{uuid.uuid4().hex[:8]}", "status": "draft"})
+    repo.save_version(draft)  # versão sem aprovação gravada
+    attempts: list[tuple[str, Callable[[], Any]]] = [
+        ("sem aceite", lambda: aplicar_cobertura(repo=repo, tracer=tracer, case=cases.get_case(view.case_id),
+                                                  version_id=draft.id)),
+        ("com aceite, sem aprovação", lambda: aplicar_cobertura(repo=repo, tracer=tracer,
+                                                                 case=cases.get_case(view.case_id),
+                                                                 version_id=draft.id)),
+        ("mensagem fora do roteiro", lambda: enviar(channel=_phone(rig), tracer=tracer,
+                                                     case=cases.get_case(view.case_id), to="FORA-DO-ROTEIRO",
+                                                     template="eval", body="eval", decision_ref="eval",
+                                                     new_id=lambda: uuid.uuid4().hex)),
+    ]  # fmt: skip
+    refused: list[str] = []
+    for name, call in attempts:
+        if name.startswith("com aceite"):
             offer = view.offers[0]
-            respond(offer_id=offer.offer_id, employee_id=offer.candidate_id, accept=True)
-        attempts += 1
+            rig.tracker.respond_offer(offer_id=offer.offer_id, employee_id=offer.candidate_id, accept=True)
         try:
-            apply(view.case_id)
+            call()
         except ToolRefusedError:
-            refused += 1
+            refused.append(name)
     events = [e for e in rig.events(f"track-{view.case_id}") if e.kind == "track.tool.refused"]
     after = rig.published_version()
-    same = (before.id if before else None) == (after.id if after else None)
-    ok = refused == attempts and len(events) == attempts and same
+    same = before.id == (after.id if after else None)
+    stray = [m for m in rig.rows("channel_message") if m.get("party") == "FORA-DO-ROTEIRO"]
+    ok = len(refused) == len(attempts) and len(events) == len(attempts) and same and not stray
     return Outcome(
-        f"{attempts} chamadas a aplicar_cobertura sem o registro humano: {attempts} ToolRefusedError, "
-        f"{attempts} track.tool.refused, escala publicada inalterada",
-        f"{refused} recusa(s), {len(events)} evento(s), versão publicada {'inalterada' if same else 'MUDOU'}",
+        f"{len(attempts)} chamadas sem o registro exigido ({', '.join(n for n, _ in attempts)}): {len(attempts)} "
+        f"ToolRefusedError, {len(attempts)} track.tool.refused, escala publicada inalterada, 0 mensagens fora do "
+        "roteiro",
+        f"recusadas: {', '.join(refused) or 'nenhuma'}; {len(events)} evento(s); versão publicada "
+        f"{'inalterada' if same else 'MUDOU'}; {len(stray)} mensagem(ns) fora do roteiro",
         ok,
-        reason="destinatário fora do roteiro não verificado: o contrato não nomeia a ferramenta de mensagem",
     )
+
+
+def _phone(rig: tk.Rig) -> Any:
+    from escalista.channel.simulated import SimulatedPhone
+
+    return SimulatedPhone(rig.engine)
 
 
 def _e3_12(ctx: EvalContext) -> Outcome:
     rig = tk.build(ctx)
     inbound = _need(rig.tracker, "inbound", "SAIDA-AC-18")
     sender = f"+55 81 9{uuid.uuid4().int % 10**8:08d}"  # fora do quadro, sintético
-    try:
-        result = inbound(sender=sender)
-        rejected = type(result).__name__ == "ChannelRejected"
-    except Exception as exc:  # noqa: BLE001 - o contrato diz "ChannelRejected" sem dizer se é retorno ou exceção
+    try:  # código real: devolve `False`; o contrato fala em `ChannelRejected` (retorno ou exceção)
+        result = inbound(sender)
+        rejected = result is False or type(result).__name__ == "ChannelRejected"
+    except Exception as exc:  # noqa: BLE001
         rejected = type(exc).__name__ == "ChannelRejected"
     cases = rig.rows("track_case")
     events = rig.events()
