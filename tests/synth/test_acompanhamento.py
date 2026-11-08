@@ -107,7 +107,8 @@ def test_store_3_absence_has_no_candidate(escala: Schedule, pessoas: list[Employ
     avaliados, candidatos = find_cover(escala, turno, pessoas, cartao)
     assert turno.store_id == "L3"
     assert (avaliados, candidatos) == (0, [])  # ninguém livre no dia: RX-05
-    assert caso["expect_rx05"] is True
+    assert caso["expect_rx05"] is True and caso["overtime_needed"] is True
+    assert caso["overtime_needed_reason"] == "sem candidato dentro das regras"
 
 
 def test_store_2_absence_has_free_colleagues_but_no_candidate_within_the_rules(
@@ -119,7 +120,8 @@ def test_store_2_absence_has_free_colleagues_but_no_candidate_within_the_rules(
     assert turno.store_id == "L2"
     assert avaliados >= 1  # há colegas livres no dia, mas nenhuma cobertura passa no verificador
     assert candidatos == []
-    assert caso["expect_rx05"] is True and caso["overtime_needed"] is False
+    assert caso["expect_rx05"] is True and caso["overtime_needed"] is True
+    assert caso["overtime_needed_reason"] == "sem candidato dentro das regras"
 
 
 def test_known_limit_find_cover_never_returns_overtime_on_this_scenario(
@@ -127,7 +129,7 @@ def test_known_limit_find_cover_never_returns_overtime_on_this_scenario(
 ) -> None:
     """Limite documentado no README: o cartão proíbe toda hora extra numa escala verificada (8 h/dia, 42 h/semana e
     2 repousos), então `find_cover` nunca devolve candidato com hora extra. Se este teste quebrar, o cartão ou o
-    `find_cover` mudou e o cenário da loja 2 pode ganhar o caso `overtime_needed`."""
+    `find_cover` mudou e o `overtime_needed` do gabarito pode precisar de outra definição."""
     for turno in escala.shifts:
         _, candidatos = find_cover(escala, turno, pessoas, cartao)
         assert all(c.overtime_hours == 0 for c in candidatos)
@@ -312,3 +314,19 @@ def test_synth_never_imports_the_sweep() -> None:
             elif isinstance(no, ast.Import):
                 modulos = [a.name for a in no.names]
             assert not any("tracker.sweep" in m or m.endswith(".sweep") for m in modulos), arquivo.name
+
+
+def test_overtime_needed_rule_rf28_across_the_planted_faults(esperado: dict) -> None:
+    """RF-28: `overtime_needed` quando não há candidato sem hora extra (lista vazia = RX-05); motivo só nesse caso."""
+    por_id = {c["id"]: c for c in esperado["cases"] if c["kind"] == "falta"}
+    assert {i: c["overtime_needed"] for i, c in por_id.items()} == {
+        "PL-01": False,
+        "DV-01": False,
+        "PL-02": True,
+        "PL-03": True,
+    }
+    for caso in por_id.values():
+        assert caso["overtime_needed"] is caso["expect_rx05"]
+        assert caso["overtime_needed_reason"] == (
+            "sem candidato dentro das regras" if caso["overtime_needed"] else None
+        )

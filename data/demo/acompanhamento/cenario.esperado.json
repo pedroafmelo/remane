@@ -56,6 +56,7 @@
       ],
       "first_without_overtime": "P105",
       "overtime_needed": false,
+      "overtime_needed_reason": null,
       "expect_rx05": false,
       "new_violations": 0,
       "offers": {
@@ -127,6 +128,7 @@
       ],
       "first_without_overtime": "P105",
       "overtime_needed": false,
+      "overtime_needed_reason": null,
       "expect_rx05": false,
       "new_violations": 0,
       "offers": null,
@@ -158,11 +160,12 @@
       "ranked": [],
       "ranked_names": [],
       "first_without_overtime": null,
-      "overtime_needed": false,
+      "overtime_needed": true,
+      "overtime_needed_reason": "sem candidato dentro das regras",
       "expect_rx05": true,
       "new_violations": 0,
       "offers": null,
-      "note": "Loja 2, sem candidato dentro das regras: as colegas livres na sex 15/01 já têm só 2 dias de repouso. `find_cover` só devolve cobertura sem violação nova e a regra de hora extra do cartão (8 h por dia, 42 h por semana, 2 repousos) torna impossível uma cobertura verificada com hora extra: por isso `overtime_needed` sai false e `expect_rx05` true. Ver o README, seção 'Limite conhecido'."
+      "note": "Loja 2, sem candidato dentro das regras: as colegas livres na sex 15/01 já têm só 2 dias de repouso. `find_cover` só devolve cobertura sem violação nova: sem candidato dentro das regras, a cobertura só fecharia com hora extra ou remanejamento, então `overtime_needed` e `expect_rx05` são true. Ver o README, seção 'Limite conhecido'."
     },
     {
       "id": "PL-03",
@@ -190,11 +193,12 @@
       "ranked": [],
       "ranked_names": [],
       "first_without_overtime": null,
-      "overtime_needed": false,
+      "overtime_needed": true,
+      "overtime_needed_reason": "sem candidato dentro das regras",
       "expect_rx05": true,
       "new_violations": 0,
       "offers": null,
-      "note": "Loja 3, sem nenhum colega livre no dia: `evaluated` 0 e RX-05."
+      "note": "Loja 3, sem nenhum colega livre no dia: `evaluated` 0, RX-05 e `overtime_needed` true (sem candidato dentro das regras)."
     },
     {
       "id": "DV-02",

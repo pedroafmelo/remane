@@ -281,7 +281,9 @@ def _caso_falta(
         "ranked": ranqueados,
         "ranked_names": [nomes[i] for i in ranqueados],
         "first_without_overtime": sem_extra,
-        "overtime_needed": bool(candidatos) and sem_extra is None,
+        # RF-28: a cobertura só fecharia com hora extra (ou remanejamento) quando nenhum candidato cabe nas regras.
+        "overtime_needed": sem_extra is None,
+        "overtime_needed_reason": "sem candidato dentro das regras" if sem_extra is None else None,
         "expect_rx05": not candidatos,
         "new_violations": 0,
         "offers": None,
@@ -435,9 +437,9 @@ def esperado(escala: Schedule, pessoas: list[Employee], cartao: RuleCard, seed: 
             reportado_em=None,
             nota=(
                 "Loja 2, sem candidato dentro das regras: as colegas livres na sex 15/01 já têm só 2 dias de repouso. "
-                "`find_cover` só devolve cobertura sem violação nova e a regra de hora extra do cartão (8 h por dia, "
-                "42 h por semana, 2 repousos) torna impossível uma cobertura verificada com hora extra: por isso "
-                "`overtime_needed` sai false e `expect_rx05` true. Ver o README, seção 'Limite conhecido'."
+                "`find_cover` só devolve cobertura sem violação nova: sem candidato dentro das regras, a cobertura só "
+                "fecharia com hora extra ou remanejamento, então `overtime_needed` e `expect_rx05` são true. Ver o "
+                "README, seção 'Limite conhecido'."
             ),
             **comum,
         ),
@@ -447,7 +449,10 @@ def esperado(escala: Schedule, pessoas: list[Employee], cartao: RuleCard, seed: 
             desvio_id=None,
             turno=_turno(escala, *FALTA_LOJA3),
             reportado_em=None,
-            nota="Loja 3, sem nenhum colega livre no dia: `evaluated` 0 e RX-05.",
+            nota=(
+                "Loja 3, sem nenhum colega livre no dia: `evaluated` 0, RX-05 e `overtime_needed` true "
+                "(sem candidato dentro das regras)."
+            ),
             **comum,
         ),
         _caso_atraso(escala, nomes, tolerancia, 25),
@@ -525,7 +530,7 @@ fictícia que geraram os instantes (`pol_atraso`, `pol_oferta_turno`, `pol_hora_
 | `no_answer` | pergunta em `fires_at`; `fires_at` e `not_before` da resposta: pergunta + 15 e + 14 (RX-09) |
 | `offers` | só quando há aviso do colaborador (`reported_at`): cada oferta tem `sent_at`, `deadline` (envio + 20 min) e `offer_expired_not_before`; `rx06_at` = aviso + 20 min por candidato ofertado (até 3: + 60 min), `rx06_not_before` = 1 min antes |
 | `evaluated`, `ranked`, `ranked_names` | quantos colegas a busca avaliou e a **ordem** dos aprovados (ids), saída do `find_cover` |
-| `first_without_overtime`, `overtime_needed`, `expect_rx05`, `new_violations` | o 1º candidato sem hora extra; se todos exigem hora extra; se não há candidato (RX-05); violações novas da cobertura (sempre 0) |
+| `first_without_overtime`, `overtime_needed`, `overtime_needed_reason`, `expect_rx05`, `new_violations` | o 1º candidato sem hora extra; `overtime_needed` (RF-28) é true quando não há candidato sem hora extra, isto é, a lista está vazia (RX-05); `overtime_needed_reason` é "sem candidato dentro das regras" nesse caso e `null` no contrário; violações novas da cobertura (sempre 0) |
 
 Os instantes são **aritmética sobre a política**, escrita pelo gerador sem chamar o varredor (PEDIDO-EV-20): um eval que
 compara o varredor com este arquivo não é circular. Nos casos de hora extra (T2): `cumulative_minutes`,
@@ -556,12 +561,16 @@ Os CIDs (`A09`, `J11`, `J11.1`) são códigos CID-10 de doenças comuns usados s
 
 ## Limite conhecido: a hora extra e o `find_cover`
 
-O pedido original era uma falta, na loja 2, em que **só** há candidatos com hora extra. Com o cartão de regras atual isso é
-impossível numa escala verificada: hora extra exige mais de 8 h no dia ou mais de 42 h na semana, e as duas coisas são
-violações do verificador (e passar de 42 h em turnos de 8 h exige 6 dias de trabalho, contra o repouso de 2 dias). O
-`find_cover` só aceita cobertura sem violação nova, então `overtime_hours` é sempre 0 e `overtime_needed` nunca é verdadeiro.
-A loja 2 fica, portanto, como "ninguém cobre dentro das regras" (RX-05). Mudar isso pede decisão do time sobre o
-`find_cover` ou sobre o cartão (por exemplo, aceitar até a hora extra da política, `pol_hora_extra`).
+Com o cartão de regras atual, o `find_cover` nunca devolve candidato com hora extra: hora extra exigiria mais de 8 h no dia
+ou mais de 42 h na semana, e as duas coisas são violações do verificador (passar de 42 h em turnos de 8 h exige 6 dias de
+trabalho, contra o repouso de 2 dias). Como ele só aceita cobertura sem violação nova, `overtime_hours` é sempre 0 e uma
+falta numa escala verificada não tem "candidato com hora extra".
+
+**Regra do RF-28 adotada (decisão do orquestrador):** `overtime_needed` vale também quando a busca não acha **nenhum**
+candidato dentro das regras, porque então a cobertura só fecharia com hora extra ou remanejamento (é o que o RX-05 oferece,
+"Hora extra de um colega"). No gabarito: `PL-02` (loja 2, colegas livres que já têm só 2 dias de repouso) e `PL-03` (loja 3,
+ninguém livre no dia) têm `overtime_needed: true`, `overtime_needed_reason: "sem candidato dentro das regras"` e
+`expect_rx05: true`; `PL-01` e `DV-01` (loja 1, com folga) têm `false` e motivo `null`.
 """  # noqa: E501
 
 
