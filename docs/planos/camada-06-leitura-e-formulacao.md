@@ -582,3 +582,9 @@ nos relatórios dos subagentes.
 - **2026-11-08 06:06:** M2 (A5, B4b, C3-bis) integrado em `c6/integra`.
 - **2026-11-08 06:14:** D6 (PDF digital) integrada em `c6/integra` (`f79d7f6`). Medido pelo orquestrador: `--suite e2` sem modelo **16/16 arquivos;
   795/795 turnos, 0 inventados, 0 perdidos; RX-13 4/4**. `c6/m2` cortado em `d441127` (antes da D6); o M3 é `c6/integra` a partir daqui.
+- **Seção 19 no `c6/m2`** (`d441127`, 06:12–06:16): 1.263 testes, ruff, E1 10/10, E2 15/15, e2e 20, front verde. **Bench com load 6,8:**
+  sem spec 9,27 s (1 thread) e 14,04 s (8), com a spec padrão 9,32 s e 11,27 s, ótimo, R$ 20.014,00: sem piora contra os 9,46 s de referência.
+- **Seção 19 no `c6/m3`** (06:16–06:19): 1.274 testes, ruff, E1 10/10, E2 16/16 (795/795, 0 inventados), e2e 20, typecheck e build.
+- **Pendências do usuário:** push e PR de `c6/m1`, `c6/m2` e `c6/m3` (nessa ordem, merge commit); G3 da C6 à mão com a chave (seção 19) e
+  `--suite e2 --with-model` (custo e latência de `llm.map_columns` e `llm.formulate` **não medidos**); ordem de merge com as branches da outra
+  sessão; o `/sync-docs` não foi rodado porque opera no diretório principal, que não é do orquestrador.

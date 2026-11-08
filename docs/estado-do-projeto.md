@@ -32,7 +32,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
 
 ## Próximas ações
 
-- [ ] **C6: M2 (formulação do pedido do gestor pelo modelo e laço do solver) integrado em `c6/integra` (2026-11-08 06:06)**; pacote M2 em preparo. **M1 pronto em `c6/m1`** ([plano](planos/camada-06-leitura-e-formulacao.md), seção 21): CSV e XLSX com cabeçalhos livres, nó 1 com reservas, quadro guardado, próxima semana sem upload. **Falta (usuário):** `git push origin c6/integra`, PR com merge commit, conferir `/health` e o login no Railway depois do merge; o G3 da C6 à mão com a chave (seção 19 do plano) e `uv run python -m escalista.evals --suite e2 --with-model` (custo e latência de `llm.map_columns` e `llm.formulate` **não medidos**). M2 (formulação e laço) e M3 (PDF) seguem em `c6/integra`.
+- [ ] **C6: M1, M2 e M3 prontos para o merge do usuário (2026-11-08 06:19)**: `c6/m1` (leitura livre, quadro e próxima semana), `c6/m2` (formulação e laço), `c6/m3` (PDF digital); mergear nessa ordem, com merge commit. Antes: M2 integrado em `c6/integra` (2026-11-08 06:06)**; pacote M2 em preparo. **M1 pronto em `c6/m1`** ([plano](planos/camada-06-leitura-e-formulacao.md), seção 21): CSV e XLSX com cabeçalhos livres, nó 1 com reservas, quadro guardado, próxima semana sem upload. **Falta (usuário):** `git push origin c6/integra`, PR com merge commit, conferir `/health` e o login no Railway depois do merge; o G3 da C6 à mão com a chave (seção 19 do plano) e `uv run python -m escalista.evals --suite e2 --with-model` (custo e latência de `llm.map_columns` e `llm.formulate` **não medidos**). M2 (formulação e laço) e M3 (PDF) seguem em `c6/integra`.
 - [x] ~~Time alinhar restrições e semear o backlog ([como-ideiar.md](ideacao/como-ideiar.md), passos 1 e 2)~~: superada, a ideia
       foi escolhida pela [DEC-003](decisoes.md) sem esse passo (auditoria de 14:42).
 - [x] Filtrar e pontuar a IDEA-002 com [criterios.md](ideacao/criterios.md): feito às 13:18 e refeito às 14:47 com o produto
@@ -124,6 +124,8 @@ rotuladas como premissa.
 | Evals E2 sem modelo (leitura, C6) | 15/15 arquivos; 747/747 turnos corretos; **0 inventados**, 0 perdidos; problemas 6/6; RX-13 4/4 | `uv run python -m escalista.evals --suite e2` em `c6/integra` (`e9462b0`), pelo orquestrador | 08/11/2026 04:12 |
 | Demanda inferida do exemplo contra a capacidade (C6) | 2.777 pessoa-hora (horário das lojas do arquivo) ou 2.774,5 (horário do cadastro simulado) contra 2.400 de capacidade sob 42h; "ajustar para caber" = 80% | testes da A3 e da B4a (`tests/rules/test_demand.py`, `tests/agents/test_graph_c6.py`) | 08/11/2026 |
 | Fluxo C6 ponta a ponta com modelo falso (60 × 7, cobertura-alvo 80%) | antes 158 violações, R$ 33.989,15, cobertura 97,04%; depois 0 violações, R$ 28.381,60, cobertura 98,5%; semana seguinte sem upload com 0 violações | `tests/e2e/test_c6.py` (relatório da C3; dados sintéticos, sem modelo real) | 08/11/2026 |
+| Solver 60 × 7 depois da C6 (seed 42) | sem spec 9,27 s (1 thread), 14,04 s (8); spec padrão 9,32 s e 11,27 s; ótimo; R$ 20.014,00; load 6,8 | `uv run python -m escalista.solver.bench --seed 42 [--spec default]` no `c6/m2` | 08/11/2026 06:15 |
+| Evals E2 sem modelo com PDF (C6, M3) | 16/16 arquivos; 795/795 turnos; 0 inventados; RX-13 4/4 | `--suite e2` no `c6/m3` | 08/11/2026 06:17 |
 | Custo e latência do modelo pequeno na justificativa | **não medido** (sem chave na fumaça); medir no G3 item 6 | — | — |
 
 ## Registro de atualizações
