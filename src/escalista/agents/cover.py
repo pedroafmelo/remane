@@ -49,7 +49,8 @@ def find_cover(
     found: list[CoverCandidate] = []
     for person in pool:
         moved = Schedule(
-            week_start=schedule.week_start, shifts=[*without.shifts, shift.model_copy(update={"employee_id": person.id})]
+            week_start=schedule.week_start,
+            shifts=[*without.shifts, shift.model_copy(update={"employee_id": person.id})],
         )
         if _keys(moved, card) - base_violations:
             continue

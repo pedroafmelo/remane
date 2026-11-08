@@ -10,7 +10,13 @@ from tests.agents.support import WEEK, rule_card
 
 def _emp(eid: str, job: str, wage: str, store: str = "L1") -> Employee:
     return Employee(
-        id=eid, name=f"{eid} (sintético)", store_id=store, job=job, hourly_wage=Decimal(wage), contract_hours=44, sex="F"
+        id=eid,
+        name=f"{eid} (sintético)",
+        store_id=store,
+        job=job,
+        hourly_wage=Decimal(wage),
+        contract_hours=44,
+        sex="F",
     )
 
 
