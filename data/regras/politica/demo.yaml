@@ -1,0 +1,23 @@
+# FICTICIO - dados de demonstracao, nao e convencao real.
+# Politica FICTICIA da empresa da demo, escrita pelo time (clean room). Nao e politica de empresa real nem de cliente.
+# Toda regra tem status: ficticia (ver data/regras/README.md). Deve aparecer como sintetico na submissao.
+# A politica so restringe a lei e a convencao, nunca afrouxa (ordem entre camadas em data/regras/README.md).
+
+norma: "Politica FICTICIA da empresa da demo (dados de demonstracao)"
+
+regras:
+  - id: repouso_semanal
+    dias: 2
+    vigencia: 2026-12-16
+    fonte: "FICTICIO - politica da empresa da demo, igual ao minimo da lei (EC 141/2026, art. 7º, XV CF)"
+    status: ficticia
+    verificacao: "n/a: dado ficticio, sem leitura de fonte real"
+
+excecoes:   # o agente nao decide sozinho; valores de acao em data/regras/README.md
+  - id: hora_extra_autorizacao_dp
+    descricao: "hora extra so com autorizacao previa do DP; o agente nao escala hora extra sozinho"
+    fonte: "FICTICIO - politica da empresa da demo"
+    acao: escalar
+    nota: "Na fatia, a escala enviada pode ter hora extra; ela entra como custo e violacao, nunca como escala feita pelo solver."
+    status: ficticia
+    verificacao: "n/a: dado ficticio, sem leitura de fonte real"
