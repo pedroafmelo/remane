@@ -547,12 +547,35 @@ Cada sessão escreve só na sua subseção: início, fim (`date`), hash, desvios
 respostas aos pedidos PEDIDO-EV-01 a 21; perguntas ao usuário registradas às 09:10; **congelamento do lado A às 09:18** (seção 6 do
 contrato). A sessão B ainda não tinha congelado nessa hora.
 
+**Como rodou (08/11, a partir de 09h22):** um orquestrador (Claude, Opus 5.5) fez a A0 sozinho e delegou cada tarefa a um subagente no
+worktree da frente (`cc61-c7-{a,b,b2,c,d,d2}`; `b2` e `d2` foram worktrees extras para correr B1 × B2 e D1 × D3a em paralelo), conferiu
+diff, donos, testes e ruff de cada entrega, fez o rebase e integrou em `c7/integra` com `merge --ff-only`, **sem push e sem tocar no
+`main`**. Linha de base: 1319 testes em 2min05 (09:25). Hashes abaixo são os de `c7/integra`.
+
 ### Sessão A
+
+- **A0** (orquestrador, 09:23 a 09:26): `6052e64` contratos (`domain/tracking.py`), portas, falsos, teste de fronteira do relógio.
+- **A1, A2, A2b, A3** (09:31 a 09:37): relógio de demo, `load_track_policy` + RX-06 e RX-09 na política, `judge`, `detect`; integrados até `fc3dd2a`. **Desvios:** `judge(fields, *, expected_day)` sem `employee_name` (o nome chega em `patient_matches`); a tabela `demo_clock` é criada pelo próprio `DemoClock` se faltar; o `no_punch` vale também para turnos já encerrados.
 
 ### Sessão B
 
+- **B1** (09:31 a 09:35): `06341c7` tabelas `track_case` e `channel_message`, `SqlTrackRepository`, `SimulatedPhone` (recusa gravar texto de entrada), `ExceptionStoreQueue`.
+- **B2** (09:31 a 09:42): `a5b962d` `Tracker` (ofertas sequenciais, portão `aplicar_cobertura`, cartões, mensagens, `summarize`).
+- **B3** (09:40 a 09:43): `17f017a` leitura do PDF (`pdf_text` → `strip_cid` → modelo `small` → `judge`). **Achado:** o pdfminer loga o conteúdo do PDF em DEBUG; os loggers `pdfminer`/`pdfplumber` ficam em WARNING.
+- **B4** (09:45 a 09:51): `d7be9fc` `run_sweep`, `answer`, RF-28 também sem candidato ([DEC-067](../decisoes.md)).
+
 ### Sessão C
+
+- **C2** (09:31 a 09:35): `f128caa` barra do relógio, celular simulado com seletor, ofertas e perguntas.
+- **C1** (09:45 a 10:00): `3451489` `tracker_wiring`, rotas, `decide` delegando cartões do acompanhamento, semente do cenário na subida (sem `Approval`: é dado sintético pré-carregado), aviso em JSON e PDF em corpo bruto ([DEC-067](../decisoes.md)).
 
 ### Sessão D
 
+- **D1, D2** (09:31 a 09:43): `a6ec80a`, `0816b44` cenário com folga (3 lojas, 17 pessoas, 0 violações), ponto simulado, atestados at-01 a 04, 08, 09 com gabarito. **Achado:** a `find_cover` nunca devolve hora extra numa escala válida; D1b (`224a549`) ajustou o gabarito do RF-28.
+- **D3a** (09:31 a 09:36): `2068a69` `audit/protected.py` e `scrub` por `kind` no `SqlTraceSink`.
+- **D4** (10:01 a 10:06): `8cdcf25` E2E do roteiro (passos 1 a 7) por HTTP. **Lacuna:** não havia rota para o rastro do caso (passo 6) → tarefa C3b.
+
 ### Integração (`c7/integra`) e marcos
+
+- **10:01 a 10:04:** merge de `origin/main` (`e17996b`, logo novo da DEC-056) → `527d001`; 1 conflito em `decisoes.md` (número da DEC-056), DECs da C7 renumeradas para 057 a 066, DEC-067 nova.
+- **M1 (10:10), gates em `c7/integra`:** `uv run pytest -q` 1664 passed (1min58; 1665 com a D4); ruff check e format 0; E2E fatia + C6 20 passed; E1 10/10; E2 16/16 sem modelo; `synth acompanhamento` sem diff; web typecheck, lint, test (60) e build 0; `docker build` 0 e `/health` ok na imagem (`demo_mode: true`). **Não verificado:** navegador, link público, modelo real.

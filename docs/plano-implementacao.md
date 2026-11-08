@@ -1,6 +1,6 @@
 # Plano macro de implementação do Escalista
 
-Última atualização: 2026-11-08 08:17 (C6 integrada ao `main` em `c6/final`, aguardando o merge do usuário, [DEC-054](decisoes.md)); antes: 2026-11-08 04:37 (C6 repensada em execução, [DEC-046](decisoes.md)); antes: 2026-11-08 00:45 (Recife; C5 em execução, G3 itens 1 a 5 passaram; antes: G3 local pela [DEC-038](decisoes.md)) · Situação: **aprovado pelo usuário em 2026-11-07 16:13** ([DEC-029](decisoes.md)) · Decisões desta etapa:
+Última atualização: 2026-11-08 10:10 (C7: M1 pronto em `c7/integra`). Antes: 2026-11-08 08:17 (C6 integrada ao `main` em `c6/final`, aguardando o merge do usuário, [DEC-054](decisoes.md)); antes: 2026-11-08 04:37 (C6 repensada em execução, [DEC-046](decisoes.md)); antes: 2026-11-08 00:45 (Recife; C5 em execução, G3 itens 1 a 5 passaram; antes: G3 local pela [DEC-038](decisoes.md)) · Situação: **aprovado pelo usuário em 2026-11-07 16:13** ([DEC-029](decisoes.md)) · Decisões desta etapa:
 [DEC-027](decisoes.md) e [DEC-028](decisoes.md).
 
 Este arquivo diz **o que cada camada entrega, do que depende e como saber que acabou**. Ele não repete o produto
@@ -319,7 +319,7 @@ puxado. Não há sessão própria.
 | C4 API, login, papéis e SPA base | C | a planejar (subconjunto planejado na C5) | subconjunto em [camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md) |
 | C5 Primeira fatia vertical | todas | **em execução**: código integrado no `main` local às 00h42 de 08/11; G3 itens 1 a 5 passaram, falta o item 6 à mão (usuário) | [camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md) |
 | C6 Leitura por agente e formulação (repensada, [DEC-046](decisoes.md)) | todas | **concluída e integrada com o `main` em `c6/final` (08/11, 08h17; [DEC-054](decisoes.md)), aguardando o push e o PR do usuário.** Construída em `c6/integra` (orquestrador, 02h54 a 06h19: M1 leitura livre, M2 formulação e laço, M3 PDF) e fundida com o `main` num PR único. Fora: o PR #16 (carga do contrato no solver), o teste à mão com a chave e `--with-model`. O FT-01 saiu da C6 | [camada-06-leitura-e-formulacao.md](planos/camada-06-leitura-e-formulacao.md) |
-| C7 Acompanhamento (FT-03) | B, C | a planejar | — |
+| C7 Acompanhamento (FT-03) | todas | **em execução** (08/11, desde 09h22): M1 pronto em `c7/integra` às 10h10, aguardando o push e o PR do usuário; M2 (teste de vazamento RN-06 e rastro do caso) em curso ([DEC-057](decisoes.md) a [DEC-067](decisoes.md)) | [camada-07-acompanhamento.md](planos/camada-07-acompanhamento.md) |
 | C8 Exceções, painel, auditoria e FT-07 | A, C | a planejar | — |
 | C9 Entrega | todas | a planejar | — |
 
