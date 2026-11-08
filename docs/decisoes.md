@@ -616,3 +616,50 @@ Formato:
 - **Alternativas consideradas:** mascote animal ou robô ilustrado (mais memorável, mais custo e risco de cliché); o usuário não escolheu entre elas.
 - **Melhor argumento contra:** dois pontos num quadrado verde podem parecer um emoji genérico. Ajuste barato se o time quiser mais caráter: inclinação do bloco e sobrancelha em certos estados.
 - **Consequências:** criados `web/components/Pat.tsx`, `web/lib/pat.ts` (+ teste), classes `pat-*` em `web/app/globals.css` e `design-system/assets/logos/pat-estados.svg`. **Ligado à landing em 2026-11-08 02:58** (pedido do usuário): avatar do chat do hero muda de estado a cada passo da história (parado, trabalhando, digitando, trabalhando, resolveu, resolveu; `patDoPasso`) e os 4 visuais de "Como funciona" levam o Pat (trabalhando, parado, resolveu, exceção). Pedido do usuário: **"trabalhando" com aspecto concentrado** (olhos estreitos, sobrancelhas quase retas, olhar varrendo da esquerda para a direita, bloco deslizando). **Não ligado** à plataforma (`/plataforma`) nem ao avatar do WhatsApp (`remane-avatar-whatsapp.svg`, segue sem olhos até o time decidir).
+
+## DEC-046 · C6 repensada: leitura por agente, formulação da SolveSpec e solver com laço limitado
+
+- 2026-11-08 02:58 · Decidido por: usuário da sessão (aprovação do plano no prompt de orquestração) · Status: aceita
+- **Contexto:** a C6 do plano macro (5.6) previa leitura de XLSX e PDF e o FT-01. O usuário pediu outro fluxo: "O modelo lê a escala (CSV, PDF, XLSX; como nem sempre vem padronizado, um agente deve ler, extrair e padronizar as informações). Um outro nó recebe as informações extraídas e define todo o problema completo de otimização; definindo isso, chama o solver e, após a otimização, monta a nova escala, e o restante do fluxo prossegue conforme decidimos." Plano em [planos/camada-06-leitura-e-formulacao.md](planos/camada-06-leitura-e-formulacao.md).
+- **Decisão:** plano da C6 aprovado. Nó 1: o modelo devolve só um mapeamento de colunas em schema fechado, aplicado pelo código a todas as linhas. Nó 2: o modelo propõe a `SolveSpec`, validada em código. Nó 3: solver com laço limitado. "O modelo propõe, o código valida, o solver executa, o verificador independente confere, o humano aprova." Formatos até as 08h30: CSV e XLSX livres; PDF digital só se sobrar tempo; PDF escaneado fora. O FT-01 (convenção em PDF, tela do cartão) sai da C6 (C6b ou corte 5). Execução por orquestrador com subagentes em `c6/integra`, **inclusive de madrugada sem o usuário** (escolha 2); o `main` recebe só os marcos M1, M2 e M3, por merge do usuário. Commits por tarefa nas branches dos worktrees e `merge --ff-only` em `c6/integra` autorizados; push, merge no `main` e limpeza de branches e worktrees, não.
+- **Motivo:** [motivo não informado].
+- **Alternativas consideradas:** a C6 do plano macro (leitura de XLSX e PDF por modelo grande, mais FT-01).
+- **Consequências:** tarefa R0 antes de tudo (papéis da [DEC-044](#dec-044--dois-papéis-na-demo-gestor-e-colaborador), registrada como consequência dela); cada merge no `main` publica no Railway ([DEC-037](decisoes.md)).
+
+## DEC-047 · Continuidade: a 1ª escala vem do arquivo; as seguintes, da última publicada
+
+- 2026-11-08 02:58 · Decidido por: usuário da sessão · Status: aceita
+- **Decisão (o que o usuário disse):** "A primeira escala é enviada como a empresa a gerencia, seja em PDF, CSV, XLSX, em diferentes formatos. Depois da primeira, as próximas passam a utilizar a última otimizada, dentro da própria plataforma." Na confirmação da 1ª, grava-se um `Roster` versionado (lojas, pessoas, padrão de demanda por dia da semana); as semanas seguintes partem da última escala publicada, deslocada 1 semana, sem upload. A porta `Repository` ganha `save_roster`, `latest_roster` e `get_roster`; o `RunState` guarda o "antes". **Salário-hora** (escolha 5): quando o arquivo não traz, valor único na confirmação; no exemplo, o cadastro simulado por nome (integração simulada, declarada).
+- **Motivo:** [motivo não informado].
+- **Consequências:** admissão e desligamento entre semanas ficam fora (o quadro só muda num novo upload).
+
+## DEC-048 · Identidade das pessoas entre semanas
+
+- 2026-11-08 02:58 · Decidido por: usuário da sessão (aprovação do plano, seção 7) · Status: aceita
+- **Decisão:** id por matrícula, se houver, ou por nome normalizado; homônimo e grafia parecida viram cartão ao gestor, nunca fusão automática por parecença.
+- **Motivo:** [motivo não informado]. **Contra (do plano):** o slug quebra se o nome da pessoa mudar de verdade; declarado como limite.
+
+## DEC-049 · Semana planejada e vigência das regras por execução
+
+- 2026-11-08 02:58 · Decidido por: usuário da sessão (escolha 4 e plano, seção 8) · Status: aceita
+- **Decisão:** na 1ª escala, a semana planejada é a do arquivo, com opção de escolher outra (o "antes" deslocado em semanas inteiras); nas seguintes, a semana posterior à última publicada. O cartão é montado pela semana planejada, com a regra mais restritiva na semana em que a vigência muda (aviso em `provisional`). A semana fixa da demo deixa de existir fora dos evals E1.
+- **Motivo:** [motivo não informado]. **Contra (do plano):** deslocar ignora feriados; a tela rotula "escala enviada, levada para a semana de ...".
+
+## DEC-050 · Demanda inferida da cobertura do arquivo, com cobertura-alvo por loja
+
+- 2026-11-08 02:58 · Decidido por: usuário da sessão (escolha 1) · Status: aceita (era `[HIPÓTESE]` de produto no plano)
+- **Decisão:** na 1ª escala, demanda = cobertura do arquivo por faixa de 30 min, corrigida pela cobertura-alvo por loja (100% por padrão, botão "ajustar para caber"), com o `CapacityCheck` mostrado antes do solver.
+- **Motivo:** [motivo não informado]. **Fato que pesou (medido no planejamento, 02:26):** no exemplo, a cobertura pede 2.776 pessoa-hora e o quadro dá no máximo 2.400 sob 42h; a 100%, o RX-02 sai sempre.
+- **Consequências:** a comparação mostra a cobertura ao lado do custo; edição fina por faixa fica fora.
+
+## DEC-051 · Limites do modelo na leitura e na formulação
+
+- 2026-11-08 02:58 · Decidido por: usuário da sessão (aprovação do plano, seções 6 e 10) · Status: aceita
+- **Decisão:** o modelo não devolve linhas, só o mapeamento; não toca no cartão; a `SolveSpec` só restringe (`extra="forbid"`, lista fechada, evidência literal); o laço relaxa só preferências, em código, com no máximo 2 chamadas ao solver. O nó 2 só chama o modelo se houver texto do gestor ou coluna de observação (escolha 3). Todo nó com saída estruturada usa o Qwen3.5-9B (o gemma-4-31B não chamou ferramenta no smoke).
+- **Motivo:** [motivo não informado].
+
+## DEC-052 · Reserva sem modelo: a falha do modelo nunca bloqueia a demo
+
+- 2026-11-08 02:58 · Decidido por: usuário da sessão (aprovação do plano, seção 11) · Status: aceita
+- **Decisão:** o nó 1 cai para a heurística de aliases e depois para o leitor da [DEC-039](decisoes.md); o nó 2 cai para a especificação padrão; o aviso RX-12 fica visível em `notices`.
+- **Motivo:** [motivo não informado].
