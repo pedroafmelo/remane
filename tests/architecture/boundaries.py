@@ -128,3 +128,32 @@ def check_tree(package_root: Path) -> list[Violation]:
             for v in check_source(module, file.read_text(encoding="utf-8"), is_package=is_package):
                 violations.append(Violation(file, v.line, v.imported, v.rule))
     return violations
+
+
+# --- relógio injetado no acompanhamento (C7, PEDIDO-EV-01) ---------------------------------------------------------
+
+WALLCLOCK_CALLS = frozenset({("datetime", "now"), ("datetime", "utcnow"), ("datetime", "today"), ("date", "today")})
+TRACKER_DIR = ("agents", "tracker")
+
+
+def wallclock_calls(source: str) -> list[int]:
+    """Linhas com `datetime.now()`, `date.today()` e afins (o acompanhamento só lê a hora pela porta `Clock`)."""
+    lines: list[int] = []
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+            owner = node.func.value
+            name = owner.attr if isinstance(owner, ast.Attribute) else getattr(owner, "id", None)
+            if (name, node.func.attr) in WALLCLOCK_CALLS:
+                lines.append(node.lineno)
+        if isinstance(node, ast.ImportFrom) and node.module in ("time",):
+            lines.extend(node.lineno for a in node.names if a.name in ("time", "time_ns"))
+    return lines
+
+
+def check_wallclock(package_root: Path) -> list[Violation]:
+    folder = package_root.joinpath(*TRACKER_DIR)
+    out: list[Violation] = []
+    for file in sorted(folder.rglob("*.py")) if folder.is_dir() else []:
+        for line in wallclock_calls(file.read_text(encoding="utf-8")):
+            out.append(Violation(file, line, "relógio do sistema", "acompanhamento lê a hora só pela porta Clock"))
+    return out
