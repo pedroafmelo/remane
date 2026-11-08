@@ -11,9 +11,17 @@ Desenho: **um grafo por trecho entre paradas humanas**, invocado pela classe `Op
 - `start_next_week` (C6): sem upload; o "antes" é a última escala publicada levada 1 semana adiante, e o quadro e a
   demanda são os do último `Roster`.
 - `confirm(run_id, data)` (o gestor confirmou o resumo) → na 1ª escala grava o `Roster` (lojas, pessoas, padrão de
-  demanda escalado pela cobertura-alvo) e roda o grafo de otimização: `otimizar → verificar → comparar → justificar`,
-  com saída antecipada se o solver não devolver escala (RX-12). Nesta camada (M1), `spec=None`: a formulação pelo
-  modelo e o laço do solver são da B4b.
+  demanda escalado pela cobertura-alvo) e roda o grafo de otimização (C6, B4b):
+  `formular → otimizar → verificar → comparar → justificar`, com saída antecipada se o solver não devolver escala
+  (RX-12). Na C5, sem `formular` e com `spec=None` (o comportamento da fatia).
+  - nó 2 `formular`: o pedido do gestor (`data.note`) e as observações do arquivo (coluna `notes`) viram `SolveSpec`
+    pelo modelo (`formulate_spec`, injetado), conferida em código (`rules.spec.make_screen`): item recusado sai da spec
+    e vai ao resumo e ao rastro com o motivo. Sem entrada, sem modelo configurado ou com o modelo falhando, vale
+    `default_spec()` (na continuidade, com estabilidade); a falha do modelo vira aviso RX-12 em `notices`.
+  - nó 3 `otimizar`: o solver lê as restrições duras do cartão estendido (`card_with_spec`), que também vai ao
+    verificador e à justificativa. Laço de no máximo 2 chamadas: a 2ª, sem as preferências suaves, só quando a spec
+    tem preferência e a 1ª falhou ou deixou demanda descoberta; fica a 2ª se a 1ª não tem escala ou descobre mais de
+    5% acima dela. O modelo não volta ao laço.
 - `approve` grava a aprovação humana e chama a ferramenta `publicar` (`tools.py`), que relê a aprovação no
   `Repository` e recusa sem ela.
 
@@ -50,6 +58,7 @@ from escalista.agents.optimizer.tools import (
     PUBLISHER_ROLES,
     AgentRepository,
     Enrich,
+    FormulateSpec,
     Justifier,
     ListEvents,
     LoadCard,
@@ -71,9 +80,9 @@ from escalista.domain.results import (
     ViolationReport,
 )
 from escalista.domain.roster import Roster
-from escalista.domain.rules import RuleCard
+from escalista.domain.rules import RuleCard, RuleLayer
 from escalista.domain.schedule import CsvIssue, DemandSlot, Employee, EmployeePublic, ReadSummary, Schedule, Store
-from escalista.domain.spec import SolveSpec
+from escalista.domain.spec import PreferredDayOffConstraint, PreferredWindowConstraint, SolveSpec
 from escalista.rules.demand import (
     capacity_check,
     demand_for_week,
@@ -84,9 +93,10 @@ from escalista.rules.demand import (
 from escalista.rules.header_aliases import guess_mapping
 from escalista.rules.identity import IdentityResult, resolve_identities
 from escalista.rules.mapping import MappingResult, apply_mapping, verify_evidence
+from escalista.rules.spec import card_with_spec, default_spec, make_screen
 from escalista.rules.week import next_week_start, shift_schedule
 from escalista.solver.cost import compare_schedules
-from escalista.solver.model import solve
+from escalista.solver.model import ModelStats, solve
 from escalista.verifier import CHECKS, verify
 
 log = logging.getLogger(__name__)
@@ -104,6 +114,14 @@ MAX_LINE_EVIDENCE = 20  # linhas com problema listadas no cartão RX-13 da leitu
 _HOURS = Decimal("0.01")
 _FORMATS = frozenset({"csv", "xlsx", "pdf"})
 _IF_NO_CONFIRM = "Nada é otimizado sem a confirmação do gestor."
+_IF_NO_APPROVAL = "A escala atual continua valendo; nenhuma versão nova é publicada."
+LLM_FORMULATE_KIND = "llm.formulate"
+NO_FORMULATE_BASIS = "modelo de formulação não configurado"
+NO_MODEL_INPUT = "sem entrada para o modelo"
+MAX_ECHO = 200  # caracteres do pedido devolvidos ao gestor no aviso RX-12 da formulação
+MAX_SOLVER_CALLS = 2
+RELAX_TOLERANCE_PCT = 5  # a 1ª tentativa fica, a menos que descubra mais de 5% acima da 2ª (sem preferências)
+SOFT_TYPES = (PreferredDayOffConstraint, PreferredWindowConstraint)
 
 
 class FlowState(TypedDict, total=False):
@@ -121,7 +139,9 @@ class FlowState(TypedDict, total=False):
     week_start: date
     hint: Schedule | None
     spec: SolveSpec | None
-    note: str  # pedido em texto do gestor; guardado para a formulação (B4b), não usado nesta camada
+    note: str  # pedido em texto do gestor (nó 2); nunca vai ao rastro
+    notes_cells: list[str]  # observações do arquivo (coluna `notes`), sem repetição; vazio na continuidade
+    base_card: RuleCard  # o cartão dos YAMLs; `card` passa a ser o estendido pela spec depois de `otimizar`
     solved: SolveResult
     after_report: ViolationReport
     before_report: ViolationReport
@@ -180,6 +200,7 @@ class OptimizerAgent:
         cadastro: object | None = None,
         enrich: Enrich | None = None,
         load_card: LoadCard | None = None,
+        formulate_spec: FormulateSpec | None = None,
         default_wage: Decimal | None = None,
         seed: int = 42,
         time_limit_s: float = 30.0,
@@ -207,6 +228,7 @@ class OptimizerAgent:
         self._cadastro = cadastro
         self._enrich = enrich
         self._load_card = load_card
+        self._formulate_spec = formulate_spec
         self._default_wage = default_wage
         self._seed = seed
         self._time_limit_s = time_limit_s
@@ -472,6 +494,7 @@ class OptimizerAgent:
             "hint": None,
             "spec": None,
             "note": answer.note,
+            "notes_cells": _notes_cells(reading.mapped),
         }
 
     def _confirm_next_week(self, state: RunState, answer: ConfirmInput) -> FlowState:
@@ -533,6 +556,7 @@ class OptimizerAgent:
             "hint": state.before,
             "spec": None,
             "note": answer.note,
+            "notes_cells": [],
         }
 
     def _save_roster(self, run_id: str, build: Callable[[int], Roster]) -> Roster:
@@ -575,7 +599,12 @@ class OptimizerAgent:
         g.add_node("verificar", self._saving(self._verificar))
         g.add_node("comparar", self._saving(self._comparar))
         g.add_node("justificar", self._saving(self._justificar))
-        g.add_edge(START, "otimizar")
+        if self._read_tables is not None:  # C6: o nó 2 formula a spec antes do solver
+            g.add_node("formular", self._saving(self._formular))
+            g.add_edge(START, "formular")
+            g.add_edge("formular", "otimizar")
+        else:  # C5: spec None
+            g.add_edge(START, "otimizar")
         g.add_conditional_edges(
             "otimizar", lambda s: "verificar" if s["run"].phase != "failed" else END, ["verificar", END]
         )
@@ -949,15 +978,158 @@ class OptimizerAgent:
         self._inputs[run.run_id] = schedule
         return {"run": run.model_copy(update={"phase": "awaiting_confirm", "summary": summary})}
 
-    # --- otimização --------------------------------------------------------------------------------------------------
+    # --- nó 2 (C6): formular ------------------------------------------------------------------------------------------
+
+    def _formular(self, state: FlowState) -> dict[str, Any]:
+        """Pedido do gestor e observações do arquivo → `SolveSpec` conferida (seções 10 e 11). Nunca bloqueia: sem
+        entrada, sem modelo ou com o modelo falhando, vale a especificação padrão."""
+        run = state["run"]
+        run_id = run.run_id
+        card, employees, week = state["card"], state["employees"], state["week_start"]
+        note, cells = state.get("note", ""), list(state.get("notes_cells", []))
+        continuity = run.mode == "continuidade"
+        fallback = default_spec(continuity=continuity)
+        notices = list(run.notices)
+        rejected: list[tuple[str, str]] = []
+        used_model = False
+        failure: str | None = None
+        spec = fallback
+        has_note = bool(note.strip())
+        if self._formulate_spec is None:
+            self._tracer.step(
+                run_id,
+                LLM_FORMULATE_KIND,
+                payload={"used_model": False, "has_note": has_note, "notes_cells": len(cells)},
+                cost_basis=NO_FORMULATE_BASIS,
+            )
+        else:
+            screen = make_screen(
+                employee_ids={e.id for e in employees}, week_start=week, card=card, evidence_sources=[note, *cells]
+            )
+            trace_id: str | None = None
+            try:
+                result = self._formulate_spec(
+                    people=[(e.id, e.name) for e in employees],
+                    week_start=week,
+                    card=card,
+                    note=note,
+                    notes_cells=cells,
+                    run_id=run_id,
+                    parent_id=self._tracer.parent(run_id),
+                    screen=screen,
+                )
+            except LLMUnavailableError as exc:
+                self._follow_latest(run_id)  # o cliente do modelo já gravou a falha (e o custo das tentativas)
+                failure, trace_id = "o modelo falhou ou insistiu em especificação recusada", exc.card.trace_id
+            except Exception as exc:  # noqa: BLE001 (seção 11: o modelo nunca bloqueia a otimização)
+                log.exception("falha inesperada na formulação pelo modelo: run_id=%s", run_id)
+                self._follow_latest(run_id)
+                failure = f"falha inesperada ao chamar o modelo ({type(exc).__name__})"
+            else:
+                used_model = result.used_model
+                if used_model:  # o evento `llm.formulate` (custo medido) é do cliente do modelo
+                    self._follow_latest(run_id)
+                else:
+                    self._tracer.step(
+                        run_id,
+                        LLM_FORMULATE_KIND,
+                        payload={"used_model": False, "has_note": has_note, "notes_cells": len(cells)},
+                        cost_basis=result.cost_basis or NO_MODEL_INPUT,
+                    )
+                if result.spec is not None:
+                    spec = result.spec
+                    if continuity and "stability_weight" not in spec.model_fields_set:
+                        spec = spec.model_copy(update={"stability_weight": fallback.stability_weight})
+                rejected = list(result.rejected)
+            if failure is not None:
+                notice = _formulate_notice(note, failure, trace_id)
+                notices.append(self._raise_card(run_id, notice, step="formular"))
+        self._tracer.step(
+            run_id,
+            "spec.validate",
+            payload={
+                "used_model": used_model,
+                "fallback": failure is not None or not used_model,
+                "failure": failure,
+                "accepted": dict(sorted(Counter(c.type for c in spec.constraints).items())),
+                "rejected": [_rejected_for_trace(item, reason) for item, reason in rejected],
+                "shortfall_weight": spec.shortfall_weight,
+                "stability_weight": spec.stability_weight,
+                "preference_weight": spec.preference_weight,
+            },
+        )  # sem o texto do pedido nem das observações (podem ter nome)
+        summary = run.summary
+        if summary is not None and rejected:
+            names = {e.id: e.name for e in employees}
+            extra = [f"Pedido não aplicado ({_with_names(item, names)}): {reason}." for item, reason in rejected]
+            summary = summary.model_copy(update={"assumptions": [*summary.assumptions, *extra]})
+        update = {"spec": spec, "notices": notices, "summary": summary}
+        return {"run": run.model_copy(update=update), "spec": spec}
+
+    # --- nó 3: otimizar (laço de no máximo 2 chamadas ao solver) ------------------------------------------------------
 
     def _otimizar(self, state: FlowState) -> dict[str, Any]:
         run = state["run"]
-        hint = state.get("hint")
+        spec = state.get("spec")
+        base = state["card"]
+        card = card_with_spec(base, spec) if spec is not None else base  # o solver lê as restrições duras do cartão
+        first = self._solve_attempt(state, card, spec, attempt=1, relaxed=[])
+        chosen, attempts = first, 1
+        soft = [c for c in spec.constraints if isinstance(c, SOFT_TYPES)] if spec is not None else []
+        if soft and (_bad(first) or _missing(first) > 0):
+            assert spec is not None
+            removed = sorted({c.type for c in soft})
+            relaxed_spec = spec.model_copy(
+                update={"constraints": [c for c in spec.constraints if not isinstance(c, SOFT_TYPES)]}
+            )
+            reason = "status" if _bad(first) else "cobertura"
+            second = self._solve_attempt(state, card, relaxed_spec, attempt=2, relaxed=removed)
+            attempts = MAX_SOLVER_CALLS
+            if _prefer_second(first, second):
+                chosen, spec = second, relaxed_spec
+            self._tracer.step(
+                run.run_id,
+                "spec.relax",
+                payload={
+                    "reason": reason,
+                    "removed": removed,
+                    "removed_count": len(soft),
+                    "missing_person_slots": {"1": _missing(first), "2": _missing(second)},
+                    "status": {"1": first.status, "2": second.status},
+                    "tolerance_pct": RELAX_TOLERANCE_PCT,
+                    "chosen_attempt": 2 if chosen is second else 1,
+                },
+            )
+        out: dict[str, Any] = {"solved": chosen, "card": card, "base_card": base, "spec": spec}
+        if chosen.schedule is None:
+            exc_card = chosen.exception or ExceptionCard(
+                code="RX-12",
+                title="O solver não encontrou uma escala",
+                reason=(
+                    f"O solver terminou com status {chosen.status} sem escala em {self._time_limit_s:g} s"
+                    + (f", nas {attempts} tentativas (a 2ª sem as preferências)." if attempts > 1 else ".")
+                ),
+                decider=Role.GESTOR,
+                recommendation="Conferir a demanda e o quadro de pessoal; tentar de novo com mais tempo de solver.",
+                if_no_answer=_IF_NO_APPROVAL,
+            )
+            exc_card = self._raise_card(run.run_id, exc_card, step="otimizar")
+            update = {"phase": "failed", "exception": exc_card, "attempts": attempts, "spec": spec}
+            return {**out, "run": run.model_copy(update=update)}
+        update: dict[str, Any] = {"phase": "optimized", "attempts": attempts, "spec": spec}
+        if chosen.exception is not None:  # RX-02: faixas descobertas; aviso, e o fluxo segue com a escala parcial
+            update["notices"] = [*run.notices, self._raise_card(run.run_id, chosen.exception, step="otimizar")]
+        return {**out, "run": run.model_copy(update=update)}
+
+    def _solve_attempt(
+        self, state: FlowState, card: RuleCard, spec: SolveSpec | None, *, attempt: int, relaxed: list[str]
+    ) -> SolveResult:
+        run, hint = state["run"], state.get("hint")
+        stats = ModelStats()
         started = time.perf_counter()
         result = solve(
             SolveRequest(
-                card=state["card"],
+                card=card,
                 stores=state["stores"],
                 employees=state["employees"],
                 demand=state["demand"],
@@ -966,8 +1138,9 @@ class OptimizerAgent:
                 time_limit_s=self._time_limit_s,
                 num_workers=self._num_workers,
                 hint=hint,
-                spec=state.get("spec"),
-            )
+                spec=spec,
+            ),
+            stats,
         )
         self._tracer.step(
             run.run_id,
@@ -981,35 +1154,26 @@ class OptimizerAgent:
                 "time_limit_s": self._time_limit_s,
                 "num_workers": self._num_workers,
                 "week_start": state["week_start"].isoformat(),
-                "attempt": 1,
+                "attempt": attempt,
+                "relaxed": relaxed,
                 "hint_shifts": len(hint.shifts) if hint is not None else 0,
                 "shifts": len(result.schedule.shifts) if result.schedule else 0,
                 "uncovered_slots": len(result.uncovered),
-                "missing_person_slots": sum(s.required for s in result.uncovered),  # `required` é o que faltou
+                "missing_person_slots": _missing(result),  # `required` de cada faixa descoberta é o que faltou
+                "spec": _spec_counts(spec),
+                "execution_rules": [r.id for r in card.rules if r.layer == RuleLayer.EXECUCAO],
+                "preferences_met": stats.preferences_met,
+                "preferences_total": stats.preferences_total,
             },
         )
-        if result.schedule is None:
-            card = result.exception or ExceptionCard(
-                code="RX-12",
-                title="O solver não encontrou uma escala",
-                reason=f"O solver terminou com status {result.status} sem escala em {self._time_limit_s:g} s.",
-                decider=Role.GESTOR,
-                recommendation="Conferir a demanda e o quadro de pessoal; tentar de novo com mais tempo de solver.",
-                if_no_answer="A escala atual continua valendo; nenhuma versão nova é publicada.",
-            )
-            card = self._raise_card(run.run_id, card, step="otimizar")
-            update = {"phase": "failed", "exception": card, "attempts": 1}
-            return {"run": run.model_copy(update=update), "solved": result}
-        update: dict[str, Any] = {"phase": "optimized", "attempts": 1}
-        if result.exception is not None:  # RX-02: faixas descobertas; aviso, e o fluxo segue com a escala parcial
-            update["notices"] = [*run.notices, self._raise_card(run.run_id, result.exception, step="otimizar")]
-        return {"run": run.model_copy(update=update), "solved": result}
+        return result
 
     def _verificar(self, state: FlowState) -> dict[str, Any]:
         run, solved, card = state["run"], state["solved"], state["card"]
         assert solved.schedule is not None
-        after = self._checked(run.run_id, solved.schedule, "otimizada", card)
-        before = self._checked(run.run_id, state["before"], "enviada", card)
+        after = self._checked(run.run_id, solved.schedule, "otimizada", card)  # cartão estendido: 0 violações exigido
+        # o "antes" responde à lei e à convenção, não ao pedido feito depois dele: cartão dos YAMLs
+        before = self._checked(run.run_id, state["before"], "enviada", state.get("base_card", card))
         version = ScheduleVersion(
             id=f"ver-{self._new_id()}",
             run_id=run.run_id,
@@ -1127,6 +1291,82 @@ class OptimizerAgent:
     def _lock(self, run_id: str) -> threading.Lock:
         with self._locks_guard:
             return self._locks.setdefault(run_id, threading.Lock())
+
+
+def _notes_cells(mapped: MappingResult) -> list[str]:
+    """Observações não vazias da coluna `notes` do arquivo, sem repetição, na ordem em que aparecem."""
+    seen: dict[str, None] = {}
+    for shift in mapped.shifts:
+        text = (shift.note or "").strip()
+        if text:
+            seen.setdefault(text, None)
+    return list(seen)
+
+
+def _formulate_notice(note: str, failure: str, trace_id: str | None) -> ExceptionCard:
+    """RX-12 da formulação (seção 11): aviso, não bloqueia. O pedido volta ao gestor (truncado) para ele reenviar;
+    o cartão fica no `RunState`, e o evento do rastro só registra o código e a quantidade de evidências."""
+    text = " ".join(note.split())
+    if len(text) > MAX_ECHO:
+        text = text[: MAX_ECHO - 1] + "…"
+    return ExceptionCard(
+        code="RX-12",
+        title="Não consegui interpretar seu pedido; otimizei sem ele",
+        reason=f"A escala foi otimizada só com as regras do cartão, sem o pedido ({failure}).",
+        decider=Role.GESTOR,
+        evidence=[f"Seu pedido: {text}"] if text else [],
+        recommendation="Confira a escala proposta; se o pedido for necessário, escreva-o de novo de forma direta "
+        "(quem, qual dia, o quê) em uma nova execução.",
+        if_no_answer=_IF_NO_APPROVAL,
+        trace_id=trace_id,
+    )
+
+
+_PERSON_REASON = re.compile(r"a pessoa \S+ não existe no quadro")
+
+
+def _rejected_for_trace(item: str, reason: str) -> dict[str, str]:
+    """Item recusado no rastro: o tipo e o motivo, sem id de pessoa (o id pode derivar do nome)."""
+    return {"type": item.split(":", 1)[0], "reason": _PERSON_REASON.sub("a pessoa não existe no quadro", reason)}
+
+
+def _with_names(item: str, names: dict[str, str]) -> str:
+    """Item recusado para o gestor: o id de pessoa vira o nome (o resumo é dele; o rastro não leva nome)."""
+    for emp_id in sorted(names, key=len, reverse=True):
+        item = item.replace(emp_id, names[emp_id])
+    return item
+
+
+def _missing(result: SolveResult) -> int:
+    """Pessoa-faixa de 30 min descobertas (`required` de cada faixa descoberta é o que faltou)."""
+    return sum(s.required for s in result.uncovered)
+
+
+def _bad(result: SolveResult) -> bool:
+    return result.schedule is None or result.status in ("infeasible", "timeout")
+
+
+def _prefer_second(first: SolveResult, second: SolveResult) -> bool:
+    """A 2ª (sem preferências) fica se a 1ª não tem escala, ou se a 1ª descobre mais de 5% acima da 2ª, ou se só a
+    1ª terminou mal. Empate (dentro da tolerância): a 1ª, que respeita as preferências."""
+    if second.schedule is None:
+        return False
+    if first.schedule is None:
+        return True
+    if _bad(first) != _bad(second):
+        return _bad(first)
+    return _missing(first) * 100 > _missing(second) * (100 + RELAX_TOLERANCE_PCT)
+
+
+def _spec_counts(spec: SolveSpec | None) -> dict[str, Any] | None:
+    if spec is None:
+        return None
+    return {
+        "shortfall_weight": spec.shortfall_weight,
+        "stability_weight": spec.stability_weight,
+        "preference_weight": spec.preference_weight,
+        "constraints": dict(sorted(Counter(c.type for c in spec.constraints).items())),
+    }
 
 
 def _rules_of(card: RuleCard, kinds: Iterable[str]) -> list[dict[str, str]]:

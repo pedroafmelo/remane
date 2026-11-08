@@ -1,8 +1,8 @@
 """Ferramentas e portas injetadas do agente de otimização (arquitetura, seções 2.1 e 4).
 
 - As bordas entram como callables tipados só com contratos de `escalista.domain` (`ReadCsv`, `Justifier`,
-  `ListEvents`; na C6, `ReadTables`, `MapColumns`, `Enrich` e `LoadCard`): `agents` não importa `ingest`, `llm` nem
-  `audit`. Os resultados das bordas entram como `Protocol` só com os campos que o agente lê.
+  `ListEvents`; na C6, `ReadTables`, `MapColumns`, `Enrich`, `LoadCard` e `FormulateSpec`): `agents` não importa
+  `ingest`, `llm` nem `audit`. Os resultados das bordas entram como `Protocol` só com os campos que o agente lê.
 - `Tracer`: um `TraceEvent` por passo, com `cost_usd = 0` e `payload.cost_basis` nos passos sem modelo, latência
   medida com `time.perf_counter`, carimbo pelo `Clock` e `parent_id` encadeado no passo anterior da execução.
 - `publicar`: a única ferramenta com efeito da fatia. **Lê a aprovação no próprio código** (`repo.get_approval`) e
@@ -25,7 +25,9 @@ from escalista.domain.reading import ColumnMapping, RawTable
 from escalista.domain.results import Comparison, Justification, ScheduleVersion, ViolationReport
 from escalista.domain.rules import RuleCard
 from escalista.domain.schedule import DemandSlot, Employee, ReadSummary, Schedule
+from escalista.domain.spec import SolveSpec
 from escalista.rules.identity import PersonDraft, StoreDraft
+from escalista.rules.spec import Screen
 
 NO_MODEL = "sem chamada de modelo"
 PUBLISHER_ROLES: frozenset[Role] = frozenset({Role.GESTOR})  # RH-01: o gestor aprova e publica
@@ -132,6 +134,43 @@ class EnrichOutcome(Protocol):
     def assumptions(self) -> list[str]: ...
 
 
+class FormulationOutcome(Protocol):
+    """Resultado da formulação (o `FormulationResult` de `llm.prompts.formulate` satisfaz). `spec=None`: sem entrada
+    para o modelo (o agente usa a especificação padrão). `rejected`: `(item descrito, motivo)` do que o `screen`
+    tirou da spec."""
+
+    @property
+    def spec(self) -> SolveSpec | None: ...
+
+    @property
+    def used_model(self) -> bool: ...
+
+    @property
+    def rejected(self) -> list[tuple[str, str]]: ...
+
+    @property
+    def cost_basis(self) -> str | None: ...
+
+
+class FormulateSpec(Protocol):
+    """Nó 2 pelo modelo: `functools.partial(llm.prompts.formulate.formulate, client)` satisfaz. Levanta
+    `LLMUnavailableError` (RX-12) quando o modelo falha ou insiste em saída recusada: o agente usa a especificação
+    padrão e avisa o gestor. O `screen` (de `rules.spec.make_screen`) é montado pelo agente com o quadro e a semana."""
+
+    def __call__(
+        self,
+        *,
+        people: list[tuple[str, str]],
+        week_start: date,
+        card: RuleCard,
+        note: str,
+        notes_cells: list[str],
+        run_id: str,
+        parent_id: str | None = None,
+        screen: Screen | None = None,
+    ) -> FormulationOutcome: ...
+
+
 class Enrich(Protocol):
     """`ingest.cadastro.enrich`: completa as pessoas lidas com salário, cargo e carga (cadastro simulado, salário do
     arquivo ou o valor confirmado pelo gestor). Levanta `ValueError` sem cadastro e sem `default_wage`."""
@@ -185,10 +224,12 @@ class Tracer:
         started: float | None = None,
         payload: dict[str, Any] | None = None,
         rule_ref: str | None = None,
+        cost_basis: str = NO_MODEL,
     ) -> TraceEvent:
-        """Passo sem modelo: `cost_usd = 0`, `cost_basis`, latência medida desde `started` (`perf_counter`)."""
+        """Passo sem modelo: `cost_usd = 0`, `cost_basis` (padrão: "sem chamada de modelo"), latência medida desde
+        `started` (`perf_counter`)."""
         latency_ms = 0 if started is None else max(0, round((time.perf_counter() - started) * 1000))
-        body = {**(payload or {}), "cost_basis": NO_MODEL}
+        body = {**(payload or {}), "cost_basis": cost_basis}
         _reject_personal(body)
         event = TraceEvent(
             id=self._new_id(),
