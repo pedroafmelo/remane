@@ -590,3 +590,19 @@ Formato:
   destino o número de teste aceita (não confirmado na doc); se o webhook precisa do app fora do modo de desenvolvimento. A seção de teste pelo WhatsApp da landing (QR)
   deixaria de funcionar para jurados, porque o número de teste só fala com os números cadastrados: **o usuário escolheu "Trocar pelo
   simulador"** ({T}); a seção vira um convite ao celular simulado da demo, e saem o QR, o botão do WhatsApp no hero e o `qrcode.react`.
+## DEC-044 · Dois papéis na demo: gestor e colaborador
+
+- 2026-11-08 02:34 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** o [produto.md](produto.md) (seção 1) e a [arquitetura, seção 11](arquitetura.md) tinham três papéis com login de demo
+  (gerente, DP e colaborador), e a pergunta 15 ("gestor de RH": gerente, DP ou papel novo) bloqueava a C4. O usuário perguntou por que
+  três; o agente explicou a separação entre quem opera a loja (gerente) e quem define as regras (DP) e ofereceu juntar os dois.
+- **Decisão (o que o usuário disse):** "Eu acho melhor deixar só gestor ou colaborador."
+  - **Gestor** = gerente + DP: aprova e publica a escala, valida coberturas, decide exceções, aprova o cartão de regras e as comprovações.
+  - **Colaborador**: avisa falta ou atraso, manda o atestado, aceita ou recusa turno, pelo celular simulado.
+  - **Resolve a pergunta 15 `[INFERÊNCIA]`:** o "gestor de RH" é o gestor.
+- **Motivo:** [motivo não informado]; o agente apontou menos login, menos permissões a testar e um jurado que não precisa entender a
+  diferença.
+- **Alternativas consideradas (as oferecidas):** manter os três papéis.
+- **Consequências:** `/entrar` tem dois botões de demo ("Entrar como gestor", "Entrar como colaborador"); a matriz de testes rota ×
+  papel da C4 cai para dois papéis. A separação entre operar e definir regras vira uma frase do pitch, não uma tela. **Avisar a
+  frente do backend (C4) antes de escrever o login.** Substitui, nesse ponto, a [DEC-017](#dec-017--requisitos-adicionais-do-usuário-gate-de-negócio-fechado-e-início-da-etapa-técnica) e a seção 1 do [produto.md](produto.md).

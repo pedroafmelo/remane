@@ -84,7 +84,7 @@ antes de abrir C6 a C8. A fatia tem prioridade sobre qualquer camada nova.
 | 4ª pessoa resgatar os US$ 25 (o código vence em 08/11) | C3 (pool completo), orçamento dos evals e da demo | 4ª pessoa `[PREENCHER: nome]` | Hoje, antes das 23h |
 | Testar cada chave (validade, saldo, "Unlock Model") | C3, C5 | Frente B | 1ª hora da C3 |
 | Política fictícia da demo: opções de exceção, prazos, os 3 tipos de exceção, valor do limite diário da convenção ([DEC-024](decisoes.md)) | C1 (camada `politica/` e `convencao/`), C7 (prazos), C8 (3 exceções) | **Pedro Veloso** ([DEC-028](decisoes.md)) | **19h** |
-| "Gestor de RH": gerente, DP ou papel novo (pergunta 15) | C4 (papéis) | Usuário | Antes do plano da C4 |
+| ~~"Gestor de RH": gerente, DP ou papel novo (pergunta 15)~~ resolvido: só gestor e colaborador ([DEC-044](decisoes.md)) | C4 (papéis) | Usuário | Antes do plano da C4 |
 | Dados do RN-13, incluindo o campo de sexo da [DEC-023](decisoes.md) | C1 (quadro sintético), C7 e C8 (filtro de saída) | Usuário | Antes do plano da C1 |
 | Critério da reotimização semanal (RF-25) | C7 (varredor) | Usuário | Antes do plano da C7 |
 | O que dispara o aviso de necessidade de hora extra e quem o recebe (RF-28) | C7 | Usuário | Antes do plano da C7 |
