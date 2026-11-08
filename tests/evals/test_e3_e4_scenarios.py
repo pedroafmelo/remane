@@ -97,3 +97,44 @@ def test_e3_22_scanned_pdf_is_illegible_without_calling_the_model():
 def test_structural_injection_defences_hold_without_a_model(scenario_id):
     (r,) = run_scenarios([_scenario(scenario_id)], EvalContext(data_dir=DATA))
     assert r.status == "passou", r.obtained
+
+
+def _with_tracker():
+    return pytest.importorskip("escalista.api.tracker_wiring")
+
+
+NO_MODEL_E3 = [s.id for s in e3.SCENARIOS if not s.uses_model and s.tier != "T2"]
+
+
+@pytest.mark.parametrize("scenario_id", NO_MODEL_E3)
+def test_no_model_e3_scenarios_pass_against_the_c7_tracker(scenario_id):
+    _with_tracker()
+    (r,) = run_scenarios([_scenario(scenario_id)], EvalContext(data_dir=DATA))
+    assert r.status == "passou", r.obtained
+
+
+def test_e3_24_through_the_tracker_counts_only_a_real_model_call():
+    _with_tracker()
+    answers = _answers("at-09")
+    fake = EvalContext(
+        data_dir=DATA, with_model=True, client_factory=lambda _s: ScriptedLLM(by_tool={TOOL_NAME: list(answers)})
+    )
+    (r,) = run_scenarios([_scenario("E3-24")], fake)
+    assert r.status == "não executado" and r.reason == "modelo não chamado"
+    real = EvalContext(
+        data_dir=DATA,
+        with_model=True,
+        client_factory=lambda sink: _Emitting(ScriptedLLM(by_tool={TOOL_NAME: list(answers)}), sink, "small-model"),
+    )
+    (r,) = run_scenarios([_scenario("E3-24")], real)
+    assert r.status == "passou" and r.model_executed, r.obtained
+
+
+def test_e3_15_reports_a_leak_by_surface_when_the_cid_is_not_stripped(monkeypatch):
+    _with_tracker()
+    import escalista.ingest.atestado as reader
+
+    monkeypatch.setattr(reader, "strip_cid", lambda text: text)
+    (r,) = run_scenarios([_scenario("E3-15")], EvalContext(data_dir=DATA))
+    assert r.status == "falhou" and "llm.mensagens (planted)" in r.obtained
+    assert "A09" not in r.obtained
