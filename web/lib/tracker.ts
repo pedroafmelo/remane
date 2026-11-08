@@ -145,6 +145,30 @@ export function attachmentsByCase(messages: InboxMessage[]): Map<string, string>
   return found;
 }
 
+/** Tipos aceitos no anexo da comprovação (o servidor confere pelos bytes): PDF ou foto. */
+export const ATTACHMENT_ACCEPT = "application/pdf,image/png,image/jpeg";
+export type AttachmentType = "application/pdf" | "image/png" | "image/jpeg";
+
+/** Tipo do anexo pelo `type` do arquivo e, na falta dele, pela extensão; `null` quando não é PDF, PNG nem JPEG. */
+export function attachmentType(file: { type: string; name: string }): AttachmentType | null {
+  const declared = file.type.toLowerCase();
+  if (declared === "application/pdf" || declared === "image/png" || declared === "image/jpeg") return declared;
+  if (declared === "image/jpg") return "image/jpeg";
+  const name = file.name.toLowerCase();
+  if (name.endsWith(".pdf")) return "application/pdf";
+  if (name.endsWith(".png")) return "image/png";
+  if (name.endsWith(".jpg") || name.endsWith(".jpeg")) return "image/jpeg";
+  return null;
+}
+
+/** Rótulo curto do anexo no balão do aviso: " (anexo PDF)", " (foto)" ou " (anexo)"; vazio sem anexo. */
+export function attachmentSuffix(mediaType?: string | null): string {
+  if (!mediaType) return "";
+  if (mediaType === "application/pdf") return " (anexo PDF)";
+  if (mediaType === "image/png" || mediaType === "image/jpeg") return " (foto)";
+  return " (anexo)";
+}
+
 /** A mensagem do anexo não vira balão próprio: ela aparece no "Você avisou … (anexo PDF)". */
 export function isAttachmentOnly(m: InboxMessage): boolean {
   return m.direction === "in" && m.template === "anexo";
@@ -153,7 +177,7 @@ export function isAttachmentOnly(m: InboxMessage): boolean {
 /** Balão do colaborador a partir de uma mensagem `in`: o texto livre nunca volta, então só se descreve o ato.
  * `attachment`: o tipo do anexo enviado no mesmo caso, se houver. */
 export function inboundText(m: InboxMessage, c: CaseView | undefined, attachment?: string | null): string {
-  const suffix = attachment === "application/pdf" ? " (anexo PDF)" : attachment ? " (anexo)" : "";
+  const suffix = attachmentSuffix(attachment);
   if (m.template.startsWith("aviso") && c) {
     return `Você avisou: ${c.kind === "falta" ? "vou faltar" : "vou me atrasar"} ${dayLabel(c.day)}.${suffix}`;
   }

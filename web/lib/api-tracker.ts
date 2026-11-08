@@ -1,6 +1,7 @@
 // Cliente das rotas do relógio de demo e do celular simulado do acompanhamento (C7).
 
 import { request } from "./api.ts";
+import { attachmentType } from "./tracker.ts";
 import type { AdvanceMinutes, AdvanceResult, CaseView, DemoClock, Inbox, PeopleList, ReportBody, ReportInput } from "./types-tracker.ts";
 
 const postJson = <T>(path: string, body: unknown) =>
@@ -11,14 +12,14 @@ export function reportBody(input: ReportInput): ReportBody {
   return { as: input.as, day: input.day, kind: input.kind, has_text: Boolean(input.text?.trim()) };
 }
 
-/** Aviso e, se houver, o PDF em seguida, no corpo bruto (como `startRun`). Devolve o caso no estado mais recente. */
+/** Aviso e, se houver, o PDF ou a foto em seguida, no corpo bruto (como `startRun`). Devolve o caso no estado mais recente. */
 async function report(input: ReportInput): Promise<CaseView> {
   const view = await postJson<CaseView>("/api/colaborador/aviso", reportBody(input));
   if (!input.file) return view;
   const params = new URLSearchParams({ as: input.as, file_name: input.file.name });
   return request<CaseView>(`/api/colaborador/caso/${encodeURIComponent(view.case_id)}/anexo?${params}`, {
     method: "POST",
-    headers: { "Content-Type": "application/pdf" },
+    headers: { "Content-Type": attachmentType(input.file) ?? "application/pdf" },
     body: input.file,
   });
 }

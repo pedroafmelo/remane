@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import { ATTACHMENT_ACCEPT, attachmentType } from "@/lib/tracker";
 import type { ReportInput } from "@/lib/types-tracker";
 import { Button } from "../Button";
 
@@ -14,7 +15,7 @@ type Props = {
   onCancel: () => void;
 };
 
-/** Aviso ao Pat no celular simulado: o turno, um texto opcional e um PDF opcional (só dados fictícios). */
+/** Aviso ao Pat no celular simulado: o turno, um texto opcional e um PDF ou foto opcional (só dados fictícios). */
 export function ReportForm({ kind, days, busy, onSubmit, onCancel }: Props) {
   const id = useId();
   const [day, setDay] = useState(days[0]?.day ?? "");
@@ -23,8 +24,8 @@ export function ReportForm({ kind, days, busy, onSubmit, onCancel }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   function pick(f: File | null) {
-    if (f && f.type !== "application/pdf" && !f.name.toLowerCase().endsWith(".pdf")) {
-      setError("O anexo precisa ser um PDF.");
+    if (f && !attachmentType(f)) {
+      setError("O anexo precisa ser um PDF ou uma foto (PNG ou JPEG).");
       setFile(null);
       return;
     }
@@ -65,12 +66,12 @@ export function ReportForm({ kind, days, busy, onSubmit, onCancel }: Props) {
         className={fieldCls}
       />
       <label htmlFor={`${id}-file`} className="text-xs text-ink-muted">
-        Anexar atestado em PDF (opcional)
+        Anexar atestado: PDF ou foto (opcional)
       </label>
       <input
         id={`${id}-file`}
         type="file"
-        accept="application/pdf"
+        accept={ATTACHMENT_ACCEPT}
         disabled={busy}
         onChange={(e) => pick(e.target.files?.[0] ?? null)}
         className="text-xs file:mr-2 file:rounded-full file:border file:border-line-strong file:bg-surface file:px-3 file:py-1.5 file:text-xs"

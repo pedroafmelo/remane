@@ -1,6 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
+  attachmentSuffix,
+  attachmentType,
   attestationLabel,
   caseStateLines,
   clockText,
@@ -137,6 +139,8 @@ test("inboundText descreve o aviso sem repetir o texto livre", () => {
   assert.equal(isAttachmentOnly(anexo), true);
   assert.equal(isAttachmentOnly(msg), false);
   assert.deepEqual([...attachmentsByCase([msg, anexo])], [["c1", "application/pdf"]]);
+  assert.equal(inboundText(msg, base, "image/png"), "Você avisou: vou faltar qui 14/01. (foto)");
+  assert.equal(inboundText(msg, base, "image/jpeg"), "Você avisou: vou faltar qui 14/01. (foto)");
   assert.equal(inboundText(msg, { ...base, kind: "atraso" }), "Você avisou: vou me atrasar qui 14/01.");
   assert.equal(inboundText({ ...msg, template: "resposta" }, base), "Você respondeu.");
 });
@@ -173,4 +177,25 @@ test("o cartão de um código novo do acompanhamento vira o formato do component
     assert.equal(view.time, null);
     assert.deepEqual(view.options, [{ label: "Validar a cobertura", value: null }]);
   }
+});
+
+test("attachmentSuffix rotula PDF, foto e outros tipos", () => {
+  assert.equal(attachmentSuffix("application/pdf"), " (anexo PDF)");
+  assert.equal(attachmentSuffix("image/png"), " (foto)");
+  assert.equal(attachmentSuffix("image/jpeg"), " (foto)");
+  assert.equal(attachmentSuffix("text/plain"), " (anexo)");
+  assert.equal(attachmentSuffix(null), "");
+  assert.equal(attachmentSuffix(undefined), "");
+});
+
+test("attachmentType aceita PDF, PNG e JPEG pelo tipo ou pela extensão", () => {
+  assert.equal(attachmentType({ type: "application/pdf", name: "a" }), "application/pdf");
+  assert.equal(attachmentType({ type: "image/png", name: "a" }), "image/png");
+  assert.equal(attachmentType({ type: "image/jpeg", name: "a" }), "image/jpeg");
+  assert.equal(attachmentType({ type: "image/jpg", name: "a" }), "image/jpeg");
+  assert.equal(attachmentType({ type: "", name: "Foto.PNG" }), "image/png");
+  assert.equal(attachmentType({ type: "", name: "foto.JPG" }), "image/jpeg");
+  assert.equal(attachmentType({ type: "", name: "atestado.pdf" }), "application/pdf");
+  assert.equal(attachmentType({ type: "image/gif", name: "a.gif" }), null);
+  assert.equal(attachmentType({ type: "", name: "sem-extensao" }), null);
 });
