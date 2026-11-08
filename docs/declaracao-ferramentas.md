@@ -8,7 +8,7 @@ Status: `planejado`, `em uso`, `removido`. Não remova linhas: marque `removido`
 
 | Item | Tipo | Uso no projeto | Status |
 |---|---|---|---|
-| Claude Code (Anthropic) | Ferramenta de código com IA | Desenvolvimento e documentação; liberada pelo guia. Não faz parte do produto ([DEC-003](decisoes.md), provisória) | em uso |
+| Claude Code (Anthropic) | Ferramenta de código com IA | Desenvolvimento e documentação; liberada pelo guia. Não faz parte do produto ([DEC-003](decisoes.md), provisória). Modelos: Opus 5.5, Sonnet 5.5 e Haiku 5.5 (política da [DEC-028](decisoes.md)); na C5, 4 sessões em paralelo ([DEC-036](decisoes.md)) | em uso |
 | Langfuse docs MCP (`https://langfuse.com/api/mcp`, oficial, sem autenticação) | Servidor MCP de documentação | Consulta de documentação durante o desenvolvimento; configurado em `.mcp.json` | em uso (conectado desde a [DEC-009](decisoes.md)) |
 | LangChain docs MCP (`https://docs.langchain.com/mcp`, oficial, sem autenticação) | Servidor MCP de documentação | Consulta de documentação do LangGraph durante o desenvolvimento; configurado em `.mcp.json` | em uso (conectado desde a [DEC-009](decisoes.md)) |
 

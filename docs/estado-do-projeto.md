@@ -1,7 +1,7 @@
 # Estado do projeto
 
 > **Fonte da verdade do momento.** Atualize ao fim de cada bloco de trabalho (ver "Documentação viva" no
-> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 16:47** (Recife), por Claude (Sonnet 5.5), ao planejar e executar a C0a e auditar as docs ([plano da C0](planos/camada-00-fundacao.md), [DEC-030](decisoes.md) a [DEC-032](decisoes.md)): **G0 atingido às 16h41**. Antes: plano macro ([plano-implementacao.md](plano-implementacao.md), [DEC-027](decisoes.md) a [DEC-029](decisoes.md)).
+> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-07 23:41** (Recife), por Claude (Opus 5.5), ao planejar a C5, primeira fatia vertical ([plano da C5](planos/camada-05-fatia-vertical.md), [DEC-035](decisoes.md) e [DEC-036](decisoes.md)), **aguardando o "aprovado"**. Antes: C0a e G0 às 16h41 ([plano da C0](planos/camada-00-fundacao.md)).
 
 ## Fase atual
 
@@ -18,8 +18,9 @@ aprova em gates: ambiente, requisitos, negócio e técnica ([DEC-005](decisoes.m
 
 | Pessoa | Perfil / foco | Disponibilidade |
 |---|---|---|
-| Pedro Veloso | Política e convenção fictícias da demo até 19h ([DEC-028](decisoes.md)); frente D `[PROPOSTA]` | Até a madrugada ([DEC-027](decisoes.md)) |
-| [PREENCHER] (3 pessoas) | [PREENCHER: frentes A, B e C do [plano macro](plano-implementacao.md)] | Até a madrugada ([DEC-027](decisoes.md)) |
+| Pedro Vieira (usuário) | **Todas as frentes (A a D) da C5**, com 4 sessões do Claude Code em paralelo, uma por worktree; revisa e integra no `main` ([DEC-035](decisoes.md), [DEC-036](decisoes.md)) | Até ~03h; volta às 07h ([DEC-035](decisoes.md)) |
+| Pedro Veloso | Política e convenção fictícias da demo até 19h ([DEC-028](decisoes.md)); **não entregues até 23h37** (pastas vazias no remoto); não programa nesta madrugada ([DEC-036](decisoes.md)) | [PREENCHER] |
+| [PREENCHER] (2 pessoas) | Não programam nesta madrugada ([DEC-036](decisoes.md)); sugestão: pitch e resgate da Featherless ([plano da C5](planos/camada-05-fatia-vertical.md), seção 10) | [PREENCHER] |
 
 Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil técnico forte.
 
@@ -47,7 +48,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
 - [ ] **Hospedagem e deploy: tudo adiado; por enquanto, testar e rodar localmente** ([DEC-033](decisoes.md), [DEC-034](decisoes.md)). A hospedagem volta a `[PREENCHER]` (o Fly.io da [DEC-030](decisoes.md) fica em suspenso); G1 pendente sem data. **Decidir antes do G6 (dom 11h30)**, porque sem link público RE-07 e RN-10 não se cumprem.
 - [x] **C0a concluída, G0 às 16h41** ([plano da C0](planos/camada-00-fundacao.md)): 84 testes verdes, ruff limpo, teste de fronteiras provado. `web/` (T9, T10), `Dockerfile` e `fly.toml` também prontos (90 testes; imagem testada localmente). **Falta:** o deploy e o G1 (adiados, [DEC-033](decisoes.md)) e avisar as frentes A, B e C de que o G0 passou. Commitado a pedido do usuário às 16h51.
 - [ ] **Pedro Veloso: política e convenção fictícias até 19h** ([DEC-028](decisoes.md)); gate G2 do plano macro.
-- [ ] **Primeira fatia vertical até 21h30** ([DEC-028](decisoes.md)): seção 2 do [plano macro](plano-implementacao.md).
+- [ ] **Primeira fatia vertical (G3):** venceu às 21h30 sem a fatia. **Plano da C5 escrito às 23h41, aguardando o "aprovado"** ([planos/camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md)): G3 vale local ([DEC-035](decisoes.md)); 4 sessões do Claude em paralelo ([DEC-036](decisoes.md)). Depois do "aprovado": (1) sessão A congela os contratos (T0, 30 a 45 min `[PROPOSTA]`); (2) abrir as sessões B, C e D; (3) G3 à mão em `localhost:8000`, meta antes do G4 (dom 08h30). **Decidir:** se o "aprovado" autoriza commits por tarefa nas 4 sessões e o que fazer com C6, C7 e C8, que não cabem antes do G4 (plano da C5, seção 9).
 - [ ] Responder antes dos planos das camadas: "gestor de RH" (antes da C4), dados do RN-13 (antes da C1), RF-25 e RF-28 (antes da C7);
       tabela do time com a frente de cada pessoa. Lista completa na seção 3 do [plano macro](plano-implementacao.md).
 - [x] ~~**Aguardando o comando do usuário para começar a implementar** ("não implemente ainda")~~: substituída pelo plano macro (16h11); `uv add`, teste
@@ -115,6 +116,8 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 
 | Data e hora | O quê | Por |
 |---|---|---|
+| 2026-11-07 23:40 | Auditoria `/sync-docs` depois do plano da C5: código, `pyproject.toml`, `uv.lock` e `.env.example` sem mudança desde `ebf58d6` (só docs alteradas, sem commit), o que bate com "sem código" do plano; 0 links quebrados em 26 arquivos `.md`; IDEA-002 segue `escolhida`; nenhuma dependência nova. **Corrigido:** a [declaração](declaracao-ferramentas.md) não nomeava os modelos do Claude Code usados no desenvolvimento (Opus, Sonnet e Haiku 5.5, [DEC-028](decisoes.md)); agora nomeia. **Pendente de decisão humana:** "aprovado" do plano da C5, commits por tarefa nas 4 sessões, destino de C6 a C8 antes do G4 | Claude |
+| 2026-11-07 23:41 | Plano da C5 (primeira fatia vertical, com os subconjuntos de C1 a C4) criado em [planos/camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md), em 2 rodadas: [DEC-035](decisoes.md) (G3 local; até ~03h e volta às 07h; o usuário em todas as frentes; contratos pela frente A) e [DEC-036](decisoes.md) (4 sessões do Claude em paralelo; CSV longo; status `ficticia`; campo sexo fora da tela). Conferido às 23h37: `origin/main` em `ebf58d6`, `data/regras/politica/` e `convencao/` vazias (G2 sem entrega). Tabela do time, plano macro (G3 local) e plano de horas atualizados. **Sem código, sem `uv add`, sem commit**; o status da C5 no plano macro só muda depois do "aprovado" | Claude |
 | 2026-11-07 16:53 | [DEC-034](decisoes.md): "tudo do deploy" fica para depois e tudo roda localmente; a hospedagem volta a `[PREENCHER]` (Fly.io em suspenso). README ganha a seção de execução local. Sem commit desta alteração | Claude |
 | 2026-11-07 16:51 | [DEC-033](decisoes.md): o usuário adiou o deploy e a decisão de hospedagem; pediu o commit (feito em partes, em inglês, Conventional Commits) e que o plano da próxima camada não seja preparado agora. `.gitignore` ganhou exceção para os HTML de `web/` | Claude |
 | 2026-11-07 16:47 | Auditoria `/sync-docs` depois da C0a: 25 arquivos `.md`, 0 links quebrados; `src/`, `tests/`, `web/`, `pyproject.toml` e `.env.example` (18 nomes: os 16 de antes mais `DATABASE_URL` e `WEB_DIST_DIR`, agora citados na [arquitetura](arquitetura.md), seção 12) conferidos contra as docs. **Corrigido:** nota errada sobre `.claude/hooks/docs_sync.py` (foi o meu `ruff format`; arquivo revertido, `.claude` excluído do ruff); item "implementação (ainda não começou)"; métricas medidas preenchidas; estrutura do CLAUDE.md (`web/`, `Dockerfile`, `fly.toml`); notas de 3 portas no plano macro e na arquitetura (seção 2.1). **Pendente de decisão humana:** ver a resposta desta auditoria | Claude |

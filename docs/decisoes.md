@@ -1,6 +1,6 @@
 # Registro de decisões
 
-Última atualização: 2026-11-07 16:11. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
+Última atualização: 2026-11-07 23:41. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
 entrada:** se a decisão mudar, crie outra e marque a antiga como `substituída por DEC-NNN`. Use `/decisao` para registrar e
 propagar o efeito para as outras docs.
 
@@ -452,3 +452,21 @@ Formato:
 - **Motivo: [motivo não informado].**
 - **Alternativas consideradas:** as duas perguntadas (manter o Fly.io; reabrir a hospedagem); o usuário respondeu "tudo do deploy", o que o agente leu como **reabrir a hospedagem**, e **não** como confirmar o Fly.io.
 - **Consequências:** a hospedagem volta a `[PREENCHER]` (a parte da [DEC-030](#dec-030--plano-da-c0-rodada-1-data-de-corte-nas-versões-flyio-c0b-com-a-frente-c-e-web-em-typescript) sobre o Fly.io fica **em suspenso**, não substituída; as demais partes da DEC-030 valem). A C0b e o G1 ficam parados sem data; `Dockerfile` e `fly.toml` ficam no repositório como material pronto, sem uso. O desenvolvimento e a demonstração rodam só localmente (`uv run uvicorn` e `npm run dev`). O risco de RE-07 e RN-10 (link público estável) continua e deve voltar a ser decidido antes do G6 (dom 11h30); o túnel do notebook segue como plano B.
+
+## DEC-035 · Plano da C5, rodada 1: G3 local, janela até 03h e de volta às 07h, o usuário em todas as frentes, contratos pela frente A
+
+- 2026-11-07 23:37 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** o G3 (primeira fatia vertical, 21h30) venceu sem a fatia; o `main` tem só a C0a; o deploy foi adiado ([DEC-034](#dec-034--tudo-do-deploy-fica-para-depois-por-enquanto-testar-e-rodar-localmente)); a política fictícia não chegou. O agente planeja a fatia para execução em paralelo ([plano da C5](planos/camada-05-fatia-vertical.md)).
+- **Decisão (o que o usuário escolheu):** (1) "Sim, G3 local": o G3 passa em `http://localhost:8000`, e não no deploy; (2) "Todos até ~03h, voltam 07h"; (3) quem fica em cada frente: "Eu em todos."; (4) quem congela os contratos: "Pessoa da frente A".
+- **Motivo: [motivo não informado].**
+- **Alternativas consideradas (as oferecidas):** (1) G3 local agora com deploy no G4; G3 só no deploy. (2) Todos direto até o G4; turnos 2 + 2. (3) Nomes por frente ou `[PREENCHER]`. (4) Sessão da frente B; Claude no plano.
+- **Consequências:** ~4h45 de relógio por frente até o G4 (dom 08h30). O fluxo à mão numa URL pública só é testado quando o deploy for decidido (antes do G6). A tarefa T0 (contratos) bloqueia as outras frentes por 30 a 45 min `[PROPOSTA]`. "Eu em todos" foi esclarecido na [DEC-036](#dec-036--plano-da-c5-rodada-2-4-sessões-do-claude-em-paralelo-csv-longo-status-ficticia-e-campo-sexo-fora-da-tela).
+
+## DEC-036 · Plano da C5, rodada 2: 4 sessões do Claude em paralelo, CSV longo, status `ficticia` e campo sexo fora da tela
+
+- 2026-11-07 23:38 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** a rodada 1 deixou "Eu em todos" ambíguo; faltavam o formato do CSV, o status das regras fictícias (o RN-09 só prevê `conferida`, `interpretacao` e `pendente`) e o RN-13 com a [DEC-023](#dec-023--art-386-da-clt-domingo-quinzenal-para-empregadas-entra-como-regra-dura).
+- **Decisão (o que o usuário escolheu):** (1) "4 sessões Claude em paralelo": uma sessão do Claude Code por frente, cada uma no seu worktree; o usuário revisa e integra; os outros 3 do time não programam nesta madrugada. (2) CSV "Longo: 1 linha por turno" (`loja_id,pessoa_id,nome,data,inicio,fim`; quadro e demanda vêm da integração simulada). (3) "Novo status `ficticia`" para as regras da convenção e da política fictícias. (4) Campo `sexo` no quadro sintético, "fora do gerente": usado só por solver e verificador, nunca na tela, na API do gerente nem no trace.
+- **Motivo: [motivo não informado].**
+- **Alternativas consideradas (as oferecidas):** (1) o time programa e o usuário coordena; uma sessão, frente a frente. (2) grade pessoa × dia. (3) `conferida`; `interpretacao`. (4) visível na grade; fora do contrato agora.
+- **Consequências:** a atenção do usuário vira o gargalo `[INFERÊNCIA]`; o fluxo de git usa worktrees e merge local (plano da C5, seção 7). O schema do carregador ganha o valor `ficticia`, aceito só em `convencao/` e `politica/` `[PROPOSTA]`; a tela mostra "fictícia (demo)". A primitiva `domingo_mulher` fica para depois da fatia, mas o contrato `Employee` já nasce com `sex`.
