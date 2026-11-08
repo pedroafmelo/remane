@@ -100,15 +100,6 @@ export default function Home() {
         </Section>
 
         <Section>
-          <Reveal>
-            <p className="text-[13px] font-medium text-ink-subtle">Para quem</p>
-            <p className="mt-3 max-w-[900px] text-[28px] font-medium leading-tight tracking-[-0.035em] sm:text-[36px]">
-              Redes de varejo, food service e farmácia com 5 a 200 lojas que fazem escala em planilha.
-            </p>
-          </Reveal>
-        </Section>
-
-        <Section>
           <Reveal className="text-center">
             <h2 className="mx-auto max-w-[760px] text-[38px] font-bold leading-[1.02] tracking-[-0.05em] sm:text-[56px]">
               Deixe a escala com quem entende de escala.

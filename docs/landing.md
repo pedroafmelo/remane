@@ -111,7 +111,7 @@ Símbolo SVG (viewBox "0 0 70 64"): quadrados 16x16 com rx 5 em ink nas posiçõ
    3. "Resolve o dia a dia": falta, atraso, atestado e troca chegam pelo WhatsApp; o agente encontra quem pode cobrir e confirma.
    4. "Chama você só quando precisa": o que custa dinheiro ou foge da regra vira exceção, com opções e custo.
 6. **WhatsApp** (id `whatsapp`): "Teste agora: mande uma mensagem como se fosse a Joana." QR code (lib `qrcode.react`) para `https://wa.me/${NEXT_PUBLIC_WHATSAPP_NUMBER}?text=Bom%20dia%2C%20n%C3%A3o%20vou%20conseguir%20ir%20hoje`. Se a variável não existir, mostre o botão "Testar a demo" no lugar do QR.
-7. **Para quem**: "Redes de varejo, food service e farmácia com 5 a 200 lojas que fazem escala em planilha."
+7. ~~**Para quem**: "Redes de varejo, food service e farmácia com 5 a 200 lojas que fazem escala em planilha."~~ Removida em 08/11 a pedido do usuário: "não quero esse nível de restrição".
 8. **CTA final**: "Sua próxima falta já pode chegar resolvida." + botão "Testar a demo".
 9. **Rodapé**: logo, "Feito no Converge Challenge powered by Tako · Recife, 2026", "Demo com dados sintéticos."
 
