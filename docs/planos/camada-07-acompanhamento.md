@@ -1,6 +1,6 @@
 # Plano da C7 · Acompanhamento de escala (FT-03): passivo, oferta ao colega e gatilhos ativos
 
-Última atualização: 2026-11-08 09:31 (Recife) · Situação: **aprovado pelo usuário às 09:22; M1 (10:10, `c7/m1`) e M2 (10:16, `c7/integra`) prontos para o merge do usuário; T2 não começou** (DECs gravadas como [DEC-057](../decisoes.md) a [DEC-066](../decisoes.md)). Antes: 09:24, contrato v1.1 incorporado · Planejado por Claude (Opus 5.5)
+Última atualização: 2026-11-08 10:32 (Recife) · Situação: **aprovado pelo usuário às 09:22; M1 (10:10), M2 (10:16) e M3 = T2 parcial (10:31, foto e RF-27) prontos; recomendado um PR só pela branch `c7/m3`** (DECs gravadas como [DEC-058](../decisoes.md) a [DEC-067](../decisoes.md)). Antes: 09:24, contrato v1.1 incorporado · Planejado por Claude (Opus 5.5)
 numa sessão só de planejamento (worktree `cc61-plan-acomp`, branch `plan/acompanhamento`, a partir de `origin/main` `b6f4a01`): sem
 código, sem `uv add`, sem commit. As DECs propostas (seção 16) **não foram gravadas** em [decisoes.md](../decisoes.md) nem no
 [estado](../estado-do-projeto.md): outras sessões editam esses arquivos ao mesmo tempo.
@@ -562,12 +562,12 @@ diff, donos, testes e ruff de cada entrega, fez o rebase e integrou em `c7/integ
 - **B1** (09:31 a 09:35): `06341c7` tabelas `track_case` e `channel_message`, `SqlTrackRepository`, `SimulatedPhone` (recusa gravar texto de entrada), `ExceptionStoreQueue`.
 - **B2** (09:31 a 09:42): `a5b962d` `Tracker` (ofertas sequenciais, portão `aplicar_cobertura`, cartões, mensagens, `summarize`).
 - **B3** (09:40 a 09:43): `17f017a` leitura do PDF (`pdf_text` → `strip_cid` → modelo `small` → `judge`). **Achado:** o pdfminer loga o conteúdo do PDF em DEBUG; os loggers `pdfminer`/`pdfplumber` ficam em WARNING.
-- **B4** (09:45 a 09:51): `d7be9fc` `run_sweep`, `answer`, RF-28 também sem candidato ([DEC-067](../decisoes.md)).
+- **B4** (09:45 a 09:51): `d7be9fc` `run_sweep`, `answer`, RF-28 também sem candidato ([DEC-068](../decisoes.md)).
 
 ### Sessão C
 
 - **C2** (09:31 a 09:35): `f128caa` barra do relógio, celular simulado com seletor, ofertas e perguntas.
-- **C1** (09:45 a 10:00): `3451489` `tracker_wiring`, rotas, `decide` delegando cartões do acompanhamento, semente do cenário na subida (sem `Approval`: é dado sintético pré-carregado), aviso em JSON e PDF em corpo bruto ([DEC-067](../decisoes.md)).
+- **C1** (09:45 a 10:00): `3451489` `tracker_wiring`, rotas, `decide` delegando cartões do acompanhamento, semente do cenário na subida (sem `Approval`: é dado sintético pré-carregado), aviso em JSON e PDF em corpo bruto ([DEC-068](../decisoes.md)).
 
 ### Sessão D
 
@@ -577,9 +577,10 @@ diff, donos, testes e ruff de cada entrega, fez o rebase e integrou em `c7/integ
 
 ### Integração (`c7/integra`) e marcos
 
-- **10:01 a 10:04:** merge de `origin/main` (`e17996b`, logo novo da DEC-056) → `527d001`; 1 conflito em `decisoes.md` (número da DEC-056), DECs da C7 renumeradas para 057 a 066, DEC-067 nova.
+- **10:01 a 10:04:** merge de `origin/main` (`e17996b`, logo novo da DEC-056) → `527d001`; 1 conflito em `decisoes.md` (número da DEC-056), DECs da C7 renumeradas para 057 a 066, DEC-068 nova.
 - **M1 (10:10), gates em `c7/integra`:** `uv run pytest -q` 1664 passed (1min58; 1665 com a D4); ruff check e format 0; E2E fatia + C6 20 passed; E1 10/10; E2 16/16 sem modelo; `synth acompanhamento` sem diff; web typecheck, lint, test (60) e build 0; `docker build` 0 e `/health` ok na imagem (`demo_mode: true`). **Não verificado:** navegador, link público, modelo real.
 - **10:09 · D3** (`f77b8d9`, com `9877f1c`): teste de vazamento RN-06, 40 superfícies por rodada (9 tabelas, bytes do arquivo SQLite, eventos `track.*`, log em DEBUG, stdout/stderr, 25 respostas HTTP, mensagens ao modelo), 0 achados; o teste falha se o `strip_cid` sair. **Correção na origem:** o motivo de reenvio do `call_structured` repetia ao modelo um nome de campo extra com cara de CID; agora mostra "(campo fora do schema)".
 - **10:12 · C3b** (`6516264`): `GET /api/runs/track-<case_id>/trace` (só gestor) e "Ver rastro do caso" na fila, com "tempo simulado", tokens e "não medido" quando não há custo.
 - **10:12 a 10:15 · merge de `origin/main` `a2f6536`** (só docs: link novo e pitch) → `4815b31`. **M2, gates:** `uv run pytest -q` 1674 passed (1min37, antes do merge só de docs); ruff 0/0; `tests/privacy` + `tests/e2e` 25 passed; E1 10/10; E2 16/16; `synth` sem diff; web typecheck, lint, test (61), build 0; `docker build` 0, `/health` ok, login de gestor 200 e `/api/demo/clock` = 13:55 simulado na imagem. **Não verificado:** navegador, link público, modelo real (custo e latência de `track.llm.read_atestado` não medidos).
-- **Cortado / não feito:** T2 inteiro (foto, RF-27, conversa livre, confirmar abono) e T3; `/sync-docs` não rodou (audita o checkout principal, defasado e intocável nesta execução).
+- **10:17 a 10:31 · T2 (M3):** D5 + C4 (`1c210f6`, fotos at-05 a at-07 com gabarito, anexo aceita PNG/JPEG pelos bytes, "PDF ou foto" no celular); RF-27 (`8b6798a`, gatilhos a 80% e acima de 6 h por semana, cartão `HORA_EXTRA` que nunca muda a escala, + `5bc8f5d` na fila); foto pelo modelo de visão (`ca0be0b`: `LLMMessage.content` com partes de texto e imagem, size `vision` com `featherless_model_vision = Qwen/Qwen3.5-9B` **nunca testado com imagem**, o rastro do cliente guarda só tipo e tamanho da imagem, teste de vazamento da foto). Merge de `origin/main` `4e1e3e8` (DEC-057, logo de volta à grade): DECs da C7 renumeradas de novo, para **DEC-058 a DEC-068**. **Gates M3 (10:27 a 10:29):** pytest 1732 passed (1min33); ruff 0/0; `tests/privacy` + `tests/e2e` 28 passed; E1 10/10; E2 16/16; `synth` sem diff; web typecheck, lint, test (63), build 0; `docker build` 0, `/health` ok, login de colaborador 200 e `/api/colaborador/pessoas` com o quadro sintético na imagem. **Não verificado:** navegador, link, modelo real (visão nunca chamada).
+- **Cortado / não feito:** do T2, a conversa livre (`Tracker.message`, SAIDA-AC-17) e o `confirmar_abono`; T3 inteiro; `/sync-docs` não rodou (audita o checkout principal, defasado e intocável nesta execução).

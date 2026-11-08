@@ -1,5 +1,5 @@
 import { patLabel, patPose, type PatEstado } from "@/lib/pat";
-import { FACE, Glasses, Mustache } from "./Logo";
+import { FACE, Glasses, Mustache } from "./PatFace";
 
 const INK = FACE.ink;
 const WARNING = "#e8890c";
@@ -7,7 +7,7 @@ const WARNING = "#e8890c";
 type PatProps = { estado?: PatEstado; size?: number; label?: string; decorativo?: boolean };
 
 /**
- * Pat, o agente do Remane: o mesmo rosto do logo (quadrado accent, óculos redondos e bigode), com o olhar mudando por estado.
+ * Pat, o agente do Remane: quadrado accent com óculos redondos e bigode (`PatFace.tsx`), com o olhar mudando por estado.
  * O rosto é desenhado em 64 x 64 e reduzido a 48 x 48 no centro, deixando margem para o contorno tracejado e o deslize.
  * Accent marca o que o agente fez; warning só aparece quando precisa de uma pessoa. Sem movimento com reduced-motion.
  */

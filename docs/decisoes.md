@@ -1,6 +1,6 @@
 # Registro de decisões
 
-Última atualização: 2026-11-08 10:04 (DEC-057 a DEC-066, plano da C7; renumeradas depois da DEC-056 do logo). Antes: 12:38 (registro do `main`, hora como escrita lá), 08:50. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
+Última atualização: 2026-11-08 10:31 (DEC-058 a DEC-068, C7; renumeradas duas vezes, depois das DEC-056 e DEC-057 do logo, que estão no `main`). Antes: 10:25 (DEC-057, logo de volta à grade); 10:04 (C7). Antes: 12:38 (registro do `main`, hora como escrita lá), 08:50. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
 entrada:** se a decisão mudar, crie outra e marque a antiga como `substituída por DEC-NNN`. Use `/decisao` para registrar e
 propagar o efeito para as outras docs.
 
@@ -687,75 +687,84 @@ Formato:
 
 ## DEC-056 · Logo novo: o rosto do Pat, com óculos redondos e bigode
 
-- 2026-11-08 12:38 · Decidido por: usuário da sessão ("vamos mudar a logo do projeto", depois "deixei a logo nova no repositório solta, faça a integração") · Status: aceita
+- 2026-11-08 12:38 · Decidido por: usuário da sessão ("vamos mudar a logo do projeto", depois "deixei a logo nova no repositório solta, faça a integração") · Status: **substituída em parte pela [DEC-057](#dec-057--a-logo-da-remane-volta-à-grade-o-rosto-com-óculos-fica-só-com-o-pat)** (a logo volta à grade; o Pat segue com o rosto)
 - **Contexto:** o símbolo era a grade da semana com um bloco remanejado, e o Pat ([DEC-045](#dec-045--mascote-do-agente-pat-o-bloco-remanejado-do-logo-com-dois-olhos-e-cinco-estados)) era esse bloco com dois olhos. O usuário deixou na raiz do repositório um PNG ("Ícone de Rosto com Óculos e Bigode.png"): quadrado verde com óculos redondos, olhos e bigode.
 - **Decisão (o que o usuário disse):** trocar o logo por essa arte e integrá-la ao front.
 - **Motivo: [motivo não informado].**
 - **Assumido pelo agente (o usuário não respondeu se o Pat mudava junto):** como a arte nova é o próprio Pat com óculos e bigode, o Pat passa a usar o mesmo rosto, com os cinco estados de antes (o olhar muda; "trabalhando" ganha sobrancelhas acima dos óculos e mantém o deslize com contorno tracejado; "digitando" põe os pontinhos abaixo do bigode). Isso substitui, nesse ponto, a regra da DEC-045 de não pôr rosto no Pat. A animação do logo deixa de ser o bloco deslizando (`slide`) e passa a ser o olhar indo de um lado ao outro (`logo-look`, 6 s) e piscando; `slide` continua só no Pat "trabalhando". O verde usado é o token `accent` #2BD48A, não o #21E491 do PNG.
 - **Consequências:** PNG movido para `docs/design-system/assets/logos/remane-logo-original.png` e vetorizado em `web/components/Logo.tsx` (`FACE`, `Glasses`, `Mustache`, reaproveitados por `web/components/Pat.tsx`). `web/app/icon.svg`, os SVGs de `design-system/assets/logos/` (símbolo, negativo, ícone de app, avatar do WhatsApp, folha de estados do Pat), o preview do Logo, os READMEs do design system e a seção Logo do [landing.md](landing.md) foram atualizados. Typecheck, lint, 48 testes do front e build passam; landing e `/entrar` conferidas no navegador headless. **`[PREENCHER]`:** quem fez a arte e com qual ferramenta; se foi gerada por IA, a ferramenta entra em [declaracao-ferramentas.md](declaracao-ferramentas.md).
-## DEC-057 · C7 em níveis T1a (M1), T1b (M2), T2 e T3, com corte por relógio
+
+## DEC-057 · A logo da Remane volta à grade; o rosto com óculos fica só com o Pat
+
+- 2026-11-08 10:25 · Decidido por: usuário ("Meu colega sem querer alterou a logo da remane substituindo pelo ícone do Pat. A logo da Remane é uma (o quadro com o quadrado verde), a do Pat é outra (ícone de óculos)", depois "Reverta, sem quebrar as sessões em andamento agora") · Status: aceita
+- **Contexto:** a [DEC-056](#dec-056--logo-novo-o-rosto-do-pat-com-óculos-redondos-e-bigode) trocou a logo da Remane pelo rosto do Pat (`82c56cd`, já no `origin/main`). O usuário diz que a troca foi sem querer; a DEC-056 a registra como pedida pelo "usuário da sessão". **Essa divergência não foi resolvida**: vale a palavra do usuário desta decisão, e o time deve confirmar com quem fez a troca.
+- **Decisão (o que o usuário disse):** reverter para a logo original (a grade com o bloco verde). O Pat continua sendo o ícone de óculos.
+- **Motivo: [motivo não informado além de "foi sem querer"].**
+- **Assumido pelo agente:** (1) não usar `git revert` do commit inteiro, porque ele devolveria o Pat ao bloco com dois olhos ([DEC-045](#dec-045--mascote-do-agente-pat-o-bloco-remanejado-do-logo-com-dois-olhos-e-cinco-estados)), e o usuário quer o Pat com óculos; (2) `remane-avatar-whatsapp.svg` fica com o Pat (óculos), porque é a foto do agente, e a pergunta ao usuário sobre isso não foi respondida; (3) o CSS `logo-look`, que só o logo novo usava, saiu.
+- **Consequências:** `FACE`, `Glasses` e `Mustache` saem de `web/components/Logo.tsx` para `web/components/PatFace.tsx` (o `Pat.tsx` importa de lá); `Logo.tsx`, `web/app/icon.svg` e os SVGs `remane-simbolo`, `remane-simbolo-negativo` e `remane-icone-app` voltam ao que eram em `82c56cd^`; o PNG vira `pat-rosto-original.png`; READMEs do design system, preview do Logo e `landing.md` voltam ao texto anterior à DEC-056; o README das logos separa as duas artes. A DEC-056 fica como histórico. **Feito numa worktree própria (`cc61-logo`, branch `web/restore-remane-logo`), sem push e sem merge no `main`:** o merge publica no Railway e outras sessões editam `Logo.tsx`, `Pat.tsx` e os docs; quem integrar deve avisá-las para dar rebase.
+## DEC-058 · C7 em níveis T1a (M1), T1b (M2), T2 e T3, com corte por relógio
 
 - 2026-11-08 09:10 (plano) e 09:22 (pedido de execução) · Decidido por: usuário (aprovou o [plano da C7](planos/camada-07-acompanhamento.md) ao pedir a execução) · Status: aceita
 - **Decisão:** a C7 entra em dois marcos ao `main`: **M1 = T1a** (relógio de demo, "Reiniciar demo", falta → oferta ao colega → aceite → validação do gestor → republica; RX-05, RX-06) e **M2 = T1b** (atestado em PDF, RX-08, RX-12, RN-06 testado, ponto simulado com RF-16 e RX-09, RF-28). Corte por relógio às 10h50 (M1) e 11h15 (M2); nada do T2 antes do M2 pronto; depois das 11h30, só correção.
 - **Motivo:** submissão às 13h00 e link testado às 11h30; o M1 sozinho já é uma demo honesta do FT-03.
 - **Consequências:** T2 (foto, RF-27, conversa livre, confirmar abono) e T3 (RF-25, solver de janela, canal real) só se sobrar tempo.
 
-## DEC-058 · Foto do atestado no T2; o T1 lê só PDF digital
+## DEC-059 · Foto do atestado no T2; o T1 lê só PDF digital
 
 - 2026-11-08 09:10 · Decidido por: usuário (pergunta 1 do plano da C7) · Status: aceita
 - **Decisão:** o T1 lê só PDF digital (texto + modelo pequeno); PDF sem camada de texto vira `ilegivel` sem chamar o modelo. A foto pelo modelo de visão fica no T2.
 - **Motivo:** a visão da Featherless nunca foi testada e exige mudar `LLMMessage`; é o primeiro corte da ordem do produto.
 - **Consequências:** os cenários de foto dos evals (E3-22 com visão, 25, 26, 28) dependem do T2.
 
-## DEC-059 · Escala com folga para a demo pelo botão "Reiniciar demo"
+## DEC-060 · Escala com folga para a demo pelo botão "Reiniciar demo"
 
 - 2026-11-08 09:10 · Decidido por: usuário (pergunta 2 do plano da C7) · Status: aceita
 - **Decisão:** "Reiniciar demo" (só o gestor) publica uma semana **sintética** com folga, rotulada como cenário pré-carregado, apaga os casos do acompanhamento e põe o relógio de demo em qua 13/01/2027 13:55 (tempo simulado).
 - **Motivo:** na escala otimizada do exemplo nenhuma falta tem cobertura (RX-05) desde o piso da carga do contrato ([DEC-055](#dec-055--piso-da-carga-do-contrato-no-solver-pr-16-entra-no-main-com-limites)).
 - **Consequências:** reiniciar sobrescreve a escala que o jurado aprovou; a tela pede confirmação.
 
-## DEC-060 · Padrões de RF-28, RF-27 e RF-25
+## DEC-061 · Padrões de RF-28, RF-27 e RF-25
 
 - 2026-11-08 09:10 · Decidido por: usuário (pergunta 3 do plano da C7) · Status: aceita
 - **Decisão:** RF-28 = aviso ao gestor quando a cobertura de uma falta só fecha com hora extra (T1); RF-27 = a 80% do limite semanal de hora extra da política (6 h) avisa o gestor, a 100% avisa colaborador e gestor e abre cartão (banco de horas, pedir replanejamento, só registrar) (T2); RF-25 = critérios de `pol_reotimizacao_semanal` (T3).
 - **Motivo:** fecha as pendências de negócio de requisitos.md (RF-25, RF-27, RF-28) com a política fictícia.
 
-## DEC-061 · Replanejamento só com `find_cover` no v1
+## DEC-062 · Replanejamento só com `find_cover` no v1
 
 - 2026-11-08 09:10 · Decidido por: usuário (pergunta 4 do plano da C7) · Status: aceita
 - **Decisão:** o `ReplanRequest` é gravado no caso e despachado in-process para a `find_cover` (reatribuição do turno conferida pelo verificador independente); o solver de janela fica no T3.
 - **Consequências:** o pitch diz "cobertura verificada pelas regras", nunca "reotimização".
 
-## DEC-062 · Acompanhamento sem LangGraph e sem checkpointer
+## DEC-063 · Acompanhamento sem LangGraph e sem checkpointer
 
 - 2026-11-08 09:10 (proposta do plano) · Decidido por: usuário (aprovou o plano) · Status: aceita
 - **Decisão:** o fluxo do acompanhamento é uma máquina de estados em código sobre a tabela `track_case`; o modelo só entra nos nós de linguagem (leitura da comprovação).
 - **Contra:** a arquitetura (seção 4) fala em um grafo por agente.
 
-## DEC-063 · Seletor "Você é:" no celular simulado
+## DEC-064 · Seletor "Você é:" no celular simulado
 
 - 2026-11-08 09:10 (proposta do plano) · Decidido por: usuário (aprovou o plano) · Status: aceita
 - **Decisão:** as rotas do colaborador aceitam `as=<employee_id>` **só com `DEMO_MODE=1`**, validado contra o quadro da escala publicada (RX-10), para o jurado trocar de pessoa e o colega confirmar a oferta.
 - **Contra:** o login de colaborador vira "qualquer pessoa do quadro"; aceitável numa demo rotulada, não em produção.
 
-## DEC-064 · Tolerância de atraso de 10 min (política) prevalece sobre os 15 min do RF-16
+## DEC-065 · Tolerância de atraso de 10 min (política) prevalece sobre os 15 min do RF-16
 
 - 2026-11-08 09:10 (proposta do plano) · Decidido por: usuário (aprovou o plano) · Status: aceita
 - **Decisão:** o gatilho de ausência de batida usa `pol_atraso.tolerancia_min` (10) da política fictícia, não o número fixo do texto do RF-16.
 
-## DEC-065 · RX-06 e RX-09 na política fictícia, como proposta do agente
+## DEC-066 · RX-06 e RX-09 na política fictícia, como proposta do agente
 
 - 2026-11-08 09:10 (proposta do plano) · Decidido por: usuário (aprovou o plano) · Status: provisória (a confirmar com o autor da política)
 - **Decisão:** `excecoes_demo` ganha RX-06 (ninguém aceitou o turno no prazo) e RX-09 (colaborador não respondeu), fictícias e rotuladas.
 
-## DEC-066 · `run_id = "track-<case_id>"` no acompanhamento
+## DEC-067 · `run_id = "track-<case_id>"` no acompanhamento
 
 - 2026-11-08 09:10 (proposta do plano) · Decidido por: usuário (aprovou o plano) · Status: aceita
 - **Decisão:** cada caso do acompanhamento é uma execução própria no rastro (gatilho sem caso: `track-sweep`); o custo do acompanhamento não entra no custo da execução da otimização no painel de impacto.
 
-## DEC-067 · RF-28 dispara também quando não há cobertura dentro das regras; aviso do colaborador sem texto livre no servidor
+## DEC-068 · RF-28 dispara também quando não há cobertura dentro das regras; aviso do colaborador sem texto livre no servidor
 
 - 2026-11-08 09:47 · Decidido por: agente orquestrador da C7, na execução · Status: provisória (o usuário confirma ao revisar o M1)
-- **Contexto:** (1) a D1 mostrou que a `find_cover` nunca devolve candidato com hora extra numa escala válida (hora extra viola o limite diário ou semanal do cartão), então "o 1º candidato gera hora extra" ([DEC-060](#dec-060--padrões-de-rf-28-rf-27-e-rf-25)) não acontece; (2) o backend não tem `python-multipart` e a regra proíbe dependência nova.
+- **Contexto:** (1) a D1 mostrou que a `find_cover` nunca devolve candidato com hora extra numa escala válida (hora extra viola o limite diário ou semanal do cartão), então "o 1º candidato gera hora extra" ([DEC-061](#dec-061--padrões-de-rf-28-rf-27-e-rf-25)) não acontece; (2) o backend não tem `python-multipart` e a regra proíbe dependência nova.
 - **Decisão:** (1) o aviso de necessidade de hora extra (RF-28) também dispara quando o replanejamento não acha nenhum candidato dentro das regras, junto do RX-05, que oferece "Hora extra de um colega"; (2) o aviso de falta vai em JSON com `has_text` (o texto livre do colaborador **não chega ao servidor**) e o PDF vai numa segunda chamada, no corpo bruto, como o upload da C6.
 - **Consequências:** o gabarito do cenário marca `overtime_needed: true` nas lojas sem candidato; o contrato com os evals registra as duas mudanças (seção 4); o evento `track.report.received.has_text` fica sempre `false` (o `has_text` real vive na mensagem de entrada do celular).
