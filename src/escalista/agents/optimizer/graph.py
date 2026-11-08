@@ -667,7 +667,8 @@ class OptimizerAgent:
         mapped, source, assumed_week = self._map(run_id, tables, notices)
         if mapped is None or not mapped.shifts:
             reason = (
-                "não consegui entender as colunas do arquivo (nem pelo modelo, nem pelos nomes dos cabeçalhos)"
+                "o arquivo não parece uma escala de trabalho: não encontrei as colunas de pessoa, dia e horário "
+                "(nem pelo modelo, nem pelos nomes dos cabeçalhos)"
                 if mapped is None
                 else "nenhum turno pôde ser lido com o mapeamento das colunas"
             )
