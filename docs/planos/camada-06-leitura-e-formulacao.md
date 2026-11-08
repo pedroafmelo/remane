@@ -580,3 +580,5 @@ nos relatórios dos subagentes.
 - **Conflitos previstos (simulação às 04:50):** `origin/feat/plataforma-impacto-regras` (outra sessão) conflita em 9 arquivos com a C6
   (também troca os papéis); `origin/fix/solver-contract-hours` conflita só com a A5 (`solver/model.py`). Ordem de merge: decisão do usuário.
 - **2026-11-08 06:06:** M2 (A5, B4b, C3-bis) integrado em `c6/integra`.
+- **2026-11-08 06:14:** D6 (PDF digital) integrada em `c6/integra` (`f79d7f6`). Medido pelo orquestrador: `--suite e2` sem modelo **16/16 arquivos;
+  795/795 turnos, 0 inventados, 0 perdidos; RX-13 4/4**. `c6/m2` cortado em `d441127` (antes da D6); o M3 é `c6/integra` a partir daqui.
