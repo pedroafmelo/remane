@@ -79,7 +79,7 @@ antes de abrir C6 a C8. A fatia tem prioridade sobre qualquer camada nova.
 
 | Pendência | Bloqueia | Dono | Prazo sugerido `[PROPOSTA]` |
 |---|---|---|---|
-| Hospedagem do link público: **Railway** ([DEC-037](decisoes.md)), no ar em <https://escalista-converge-production.up.railway.app> desde 2026-11-08 01:03; G1 atingido. Histórico: Fly.io em suspenso ([DEC-033](decisoes.md), [DEC-034](decisoes.md)) | C0b (G1), RE-07, RN-10 | Usuário | `[PREENCHER]` |
+| Hospedagem do link público: **Railway** ([DEC-037](decisoes.md)), no ar desde 2026-11-08 01:03 (G1 atingido); desde a manhã de 08/11 em <https://remane.up.railway.app>. Histórico: Fly.io em suspenso ([DEC-033](decisoes.md), [DEC-034](decisoes.md)) | C0b (G1), RE-07, RN-10 | Usuário | `[PREENCHER]` |
 | Chave 1 da Featherless vazia ou ausente no `.env` | C3 (teste de fumaça, failover) | Dono da chave 1 `[PREENCHER]` | Antes da C3, ~17h30 |
 | 4ª pessoa resgatar os US$ 25 (o código vence em 08/11) | C3 (pool completo), orçamento dos evals e da demo | 4ª pessoa `[PREENCHER: nome]` | Hoje, antes das 23h |
 | Testar cada chave (validade, saldo, "Unlock Model") | C3, C5 | Frente B | 1ª hora da C3 |

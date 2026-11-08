@@ -8,7 +8,7 @@ https://hackathons.canastra.ventures/. Percorra esta lista antes de enviar (e co
 - [ ] **Descrição:** problema, para quem, solução e como o agente funciona. Declara que dados e integrações são sintéticos
       ou simulados. Sinaliza se responde ao Desafio Tako.
 - [ ] **Vídeo de demonstração** do sistema rodando num caso real (sintético), mostrando também uma exceção.
-- [ ] **Link de acesso** estável, navegável e testável, com dados pré-carregados. No ar: <https://escalista-converge-production.up.railway.app> (Railway, [DEC-037](decisoes.md)); falta a demo com dados.
+- [ ] **Link de acesso** estável, navegável e testável, com dados pré-carregados. No ar: <https://remane.up.railway.app> (domínio trocado em 08/11 pela manhã; o antigo, `escalista-converge-production`, saiu do ar) (Railway, [DEC-037](decisoes.md)); falta a demo com dados.
 - [ ] **Material de apresentação** para o pitch.
 - [ ] **Ferramentas, modelos e APIs de terceiros:** copiar de [declaracao-ferramentas.md](declaracao-ferramentas.md), sem
       itens `a confirmar`.
