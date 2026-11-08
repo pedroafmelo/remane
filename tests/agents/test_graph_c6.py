@@ -1,6 +1,7 @@
-"""Agente na C6 (B4a): nó 1 `ler_e_padronizar` com as bordas reais (leitor de tabelas, cadastro simulado, prompt de
-mapeamento amarrado ao `FakeLLMClient`), reserva sem modelo, identidade, confirmação que grava o `Roster`,
-publicação e a continuidade (`start_next_week`) sem upload.
+"""Agente na C6 (B4a): nó 1 `ler_e_padronizar` com as bordas reais (leitor de tabelas, cadastro simulado, prompts de
+mapeamento e de formulação amarrados ao `FakeLLMClient`), reserva sem modelo, identidade, confirmação que grava o
+`Roster`, publicação e a continuidade (`start_next_week`) sem upload. O nó 2 e o laço do solver (B4b) estão em
+`test_graph_c6_formulate.py`, com este mesmo `C6Harness`.
 
 Os arquivos pequenos do E2 (até 8 pessoas) rodam o solver em menos de 1 s; o exemplo de 60 pessoas com solver é
 `slow`.
@@ -26,14 +27,24 @@ from escalista.domain.results import Approval, RunState
 from escalista.domain.schedule import CsvIssue, EmployeePublic
 from escalista.ingest.cadastro import enrich, load_cadastro
 from escalista.ingest.tables import read_tables
+from escalista.llm.prompts.formulate import formulate
 from escalista.llm.prompts.justify import make_justifier
 from escalista.llm.prompts.map_columns import propose_mapping
 from escalista.rules.header_aliases import guess_mapping
 from escalista.rules.loader import load_rule_card_for_week
 from escalista.rules.mapping import check_mapping
+from escalista.rules.spec import default_spec
 from escalista.rules.week import shift_schedule
 from tests.agents.support import DEMO_DIR, GOOD_JUSTIFICATION, NOW, RULES_DIR
-from tests.fakes import TOOL_JUSTIFY, TOOL_MAPPING, FakeLLMClient, FixedClock, InMemoryRepository, ListTraceSink
+from tests.fakes import (
+    TOOL_JUSTIFY,
+    TOOL_MAPPING,
+    TOOL_SPEC,
+    FakeLLMClient,
+    FixedClock,
+    InMemoryRepository,
+    ListTraceSink,
+)
 
 E2_DIR = DEMO_DIR / "e2"
 EXAMPLE = DEMO_DIR / "escala_exemplo_grade.xlsx"
@@ -54,14 +65,20 @@ def model_mapping(path: Path) -> dict:
 
 
 class C6Harness:
-    """Agente no modo C6 com as bordas reais e o modelo falso (mapeamento e justificativa por ferramenta)."""
+    """Agente no modo C6 com as bordas reais e o modelo falso (mapeamento, formulação e justificativa por ferramenta).
+
+    `formulate_spec` é o `formulate` real amarrado ao falso (o que o wiring da C3-bis vai ligar); `with_formulate=False`
+    reproduz o wiring de hoje (sem formulação: especificação padrão, sem aviso)."""
 
     def __init__(
         self,
         *,
         mappings: list[dict] | None = None,
+        specs: list[dict] | None = None,
         fail_mapping: bool = False,
+        fail_spec: bool = False,
         with_model: bool = True,
+        with_formulate: bool = True,
         repo: InMemoryRepository | None = None,
         sink: ListTraceSink | None = None,
         time_limit_s: float = 10.0,
@@ -69,9 +86,12 @@ class C6Harness:
         self.repo = repo or InMemoryRepository()
         self.sink = sink or ListTraceSink()
         self.clock = FixedClock(NOW)
+        failing = {TOOL_MAPPING} if fail_mapping else set()
+        if fail_spec:
+            failing.add(TOOL_SPEC)
         self.llm = FakeLLMClient(
-            by_tool={TOOL_MAPPING: mappings or [], TOOL_JUSTIFY: [GOOD_JUSTIFICATION] * 10},
-            fail_tools={TOOL_MAPPING} if fail_mapping else (),
+            by_tool={TOOL_MAPPING: mappings or [], TOOL_SPEC: specs or [], TOOL_JUSTIFY: [GOOD_JUSTIFICATION] * 10},
+            fail_tools=failing,
         )
 
         def map_columns(tables, run_id, parent_id):  # o que o wiring da C3 vai ligar
@@ -88,6 +108,7 @@ class C6Harness:
             cadastro=load_cadastro(DEMO_DIR),
             enrich=enrich,
             load_card=partial(load_rule_card_for_week, RULES_DIR),
+            formulate_spec=partial(formulate, self.llm) if with_formulate else None,
             seed=42,
             time_limit_s=time_limit_s,
             num_workers=1,
@@ -319,7 +340,7 @@ def test_confirmation_saves_roster_v1_and_approval_publishes() -> None:
     state = h.agent.confirm(read.run_id)
 
     assert state.phase == "awaiting_approval" and state.report.total == 0
-    assert state.roster_version == 1 and state.week_start == FILE_WEEK and state.spec is None
+    assert state.roster_version == 1 and state.week_start == FILE_WEEK and state.spec == default_spec()
     roster = h.agent.roster()
     assert roster == h.repo.get_roster(1)
     assert roster.version == 1 and roster.source_run_id == read.run_id
@@ -328,7 +349,13 @@ def test_confirmation_saves_roster_v1_and_approval_publishes() -> None:
     assert all(e.sex is None for e in roster.employees)
     assert state.comparison.before.violations >= 0 and state.justification is not None
     kinds = h.kinds(read.run_id)
-    assert kinds[kinds.index("read.summary") + 1 :][:3] == ["read.confirmed", "roster.saved", "solver.run"]
+    assert kinds[kinds.index("read.summary") + 1 :][:5] == [
+        "read.confirmed",
+        "roster.saved",
+        "llm.formulate",
+        "spec.validate",
+        "solver.run",
+    ]
     assert h.event(read.run_id, "roster.saved").payload["version"] == 1
 
     done = h.publish(state)
@@ -375,7 +402,9 @@ def test_no_sex_or_names_in_trace_and_people_as_public() -> None:
     assert len(people) == 8 and all(isinstance(p, EmployeePublic) for p in people)
     assert '"sex"' not in json.dumps([p.model_dump(mode="json") for p in people])
     for e in h.agent.trace(read.run_id):
-        if e.kind != "llm.justify":
+        if e.kind == "llm.formulate":  # sem pedido: o nó 2 não chama o modelo
+            assert e.cost_usd == Decimal(0) and e.payload["cost_basis"] == "sem entrada para o modelo"
+        elif e.kind != "llm.justify":
             assert e.cost_usd == Decimal(0) and e.payload["cost_basis"] == NO_MODEL
 
 
