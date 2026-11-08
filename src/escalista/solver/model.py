@@ -7,6 +7,9 @@ Modelo, por loja (as lojas são independentes, porque a pessoa só trabalha na p
 - **Restrições duras (4 primitivas do cartão):** horas na semana ≤ `jornada_semanal_max`; horas no dia ≤
   `jornada_diaria_max` (o catálogo já respeita, e a restrição explícita fica de garantia); entre turnos de dias
   consecutivos, descanso ≥ `interjornada_min`; dias sem turno ≥ `repouso_semanal`. O solver **não escala hora extra**.
+- **Carga do contrato:** horas na semana ≥ mín(`contract_hours`, o que a lei permite com o repouso e a jornada
+  diária), porque o mensalista recebe a carga contratada trabalhando ou não; sem isso, a "economia" contava salário
+  que continua sendo pago.
 - **Cobertura com penalidade** (não é restrição dura): `falta[faixa] ≥ pedidas − cobertas`. Objetivo, em inteiros
   (centavos × minutos): Σ turno × minutos × salário-hora em centavos + `PENALTY_WAGE_HOURS` × 60 × maior salário em
   centavos × Σ falta. Uma faixa a menos sem gente vale mais que 100 horas de salário: cobrir vem antes de economizar.
@@ -157,6 +160,8 @@ def _solve_store(
         model.add(sum(works) <= DAYS - limits.rest_days)
         week_minutes[e.id] = sum(k.duration_min * x[e.id, d, k] for d in range(DAYS) for k in catalog)
         model.add(week_minutes[e.id] <= limits.weekly_min)
+        # Carga do contrato: o mensalista recebe por ela trabalhando ou não, então a escala a cumpre (até o teto legal).
+        model.add(week_minutes[e.id] >= min(e.contract_hours * 60, limits.per_person_week_min))
         # Interjornada: turno do dia d que termina em `end` conflita com o do dia d+1 que começa antes de
         # end + descanso − 24h. Para cada fim possível, "termina em ≥ end" + "começa cedo demais" ≤ 1.
         for d in range(DAYS - 1):
