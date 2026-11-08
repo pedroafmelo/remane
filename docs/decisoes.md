@@ -587,6 +587,6 @@ Formato:
 - **Alternativas consideradas (as oferecidas):** só o simulador.
 - **Consequências:** `whatsapp-web.js` sai da [declaração](declaracao-ferramentas.md) (não chegou ao repositório); entra a WhatsApp
   Cloud API (planejado). O chip da Claro deixa de ser necessário. **`[PREENCHER]`:** quem cria o app na Meta; quantos números de
-  destino o número de teste aceita (não confirmado na doc); se o webhook precisa do app fora do modo de desenvolvimento. **Pendente
-  com o usuário:** a seção de teste pelo WhatsApp da landing (QR) deixa de funcionar para jurados, porque o número de teste só fala com
-  os números cadastrados.
+  destino o número de teste aceita (não confirmado na doc); se o webhook precisa do app fora do modo de desenvolvimento. A seção de teste pelo WhatsApp da landing (QR)
+  deixaria de funcionar para jurados, porque o número de teste só fala com os números cadastrados: **o usuário escolheu "Trocar pelo
+  simulador"** ({T}); a seção vira um convite ao celular simulado da demo, e saem o QR, o botão do WhatsApp no hero e o `qrcode.react`.
