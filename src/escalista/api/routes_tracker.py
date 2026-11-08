@@ -4,8 +4,8 @@ Cada rota tem linha na matriz de `tests/api/test_access.py`.
 - gestor e colaborador: `GET /api/demo/clock`, `POST /api/demo/clock/advance` (avança e varre);
 - só gestor: `POST /api/demo/reset`;
 - colaborador: `GET /api/colaborador/pessoas`, `GET /api/colaborador/caixa`, `POST /api/colaborador/aviso`,
-  `POST /api/colaborador/caso/{case_id}/anexo` (PDF no corpo bruto), `POST /api/colaborador/oferta/{offer_id}` e
-  `POST /api/colaborador/resposta`.
+  `POST /api/colaborador/caso/{case_id}/anexo` (PDF ou foto PNG/JPEG no corpo bruto),
+  `POST /api/colaborador/oferta/{offer_id}` e `POST /api/colaborador/resposta`.
 
 Quem é o colaborador (`as`): sem `as`, a pessoa padrão da demo (`ExceptionDesk.default_person`). Trocar de pessoa só
 com `DEMO_MODE` ligado e só para alguém do quadro da escala publicada (RX-10: o `Tracker.inbound` registra a recusa);
@@ -32,10 +32,12 @@ from escalista.api.excecoes import ExceptionDesk
 from escalista.api.tracker_wiring import InboundLog, reset_demo
 from escalista.clock.demo import DEMO_CLOCK_BASE
 from escalista.domain.contracts import Role
-from escalista.domain.tracking import Attachment, CaseView
+from escalista.domain.tracking import Attachment, CaseView, MediaType
 
 MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024  # 5 MB (MiB)
 PDF_MAGIC = b"%PDF"
+PNG_MAGIC = b"\x89PNG"
+JPEG_MAGIC = b"\xff\xd8\xff"
 
 
 # --- respostas e corpos ---------------------------------------------------------------------------------------------
@@ -188,8 +190,19 @@ def _guarded[T](log: InboundLog, message_id: str, fn: Callable[[], T]) -> T:
         raise
 
 
-async def _read_pdf(request: Request) -> bytes:
-    """Lê o corpo bruto em memória (sem arquivo temporário), até 5 MB; só PDF pelos bytes iniciais."""
+def _media_type(head: bytes) -> MediaType | None:
+    """O tipo do anexo pelos bytes iniciais (nunca pelo cabeçalho `Content-Type`): PDF, PNG ou JPEG."""
+    if head.lstrip().startswith(PDF_MAGIC):
+        return "application/pdf"
+    if head.startswith(PNG_MAGIC):
+        return "image/png"
+    if head.startswith(JPEG_MAGIC):
+        return "image/jpeg"
+    return None
+
+
+async def _read_attachment(request: Request) -> tuple[bytes, MediaType]:
+    """Lê o corpo bruto em memória (sem arquivo temporário), até 5 MB; só PDF, PNG ou JPEG pelos bytes iniciais."""
     declared = request.headers.get("content-length", "")
     if declared.isdigit() and int(declared) > MAX_ATTACHMENT_BYTES:
         raise HTTPException(status.HTTP_413_CONTENT_TOO_LARGE, "o anexo passa de 5 MB")
@@ -198,9 +211,10 @@ async def _read_pdf(request: Request) -> bytes:
         body += chunk
         if len(body) > MAX_ATTACHMENT_BYTES:
             raise HTTPException(status.HTTP_413_CONTENT_TOO_LARGE, "o anexo passa de 5 MB")
-    if not bytes(body[:1024]).lstrip().startswith(PDF_MAGIC):
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "o anexo precisa ser um PDF")
-    return bytes(body)
+    media_type = _media_type(bytes(body[:1024]))
+    if media_type is None:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "o anexo precisa ser um PDF, PNG ou JPEG")
+    return bytes(body), media_type
 
 
 # --- rotas ----------------------------------------------------------------------------------------------------------
@@ -313,16 +327,16 @@ async def attach(
     as_: str | None = Query(default=None, alias="as"),  # noqa: B008
     file_name: str = Query(default="anexo.pdf", max_length=200),  # noqa: B008
 ) -> CaseView:
-    """Comprovação em PDF no corpo bruto (até 5 MB), só do dono do caso. Lida em memória; nada vai a disco."""
+    """Comprovação (PDF ou foto PNG/JPEG) no corpo bruto, até 5 MB, só do dono do caso. Só em memória."""
     person = await run_in_threadpool(resolve_person, request, as_)
-    data = await _read_pdf(request)
+    data, media_type = await _read_attachment(request)
     tracker = _tracker(request)
     case = await run_in_threadpool(_flow, lambda: tracker.case(case_id))
     if case.employee_id != person:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "só quem avisou anexa a comprovação deste caso")
     log = _inbound(request)
-    message_id = log.record(party=person, template="anexo", case_id=case_id, media_type="application/pdf")
-    attachment = Attachment(data=data, media_type="application/pdf", filename=file_name)
+    message_id = log.record(party=person, template="anexo", case_id=case_id, media_type=media_type)
+    attachment = Attachment(data=data, media_type=media_type, filename=file_name)
     return await run_in_threadpool(_guarded, log, message_id, lambda: tracker.attach(case_id, attachment))
 
 

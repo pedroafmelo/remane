@@ -17,6 +17,7 @@ from escalista.store.sql_repository import SqlRepository
 from tests.fakes import FakeLLMClient
 
 ATESTADO = Path("data/demo/acompanhamento/atestados/at-09-cid-espalhado.pdf")
+PHOTOS = Path("data/demo/acompanhamento/atestados")
 CID = "J11"
 THURSDAY = "2027-01-14"
 READING = {
@@ -206,14 +207,41 @@ def test_attachment_must_be_a_pdf_of_the_case_owner(tmp_path):
     api.login("colaborador")
     case = api.post("/api/colaborador/aviso", json={"as": "P101", "day": THURSDAY, "kind": "falta"}).json()
     url = f"/api/colaborador/caso/{case['case_id']}/anexo"
-    not_pdf = api.post(url, params={"as": "P101"}, content=b"\x89PNG\r\n imagem", headers={"Content-Type": "image/png"})
-    assert not_pdf.status_code == 422
+    not_allowed = api.post(url, params={"as": "P101"}, content=b"GIF89a imagem", headers={"Content-Type": "image/gif"})
+    assert not_allowed.status_code == 422
     other = api.post(url, params={"as": "P105"}, content=ATESTADO.read_bytes())
     assert other.status_code == 403
     too_big = api.post(url, params={"as": "P101"}, content=b"%PDF" + b"0" * (5 * 1024 * 1024))
     assert too_big.status_code == 413
     box = api.get("/api/colaborador/caixa", params={"as": "P101"}).json()
     assert [m["template"] for m in box["messages"] if m["direction"] == "in"] == ["aviso_falta"]  # recusas não ficam
+
+
+@pytest.mark.parametrize(
+    ("content", "media_type"),
+    [
+        (PHOTOS / "at-05-foto-legivel.png", "image/png"),
+        (b"\xff\xd8\xff\xe0 jpeg sintetico", "image/jpeg"),
+    ],
+)
+def test_photo_attachment_is_accepted_with_its_media_type(tmp_path, content, media_type):
+    """PNG e JPEG são aceitos pelos bytes iniciais; o tipo vai para a caixa. Não se afirma o veredito da foto aqui."""
+    api = make_client(tmp_path)
+    api.login("colaborador")
+    case = api.post("/api/colaborador/aviso", json={"as": "P101", "day": THURSDAY, "kind": "falta"}).json()
+    data = content.read_bytes() if isinstance(content, Path) else content
+    sent = api.post(
+        f"/api/colaborador/caso/{case['case_id']}/anexo",
+        params={"as": "P101", "file_name": "foto.png"},
+        content=data,
+        headers={"Content-Type": media_type},
+    )
+    assert sent.status_code == 200, sent.text
+    assert sent.json()["case_id"] == case["case_id"] and "abono" in sent.json()
+    inbound = [
+        m for m in api.get("/api/colaborador/caixa", params={"as": "P101"}).json()["messages"] if m["direction"] == "in"
+    ]
+    assert inbound[-1]["template"] == "anexo" and inbound[-1]["attachment_media_type"] == media_type
 
 
 def test_refused_report_leaves_no_inbound_message(tmp_path):
