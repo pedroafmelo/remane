@@ -1,6 +1,6 @@
 """Ligação da API ao agente da fatia (plano da C5, seção 4: C2 e C4).
 
-`SliceAgentC6` (o `SliceAgent` mais a continuidade da C6) é o que as rotas de `routes_runs.py` consomem. `build_agent`
+`SliceAgent` (com a continuidade da C6) é o que as rotas de `routes_runs.py` consomem. `build_agent`
 liga o agente LangGraph da I1 (`OptimizerSliceAgent`, que traduz os erros do agente nos daqui) com o rastro e o
 repositório em SQL e o cliente Featherless. O `FakeSliceAgent` (respostas fixas) fica só para os testes de rota,
 injetado em `create_app(agent=...)`.
@@ -19,9 +19,9 @@ from __future__ import annotations
 import functools
 import logging
 from collections.abc import Callable
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import TYPE_CHECKING, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
 
 from fastapi import Request
 from sqlalchemy import Engine
@@ -34,15 +34,11 @@ from escalista.domain.results import Approval, RunState, ScheduleVersion
 from escalista.domain.roster import Roster
 from escalista.domain.schedule import EmployeePublic, Schedule
 
-if TYPE_CHECKING:
-    from escalista.domain.rules import RuleCard
-
 log = logging.getLogger("escalista")
 
 MAX_UPLOAD_BYTES = 1024 * 1024  # 1 MB (MiB): acima disso, 413
 DEFAULT_DEMO_FILES_DIR = "data/demo"
 DEFAULT_RULES_DIR = "data/regras"
-DEMO_WEEK_START = date(2027, 1, 11)  # a semana da demo (11 a 17/01/2027), já sob as 42h e os 2 repousos da EC 141
 BRT = timezone(timedelta(hours=-3), "BRT")  # sem horário de verão desde 2019
 
 
@@ -98,17 +94,6 @@ class SliceAgent(Protocol):
         """Os eventos do rastro da execução, em ordem; cada um com `cost_usd` (0 nos passos sem modelo)."""
         ...
 
-
-@runtime_checkable
-class SliceAgentC6(SliceAgent, Protocol):
-    """O `SliceAgent` com a continuidade da C6 (planejar a próxima semana sem upload e ler o quadro). É o que as rotas
-    consomem.
-
-    Os dois métodos ficam num protocolo à parte só enquanto o `OptimizerAgent` da frente B não os tem (B4a): o teste
-    `tests/agents/test_graph.py::test_agent_satisfies_the_api_protocol` confere `isinstance(agente, SliceAgent)`, e
-    pôr os métodos no `SliceAgent` o quebraria antes da hora. Quando a B4a entregar, os dois protocolos podem virar um.
-    """
-
     def start_next_week(self) -> RunState:
         """Planeja a semana seguinte à última publicada, sem upload (modo `continuidade`): o "antes" é a publicada
         deslocada 7 dias, e o quadro e a demanda são os do último `Roster`. Devolve a fase `awaiting_confirm`.
@@ -118,6 +103,9 @@ class SliceAgentC6(SliceAgent, Protocol):
     def roster(self) -> Roster | None:
         """O último quadro confirmado, ou `None`. A API só o expõe com as pessoas como `EmployeePublic` (RN-13)."""
         ...
+
+
+SliceAgentC6 = SliceAgent  # nome da C6 mantido: os dois protocolos viraram um quando o agente da B4a entregou
 
 
 class SliceAgentError(Exception):
@@ -148,10 +136,15 @@ LLMFactory = Callable[[TraceSink, Clock], LLMClient]
 def build_agent(
     settings: Settings, *, engine: Engine | None = None, llm_factory: LLMFactory | None = None
 ) -> SliceAgentC6:
-    """Liga o agente real: `SqlTraceSink`, `SqlRepository`, relógio do sistema e o cliente Featherless.
+    """Liga o agente real no caminho da C6: `SqlTraceSink`, `SqlRepository`, relógio do sistema e o cliente Featherless.
+
+    Nada fixo de semana, quadro ou demanda: o agente lê as tabelas do arquivo (mapeamento pelo modelo, com a heurística
+    de reserva), completa com o cadastro simulado de `data/demo/` (integração simulada, declarada nas premissas do
+    resumo) e carrega o cartão de regras da semana de cada execução.
 
     `engine` e `llm_factory` existem para os testes (SQLite em memória e falso de LLM); em produção ficam `None`
-    (banco de `settings.database_url` e cliente da Featherless com as chaves do ambiente; sem chave, RX-12)."""
+    (banco de `settings.database_url` e cliente da Featherless com as chaves do ambiente; sem chave, o cliente levanta
+    RX-12 e o agente cai na heurística com aviso, sem inventar texto)."""
     import escalista.audit.tables  # noqa: F401 (registra a tabela antes do init_db)
     import escalista.store.sql_repository  # noqa: F401 (idem)
     from escalista.agents.optimizer.graph import OptimizerAgent
@@ -159,11 +152,13 @@ def build_agent(
     from escalista.audit.sink import SqlTraceSink
     from escalista.clock.system import SystemClock
     from escalista.db import init_db, make_engine
-    from escalista.ingest.csv_schedule import read_schedule_csv
-    from escalista.ingest.demo_network import load_demo_network
+    from escalista.ingest.cadastro import enrich, load_cadastro
+    from escalista.ingest.tables import read_tables
     from escalista.llm.client import FeatherlessClient
     from escalista.llm.prompts.justify import make_justifier
-    from escalista.rules.loader import load_rule_card
+    from escalista.llm.prompts.map_columns import propose_mapping
+    from escalista.rules.loader import load_rule_card_for_week
+    from escalista.rules.mapping import check_mapping
     from escalista.store.sql_repository import SqlRepository
 
     engine = engine or make_engine(settings.database_url)
@@ -174,27 +169,23 @@ def build_agent(
         client = llm_factory(sink, clock)
     else:  # sem chave, o cliente sobe e `complete` levanta RX-12 (testado), sem inventar texto
         client = FeatherlessClient.from_settings(settings, trace_sink=sink, clock=clock)
-    card: RuleCard = load_rule_card(Path(DEFAULT_RULES_DIR), DEMO_WEEK_START)
-    stores, employees, demand = load_demo_network(Path(DEFAULT_DEMO_FILES_DIR))
-    read_csv = functools.partial(read_schedule_csv, employees=employees, stores=stores, week_start=DEMO_WEEK_START)
+
+    def map_columns(tables, run_id, parent_id):  # noqa: ANN001, ANN202 (o modelo propõe, `check_mapping` confere)
+        return propose_mapping(client, tables, run_id=run_id, parent_id=parent_id, check=check_mapping)
+
     agent = OptimizerAgent(
         repo=SqlRepository(engine),
         sink=sink,
         clock=clock,
-        read_csv=read_csv,
         justify=make_justifier(client),
         list_events=sink.list_events,
-        card=card,
-        stores=stores,
-        employees=employees,
-        demand=demand,
-        week_start=DEMO_WEEK_START,
+        read_tables=read_tables,
+        map_columns=map_columns,
+        cadastro=load_cadastro(Path(DEFAULT_DEMO_FILES_DIR)),
+        enrich=enrich,
+        load_card=functools.partial(load_rule_card_for_week, Path(DEFAULT_RULES_DIR)),
     )
-    log.info(
-        "agente da fatia: OptimizerAgent (LangGraph), semana %s, chaves: %d",
-        DEMO_WEEK_START,
-        len(settings.featherless_keys),
-    )
+    log.info("agente da fatia: OptimizerAgent (LangGraph, caminho C6), chaves: %d", len(settings.featherless_keys))
     return OptimizerSliceAgent(agent)
 
 

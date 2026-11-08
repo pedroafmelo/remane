@@ -21,7 +21,7 @@ export function UploadPanel({ busy, onFile, onDemo }: { busy: boolean; onFile: (
           Usar exemplo em CSV (formato padrão)
         </Button>
         <Button variant="secondary" disabled={busy} onClick={() => onDemo("escala_defeito.csv")}>
-          Exemplo com defeitos (mostra o RX-13)
+          Exemplo com defeitos (mostra os problemas com a linha)
         </Button>
         <span className="text-[13px] text-ink-muted">ou</span>
         <input

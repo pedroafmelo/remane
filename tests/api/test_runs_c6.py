@@ -1,11 +1,10 @@
 """Rotas da C6 contra o agente falso (plano da C6, seção 14, C1): upload binário (CSV, XLSX e PDF por extensão e bytes
 iniciais), `confirm` com `ConfirmInput` opcional, `POST /api/runs/next-week`, `GET /api/roster` sem `sex` (RN-13) e o
-adaptador do agente real enquanto a B4a não chega.
+adaptador do agente real.
 
 Sempre `Settings(_env_file=None)` com `monkeypatch`: estes testes nunca leem o `.env` real.
 """
 
-import logging
 from datetime import date, timedelta
 
 import pytest
@@ -13,7 +12,7 @@ import pytest
 from escalista.api import wiring
 from escalista.api.app import create_app
 from escalista.api.fake_agent import NO_FIRST_SCHEDULE, FakeSliceAgent
-from escalista.api.optimizer_adapter import NEXT_WEEK_UNAVAILABLE, OptimizerSliceAgent
+from escalista.api.optimizer_adapter import OptimizerSliceAgent
 from escalista.api.wiring import MAX_UPLOAD_BYTES
 from escalista.config import Settings
 from escalista.domain.reading import ConfirmInput, IdentityAnswer
@@ -249,28 +248,17 @@ def test_no_response_of_the_c6_routes_carries_sex(tmp_path):
         assert "sex" not in keys_of(body), body
 
 
-# --- adaptador do agente real enquanto a B4a não chega ---
+# --- adaptador do agente real ---
 
 
-class _AgentC5:
-    """Só a superfície da C5 (sem `start_next_week`, `roster` nem `data` no `confirm`)."""
-
-    def __init__(self) -> None:
-        self.confirmed: list[tuple] = []
-
-    def confirm(self, run_id: str) -> RunState:
-        self.confirmed.append((run_id,))
-        return RunState(run_id=run_id, phase="awaiting_approval")
-
-
-class _AgentC6(_AgentC5):
+class _AgentC6:
     """Com as assinaturas da B4a."""
 
     def __init__(self, roster: Roster | None = None, *, phase_error: bool = False) -> None:
-        super().__init__()
+        self.confirmed: list[tuple] = []
         self._roster, self._phase_error = roster, phase_error
 
-    def confirm(self, run_id: str, data: ConfirmInput | None = None) -> RunState:  # type: ignore[override]
+    def confirm(self, run_id: str, data: ConfirmInput | None = None) -> RunState:
         self.confirmed.append((run_id, data))
         return RunState(run_id=run_id, phase="awaiting_approval")
 
@@ -283,19 +271,6 @@ class _AgentC6(_AgentC5):
 
     def roster(self) -> Roster | None:
         return self._roster
-
-
-def test_adapter_without_the_new_methods_degrades_without_breaking(caplog):
-    inner = _AgentC5()
-    adapter = OptimizerSliceAgent(inner)  # type: ignore[arg-type]
-    assert adapter.confirm("run-1").phase == "awaiting_approval"
-    with caplog.at_level(logging.WARNING, logger="escalista"):
-        adapter.confirm("run-2", ConfirmInput(note="a Ana está de férias"))
-    assert inner.confirmed == [("run-1",), ("run-2",)]
-    assert "ConfirmInput" in caplog.text and "Ana" not in caplog.text  # o texto do pedido não vai ao log
-    with pytest.raises(wiring.RunPhaseError, match=NEXT_WEEK_UNAVAILABLE):
-        adapter.start_next_week()
-    assert adapter.roster() is None
 
 
 def test_adapter_forwards_when_the_agent_has_the_new_methods():
@@ -317,7 +292,7 @@ def test_adapter_translates_the_agent_phase_error_of_next_week():
 
 
 def test_real_app_answers_next_week_409_and_roster_404_on_a_fresh_database(tmp_path):
-    """Com o agente real e o banco vazio: sem 500, antes e depois da B4a (sem publicada nem quadro)."""
+    """Com o agente real e o banco vazio: sem 500 (sem publicada nem quadro)."""
     from fastapi.testclient import TestClient
 
     settings = Settings(
@@ -335,4 +310,4 @@ def test_real_app_answers_next_week_409_and_roster_404_on_a_fresh_database(tmp_p
 
 def test_fake_and_adapter_satisfy_the_c6_protocol():
     assert isinstance(FakeSliceAgent(), wiring.SliceAgentC6)
-    assert isinstance(OptimizerSliceAgent(_AgentC5()), wiring.SliceAgentC6)  # type: ignore[arg-type]
+    assert isinstance(OptimizerSliceAgent(_AgentC6()), wiring.SliceAgentC6)  # type: ignore[arg-type]

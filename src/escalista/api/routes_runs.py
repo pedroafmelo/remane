@@ -49,7 +49,7 @@ XLSX_MEDIA_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.s
 DEMO_FILES: dict[str, tuple[str, str]] = {
     "escala_exemplo_grade.xlsx": (XLSX_MEDIA_TYPE, "Escala de exemplo em planilha (XLSX, grade)"),
     "escala_atual.csv": (CSV_MEDIA_TYPE, "Escala de exemplo em CSV (formato padrão)"),
-    "escala_defeito.csv": (CSV_MEDIA_TYPE, "Exemplo com defeitos (mostra o RX-13)"),
+    "escala_defeito.csv": (CSV_MEDIA_TYPE, "Exemplo com defeitos (mostra os problemas com a linha)"),
 }
 TEXT_EXTENSIONS = frozenset({".csv", ".txt"})
 XLSX_MAGIC = b"PK\x03\x04"
