@@ -1,6 +1,6 @@
 # Plano de horas
 
-Última atualização: 2026-11-08 00:45 (C5 executada, G3 itens 1 a 5 passaram; antes: G3 replanejado local, [DEC-038](decisoes.md); antes: gate da primeira fatia às 21h30 e noite com 4 pessoas, [DEC-027](decisoes.md) e [DEC-028](decisoes.md); camadas em [plano-implementacao.md](plano-implementacao.md)). **Sugestão**, não compromisso: ajuste ao decidir a ideia e registre em
+Última atualização: 2026-11-08 01:44 (integração do remoto com a C5, [DEC-042](decisoes.md): G2 entregue por Pedro Veloso e G1 atingido no Railway só com a landing; antes: 00:45, C5 executada, G3 itens 1 a 5 passaram; antes: G3 replanejado local, [DEC-038](decisoes.md); antes: gate da primeira fatia às 21h30 e noite com 4 pessoas, [DEC-027](decisoes.md) e [DEC-028](decisoes.md); camadas em [plano-implementacao.md](plano-implementacao.md)). **Sugestão**, não compromisso: ajuste ao decidir a ideia e registre em
 [estado-do-projeto.md](estado-do-projeto.md). Horário de Brasília. Prazo duro: **dom 13h00**.
 
 ## Linha do tempo com gates
@@ -70,7 +70,7 @@ decidir nesse momento; SPA React com login e botões de demo; spike de 1 h do Wh
 | C0a e G0 (esqueleto, contratos v0, teste de fronteiras, `/health`) | 2026-11-07 16:41 (plano da C0) |
 | Modelo e tracing funcionando | |
 | Plano macro de implementação | 2026-11-07 16:11 (aprovado, DEC-029) |
-| Primeiro fluxo ponta a ponta | |
+| Primeiro fluxo ponta a ponta | 2026-11-08 00:42 (G3 itens 1 a 5, local; item 6 à mão pendente) |
 | Evals rodando | |
-| Link público estável | |
+| Link público: landing no ar (G1) | 2026-11-08 01:03 (Railway, DEC-037); app completo ainda não publicado |
 | Submissão enviada | |

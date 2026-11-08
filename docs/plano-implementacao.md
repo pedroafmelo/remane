@@ -101,7 +101,7 @@ As janelas fixas do evento e o cronograma estão no [plano de horas](plano-de-ho
 |---|---|---|---|
 | G0 · C0a pronta | ~17h15 `[PROPOSTA]`; **atingido às 16h41** (plano da C0) | `pytest` e `ruff` verdes; teste de fronteiras ativo; contratos v0 no `main` | As frentes não abrem; a C0 continua com prioridade |
 | G1 · Hospedagem e deploy de teste | Fim da C0 ([DEC-027](decisoes.md)) | `/health` responde 200 na URL pública | Plano B: túnel do notebook ([arquitetura, seção 12](arquitetura.md)) até a decisão; registrar o risco |
-| G2 · Política fictícia | 19h ([DEC-028](decisoes.md)) | YAMLs em `data/regras/politica/` e `convencao/` | C1 segue só com `lei/`; C7 e C8 esperam |
+| G2 · Política fictícia | 19h ([DEC-028](decisoes.md)); **entregue** por Pedro Veloso (PR #3) e lida pelo solver desde a [DEC-042](decisoes.md) | YAMLs em `data/regras/politica/` e `convencao/` | C1 segue só com `lei/`; C7 e C8 esperam |
 | **G3 · Primeira fatia vertical** | **21h30** ([DEC-028](decisoes.md)); venceu sem a fatia; replanejada no [plano da C5](planos/camada-05-fatia-vertical.md) | Seção 2, **localmente em `localhost:8000`** ([DEC-038](decisoes.md); antes: no deploy) | Ordem de corte; nada de camada nova antes da fatia |
 | G4 · Núcleo das features v1 | Dom 08h30 (janela do plano de horas) | C6, C7 e C8 concluídas ou cortadas conscientemente | Cortar na ordem do produto, seção 2 |
 | G5 · Evals completos | Dom 10h30 | 30 cenários num comando, com relatório (RN-04) | Reportar só os que rodam, sem arredondar |

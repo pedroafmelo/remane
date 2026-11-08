@@ -1,6 +1,6 @@
 # Registro de decisões
 
-Última atualização: 2026-11-08 00:46. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
+Última atualização: 2026-11-08 01:44. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
 entrada:** se a decisão mudar, crie outra e marque a antiga como `substituída por DEC-NNN`. Use `/decisao` para registrar e
 propagar o efeito para as outras docs.
 
@@ -552,3 +552,18 @@ Formato:
 - **Motivo: [motivo não informado].**
 - **Alternativas consideradas (as oferecidas):** (1) o usuário commita; (2) só o usuário integra; (3) parar às ~03h e voltar às 07h, ou seguir sem supervisão até o G3; (4) só o usuário commita.
 - **Consequências:** o fluxo da [seção 7 do plano da C5](planos/camada-05-fatia-vertical.md) muda: quem integra é o orquestrador, e não o usuário, sempre sem push. "Indefinido" foi lido pelo agente como "seguir até o G3" (**interpretação, não confirmada**). Decisões tomadas pelo **agente** durante a execução, sem consulta, registradas aqui para revisão: (a) upload do CSV em corpo bruto `text/csv`, porque `python-multipart` não está instalado e `uv add` estava vedado; (b) teto de 8 pessoas por faixa na demanda sintética (D2b), porque o ótimo deixava 9,5 pessoa-horas descobertas e a demo padrão cairia sempre no RX-02; (c) uma tarefa a mais, S1 (`store/`), que o plano previa sem tarefa. Execução e G3 no [registro da C5](planos/camada-05-fatia-vertical.md), seção 12.
+
+## DEC-042 · Integração do remoto com a C5 numa branch própria: Next + Remane, regras do Pedro Veloso no solver, nome do agente Pat
+
+- 2026-11-08 01:44 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** o `origin/main` recebeu os PRs #2 a #6 (landing Remane em Next.js, posicionamento, convenção e política fictícias de Pedro Veloso, Railway, G1) enquanto o `main` local recebia a C5 inteira (24 commits, sem push). O PR #7 (design system do Pedro Melo) estava aberto e em conflito. As DEC-035 a DEC-037 existiam nos dois lados com conteúdo diferente.
+- **Decisão (o que o usuário disse):** "resolver os conflitos, integrar os arquivos do Pedro Veloso e o design system do Pedro Melo, atualizar o repositório, para poder prosseguir"; sobre as regras do Pedro Veloso: "B: Faz o solver usar as regras dele" (entre manter as duas camadas lado a lado, sem o motor lê-las, e fazer o motor lê-las); "O nome do agente é Pat" (produto **Remane**, agente **Pat**, pacote Python `escalista`); "Deixa o whatsapp para depois"; todo o front deve sair do design system.
+- **Motivo: [motivo não informado].**
+- **Alternativas consideradas (as oferecidas):** regras do Pedro lado a lado com as do D1, sem o motor lê-las (opção a); WhatsApp planejado em paralelo.
+- **Como o agente encaixou (`[PROPOSTA]`, sem confirmação do usuário):**
+  - **Numeração:** as DEC-035 a 038 locais viraram **038 a 041** (as do remoto, já públicas, ficam 035 a 037); a série está em ordem no arquivo.
+  - **Git:** branch `integrate/remote-main` em worktree próprio, com merge de `origin/main`, de `origin/docs/design-system` (conteúdo do PR #7) e dos dois ramos de trabalho; **sem push no `main`** (o Railway publica a cada merge na `main`).
+  - **Front:** a SPA da fatia (Vite) foi portada para Next com o design system em `/entrar/` (3 botões de demo) e `/plataforma/`; `web/src/` removido.
+  - **Regras:** o carregador lê `restringe: <primitiva>` com o campo do valor do Pedro (`percentual`, `horas`, `dias`) e **não** lê `amplia:` (fica `info`): tratá-lo como primitiva faz a fusão ver a jornada de 9h da convenção como "mais frouxa" que a lei e abrir um RX-01 espúrio na semana da demo. **Efeito:** a ampliação diária (9h a partir de 16/12/2026) ainda **não** alimenta o motor; a fatia não precisa dela (5 x 8 h = 40 h < 42 h). Isso é um recorte da opção B, **a confirmar** pelo usuário.
+  - **D1:** `convencao/demo.yaml` e `politica/demo.yaml` removidos; a autorização prévia do DP para hora extra, sem equivalente no Pedro, ficou em `politica/autorizacao_hora_extra.yaml`.
+- **Consequências:** em vigor na demo, vêm do Pedro: hora extra a 60% (`cct_adicional_hora_extra`) e interjornada de 12 h (`pol_interjornada`). Os números da demo não mudaram (medidos pelo subagente: 158 violações e R$ 33.989,15 antes; 0 e R$ 20.014,00 depois). Os cenários E1-03 e E1-10 mudaram o controle "no limite" de 11 h para 12 h. O `rule_id` das violações de interjornada plantadas passou a `pol_interjornada`. **Ficam abertos:** WhatsApp (adiado); RX-01 e RX-11 plantados pelo Pedro **não** saem do cartão (`cct_repouso_semanal` não tem `restringe` e `cct_folgas_dominicais` é `info`); o **Patrick** (personagem da landing, DEC-036) e o **Pat** (agente) se confundem, decisão do Pedro Melo; o app completo ainda não está no Railway (precisa de `SESSION_SECRET`, `DEMO_MODE` e chaves como variáveis do serviço).
