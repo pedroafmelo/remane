@@ -1147,9 +1147,14 @@ class Tracker:
         if reading is None:
             self._open_card(case, cards.rx12_reading_card(self._clock.now(), case.shift))
         elif reading.verdict != "valido":
+            seen = (
+                "documento não reconhecido como atestado (outro tipo de documento ou ilegível)."
+                if reading.verdict == "ilegivel"
+                else f"{reading.verdict}; motivos: {', '.join(reading.reasons) or 'nenhum'}."
+            )
             evidence = [
                 f"Turno: {shift_label(case.shift)}, {self._store(world, case)}",
-                f"Leitura: {reading.verdict}; motivos: {', '.join(reading.reasons) or 'nenhum'}.",
+                f"Leitura: {seen}",
                 "Abono provisório até a sua confirmação.",
             ]
             card = cards.policy_card(self._policy_cards["RX-08"], self._clock.now(), evidence)
