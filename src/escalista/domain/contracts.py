@@ -10,7 +10,7 @@ from __future__ import annotations
 from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
-from typing import Any
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StrictInt
 
@@ -52,9 +52,34 @@ class TraceEvent(BaseModel):
     payload: dict[str, Any] = Field(default_factory=dict)  # já redigido (RN-06)
 
 
+class TextPart(BaseModel):
+    """Trecho de texto de uma mensagem em partes (A5, C7 T2)."""
+
+    type: Literal["text"] = "text"
+    text: str
+
+
+class ImagePart(BaseModel):
+    """Imagem de uma mensagem em partes (A5, C7 T2; foto do atestado).
+
+    RN-06: os bytes ficam **só em memória** e saem de `repr`/`str` (`repr=False`); o cliente os converte em `data:` URI
+    só no corpo da requisição ao provedor (DEC-020 permite que a imagem passe pela Featherless). Nunca serializar esta
+    parte para log, rastro, banco ou resposta.
+    """
+
+    type: Literal["image"] = "image"
+    media_type: Literal["image/png", "image/jpeg"]
+    data: bytes = Field(repr=False)
+
+
+ContentPart = Annotated[TextPart | ImagePart, Field(discriminator="type")]
+
+
 class LLMMessage(BaseModel):
+    """Mensagem ao modelo. `content` é texto ou, para a foto do atestado (A5), uma lista de partes texto/imagem."""
+
     role: str
-    content: str
+    content: str | list[ContentPart]
 
 
 class LLMResult(BaseModel):

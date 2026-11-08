@@ -13,10 +13,12 @@ from pydantic import ValidationError
 from escalista.domain.contracts import (
     ExceptionCard,
     ExceptionOption,
+    ImagePart,
     LLMMessage,
     LLMResult,
     LLMUnavailableError,
     Role,
+    TextPart,
     TraceEvent,
 )
 from escalista.domain.ports import Clock, LLMClient, TraceSink
@@ -110,3 +112,38 @@ def test_fakes_behave():
 def test_legacy_role_values_read_as_gestor() -> None:
     # DEC-044: rows saved before the rename still carry "gerente" or "dp"
     assert Role("gerente") is Role.GESTOR and Role("dp") is Role.GESTOR
+
+
+# --- A5 (C7 T2): conteúdo em partes, para a foto do atestado ----------------------------------------------------------
+
+
+def test_llm_message_content_still_accepts_plain_text():
+    assert LLMMessage(role="user", content="oi").content == "oi"
+
+
+def test_llm_message_content_accepts_text_and_image_parts():
+    message = LLMMessage(
+        role="user",
+        content=[{"type": "text", "text": "leia"}, {"type": "image", "media_type": "image/png", "data": b"\x89PNG"}],
+    )
+    text, image = message.content
+    assert isinstance(text, TextPart) and text.text == "leia"
+    assert isinstance(image, ImagePart) and image.data == b"\x89PNG" and image.media_type == "image/png"
+
+
+def test_image_part_accepts_only_png_and_jpeg():
+    assert ImagePart(media_type="image/jpeg", data=b"\xff\xd8\xff").type == "image"
+    with pytest.raises(ValidationError):
+        ImagePart(media_type="image/gif", data=b"GIF89a")
+
+
+def test_unknown_part_type_is_refused():
+    with pytest.raises(ValidationError):
+        LLMMessage(role="user", content=[{"type": "audio", "data": b"x"}])
+
+
+def test_image_bytes_never_in_repr_nor_str():
+    secret = b"BYTES-DA-IMAGEM-NAO-VAZAR"
+    message = LLMMessage(role="user", content=[ImagePart(media_type="image/png", data=secret)])
+    for shown in (repr(message), str(message), repr(message.content[0]), str(message.content[0])):
+        assert "BYTES-DA-IMAGEM" not in shown
