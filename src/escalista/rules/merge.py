@@ -5,12 +5,19 @@ cada primitiva da fatia, entre as regras vigentes na data de referência, vale a
 no empate, fica a camada mais alta. Se uma camada mais baixa for **mais frouxa** que uma mais alta, a regra mais
 restritiva entra **provisoriamente**: o id vai para `RuleCard.provisional` e abre-se um `ExceptionCard` RX-01 ao gestor,
 com as duas fontes na evidência. Regras `info` não se fundem: todas as vigentes seguem no cartão.
+
+Cartão da semana (`build_week_card`, plano da C6, seção 8): monta o cartão no 1º dia e em cada dia da semana em que o
+conjunto de regras vigentes muda. Sem mudança, é exatamente `build_card(rules, week_start)` (E1 e C5 não mudam). Com
+mudança, por primitiva vale a mais restritiva entre os dias, na semana inteira, e o id dela entra em `provisional` se o
+valor mudou na semana, se a primitiva falta em algum dia ou se já era provisória em algum dia. Regras `info` e
+`ExceptionCard` de qualquer dia seguem no cartão, sem repetir. A `Rule` aplicada é a original (vigência do YAML
+intacta): nenhum consumidor filtra o cartão por data.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, timedelta
 
 from escalista.domain.contracts import ExceptionCard, Role
 from escalista.domain.rules import Rule, RuleCard, RuleLayer
@@ -65,6 +72,46 @@ def build_card(rules: list[Rule], reference_date: date) -> RuleCard:
             exceptions += [_conflict_card(winner, looser, stricter) for looser, stricter in conflicts]
 
     return RuleCard(reference_date=reference_date, rules=merged, provisional=provisional, exceptions=exceptions)
+
+
+def build_week_card(rules: list[Rule], week_start: date) -> RuleCard:
+    """Cartão da semana que começa em `week_start` (segunda-feira). Função pura; ver o docstring do módulo."""
+    if week_start.weekday() != 0:
+        raise ValueError("week_start deve ser uma segunda-feira")
+    days = [week_start + timedelta(days=i) for i in range(7)]
+    in_force = [frozenset(i for i, r in enumerate(rules) if is_in_force(r, d)) for d in days]
+    change_days = [d for d, prev, cur in zip(days[1:], in_force, in_force[1:], strict=False) if cur != prev]
+    if not change_days:
+        return build_card(rules, week_start)
+
+    cards = [build_card(rules, d) for d in [week_start, *change_days]]
+    provisional_kinds = {r.kind for c in cards for r in c.rules if r.id in c.provisional}
+    merged: list[Rule] = []
+    provisional: list[str] = []
+    seen: set[str] = set()
+    for card in cards:
+        for rule in card.rules:
+            key = rule.kind if rule.kind in PRIMITIVES else rule.model_dump_json()
+            if key in seen:
+                continue
+            seen.add(key)
+            if rule.kind not in PRIMITIVES:
+                merged.append(rule)
+                continue
+            winners = [r for c in cards for r in c.rules if r.kind == rule.kind]
+            chosen = winners[0]
+            for other in winners[1:]:
+                if _stricter(other, chosen):
+                    chosen = other
+            merged.append(chosen)
+            changed = len(winners) < len(cards) or any(_value(w) != _value(chosen) for w in winners)
+            if (changed or rule.kind in provisional_kinds) and chosen.id not in provisional:
+                provisional.append(chosen.id)
+
+    exceptions: list[ExceptionCard] = []
+    for card in cards:
+        exceptions += [e for e in card.exceptions if e not in exceptions]
+    return RuleCard(reference_date=week_start, rules=merged, provisional=provisional, exceptions=exceptions)
 
 
 def _value(rule: Rule) -> float:

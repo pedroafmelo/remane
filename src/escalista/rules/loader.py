@@ -43,7 +43,7 @@ from typing import Any
 import yaml
 
 from escalista.domain.rules import Rule, RuleCard, RuleLayer, RuleStatus
-from escalista.rules.merge import PRIMITIVES, build_card
+from escalista.rules.merge import PRIMITIVES, build_card, build_week_card
 
 # Campo do YAML que dá o valor de cada primitiva; a chave em `params` e o sentido ficam em `merge.PRIMITIVES`.
 YAML_FIELDS: dict[str, str] = {
@@ -191,8 +191,8 @@ def _text(value: Any) -> str | None:
     return None if value is None else str(value).strip()
 
 
-def load_rule_card(base_dir: Path, reference_date: date) -> RuleCard:
-    """Lê `lei/`, `convencao/` e `politica/` sob `base_dir` (arquivos `*.yaml`, em ordem alfabética) e funde.
+def read_rules(base_dir: Path) -> list[Rule]:
+    """Lê `lei/`, `convencao/` e `politica/` sob `base_dir` (arquivos `*.yaml`, em ordem alfabética), sem fundir.
 
     `lei/` precisa ter ao menos um arquivo; as outras camadas são opcionais.
     """
@@ -204,4 +204,15 @@ def load_rule_card(base_dir: Path, reference_date: date) -> RuleCard:
             raise RuleFileError(f"{layer.value}/", None, "nenhum arquivo .yaml de lei encontrado")
         for file in files:
             rules += parse_layer(file.read_text(encoding="utf-8"), layer, f"{layer.value}/{file.name}")
-    return build_card(rules, reference_date)
+    return rules
+
+
+def load_rule_card(base_dir: Path, reference_date: date) -> RuleCard:
+    """Lê as camadas (`read_rules`) e funde na data de referência."""
+    return build_card(read_rules(base_dir), reference_date)
+
+
+def load_rule_card_for_week(base_dir: Path, week_start: date) -> RuleCard:
+    """Cartão da semana que começa em `week_start` (segunda): se alguma vigência muda no meio da semana, vale a
+    regra mais restritiva na semana inteira, como provisória (`merge.build_week_card`; plano da C6, seção 8)."""
+    return build_week_card(read_rules(base_dir), week_start)
