@@ -88,6 +88,12 @@ function clock(time: string): string {
   return m === "00" ? String(Number(h)) : `${Number(h)}:${m}`;
 }
 
+/** "2027-01-13T14:00:00" -> "14h"; "2027-01-13T14:30:00" -> "14:30". */
+export function hourLabel(iso: string): string {
+  const t = hhmm(iso);
+  return t.endsWith(":00") ? `${Number(t.slice(0, 2))}h` : t;
+}
+
 /** Horário no padrão do design system: "14–22h" (sem minutos quando cheios); "+1" se termina no dia seguinte. */
 export function shiftLabel(startIso: string, endIso: string): string {
   const next = endIso.slice(0, 10) !== startIso.slice(0, 10) ? " +1" : "";
