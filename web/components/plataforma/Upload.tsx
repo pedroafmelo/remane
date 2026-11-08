@@ -6,10 +6,10 @@ import { Button } from "../Button";
 import { Card, Muted } from "./ui";
 
 /** Envio: um CSV, XLSX ou PDF do disco ou um dos arquivos de exemplo (sintéticos) da rota de demo. */
-export function UploadPanel({ busy, onFile, onDemo }: { busy: boolean; onFile: (file: File) => void; onDemo: (name: string) => void }) {
+export function UploadPanel({ title = "Enviar a escala atual", busy, onFile, onDemo }: { title?: string; busy: boolean; onFile: (file: File) => void; onDemo: (name: string) => void }) {
   const inputId = useId();
   return (
-    <Card title="Enviar a escala atual">
+    <Card title={title}>
       <p className="mb-4 text-[15px] leading-relaxed text-ink-muted">
         Envie a escala da semana em CSV ou XLSX, até 1 MB, com os cabeçalhos que a sua empresa já usa (o Pat lê e mostra como entendeu cada coluna), ou use um arquivo de exemplo. PDF também é aceito; se não der para ler, o Pat explica num cartão. Os exemplos são dados sintéticos gerados pelo time.
       </p>

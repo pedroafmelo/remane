@@ -9,9 +9,12 @@ export const ROLE_LABELS: Record<Role, string> = {
 export const ROLE_SHORT: Record<Role, string> = { gestor: "gestor", colaborador: "colaborador" };
 
 export const DEMO_ROLES: { role: Role; blurb: string }[] = [
-  { role: "gestor", blurb: "Envia a escala, confere o antes e o depois e aprova a publicação." },
-  { role: "colaborador", blurb: "Entra como quem trabalha na escala. Nesta versão, o acesso ainda é só de leitura da conta." },
+  { role: "gestor", blurb: "Envia a escala, confere o antes e o depois, decide as exceções e aprova a publicação." },
+  { role: "colaborador", blurb: "Vê a própria escala no celular simulado e avisa uma falta ao Pat." },
 ];
+
+/** Para onde cada papel vai depois de entrar. */
+export const HOME_BY_ROLE: Record<Role, string> = { gestor: "/plataforma/", colaborador: "/colaborador/" };
 
 export function roleLabel(role: string): string {
   return ROLE_LABELS[role as Role] ?? role;

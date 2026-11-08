@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { api, asFailure } from "@/lib/api";
 import { loginMessage } from "@/lib/errors";
-import { DEMO_ROLES, ROLE_LABELS, ROLE_SHORT } from "@/lib/roles";
+import { DEMO_ROLES, HOME_BY_ROLE, ROLE_LABELS, ROLE_SHORT } from "@/lib/roles";
 import type { Role } from "@/lib/types";
 import { Button } from "../Button";
 import { Logo } from "../Logo";
@@ -22,7 +22,7 @@ export function EntrarPanel() {
     setError(null);
     try {
       await api.loginDemo(role);
-      router.push("/plataforma/");
+      router.push(HOME_BY_ROLE[role]);
     } catch (err) {
       setError(loginMessage(asFailure(err)));
       setBusy(null);

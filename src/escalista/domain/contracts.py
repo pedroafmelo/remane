@@ -22,6 +22,11 @@ class Role(StrEnum):
     GESTOR = "gestor"
     COLABORADOR = "colaborador"
 
+    @classmethod
+    def _missing_(cls, value: object) -> Role | None:
+        # linhas gravadas antes da DEC-044 (volume do Railway) ainda dizem "gerente" ou "dp"
+        return cls.GESTOR if value in ("gerente", "dp") else None
+
 
 class TraceEvent(BaseModel):
     """Um passo do rastro (RN-01 a RN-03).

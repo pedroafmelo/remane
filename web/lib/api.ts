@@ -40,13 +40,13 @@ async function send(path: string, init?: RequestInit): Promise<Response> {
   return res;
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+export async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await send(path, init);
   if (res.status === 204) return undefined as T;
   return (await res.json()) as T;
 }
 
-const post = <T>(path: string) => request<T>(path, { method: "POST" });
+export const post = <T>(path: string) => request<T>(path, { method: "POST" });
 
 export const api = {
   loginDemo: (role: Role) => post<Me>(`/auth/demo/${role}`),

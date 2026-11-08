@@ -246,3 +246,6 @@ APIs.yaml
 
 # Dados sintéticos de leitura (C6, D1): os XLSX de data/ são versionados
 !data/**/*.xlsx
+
+# Worktrees locais do Claude Code
+.claude/worktrees/

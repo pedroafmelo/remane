@@ -19,7 +19,7 @@ from __future__ import annotations
 import functools
 import logging
 from collections.abc import Callable
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
@@ -39,6 +39,9 @@ log = logging.getLogger("escalista")
 MAX_UPLOAD_BYTES = 1024 * 1024  # 1 MB (MiB): acima disso, 413
 DEFAULT_DEMO_FILES_DIR = "data/demo"
 DEFAULT_RULES_DIR = "data/regras"
+# A semana da demo (11 a 17/01/2027), já sob as 42h e os 2 repousos da EC 141. O agente da C6 deduz a semana do arquivo;
+# esta constante é só das telas que não têm arquivo: Regras, simulação de vigência e fila de exceções.
+DEMO_WEEK_START = date(2027, 1, 11)
 BRT = timezone(timedelta(hours=-3), "BRT")  # sem horário de verão desde 2019
 
 

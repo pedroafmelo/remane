@@ -1,24 +1,24 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
 import { api, asFailure } from "@/lib/api";
 import type { Failure } from "@/lib/errors";
 import { phaseLabel, timeBr } from "@/lib/format";
-import { canOperateSchedule, roleLabel } from "@/lib/roles";
-import type { ConfirmInput, Me, ProposedSchedule, PublishedSchedule, RunState, TraceEvent } from "@/lib/types";
+import type { ConfirmInput, ProposedSchedule, PublishedSchedule, RunState, TraceEvent } from "@/lib/types";
 import { Button } from "@/components/Button";
 import { ComparePanel } from "@/components/plataforma/Compare";
 import { ExceptionPanel } from "@/components/plataforma/ExceptionPanel";
 import { NoticeList } from "@/components/plataforma/NoticeList";
+import { PatWorking } from "@/components/plataforma/PatWorking";
 import { JustificationPanel } from "@/components/plataforma/Justification";
 import { SpecApplied } from "@/components/plataforma/SpecApplied";
 import { ScheduleView } from "@/components/plataforma/ScheduleView";
 import { Shell } from "@/components/plataforma/Shell";
+import { SessionGate, useSession } from "@/components/plataforma/session";
 import { SummaryPanel } from "@/components/plataforma/Summary";
 import { TracePanel } from "@/components/plataforma/Trace";
 import { UploadPanel } from "@/components/plataforma/Upload";
-import { Card, Muted, Notice } from "@/components/plataforma/ui";
+import { Muted, Notice } from "@/components/plataforma/ui";
 
 const BUSY_LABELS: Record<string, string> = {
   upload: "Enviando e lendo o arquivo…",
@@ -29,17 +29,12 @@ const BUSY_LABELS: Record<string, string> = {
 };
 
 export default function PlataformaPage() {
-  const router = useRouter();
-  const [booting, setBooting] = useState(true);
-  const [me, setMe] = useState<Me | null>(null);
   const [busy, setBusy] = useState<string | null>(null); // o que está em andamento
   const [problem, setProblem] = useState<Failure | null>(null);
   const [run, setRun] = useState<RunState | null>(null);
   const [proposed, setProposed] = useState<ProposedSchedule | null>(null);
   const [published, setPublished] = useState<PublishedSchedule | null>(null);
   const [trace, setTrace] = useState<TraceEvent[]>([]);
-
-  const toLogin = useCallback(() => router.replace("/entrar/"), [router]);
 
   const refreshTrace = useCallback(async (runId: string) => {
     try {
@@ -57,28 +52,8 @@ export default function PlataformaPage() {
     }
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-    api
-      .me()
-      .then(async (m) => {
-        if (cancelled) return;
-        setMe(m);
-        if (canOperateSchedule(m.papel)) await refreshPublished();
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        const failure = asFailure(err);
-        if (failure.kind === "auth") toLogin();
-        else setProblem(failure);
-      })
-      .finally(() => {
-        if (!cancelled) setBooting(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [refreshPublished, toLogin]);
+  const session = useSession("gestor", refreshPublished);
+  const { toLogin } = session;
 
   /** Executa uma ação da tela: marca ocupado, limpa o problema e traduz os erros (401 volta a `/entrar/`). */
   async function act(label: string, fn: () => Promise<void>, runId?: string) {
@@ -108,12 +83,11 @@ export default function PlataformaPage() {
 
   const logout = () =>
     act("logout", async () => {
-      await api.logout();
       reset();
-      toLogin();
+      await session.logout();
     });
 
-  /** Envia o CSV (do disco ou de exemplo). Recusas de arquivo (413, 422) voltam com o cartão RX-13 no corpo. */
+  /** Envia o arquivo (CSV, XLSX ou PDF, do disco ou de exemplo). Recusas (413, 422) voltam com o cartão RX-13 no corpo. */
   const send = (load: () => Promise<{ name: string; blob: Blob }>) =>
     act("upload", async () => {
       setRun(null);
@@ -158,48 +132,7 @@ export default function PlataformaPage() {
       r.run_id,
     );
 
-  if (booting) {
-    return (
-      <Shell>
-        <p role="status" className="text-ink-muted">
-          Carregando…
-        </p>
-      </Shell>
-    );
-  }
-
-  if (!me) {
-    // sem sessão o redirecionamento já foi pedido; se o servidor não respondeu, a mensagem fica aqui
-    return (
-      <Shell>
-        {problem ? <Notice>{problem.message}</Notice> : <p className="text-ink-muted">Redirecionando para a entrada…</p>}
-        <div>
-          <Button href="/entrar/" variant="secondary">
-            Ir para a entrada
-          </Button>
-        </div>
-      </Shell>
-    );
-  }
-
-  const who = { nome: me.nome, papelLabel: roleLabel(me.papel) };
-
-  if (!canOperateSchedule(me.papel)) {
-    return (
-      <Shell who={who} onLogout={logout} busy={busy !== null}>
-        {problem && <Notice>{problem.message}</Notice>}
-        <Card title="Esta área é do gestor" id="sem-acesso">
-          <p className="mb-4 text-[15px] leading-relaxed text-ink-muted">
-            Você entrou como {roleLabel(me.papel).toLowerCase()}. Nesta versão, só o gestor envia a escala, confere o antes e o depois e
-            aprova a publicação; o servidor recusa essas ações para quem não é gestor.
-          </p>
-          <Button variant="secondary" onClick={logout} disabled={busy !== null}>
-            Entrar com outro papel
-          </Button>
-        </Card>
-      </Shell>
-    );
-  }
+  if (!session.me) return <SessionGate session={session} />;
 
   const working = busy !== null;
   // Com exceção na execução (por exemplo RX-12), não há texto de justificativa, mesmo que o corpo traga um.
@@ -207,23 +140,33 @@ export default function PlataformaPage() {
   const live = busy ? BUSY_LABELS[busy] : run ? `Execução ${phaseLabel(run.phase).toLowerCase()}.` : "";
 
   return (
-    <Shell who={who} onLogout={logout} onReset={run || problem ? reset : undefined} busy={working}>
+    <Shell who={session.who} area="escala" onLogout={logout} onReset={run || problem ? reset : undefined} busy={working}>
       <p role="status" aria-live="polite" className="sr-only">
         {live}
       </p>
 
       <h1 className="text-[32px] font-semibold leading-[1.1] tracking-[-0.035em]">Escala da semana</h1>
 
-      {problem && (
+      {(problem ?? session.problem) && (
         <>
-          <Notice>{problem.message}</Notice>
-          {problem.exception && <ExceptionPanel card={problem.exception} />}
+          <Notice>{(problem ?? session.problem)!.message}</Notice>
+          {problem?.exception && <ExceptionPanel card={problem.exception} />}
         </>
       )}
 
       {!run && (
         <>
+          {published?.version && (
+            <ScheduleView
+              id="escala-vigente"
+              title="Escala vigente"
+              schedule={published.version.schedule}
+              employees={published.employees}
+              note={`Criada em ${timeBr(published.version.created_at)} · ${published.version.violations_total} violações das regras`}
+            />
+          )}
           <UploadPanel
+            title={published?.version ? "Planejar uma nova escala" : "Enviar a escala atual"}
             busy={busy === "upload"}
             onFile={(f) => send(async () => ({ name: f.name, blob: f }))}
             onDemo={(name) => send(async () => ({ name, blob: await api.demoFile(name) }))}
@@ -233,17 +176,8 @@ export default function PlataformaPage() {
               <Button variant="secondary" onClick={planNextWeek} disabled={working} aria-busy={busy === "nextweek"}>
                 {busy === "nextweek" ? "Preparando…" : "Planejar a próxima semana"}
               </Button>
-              <Muted>Sem novo arquivo: parte da última escala publicada e do quadro já confirmado.</Muted>
+              <Muted>Sem novo arquivo: parte da escala vigente e do quadro já confirmado.</Muted>
             </div>
-          )}
-          {published?.version && (
-            <ScheduleView
-              id="ultima-publicada"
-              title="Última grade publicada"
-              schedule={published.version.schedule}
-              employees={published.employees}
-              note={`Versão ${published.version.id} · ${published.version.violations_total} violações · criada em ${timeBr(published.version.created_at)}`}
-            />
           )}
         </>
       )}
@@ -262,6 +196,18 @@ export default function PlataformaPage() {
               canConfirm={run.phase === "awaiting_confirm"}
               busy={busy === "confirm"}
               onConfirm={(input) => confirm(run, input)}
+            />
+          )}
+
+          {busy === "confirm" && (
+            <PatWorking
+              title="O Pat está montando a escala"
+              steps={[
+                "Otimiza a semana dentro da lei, da convenção e da política (cerca de 20 s)",
+                "Confere a proposta com um verificador independente",
+                "Compara antes e depois com a mesma função de custo",
+                "Escreve a justificativa com o modelo (cerca de 15 s)",
+              ]}
             />
           )}
 

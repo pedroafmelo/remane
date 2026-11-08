@@ -123,7 +123,7 @@ excecoes_demo:
         efeito: "A escala segue com 2 repousos por semana; a exceção fica aberta."
         custo_base: nenhum
     opcoes_vedadas:
-      - "Aplicar a cláusula 6ª: afrouxa a lei (P1 de produto.md)"
+      - "Aplicar a cláusula 6ª: afrouxa a lei"
     recomendacao: "Confirmar a regra da EC."
     sem_resposta: "A regra mais restritiva continua provisória e a exceção segue aberta. Não há próximo decisor."
     acao: escalar
