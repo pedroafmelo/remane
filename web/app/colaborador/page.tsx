@@ -7,10 +7,12 @@ import type { Failure } from "@/lib/errors";
 import type { PatEstado } from "@/lib/pat";
 import {
   PERSON_STORAGE_KEY,
+  attachmentsByCase,
   caseStateLines,
   deadlineLabel,
   inboundText,
   isOpenCase,
+  isAttachmentOnly,
   isOpenOffer,
   offerText,
   outboundText,
@@ -76,10 +78,10 @@ export default function ColaboradorPage() {
     const id = current.current;
     if (!id) return;
     try {
-      const [box, clock] = await Promise.all([trackerApi.inbox(id), trackerApi.clock()]);
+      const box = await trackerApi.inbox(id);
       if (current.current !== id) return; // a pessoa mudou durante a chamada: descarta a resposta velha
       setInbox(box);
-      setNow(clock.now);
+      setNow(box.now);
       setProblem(null);
     } catch (err) {
       if (current.current === id) setProblem(asFailure(err));
@@ -147,7 +149,9 @@ export default function ColaboradorPage() {
           ? "resolveu"
           : "parado";
   const days = inbox ? reportDays(inbox.shifts) : [];
-  const messages = [...(inbox?.messages ?? [])].sort((a, b) => a.at.localeCompare(b.at));
+  const allMessages = inbox?.messages ?? [];
+  const attachments = attachmentsByCase(allMessages);
+  const messages = allMessages.filter((m) => !isAttachmentOnly(m)).sort((a, b) => a.at.localeCompare(b.at));
   const caseById = new Map(cases.map((c) => [c.case_id, c]));
   const firstName = inbox?.employee.name.split(" ")[0];
 
@@ -212,7 +216,7 @@ export default function ColaboradorPage() {
                     </ChatBubble>
                   ) : (
                     <ChatBubble key={m.id} mirrored from="person">
-                      {inboundText(m, caseById.get(m.case_id))}
+                      {inboundText(m, m.case_id ? caseById.get(m.case_id) : undefined, m.case_id ? attachments.get(m.case_id) : null)}
                     </ChatBubble>
                   ),
                 )}

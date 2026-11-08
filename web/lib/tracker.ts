@@ -129,13 +129,35 @@ export function isOpenCase(c: CaseView): boolean {
   return c.status === "aguardando_colaborador" || c.status === "oferta_enviada" || c.status === "aguardando_gestor";
 }
 
-/** Balão do colaborador a partir de uma mensagem `in`: o texto livre nunca volta, então só se descreve o ato. */
-export function inboundText(m: InboxMessage, c: CaseView | undefined): string {
-  const attachment = c?.abono === "provisorio" ? " (anexo PDF)" : "";
-  if (m.template.startsWith("aviso") && c) {
-    return `Você avisou: ${c.kind === "falta" ? "vou faltar" : "vou me atrasar"} ${dayLabel(c.day)}.${attachment}`;
+const REPLIES: Record<string, string> = {
+  oferta_aceita: "Aceito cobrir o turno.",
+  oferta_recusada: "Não posso cobrir.",
+  resposta_vou: "Estou a caminho.",
+  resposta_nao_vou: "Não vou.",
+};
+
+/** Anexos enviados por caso (mensagens `in` com `attachment_media_type`). */
+export function attachmentsByCase(messages: InboxMessage[]): Map<string, string> {
+  const found = new Map<string, string>();
+  for (const m of messages) {
+    if (m.direction === "in" && m.case_id && m.attachment_media_type) found.set(m.case_id, m.attachment_media_type);
   }
-  return m.body ?? "Você respondeu.";
+  return found;
+}
+
+/** A mensagem do anexo não vira balão próprio: ela aparece no "Você avisou … (anexo PDF)". */
+export function isAttachmentOnly(m: InboxMessage): boolean {
+  return m.direction === "in" && m.template === "anexo";
+}
+
+/** Balão do colaborador a partir de uma mensagem `in`: o texto livre nunca volta, então só se descreve o ato.
+ * `attachment`: o tipo do anexo enviado no mesmo caso, se houver. */
+export function inboundText(m: InboxMessage, c: CaseView | undefined, attachment?: string | null): string {
+  const suffix = attachment === "application/pdf" ? " (anexo PDF)" : attachment ? " (anexo)" : "";
+  if (m.template.startsWith("aviso") && c) {
+    return `Você avisou: ${c.kind === "falta" ? "vou faltar" : "vou me atrasar"} ${dayLabel(c.day)}.${suffix}`;
+  }
+  return REPLIES[m.template] ?? m.body ?? "Você respondeu.";
 }
 
 /** Balão do Pat a partir de uma mensagem `out`. */

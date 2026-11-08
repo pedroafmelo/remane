@@ -40,8 +40,12 @@ export interface InboxMessage {
   template: string;
   /** só nas mensagens `out`; o texto livre do colaborador nunca volta do servidor */
   body: string | null;
+  /** o colaborador escreveu algo (o texto em si não sai do celular) */
+  has_text: boolean;
+  /** tipo do anexo enviado nesta mensagem de entrada (`application/pdf`), ou `null` */
+  attachment_media_type: string | null;
   at: string;
-  case_id: string;
+  case_id: string | null;
 }
 
 export type OfferStatus = "enviada" | "aceita" | "recusada" | "vencida";
@@ -108,6 +112,8 @@ export interface CaseView {
 }
 
 export interface Inbox {
+  /** relógio de demo no instante da leitura da caixa */
+  now: string;
   employee: Person;
   week_start: string;
   shifts: { day: string; start: string; end: string }[];
@@ -122,6 +128,15 @@ export interface ReportInput {
   as: string;
   day: string;
   kind: "falta" | "atraso";
+  /** fica no celular: só vira `has_text` no corpo do aviso */
   text?: string;
   file?: File | null;
+}
+
+/** Corpo do `POST /api/colaborador/aviso`. */
+export interface ReportBody {
+  as: string;
+  day: string;
+  kind: "falta" | "atraso";
+  has_text: boolean;
 }

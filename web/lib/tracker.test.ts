@@ -14,7 +14,8 @@ import {
   triggerSummary,
   turnLabel,
 } from "./tracker.ts";
-import { reportForm } from "./api-tracker.ts";
+import { reportBody } from "./api-tracker.ts";
+import { attachmentsByCase, isAttachmentOnly } from "./tracker.ts";
 import type { CaseView, InboxMessage, InboxOffer } from "./types-tracker.ts";
 
 const base: CaseView = {
@@ -119,23 +120,38 @@ test("isOpenCase mantém a sondagem enquanto não há desfecho", () => {
 });
 
 test("inboundText descreve o aviso sem repetir o texto livre", () => {
-  const msg: InboxMessage = { id: "m1", direction: "in", template: "aviso_falta", body: null, at: "2027-01-13T13:56:00", case_id: "c1" };
+  const msg: InboxMessage = {
+    id: "m1",
+    direction: "in",
+    template: "aviso_falta",
+    body: null,
+    has_text: true,
+    attachment_media_type: null,
+    at: "2027-01-13T13:56:00",
+    case_id: "c1",
+  };
   assert.equal(inboundText(msg, base), "Você avisou: vou faltar qui 14/01.");
-  assert.equal(inboundText(msg, { ...base, abono: "provisorio" }), "Você avisou: vou faltar qui 14/01. (anexo PDF)");
+  assert.equal(inboundText(msg, base, "application/pdf"), "Você avisou: vou faltar qui 14/01. (anexo PDF)");
+  assert.equal(inboundText({ ...msg, template: "oferta_aceita" }, base), "Aceito cobrir o turno.");
+  const anexo = { ...msg, id: "m2", template: "anexo", attachment_media_type: "application/pdf" };
+  assert.equal(isAttachmentOnly(anexo), true);
+  assert.equal(isAttachmentOnly(msg), false);
+  assert.deepEqual([...attachmentsByCase([msg, anexo])], [["c1", "application/pdf"]]);
   assert.equal(inboundText(msg, { ...base, kind: "atraso" }), "Você avisou: vou me atrasar qui 14/01.");
   assert.equal(inboundText({ ...msg, template: "resposta" }, base), "Você respondeu.");
 });
 
-test("reportForm só envia texto e arquivo quando existem", () => {
-  const bare = reportForm({ as: "e1", day: "2027-01-14", kind: "falta", text: "  " });
-  assert.equal(bare.get("as"), "e1");
-  assert.equal(bare.get("kind"), "falta");
-  assert.equal(bare.has("text"), false);
-  assert.equal(bare.has("file"), false);
+test("reportBody nunca leva o texto livre, só has_text", () => {
+  assert.deepEqual(reportBody({ as: "e1", day: "2027-01-14", kind: "falta", text: "  " }), {
+    as: "e1",
+    day: "2027-01-14",
+    kind: "falta",
+    has_text: false,
+  });
   const file = new File(["%PDF"], "at.pdf", { type: "application/pdf" });
-  const full = reportForm({ as: "e1", day: "2027-01-14", kind: "atraso", text: " cheguei tarde ", file });
-  assert.equal(full.get("text"), "cheguei tarde");
-  assert.equal((full.get("file") as File).name, "at.pdf");
+  const full = reportBody({ as: "e1", day: "2027-01-14", kind: "atraso", text: " cheguei tarde ", file });
+  assert.equal(full.has_text, true);
+  assert.equal(JSON.stringify(full).includes("cheguei"), false);
 });
 
 test("o cartão de um código novo do acompanhamento vira o formato do componente sem supor falta", async () => {
