@@ -119,6 +119,16 @@ def test_agents_cannot_import_concrete_borders(pkg):
     assert check_source("escalista.agents.optimizer.graph", f"from ...{pkg} import x\n")
 
 
+def test_agents_cannot_import_the_sql_store():
+    """`store/` (SQL do `Repository`, frente B) é borda: agents usa a porta, nunca a implementação."""
+    assert check_source("escalista.agents.optimizer.graph", "import escalista.store\n")
+    assert check_source(
+        "escalista.agents.optimizer.graph", "from escalista.store.sql_repository import SqlRepository\n"
+    )
+    assert check_source("escalista.agents.optimizer.graph", "from escalista import store\n")
+    assert check_source("escalista.agents.optimizer.graph", "from ...store import x\n")
+
+
 def test_agents_may_use_core_ports_and_langgraph():
     source = "\n".join(
         [

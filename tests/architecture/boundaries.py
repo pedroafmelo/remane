@@ -19,7 +19,7 @@ from pathlib import Path
 ROOT = "escalista"
 CORE_PACKAGES = ("domain", "rules", "solver", "verifier")
 AGENTS_PKG = "agents"
-CONCRETE_BORDERS = frozenset({"api", "llm", "channel", "clock", "audit", "ingest", "synth", "evals"})
+CONCRETE_BORDERS = frozenset({"api", "llm", "channel", "clock", "audit", "ingest", "synth", "evals", "store"})
 EFFECTFUL_STDLIB = frozenset({"socket", "ssl", "http", "urllib", "sqlite3", "subprocess", "smtplib"})
 THIRD_PARTY_ALLOWED: dict[str, frozenset[str]] = {
     "domain": frozenset({"pydantic"}),
