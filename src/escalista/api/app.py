@@ -9,13 +9,15 @@ from fastapi.responses import FileResponse
 from sqlalchemy import text
 
 from escalista.api.auth import install_auth
+from escalista.api.routes_runs import install_runs
+from escalista.api.wiring import DEFAULT_DEMO_FILES_DIR, SliceAgent, build_agent
 from escalista.config import Settings
 from escalista.db import init_db, make_engine
 
 log = logging.getLogger("escalista")
 
 
-def create_app(settings: Settings | None = None) -> FastAPI:
+def create_app(settings: Settings | None = None, *, agent: SliceAgent | None = None) -> FastAPI:
     settings = settings or Settings()
     engine = make_engine(settings.database_url)
     init_db(engine)
@@ -24,6 +26,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(title="Escalista", description="Dados sintéticos", docs_url=None, redoc_url=None)
     app.state.settings = settings
     app.state.engine = engine
+    app.state.agent = agent or build_agent(settings)
+    app.state.demo_files_dir = DEFAULT_DEMO_FILES_DIR
 
     @app.get("/health")
     def health() -> dict:
@@ -32,6 +36,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return {"status": "ok", "db": "ok", "version": os.environ.get("GIT_SHA", "dev"), **settings.summary()}
 
     install_auth(app, settings)  # antes da SPA: o fallback `/{path}` não pode engolir `/api/me`
+    install_runs(app)
     _serve_spa(app, Path(settings.web_dist_dir))
     return app
 

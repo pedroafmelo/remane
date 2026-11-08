@@ -1,8 +1,9 @@
 """Acesso: sessão por cookie assinado, login de demo e matriz rota × papel (RF-29, RF-30, DEC-017; arquitetura, 11).
 
-A matriz `ROUTES` é a fonte única de quem pode chamar cada rota protegida. Para proteger uma rota nova
-(C2: `/api/runs...`, `/api/schedules/published`, `/api/demo/files/{nome}`), acrescente uma linha: o teste
-parametrizado prova 401 sem sessão, 403 com cada papel não permitido e sucesso com cada papel permitido.
+A matriz `ROUTES` é a fonte única de quem pode chamar cada rota protegida. Para proteger uma rota nova, acrescente
+uma linha: o teste parametrizado prova 401 sem sessão, 403 com cada papel não permitido e sucesso com cada papel
+permitido. `path` é o molde da rota (como o FastAPI o registra); `url`, quando houver, é o endereço concreto chamado,
+que aponta para as execuções semeadas do agente falso (`FakeSliceAgent.with_seeded_runs`).
 
 Sempre `Settings(_env_file=None)` com `monkeypatch`: estes testes nunca leem o `.env` real.
 """
@@ -20,6 +21,8 @@ from escalista.api.accounts import SEEDED_ACCOUNTS
 from escalista.api.app import create_app
 from escalista.api.auth import SESSION_COOKIE
 from escalista.api.deps import require_role
+from escalista.api.fake_agent import SEEDED_AWAITING_APPROVAL, SEEDED_AWAITING_CONFIRM, FakeSliceAgent
+from escalista.api.wiring import get_agent, get_demo_files_dir
 from escalista.config import Settings
 from escalista.domain.contracts import Role
 
@@ -33,14 +36,33 @@ class Route:
     path: str
     roles: frozenset[Role]
     ok_status: int = 200
-    request: dict[str, Any] = field(default_factory=dict)  # json, files, data... para o caso de sucesso
+    request: dict[str, Any] = field(default_factory=dict)  # json, content, params... para o caso de sucesso
+    url: str | None = None  # endereço concreto, quando `path` tem parâmetro
 
     def __str__(self) -> str:
         return f"{self.method} {self.path}"
 
 
+GERENTE = frozenset({Role.GERENTE})
+CSV_OK = b"# SINTETICO - dados ficticios\nfuncionario,loja,dia,inicio,fim\nE01,L01,2027-01-11,08:00,16:00\n"
+CONFIRM, APPROVE = SEEDED_AWAITING_CONFIRM, SEEDED_AWAITING_APPROVAL
+
 ROUTES: list[Route] = [
     Route("GET", "/api/me", ALL_ROLES),
+    Route(
+        "POST",
+        "/api/runs",
+        GERENTE,
+        ok_status=201,
+        request={"params": {"file_name": "escala.csv"}, "content": CSV_OK, "headers": {"Content-Type": "text/csv"}},
+    ),
+    Route("GET", "/api/runs/{run_id}", GERENTE, url=f"/api/runs/{APPROVE}"),
+    Route("POST", "/api/runs/{run_id}/confirm", GERENTE, url=f"/api/runs/{CONFIRM}/confirm"),
+    Route("GET", "/api/runs/{run_id}/schedule", GERENTE, url=f"/api/runs/{APPROVE}/schedule"),
+    Route("POST", "/api/runs/{run_id}/approve", GERENTE, url=f"/api/runs/{APPROVE}/approve"),
+    Route("GET", "/api/runs/{run_id}/trace", GERENTE, url=f"/api/runs/{APPROVE}/trace"),
+    Route("GET", "/api/schedules/published", GERENTE),
+    Route("GET", "/api/demo/files/{name}", GERENTE, url="/api/demo/files/escala_atual.csv"),
 ]
 
 CASES_FORBIDDEN = [(r, role) for r in ROUTES for role in Role if role not in r.roles]
@@ -61,7 +83,14 @@ def make_client(tmp_path, *, demo_mode: bool = True, secret: str | None = f"{SEN
         demo_mode=demo_mode,
         session_secret=secret,
     )
-    return TestClient(create_app(settings))
+    app = create_app(settings)
+    agent = FakeSliceAgent.with_seeded_runs()
+    demo_dir = tmp_path / "demo"
+    demo_dir.mkdir(exist_ok=True)
+    (demo_dir / "escala_atual.csv").write_bytes(CSV_OK)
+    app.dependency_overrides[get_agent] = lambda: agent
+    app.dependency_overrides[get_demo_files_dir] = lambda: demo_dir
+    return TestClient(app)
 
 
 def login(client: TestClient, role: Role) -> None:
@@ -70,7 +99,7 @@ def login(client: TestClient, role: Role) -> None:
 
 
 def call(client: TestClient, route: Route, **request) -> Any:
-    return client.request(route.method, route.path, **request)
+    return client.request(route.method, route.url or route.path, **request)
 
 
 # --- matriz rota × papel ---
@@ -108,7 +137,7 @@ def test_every_api_route_is_in_the_matrix(tmp_path):
 
 @pytest.mark.parametrize("role", list(Role), ids=str)
 def test_require_role_on_a_gerente_only_route(tmp_path, role):
-    """Enquanto a matriz só tem `/api/me` (todos os papéis), o 403 é provado numa rota de teste só do gerente."""
+    """`require_role` isolado das rotas reais, numa rota de teste só do gerente."""
     client = make_client(tmp_path)
     client.app.add_api_route("/probe/gerente", lambda: {"ok": True}, dependencies=[Depends(require_role(Role.GERENTE))])
     assert client.get("/probe/gerente").status_code == 401
