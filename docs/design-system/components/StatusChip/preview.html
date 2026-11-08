@@ -1,0 +1,28 @@
+<!-- @dsCard group="Estado" height=88 subtitle="Conforme, resolvido, exceção, violação" -->
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>StatusChip</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../../tokens.css">
+<style>
+  body { margin: 0; padding: 24px; background: var(--surface); font-family: var(--font-sans); }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font: 500 12px/1 var(--font-sans); padding: 7px 11px; border-radius: var(--radius-full); }
+  .dot { width: 7px; height: 7px; border-radius: 50%; }
+  .neutral { background: var(--paper); color: var(--ink); }
+  .ok { background: var(--accent-soft); color: var(--ink); } .ok .dot { background: var(--accent-strong); }
+  .warn { background: var(--warning-soft); color: var(--warning-ink); } .warn .dot { background: var(--warning); }
+  .bad { background: var(--danger-soft); color: var(--danger); } .bad .dot { background: var(--danger); }
+</style>
+</head>
+<body>
+<div class="row">
+  <span class="chip neutral">42h · 2 folgas · tudo conforme</span>
+  <span class="chip ok"><span class="dot"></span>resolvido sem o gestor</span>
+  <span class="chip warn"><span class="dot"></span>precisa de você</span>
+  <span class="chip bad"><span class="dot"></span>passou de 42h</span>
+</div>
+</body>
+</html>

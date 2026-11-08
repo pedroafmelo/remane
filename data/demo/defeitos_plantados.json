@@ -1,0 +1,27 @@
+[
+  {
+    "line": 48,
+    "field": "inicio",
+    "reason": "hora inválida em inicio: '25:70' (esperado HH:MM)"
+  },
+  {
+    "line": 53,
+    "field": "pessoa_id",
+    "reason": "pessoa_id 'P999' não existe em pessoas.json"
+  },
+  {
+    "line": 59,
+    "field": "inicio",
+    "reason": "turno sobreposto ao da linha 58, mesma pessoa e mesma data"
+  },
+  {
+    "line": 64,
+    "field": "data",
+    "reason": "data 2027-01-25 fora da semana de 11/01 a 17/01/2027"
+  },
+  {
+    "line": 69,
+    "field": "fim",
+    "reason": "campo obrigatório vazio: fim"
+  }
+]

@@ -1,6 +1,6 @@
 # Declaração de ferramentas, modelos e APIs de terceiros
 
-Última atualização: 2026-11-07 23:55 (`web/` passa a Next.js, [DEC-035](decisoes.md): saem Vite e @vitejs/plugin-react, entram next, tailwindcss, @tailwindcss/postcss, geist, qrcode.react, eslint e eslint-config-next, todos sob a data de corte). Antes, 16:48 (auditoria depois da C0a: dependências Python e npm instaladas sob a data de corte 2026-10-23, [DEC-030](decisoes.md); Fly.io e Docker decididos; `web/` criado. A mudança mais recente do `pyproject.toml` foi só a exclusão de `.claude` na configuração do ruff, **sem dependência nova**). **A submissão exige esta lista** (guia, seção 7) e a regra de uso de IA pede que APIs,
+Última atualização: 2026-11-08 01:23 (integração do remoto com a C5: `web/` em Next.js ([DEC-035](decisoes.md)) e hospedagem no Railway ([DEC-037](decisoes.md)) valem; nada novo entrou por esta integração. Antes: 2026-11-08 00:45, execução da C5: `httpx2`, dependência indireta do `openai`, passou a ser importada nos testes; o `pyproject.toml` ganhou só o marcador `slow` do pytest, na tarefa T0, **sem dependência nova**; o Claude Code passou a rodar com subagentes, ver a linha abaixo. Antes: 2026-11-07 16:48, auditoria depois da C0a, com dependências Python e npm sob a data de corte 2026-10-23, [DEC-030](decisoes.md)). **A submissão exige esta lista** (guia, seção 7) e a regra de uso de IA pede que APIs,
 modelos e plataformas sejam declarados (seção 5). Atualize **no mesmo turno** em que algo entrar ou sair do projeto.
 Status: `planejado`, `em uso`, `removido`. Não remova linhas: marque `removido`.
 
@@ -8,7 +8,7 @@ Status: `planejado`, `em uso`, `removido`. Não remova linhas: marque `removido`
 
 | Item | Tipo | Uso no projeto | Status |
 |---|---|---|---|
-| Claude Code (Anthropic) | Ferramenta de código com IA | Desenvolvimento e documentação; liberada pelo guia. Não faz parte do produto ([DEC-003](decisoes.md), provisória) | em uso |
+| Claude Code (Anthropic) | Ferramenta de código com IA | Desenvolvimento e documentação; liberada pelo guia. Não faz parte do produto ([DEC-003](decisoes.md), provisória). Modelos: Opus 5.5, Sonnet 5.5 e Haiku 5.5 (política da [DEC-028](decisoes.md)); na C5, 4 sessões em paralelo ([DEC-039](decisoes.md)), executadas por uma sessão orquestradora que delega cada tarefa a um subagente (Opus, Sonnet ou Haiku 5.5, conforme a tarefa) | em uso |
 | Langfuse docs MCP (`https://langfuse.com/api/mcp`, oficial, sem autenticação) | Servidor MCP de documentação | Consulta de documentação durante o desenvolvimento; configurado em `.mcp.json` | em uso (conectado desde a [DEC-009](decisoes.md)) |
 | LangChain docs MCP (`https://docs.langchain.com/mcp`, oficial, sem autenticação) | Servidor MCP de documentação | Consulta de documentação do LangGraph durante o desenvolvimento; configurado em `.mcp.json` | em uso (conectado desde a [DEC-009](decisoes.md)) |
 
@@ -16,7 +16,7 @@ Status: `planejado`, `em uso`, `removido`. Não remova linhas: marque `removido`
 
 | Item | Tipo | Uso no projeto | Status |
 |---|---|---|---|
-| Featherless (API compatível com OpenAI, `https://api.featherless.ai/v1`) | Inferência de modelos open source | Inferência de todo o agente do produto (US$ 25 por pessoa, benefício do evento), via SDK da OpenAI com `base_url` da Featherless | planejado ([DEC-003](decisoes.md), provisória) |
+| Featherless (API compatível com OpenAI, `https://api.featherless.ai/v1`) | Inferência de modelos open source | Inferência de todo o agente do produto (US$ 25 por pessoa, benefício do evento), via SDK da OpenAI com `base_url` da Featherless | **em uso no código** desde a C5 (`src/escalista/llm/client.py`, justificativa da fatia); **ainda sem chamada real medida** (teste de fumaça das chaves pendente, do usuário) ([DEC-003](decisoes.md), provisória) |
 
 **Modelos escolhidos ([DEC-020](decisoes.md)).** Nomes e preços das fichas em featherless.ai/models, lidas por subagente em 07/11/2026.
 **Nenhum foi testado por nós** (nem em português, nem em tool calling, nem em visão); o teste de fumaça decide antes de adotar.
@@ -55,20 +55,21 @@ langfuse e openai entram na implementação. Antes da submissão, deixe aqui só
 | numpy, pandas, requests | `pyproject.toml` (scaffold) | removido ([DEC-007](decisoes.md)); voltam com `uv add` se a técnica pedir |
 | bs4 | `pyproject.toml` (scaffold) | removido do `pyproject.toml` ([DEC-005](decisoes.md)) |
 | python-bcb | `pyproject.toml` (scaffold) | removido do `pyproject.toml` ([DEC-005](decisoes.md)) |
+| httpx2 2.16.0 | dependência indireta do `openai` 3.37 (no `uv.lock`, **não** declarada no `pyproject.toml`) | **em uso só nos testes** (`tests/llm/`: transporte HTTP falso do cliente Featherless, C5/B2); se o time quiser, declarar com `uv add --dev` |
 | pytest 9.1.1, pytest-cov 7.1.0, ruff 0.17.2, httpx 0.28.1 (BSD-3-Clause; `TestClient`), pillow 13.0.0, reportlab 5.1.0 | `pyproject.toml` (grupo dev) | **em uso** (httpx é `[PROPOSTA]` fora da seção 19 da arquitetura; pillow e reportlab ainda sem código que os use) |
 | pyyaml 6.0.3 (MIT) | Leitura de `data/regras/*.yaml` na C1 | **em uso** (instalado na C0a, `[PROPOSTA]` fora da seção 19; PyPI, 07/11/2026) |
 | uv_build (`>=0.9.17,<0.10`; MIT ou Apache-2.0) | Backend de build do pacote `escalista` | **em uso** (`[PROPOSTA]`) |
 | taskipy, typos, isort | `pyproject.toml` (scaffold) | removido ([DEC-007](decisoes.md)) |
-| Google OR-Tools (CP-SAT) 9.15.6755, Apache-2.0 | Solver de escala (núcleo) | instalado na C0a (`uv add`); ainda sem código que o use |
-| LangGraph (MIT; **resolvido 1.2.17**, instalado na C0a; a mais nova era 1.2.20; Python >= 3.10; exige langchain-core >= 1.4.7, < 2, hoje 1.7.6, MIT) | Grafo dos três agentes ([DEC-018](decisoes.md)) | planejado ([FATO] PyPI JSON e registro do npm, subagente só leitura, 07/11/2026; saiu há menos de 14 dias, anterior 1.2.16) |
+| Google OR-Tools (CP-SAT) 9.15.6755, Apache-2.0 | Solver de escala (núcleo) | **em uso** desde a C5 (`src/escalista/solver/model.py`) |
+| LangGraph (MIT; **resolvido 1.2.17**, instalado na C0a; a mais nova era 1.2.20; Python >= 3.10; exige langchain-core >= 1.4.7, < 2, hoje 1.7.6, MIT) | Grafo dos três agentes ([DEC-018](decisoes.md)) | **em uso** desde a C5 (agente de otimização, `src/escalista/agents/optimizer/graph.py`; os outros dois ainda não existem) ([FATO] PyPI JSON e registro do npm, subagente só leitura, 07/11/2026; saiu há menos de 14 dias, anterior 1.2.16) |
 | langfuse (SDK Python, MIT; **resolvido 5.0.4**, instalado na C0a; a mais nova era 5.2.0; Python >= 3.11) | Tracing; `langfuse.openai` existe nesta versão, compatibilidade com o openai 3.x **[NÃO ENCONTRADO]**, testar | planejado ([FATO] PyPI JSON e registro do npm, subagente só leitura, 07/11/2026; menos de 14 dias, anterior 5.0.4) |
-| openai (SDK Python, Apache-2.0; **resolvido 3.37.0**, instalado na C0a; a mais nova era 3.46.0; Python >= 3.10) | Cliente da API compatível da Featherless | planejado ([FATO] PyPI JSON e registro do npm, subagente só leitura, 07/11/2026; menos de 14 dias, anterior 3.37.0) |
+| openai (SDK Python, Apache-2.0; **resolvido 3.37.0**, instalado na C0a; a mais nova era 3.46.0; Python >= 3.10) | Cliente da API compatível da Featherless | **em uso** desde a C5 (`src/escalista/llm/client.py`) ([FATO] PyPI JSON e registro do npm, subagente só leitura, 07/11/2026; menos de 14 dias, anterior 3.37.0) |
 | Node.js, whatsapp-web.js e Puppeteer (Chromium) | Microserviço da ponte do WhatsApp | planejado como spike de 1 h; serviço ainda não existe |
 | openpyxl 3.1.5 (MIT) e defusedxml 0.7.1 (PSF) | Leitura de XLSX | planejado (versões e licenças pelo PyPI, 07/11/2026) |
 | pdfplumber 0.11.10 (MIT), com pdfminer.six (MIT) e pypdfium2 5.15.1 (BSD-3-Clause e Apache-2.0, com licenças permissivas de terceiros no binário do PDFium; nenhuma copyleft fora dos builds musl, que trazem a GCC Runtime Library Exception; [FATO] PyPI JSON e registro do npm, subagente só leitura, 07/11/2026) | Leitura de PDF digital: escala, convenção e atestado | planejado |
 | React e react-dom 19.3.1 (MIT), Vite (MIT; Node ^20.19 ou >= 22.12; **instalado 8.3.5**, a mais nova era 8.3.6), @vitejs/plugin-react (MIT; **instalado 6.1.2**, a mais nova era 6.2.1), TypeScript 6.0.3 (Apache-2.0; fixado pelo template), @types/react 19.3.0, @types/react-dom 19.3.0, @types/node 24.19.2 | SPA do front-end ([DEC-018](decisoes.md)) | Vite e @vitejs/plugin-react **removidos** em 2026-11-07 ([DEC-035](decisoes.md)); React, react-dom, TypeScript e os @types seguem na linha abaixo. Scaffold original gerado por `create-vite` 9.3.1 (MIT) |
 | next 16.4.2 (MIT), eslint-config-next 16.4.2 (MIT), eslint 9.39.5 (MIT), tailwindcss e @tailwindcss/postcss 4.3.3 (MIT), geist 1.8.2 (fonte Geist da Vercel, SIL Open Font License 1.1), qrcode.react 4.2.0 (ISC), com React e react-dom 19.3.1, TypeScript 6.0.3, @types/react 19.3.0, @types/react-dom 19.3.0 e @types/node 24.19.2 | Landing e front-end da plataforma em `web/`; build em export estático servido pelo FastAPI ([DEC-035](decisoes.md)) | **em uso** desde 2026-11-07, sob `before=2026-10-23` e `save-exact` em `web/.npmrc` |
-| SQLAlchemy (MIT; Python >= 3.11; **resolvido 2.1.6**, em uso desde a C0a; a mais nova era 2.1.8) e itsdangerous 2.2.0 (BSD-3-Clause) | Banco e sessão por cookie assinado `[PROPOSTA]` | planejado ([FATO] PyPI JSON e registro do npm, subagente só leitura, 07/11/2026; SQLAlchemy com menos de 14 dias, anterior 2.1.6) |
+| SQLAlchemy (MIT; Python >= 3.11; **resolvido 2.1.6**, em uso desde a C0a; a mais nova era 2.1.8) e itsdangerous 2.2.0 (BSD-3-Clause) | Banco e sessão por cookie assinado `[PROPOSTA]` | **em uso** (SQLAlchemy desde a C0a; itsdangerous via `SessionMiddleware` do Starlette desde a C5) ([FATO] PyPI JSON e registro do npm, subagente só leitura, 07/11/2026; SQLAlchemy com menos de 14 dias, anterior 2.1.6) |
 | Pillow 13.0.0 (MIT-CMU) e reportlab 5.1.0 (BSD) | Geração de dados sintéticos (grupo dev) | planejado |
 | pandas, numpy | Dependências transitivas do OR-Tools; não importadas por nós | planejado como transitivas |
 | PyMuPDF (AGPL-3.0) e fpdf2 (LGPL-3.0) | Descartados por licença | removido (nunca entrou) |

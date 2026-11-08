@@ -23,6 +23,7 @@ Hackathon de AI Agents (**tema aberto**), 07 e 08/11/2026, Porto Digital, Recife
 | Planejar as horas | [docs/plano-de-horas.md](docs/plano-de-horas.md) |
 | Preparar submissão, pitch e demo | [docs/entrega.md](docs/entrega.md) |
 | Marca, copy e movimento da landing Remane | [docs/landing.md](docs/landing.md) |
+| Design system (tokens, componentes, logos) | [docs/design-system/README.md](docs/design-system/README.md) |
 | Listar ferramentas e modelos usados | [docs/declaracao-ferramentas.md](docs/declaracao-ferramentas.md) |
 | Consultar a ideia anterior (arquivada) | [docs/ideacao/ideias/IDEA-001-recuperacao-depositos.md](docs/ideacao/ideias/IDEA-001-recuperacao-depositos.md) |
 

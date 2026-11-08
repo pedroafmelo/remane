@@ -1,6 +1,6 @@
 # Plano macro de implementação do Escalista
 
-Última atualização: 2026-11-07 16:11 (Recife) · Situação: **aprovado pelo usuário em 2026-11-07 16:13** ([DEC-029](decisoes.md)) · Decisões desta etapa:
+Última atualização: 2026-11-08 00:45 (Recife; C5 em execução, G3 itens 1 a 5 passaram; antes: G3 local pela [DEC-038](decisoes.md)) · Situação: **aprovado pelo usuário em 2026-11-07 16:13** ([DEC-029](decisoes.md)) · Decisões desta etapa:
 [DEC-027](decisoes.md) e [DEC-028](decisoes.md).
 
 Este arquivo diz **o que cada camada entrega, do que depende e como saber que acabou**. Ele não repete o produto
@@ -101,8 +101,8 @@ As janelas fixas do evento e o cronograma estão no [plano de horas](plano-de-ho
 |---|---|---|---|
 | G0 · C0a pronta | ~17h15 `[PROPOSTA]`; **atingido às 16h41** (plano da C0) | `pytest` e `ruff` verdes; teste de fronteiras ativo; contratos v0 no `main` | As frentes não abrem; a C0 continua com prioridade |
 | G1 · Hospedagem e deploy de teste | Fim da C0 ([DEC-027](decisoes.md)) | `/health` responde 200 na URL pública | Plano B: túnel do notebook ([arquitetura, seção 12](arquitetura.md)) até a decisão; registrar o risco |
-| G2 · Política fictícia | 19h ([DEC-028](decisoes.md)) | YAMLs em `data/regras/politica/` e `convencao/` | C1 segue só com `lei/`; C7 e C8 esperam |
-| **G3 · Primeira fatia vertical** | **21h30** ([DEC-028](decisoes.md)) | Seção 2, no deploy | Ordem de corte; nada de camada nova antes da fatia |
+| G2 · Política fictícia | 19h ([DEC-028](decisoes.md)); **entregue** por Pedro Veloso (PR #3) e lida pelo solver desde a [DEC-042](decisoes.md) | YAMLs em `data/regras/politica/` e `convencao/` | C1 segue só com `lei/`; C7 e C8 esperam |
+| **G3 · Primeira fatia vertical** | **21h30** ([DEC-028](decisoes.md)); venceu sem a fatia; replanejada no [plano da C5](planos/camada-05-fatia-vertical.md) | Seção 2, **localmente em `localhost:8000`** ([DEC-038](decisoes.md); antes: no deploy) | Ordem de corte; nada de camada nova antes da fatia |
 | G4 · Núcleo das features v1 | Dom 08h30 (janela do plano de horas) | C6, C7 e C8 concluídas ou cortadas conscientemente | Cortar na ordem do produto, seção 2 |
 | G5 · Evals completos | Dom 10h30 | 30 cenários num comando, com relatório (RN-04) | Reportar só os que rodam, sem arredondar |
 | G6 · Link público | Dom 11h30 (plano de horas) | Teste como jurado ([entrega.md](entrega.md), seção 2) | Parar de adicionar funções |
@@ -313,11 +313,11 @@ puxado. Não há sessão própria.
 | Camada | Frente | Status | Plano |
 |---|---|---|---|
 | C0 Fundação e deploy de teste | 1 pessoa, depois C | C0a concluída (G0 às 16h41); C0b parada: Docker pronto, deploy adiado ([DEC-033](decisoes.md), [DEC-034](decisoes.md)) | [camada-00-fundacao.md](planos/camada-00-fundacao.md) |
-| C1 Domínio, regras e rede sintética | A | a planejar | — |
-| C2 Solver, verificador e custo | A | a planejar | — |
-| C3 Cliente LLM, pool de chaves e rastro | B | a planejar | — |
-| C4 API, login, papéis e SPA base | C | a planejar | — |
-| C5 Primeira fatia vertical | todas | a planejar | — |
+| C1 Domínio, regras e rede sintética | A | a planejar (subconjunto planejado na C5) | subconjunto em [camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md) |
+| C2 Solver, verificador e custo | A | a planejar (subconjunto planejado na C5) | subconjunto em [camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md) |
+| C3 Cliente LLM, pool de chaves e rastro | B | a planejar (subconjunto planejado na C5) | subconjunto em [camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md) |
+| C4 API, login, papéis e SPA base | C | a planejar (subconjunto planejado na C5) | subconjunto em [camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md) |
+| C5 Primeira fatia vertical | todas | **em execução**: código integrado no `main` local às 00h42 de 08/11; G3 itens 1 a 5 passaram, falta o item 6 à mão (usuário) | [camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md) |
 | C6 Leitura completa e FT-01 | B, D | a planejar | — |
 | C7 Acompanhamento (FT-03) | B, C | a planejar | — |
 | C8 Exceções, painel, auditoria e FT-07 | A, C | a planejar | — |

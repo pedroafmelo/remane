@@ -3,6 +3,7 @@
 from datetime import datetime
 
 from escalista.domain.contracts import ExceptionCard, LLMMessage, LLMResult, LLMUnavailableError, TraceEvent
+from escalista.domain.results import Approval, RunState, ScheduleVersion
 
 
 class FixedClock:
@@ -51,3 +52,40 @@ class FakeLLMClient:
         if self._results:
             return self._results.pop(0)
         return LLMResult(content="resposta falsa", model="fake", key_index=1)
+
+
+class InMemoryRepository:
+    """`Repository` em dicionários. Guarda cópias, para o chamador não alterar o que já foi salvo."""
+
+    def __init__(self) -> None:
+        self.runs: dict[str, RunState] = {}
+        self.versions: dict[str, ScheduleVersion] = {}
+        self.approvals: dict[str, Approval] = {}
+        self.published_at: dict[str, datetime] = {}
+
+    def save_run(self, state: RunState) -> None:
+        self.runs[state.run_id] = state.model_copy(deep=True)
+
+    def get_run(self, run_id: str) -> RunState | None:
+        return self.runs.get(run_id)
+
+    def save_version(self, v: ScheduleVersion) -> None:
+        self.versions[v.id] = v.model_copy(deep=True)
+
+    def get_version(self, version_id: str) -> ScheduleVersion | None:
+        return self.versions.get(version_id)
+
+    def record_approval(self, a: Approval) -> None:
+        self.approvals[a.version_id] = a.model_copy(deep=True)
+
+    def get_approval(self, version_id: str) -> Approval | None:
+        return self.approvals.get(version_id)
+
+    def mark_published(self, version_id: str, at: datetime) -> None:
+        self.versions[version_id] = self.versions[version_id].model_copy(update={"status": "published"})
+        self.published_at[version_id] = at
+
+    def latest_published(self) -> ScheduleVersion | None:
+        if not self.published_at:
+            return None
+        return self.versions[max(self.published_at, key=self.published_at.__getitem__)]

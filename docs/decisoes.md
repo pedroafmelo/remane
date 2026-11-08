@@ -1,6 +1,6 @@
 # Registro de decisões
 
-Última atualização: 2026-11-07 16:11. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
+Última atualização: 2026-11-08 01:44. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
 entrada:** se a decisão mudar, crie outra e marque a antiga como `substituída por DEC-NNN`. Use `/decisao` para registrar e
 propagar o efeito para as outras docs.
 
@@ -516,3 +516,54 @@ Formato:
   (só a landing, não roda o backend).
 - **Consequências:** a hospedagem sai de `[PREENCHER]`; G1 pode acontecer. Quem faz o primeiro passo no painel é o dono da conta
   (ligar o GitHub, criar o volume e o domínio). Segredos (chaves da Featherless, `DEMO_MODE`) entram como variáveis do serviço, nunca no repositório.
+
+## DEC-038 · Plano da C5, rodada 1: G3 local, janela até 03h e de volta às 07h, o usuário em todas as frentes, contratos pela frente A
+
+- 2026-11-07 23:37 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** o G3 (primeira fatia vertical, 21h30) venceu sem a fatia; o `main` tem só a C0a; o deploy foi adiado ([DEC-034](#dec-034--tudo-do-deploy-fica-para-depois-por-enquanto-testar-e-rodar-localmente)); a política fictícia não chegou. O agente planeja a fatia para execução em paralelo ([plano da C5](planos/camada-05-fatia-vertical.md)).
+- **Decisão (o que o usuário escolheu):** (1) "Sim, G3 local": o G3 passa em `http://localhost:8000`, e não no deploy; (2) "Todos até ~03h, voltam 07h"; (3) quem fica em cada frente: "Eu em todos."; (4) quem congela os contratos: "Pessoa da frente A".
+- **Motivo: [motivo não informado].**
+- **Alternativas consideradas (as oferecidas):** (1) G3 local agora com deploy no G4; G3 só no deploy. (2) Todos direto até o G4; turnos 2 + 2. (3) Nomes por frente ou `[PREENCHER]`. (4) Sessão da frente B; Claude no plano.
+- **Consequências:** ~4h45 de relógio por frente até o G4 (dom 08h30). O fluxo à mão numa URL pública só é testado quando o deploy for decidido (antes do G6). A tarefa T0 (contratos) bloqueia as outras frentes por 30 a 45 min `[PROPOSTA]`. "Eu em todos" foi esclarecido na [DEC-039](#dec-039--plano-da-c5-rodada-2-4-sessões-do-claude-em-paralelo-csv-longo-status-ficticia-e-campo-sexo-fora-da-tela).
+
+## DEC-039 · Plano da C5, rodada 2: 4 sessões do Claude em paralelo, CSV longo, status `ficticia` e campo sexo fora da tela
+
+- 2026-11-07 23:38 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** a rodada 1 deixou "Eu em todos" ambíguo; faltavam o formato do CSV, o status das regras fictícias (o RN-09 só prevê `conferida`, `interpretacao` e `pendente`) e o RN-13 com a [DEC-023](#dec-023--art-386-da-clt-domingo-quinzenal-para-empregadas-entra-como-regra-dura).
+- **Decisão (o que o usuário escolheu):** (1) "4 sessões Claude em paralelo": uma sessão do Claude Code por frente, cada uma no seu worktree; o usuário revisa e integra; os outros 3 do time não programam nesta madrugada. (2) CSV "Longo: 1 linha por turno" (`loja_id,pessoa_id,nome,data,inicio,fim`; quadro e demanda vêm da integração simulada). (3) "Novo status `ficticia`" para as regras da convenção e da política fictícias. (4) Campo `sexo` no quadro sintético, "fora do gerente": usado só por solver e verificador, nunca na tela, na API do gerente nem no trace.
+- **Motivo: [motivo não informado].**
+- **Alternativas consideradas (as oferecidas):** (1) o time programa e o usuário coordena; uma sessão, frente a frente. (2) grade pessoa × dia. (3) `conferida`; `interpretacao`. (4) visível na grade; fora do contrato agora.
+- **Consequências:** a atenção do usuário vira o gargalo `[INFERÊNCIA]`; o fluxo de git usa worktrees e merge local (plano da C5, seção 7). O schema do carregador ganha o valor `ficticia`, aceito só em `convencao/` e `politica/` `[PROPOSTA]`; a tela mostra "fictícia (demo)". A primitiva `domingo_mulher` fica para depois da fatia, mas o contrato `Employee` já nasce com `sex`.
+
+## DEC-040 · Plano da C5 aprovado; commits autorizados nas branches dos worktrees
+
+- 2026-11-07 23:49 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** o plano da C5 ([planos/camada-05-fatia-vertical.md](planos/camada-05-fatia-vertical.md)) esperava o "aprovado" e a decisão sobre commits por tarefa nas 4 sessões ([DEC-038](#dec-038--plano-da-c5-rodada-1-g3-local-janela-até-03h-e-de-volta-às-07h-o-usuário-em-todas-as-frentes-contratos-pela-frente-a), [DEC-039](#dec-039--plano-da-c5-rodada-2-4-sessões-do-claude-em-paralelo-csv-longo-status-ficticia-e-campo-sexo-fora-da-tela)).
+- **Decisão (o que o usuário disse):** "Aprovo o plano." e, sobre os commits, "Autorizados."
+- **Motivo: [motivo não informado].**
+- **Alternativas consideradas (as oferecidas):** commits autorizados por tarefa concluída, na branch do worktree e nunca no `main`; ou não autorizados.
+- **Consequências:** os itens `[PROPOSTA]` do plano entram na aprovação e seguem rotulados (nomes de contratos, quinta primitiva `jornada_diaria_max`, semana de 11 a 17/01/2027, hora extra só com autorização, pacote `store/`, verificador na sessão D, fluxo sem PR); qualquer um muda por nova DEC. **Commits autorizados** para as 4 sessões, por tarefa concluída, **na branch do worktree** (`c5/<frente>-<tarefa>`), **sem push e sem commit no `main`**: o `main` só recebe o que o usuário integra com `merge --ff-only`. Esta autorização vale só para as sessões da C5. **Segue `[PREENCHER]`:** o que fazer com C6, C7 e C8 diante do G4 (plano da C5, seção 9). Os worktrees foram criados às 23h47 (`/Users/pedrohmv/Projetos/cc61-a` a `cc61-d`, branches `c5/a-contracts`, `c5/b-trace`, `c5/c-access` e `c5/d-data`) a partir de `d6c10c7`.
+
+## DEC-041 · Execução da C5 por uma sessão orquestradora com subagentes; merge local pelo orquestrador
+
+- 2026-11-07 23:55 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** o usuário entregou um roteiro de orquestração para executar a C5 ([plano da C5](planos/camada-05-fatia-vertical.md)) com uma sessão que delega cada tarefa a um subagente nos 4 worktrees, com três escolhas em aberto. O `main` tinha a [DEC-040](#dec-040--plano-da-c5-aprovado-commits-autorizados-nas-branches-dos-worktrees) sem commit.
+- **Decisão (o que o usuário escolheu):** (1) DEC-040: "Eu commito agora", isto é, o orquestrador a commita; (2) merge no `main`: "Orquestrador, ff-only" (local, sem push); (3) duração: "Indefinido."; (4) commit das docs de registro: "Orquestrador commita".
+- **Motivo: [motivo não informado].**
+- **Alternativas consideradas (as oferecidas):** (1) o usuário commita; (2) só o usuário integra; (3) parar às ~03h e voltar às 07h, ou seguir sem supervisão até o G3; (4) só o usuário commita.
+- **Consequências:** o fluxo da [seção 7 do plano da C5](planos/camada-05-fatia-vertical.md) muda: quem integra é o orquestrador, e não o usuário, sempre sem push. "Indefinido" foi lido pelo agente como "seguir até o G3" (**interpretação, não confirmada**). Decisões tomadas pelo **agente** durante a execução, sem consulta, registradas aqui para revisão: (a) upload do CSV em corpo bruto `text/csv`, porque `python-multipart` não está instalado e `uv add` estava vedado; (b) teto de 8 pessoas por faixa na demanda sintética (D2b), porque o ótimo deixava 9,5 pessoa-horas descobertas e a demo padrão cairia sempre no RX-02; (c) uma tarefa a mais, S1 (`store/`), que o plano previa sem tarefa. Execução e G3 no [registro da C5](planos/camada-05-fatia-vertical.md), seção 12.
+
+## DEC-042 · Integração do remoto com a C5 numa branch própria: Next + Remane, regras do Pedro Veloso no solver, nome do agente Pat
+
+- 2026-11-08 01:44 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** o `origin/main` recebeu os PRs #2 a #6 (landing Remane em Next.js, posicionamento, convenção e política fictícias de Pedro Veloso, Railway, G1) enquanto o `main` local recebia a C5 inteira (24 commits, sem push). O PR #7 (design system do Pedro Melo) estava aberto e em conflito. As DEC-035 a DEC-037 existiam nos dois lados com conteúdo diferente.
+- **Decisão (o que o usuário disse):** "resolver os conflitos, integrar os arquivos do Pedro Veloso e o design system do Pedro Melo, atualizar o repositório, para poder prosseguir"; sobre as regras do Pedro Veloso: "B: Faz o solver usar as regras dele" (entre manter as duas camadas lado a lado, sem o motor lê-las, e fazer o motor lê-las); "O nome do agente é Pat" (produto **Remane**, agente **Pat**, pacote Python `escalista`); "Deixa o whatsapp para depois"; todo o front deve sair do design system.
+- **Motivo: [motivo não informado].**
+- **Alternativas consideradas (as oferecidas):** regras do Pedro lado a lado com as do D1, sem o motor lê-las (opção a); WhatsApp planejado em paralelo.
+- **Como o agente encaixou (`[PROPOSTA]`, sem confirmação do usuário):**
+  - **Numeração:** as DEC-035 a 038 locais viraram **038 a 041** (as do remoto, já públicas, ficam 035 a 037); a série está em ordem no arquivo.
+  - **Git:** branch `integrate/remote-main` em worktree próprio, com merge de `origin/main`, de `origin/docs/design-system` (conteúdo do PR #7) e dos dois ramos de trabalho; **sem push no `main`** (o Railway publica a cada merge na `main`).
+  - **Front:** a SPA da fatia (Vite) foi portada para Next com o design system em `/entrar/` (3 botões de demo) e `/plataforma/`; `web/src/` removido.
+  - **Regras:** o carregador lê `restringe: <primitiva>` com o campo do valor do Pedro (`percentual`, `horas`, `dias`) e **não** lê `amplia:` (fica `info`): tratá-lo como primitiva faz a fusão ver a jornada de 9h da convenção como "mais frouxa" que a lei e abrir um RX-01 espúrio na semana da demo. **Efeito:** a ampliação diária (9h a partir de 16/12/2026) ainda **não** alimenta o motor; a fatia não precisa dela (5 x 8 h = 40 h < 42 h). Isso é um recorte da opção B, **a confirmar** pelo usuário.
+  - **D1:** `convencao/demo.yaml` e `politica/demo.yaml` removidos; a autorização prévia do DP para hora extra, sem equivalente no Pedro, ficou em `politica/autorizacao_hora_extra.yaml`.
+- **Consequências:** em vigor na demo, vêm do Pedro: hora extra a 60% (`cct_adicional_hora_extra`) e interjornada de 12 h (`pol_interjornada`). Os números da demo não mudaram (medidos pelo subagente: 158 violações e R$ 33.989,15 antes; 0 e R$ 20.014,00 depois). Os cenários E1-03 e E1-10 mudaram o controle "no limite" de 11 h para 12 h. O `rule_id` das violações de interjornada plantadas passou a `pol_interjornada`. **Ficam abertos:** WhatsApp (adiado); RX-01 e RX-11 plantados pelo Pedro **não** saem do cartão (`cct_repouso_semanal` não tem `restringe` e `cct_folgas_dominicais` é `info`); o personagem da landing (DEC-036), que se chamava Patrick, se confundia com o agente **Pat**: **o usuário mandou trocar para "Pedro"** (2026-11-08 01:47; "use Pedro ao invés de patrick"); a troca foi feita em `web/` (hero, história e grade), e o texto da DEC-036 acima fica como foi decidido; o app completo ainda não está no Railway (precisa de `SESSION_SECRET`, `DEMO_MODE` e chaves como variáveis do serviço).

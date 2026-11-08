@@ -11,6 +11,7 @@ export default function config(phase: string): NextConfig {
     async rewrites() {
       return [
         { source: "/api/:path*", destination: "http://localhost:8000/api/:path*" },
+        { source: "/auth/:path*", destination: "http://localhost:8000/auth/:path*" }, // login e logout de demo ficam fora de /api
         { source: "/health", destination: "http://localhost:8000/health" },
       ];
     },

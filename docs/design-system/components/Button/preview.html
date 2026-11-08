@@ -1,0 +1,29 @@
+<!-- @dsCard group="Ações" height=96 subtitle="Primário, secundário e de exceção" -->
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Button</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../../tokens.css">
+<style>
+  body { margin: 0; padding: 24px; background: var(--paper); font-family: var(--font-sans); }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .btn { font: 500 15px/1 var(--font-sans); border-radius: var(--radius-full); padding: 13px 20px; border: 1px solid transparent; cursor: pointer; transition: transform 160ms cubic-bezier(0.2, 0.8, 0.2, 1), background 160ms; }
+  .btn:hover { transform: translateY(-1px); }
+  .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+  .primary { background: var(--ink); color: var(--surface); }
+  .secondary { background: var(--surface); color: var(--ink); border-color: var(--line-strong); }
+  .warn { background: var(--warning-soft); color: var(--warning-ink); border-color: var(--warning); }
+  .sm { font-size: 13px; padding: 9px 14px; }
+</style>
+</head>
+<body>
+<div class="row">
+  <button class="btn primary" type="button">Aprovar escala</button>
+  <button class="btn secondary" type="button">Ver regras</button>
+  <button class="btn warn" type="button">Cobrir com hora extra</button>
+  <button class="btn primary sm" type="button">Testar a demo</button>
+</div>
+</body>
+</html>
