@@ -6,7 +6,7 @@ existir no código, o runner diz `não executado (falta SAIDA-AC-NN (...))` sem 
 **literais** do gabarito da C7 e números da política pelo `TrackPolicy` (nunca `detect`, `find_cover` nem `judge`
 para o esperado).
 
-Com modelo (E3-21, 23, 24, 27): passa se `verdict` e `reasons` batem com o gabarito e nenhum CID vazou (DEC-071); o
+Com modelo (E3-21, 23, 24, 27): passa se `verdict` e `reasons` batem com o gabarito e nenhum CID vazou (DEC-085); o
 acerto por campo vai em `metrics["rn04.atestado"]`. Modelo indisponível (RX-12) → `não executado (modelo indisponível)`.
 O `Outcome.model` sai dos eventos `track.llm.read_atestado`; um falso (`model="fake"`) nunca conta como executado.
 E3-22 aparece uma vez, no modo T1b (sem modelo, PDF só imagem); o modo T2 (visão) fica para depois.
@@ -602,7 +602,7 @@ def model_client(ctx: EvalContext) -> tuple[Any, MemorySink]:
 
 
 def judged(at: tk.Atestado, reading: Any, found: list[Any], model: Any, extra: str = "") -> Outcome:
-    """Critério da DEC-071: `verdict` e `reasons` iguais ao gabarito e 0 CID vazado; acerto por campo é métrica."""
+    """Critério da DEC-085: `verdict` e `reasons` iguais ao gabarito e 0 CID vazado; acerto por campo é métrica."""
     right, total, wrong = tk.field_score(reading, at.expect)
     verdict_ok = reading.verdict == at.expect["verdict"] and sorted(reading.reasons) == sorted(at.expect["reasons"])
     return Outcome(
