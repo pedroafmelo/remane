@@ -1,6 +1,6 @@
 # Plano da C6 repensada · Leitura por agente e formulação do problema de otimização
 
-Última atualização: 2026-11-08 02:28 (Recife) · Situação: **proposta, aguarda o "aprovado" do usuário** · Planejado por Claude
+Última atualização: 2026-11-08 02:52 (DECs renumeradas de 043 a 050 para 046 a 053; papéis `gestor` e `colaborador` da DEC-044; tarefa R0). Antes: 2026-11-08 02:28 (Recife) · Situação: **aprovado pelo usuário em 2026-11-08 02:54** (Recife; prompt de orquestração da C6) · Planejado por Claude
 (Opus 5.5, [DEC-028](../decisoes.md)) numa sessão só de planejamento: sem código, sem `uv add`, sem commit. As DECs propostas (seção 18)
 **não foram gravadas** em [decisoes.md](../decisoes.md): outra sessão pode estar editando o arquivo.
 
@@ -11,6 +11,11 @@ agente. **[INFERÊNCIA]** é dedução sem medição. **[HIPÓTESE]** é premiss
 **O que muda em relação à C6 do [plano macro](../plano-implementacao.md) (seção 5.6):** esta C6 cobre o resto do **FT-02**: leitura de
 formato livre por agente, persistência do quadro e das semanas seguintes, e formulação do problema pelo modelo. O **FT-01** (convenção em
 PDF, tela do cartão, aprovação do DP) **fica fora**: vira C6b depois do G4 ou o corte 5 do produto (o cartão continua vindo dos YAMLs).
+
+**Papéis (DEC-044, mergeada depois que este plano foi escrito):** a demo tem **`gestor`** (gerente + DP) e **`colaborador`**. Onde este plano
+diz "gerente" ou "DP", leia **gestor**. Isso exige uma tarefa nova, **R0** (seção 14), feita **antes de tudo e sozinha**, porque o contrato `Role`
+(`domain/contracts.py`), `require_role`, `POST /auth/demo/{papel}`, o `decider` dos cartões, `PUBLISHER_ROLES` e a SPA ainda usam `gerente` e `dp`
+[FATO: a PR #12 só mudou docs; confira com `git grep -n "gerente\|Role\."`].
 
 ## 0. Como o trabalho roda
 
@@ -325,6 +330,12 @@ truncada; e um falso que devolve o mapeamento "envenenado" (fim no lugar de iní
 Verificação de toda tarefa antes de integrar: `uv run pytest -q && uv run ruff check .`, mais a específica. Donos exclusivos como na C5:
 `domain/`, `tests/fakes.py` e `tests/architecture/` → A; `pyproject.toml` e `uv.lock` → ninguém.
 
+### R0 · papéis `gestor` e `colaborador` (DEC-044), antes de tudo e sozinha (Opus 5.5)
+
+| Id | Tarefa | Depende | Horas | Verificação |
+|---|---|---|---|---|
+| R0 | **Uma única tarefa transversal, com permissão de editar todas as pastas** (exceção ao dono exclusivo, porque trocar o enum quebra tudo ao mesmo tempo): `Role` passa a `gestor` e `colaborador` (some `gerente` e `dp`); `require_role`, `POST /auth/demo/{papel}` (e o 404 de papel desconhecido), `PUBLISHER_ROLES`, o `decider` dos cartões (RX-02, RX-12, RX-13 e os demais: quem era gerente ou DP vira gestor), a matriz rota × papel (de três para dois), os textos da SPA e `/entrar` (**dois** botões: "Entrar como gestor" e "Entrar como colaborador"), `data/` e testes, e2e e evals E1 que citem `gerente` ou `dp`. Teste de contrato dos papéis. Sem aliases de compatibilidade (a DEC-044 não pede). Antes de começar, ler a DEC-044 em `docs/decisoes.md` | — | 0,25–0,5 | `pytest`, `ruff`, `evals --suite e1` (10/10), `npm --prefix web run typecheck && npm --prefix web run build`; `git grep -n -i "gerente\|\bdp\b"` só no que for texto histórico de docs |
+
 ### Frente A · núcleo e contratos (Opus 5.5 em tudo: o custo do erro aqui é alto)
 
 | Id | Tarefa | Depende | Horas | Verificação específica |
@@ -378,11 +389,11 @@ A0 ─┬─► A1 ─┐                    D1 ──────────�
     └─► C1 ─► C2 ───┴───────────────────────────────────┘
 ```
 
-- **Caminho crítico [PROPOSTA]:** A0 (0,5–0,75) → A1 (0,75–1,25) → B4 (1–1,5) → C3 + e2e (0,5–0,75) → à mão (0,25) = **3 a 4,5 h**.
+- **Caminho crítico [PROPOSTA]:** A0 (0,5–0,75) → A1 (0,75–1,25) → B4 (1–1,5) → C3 + e2e (0,5–0,75) → à mão (0,25) = **3 a 4,5 h** (mais 0,25 a 0,5 h da R0, `[PROPOSTA]`).
   Referência medida: a C5 foi estimada em 3,25 a 5 h e levou ~45 min de relógio com o orquestrador
   ([estado](../estado-do-projeto.md), Métricas medidas). [INFERÊNCIA] Aqui pode levar de 1 a 2 h, mas B4 e o laço do solver têm mais risco
   de depuração que a C5.
-- **Ordem de integração em `c6/integra`:** A0 → D1, D2, D3, D4, B1, C1 (em qualquer ordem) → A1, A2, A3, A4 → B2, B3, A5, D7 → C2 → **B4
+- **Ordem de integração em `c6/integra`:** **R0 (sozinha, com todas as frentes paradas)** → A0 → D1, D2, D3, D4, B1, C1 (em qualquer ordem) → A1, A2, A3, A4 → B2, B3, A5, D7 → C2 → **B4
   (com as outras frentes paradas)** → C3 (idem) → D5. Rebase de cada branch curta (`c6/<frente>-<tarefa>`) sobre `c6/integra` e
   `merge --ff-only`.
 - **Marcos (só eles vão ao `main`, e quem faz o merge é o usuário):**
@@ -426,25 +437,25 @@ leem o `main`.
    de qualquer forma, porque a demanda passa a ser a inferida). Contra: é mais um elemento simulado a declarar na
    submissão; sem ele, a economia vira só horas × um salário único.
 
-## 18. DECs propostas (não gravadas; o número final é o próximo livre em [decisoes.md](../decisoes.md), hoje DEC-043, salvo se o PR #9 usou)
+## 18. DECs propostas (não gravadas; o número final é o próximo livre em [decisoes.md](../decisoes.md), hoje **DEC-046**: a DEC-043 é o WhatsApp (Cloud API), a DEC-044 são os dois papéis e a DEC-045 é o mascote)
 
-- **DEC-043 · C6 repensada:** o FT-02 lê formato livre por agente (nó 1, mapeamento em schema fechado aplicado pelo código), formula a
+- **DEC-046 · C6 repensada:** o FT-02 lê formato livre por agente (nó 1, mapeamento em schema fechado aplicado pelo código), formula a
   `SolveSpec` (nó 2) e chama o solver com laço limitado (nó 3). O FT-01 (convenção em PDF e tela do cartão) sai da C6 e vai para C6b ou para
   o corte 5. Execução em `c6/integra`, com o `main` só nos marcos M1, M2 e M3, por merge do usuário.
-- **DEC-044 · Continuidade e persistência:** a 1ª execução lê um arquivo e grava, na confirmação, um `Roster` versionado (lojas, pessoas,
+- **DEC-047 · Continuidade e persistência:** a 1ª execução lê um arquivo e grava, na confirmação, um `Roster` versionado (lojas, pessoas,
   padrão de demanda por dia da semana). As seguintes partem da última escala publicada, deslocada 1 semana, sem upload. A porta
   `Repository` ganha `save_roster`, `latest_roster` e `get_roster`, e o `RunState` passa a guardar o "antes".
-- **DEC-045 · Identidade das pessoas:** id por matrícula ou por nome normalizado; homônimo e grafia parecida viram cartão ao gerente, nunca
+- **DEC-048 · Identidade das pessoas:** id por matrícula ou por nome normalizado; homônimo e grafia parecida viram cartão ao gerente, nunca
   fusão automática por parecença.
-- **DEC-046 · Semana e vigência por execução:** o cartão é montado pela semana planejada, com a mais restritiva na semana em que a vigência
+- **DEC-049 · Semana e vigência por execução:** o cartão é montado pela semana planejada, com a mais restritiva na semana em que a vigência
   muda (aviso em `provisional`). A semana fixa da demo deixa de existir fora dos evals E1.
-- **DEC-047 · Demanda inferida** (depende da pergunta 1): demanda = cobertura do arquivo por faixa, corrigida pela cobertura-alvo por loja,
+- **DEC-050 · Demanda inferida** (depende da pergunta 1): demanda = cobertura do arquivo por faixa, corrigida pela cobertura-alvo por loja,
   com `CapacityCheck` antes do solver.
-- **DEC-048 · Limites do modelo:** o modelo não devolve linhas, só o mapeamento; não toca no cartão; a `SolveSpec` só restringe
+- **DEC-051 · Limites do modelo:** o modelo não devolve linhas, só o mapeamento; não toca no cartão; a `SolveSpec` só restringe
   (`extra="forbid"`, lista fechada, evidência literal); o laço relaxa só preferências, em código, no máximo 2 chamadas ao solver.
-- **DEC-049 · Reserva sem modelo:** a falha do modelo nunca bloqueia: o nó 1 cai para a heurística de aliases e depois para o leitor da
+- **DEC-052 · Reserva sem modelo:** a falha do modelo nunca bloqueia: o nó 1 cai para a heurística de aliases e depois para o leitor da
   DEC-039; o nó 2 cai para a especificação padrão; o aviso RX-12 fica visível em `notices`.
-- **DEC-050 · Campo de sexo opcional no contrato** (consequência da decisão 2 do usuário): `Employee.sex` passa a `None` por padrão; nenhuma
+- **DEC-053 · Campo de sexo opcional no contrato** (consequência da decisão 2 do usuário): `Employee.sex` passa a `None` por padrão; nenhuma
   regra o usa nesta camada.
 
 ## 19. Critério de pronto (comandos)
