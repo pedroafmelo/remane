@@ -55,7 +55,7 @@ regras:
     fonte: "Política fictícia, item 6"
     nota: >
       Passados 10 min do início do turno sem batida no ponto simulado, o agente pergunta ao colaborador (gatilho
-      ativo de falta ou atraso). Sem resposta em 15 min, abre RX-09 ao gestor.
+      ativo de falta ou atraso). Sem resposta em 15 min, abre uma exceção ao gestor.
     prazo_resposta_colaborador_min: 15
     status: interpretacao
 
@@ -64,14 +64,14 @@ regras:
     candidatos_max_antes_de_escalar: 3
     ordem: pol_ordem_preferencia_cobertura
     fonte: "Política fictícia, item 7"
-    nota: "O colega confirma antes; o gestor valida sempre (produto.md, FT-03). Sem aceite dos 3, abre RX-06."
+    nota: "O colega confirma antes, e o gestor valida sempre. Se nenhum dos 3 candidatos aceitar, abre uma exceção ao gestor."
     status: interpretacao
 
   - id: pol_aviso_hora_extra_estourando
     dispara_em_percentual_do_limite: 80
     destino: gestor
     fonte: "Política fictícia, item 8"
-    nota: "Gatilho ativo (b) do FT-03: aviso ao gestor quando alguém chega a 80% do limite semanal ou mensal de pol_hora_extra."
+    nota: "Aviso ao gestor quando alguém chega a 80% do limite semanal ou mensal de hora extra da política."
     status: interpretacao
 
   - id: pol_aviso_necessidade_hora_extra
@@ -81,7 +81,7 @@ regras:
       - "a escala da semana seguinte só fecha com mais de 10 horas extras somadas na loja"
     destino: gestor
     fonte: "Política fictícia, item 9"
-    nota: "[PROPOSTA] Gatilho ativo (c) do FT-03 (RF-28). O time ainda não decidiu o que dispara o aviso nem quem o recebe."
+    nota: "Em aberto: o time ainda não decidiu o que dispara o aviso nem quem o recebe."
     status: interpretacao
 
   - id: pol_reotimizacao_semanal
@@ -92,7 +92,7 @@ regras:
       - "hora extra projetada acima de 10 horas na loja"
       - "2 ou mais mudanças no quadro da loja na semana (férias, afastamento, admissão ou desligamento)"
     fonte: "Política fictícia, item 10"
-    nota: "[PROPOSTA] Critério do RF-25 (produto.md, FT-02). O agente propõe; o gestor confirma e depois aprova a escala."
+    nota: "Em proposta: o agente sugere refazer a escala, e o gestor confirma e depois aprova."
     status: interpretacao
 
   - id: pol_prazos_e_escalada

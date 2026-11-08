@@ -26,7 +26,7 @@ CARD = RuleCard(
             source="art. 6º, I, EC 141",
         ),
         Rule(
-            id="hora_extra_autorizacao_dp",
+            id="hora_extra_autorizacao_previa",
             kind="info",
             layer=RuleLayer.POLITICA,
             status=RuleStatus.FICTICIA,
@@ -179,7 +179,7 @@ def test_prompt_has_ids_sources_and_facts_but_no_personal_data() -> None:
     client = FakeLLMClient([result(GOOD)])
     run(client)
     text = "\n".join(m.content for m in client.calls[0]["messages"])
-    assert "jornada_semanal_max" in text and "hora_extra_autorizacao_dp" in text
+    assert "jornada_semanal_max" in text and "hora_extra_autorizacao_previa" in text
     assert "art. 6º, I, EC 141" in text and "ficticia" in text
     assert "E-007" in text and "L1" in text and "100" in text
     assert "Fulana" not in text  # `Violation.detail` fica de fora
