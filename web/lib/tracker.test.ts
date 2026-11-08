@@ -137,3 +137,24 @@ test("reportForm só envia texto e arquivo quando existem", () => {
   assert.equal(full.get("text"), "cheguei tarde");
   assert.equal((full.get("file") as File).name, "at.pdf");
 });
+
+test("o cartão de um código novo do acompanhamento vira o formato do componente sem supor falta", async () => {
+  const { toExceptionView } = await import("./exception.ts");
+  for (const code of ["COBERTURA", "RX-05", "RX-06", "RX-08", "RX-09"]) {
+    const view = toExceptionView({
+      code,
+      title: "Cobertura: Bia aceitou",
+      reason: "Bia aceitou cobrir o turno.",
+      decider: "gestor",
+      deadline: null,
+      evidence: ["3 candidatos avaliados"],
+      options: [{ label: "Validar a cobertura", effect: null, cost_usd: null }],
+      recommendation: null,
+      if_no_answer: null,
+      trace_id: null,
+    });
+    assert.equal(view.chip, `${code} · precisa de você`);
+    assert.equal(view.time, null);
+    assert.deepEqual(view.options, [{ label: "Validar a cobertura", value: null }]);
+  }
+});
