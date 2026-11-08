@@ -7,7 +7,7 @@ import { LogoMark } from "../Logo";
 import { DAYS, STORY_CAPTIONS, STORY_LAST_STEP, stepFromProgress, storyRows } from "@/lib/story";
 import { useReducedMotion } from "./useReducedMotion";
 
-// O painel fica preso na tela enquanto a rolagem conduz o caso do Patrick.
+// O painel fica preso na tela enquanto a rolagem conduz o caso do Pedro.
 export function HeroStory() {
   const ref = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
@@ -71,7 +71,7 @@ export function HeroStory() {
                 </ChatBubble>
               )}
               {step === 2 && <ChatBubble from="typing" />}
-              {step >= 3 && <ChatBubble from="agent">Recebi, Patrick. Atestado ok, melhoras. Já estou cobrindo seu turno das 14h.</ChatBubble>}
+              {step >= 3 && <ChatBubble from="agent">Recebi, Pedro. Atestado ok, melhoras. Já estou cobrindo seu turno das 14h.</ChatBubble>}
               {step >= 4 && <ChatBubble from="event">Carlos aceitou o turno · sem hora extra</ChatBubble>}
               {step >= 5 && <ChatBubble from="agent">Pronto, turno coberto. A gestora já foi avisada.</ChatBubble>}
             </div>

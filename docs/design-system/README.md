@@ -3,7 +3,7 @@
 > **Design system do Remane**, copiado do artefato do claude.ai (<https://claude.ai/artifact/8Bg2WxFALVjNyQ34zZU3Jf>) em 08/11.
 > **O código de verdade está em `web/`:** tokens em `web/app/globals.css`, componentes em `web/components/` (mesmos nomes).
 > **Copy desatualizada:** "Sua escala se remaneja sozinha", a Joana e o selo da EC 141 que aparecem aqui e nos previews foram
-> substituídos pela [DEC-036](../decisoes.md) ("O engenheiro da sua escala de trabalho.", Patrick, sem a 6x1 no centro).
+> substituídos pela [DEC-036](../decisoes.md) ("O engenheiro da sua escala de trabalho.", personagem Pedro (antes Patrick), sem a 6x1 no centro).
 > Para ver um componente, abra `components/<Nome>/preview.html` no navegador; o guia de uso no Next está em [desenvolvimento.md](desenvolvimento.md).
 
 

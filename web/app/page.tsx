@@ -88,7 +88,7 @@ export default function Home() {
               <p className="mt-4 text-lg leading-normal text-ink-muted">
                 {wa
                   ? "Aponte a câmera do celular para o código. A mensagem já vai escrita; o agente responde como faria na loja."
-                  : "Abra a demo e veja o agente cobrir a falta do Patrick do começo ao fim."}
+                  : "Abra a demo e veja o agente cobrir a falta do Pedro do começo ao fim."}
               </p>
               {wa && <Button href={wa} variant="secondary" className="mt-6">Abrir no WhatsApp</Button>}
             </div>
