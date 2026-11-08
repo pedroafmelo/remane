@@ -1,0 +1,20 @@
+[
+  {
+    "id": "L1",
+    "name": "Loja Sintética Centro",
+    "opens": "08:00:00",
+    "closes": "22:00:00"
+  },
+  {
+    "id": "L2",
+    "name": "Loja Sintética Norte",
+    "opens": "08:00:00",
+    "closes": "22:00:00"
+  },
+  {
+    "id": "L3",
+    "name": "Loja Sintética Sul",
+    "opens": "08:00:00",
+    "closes": "22:00:00"
+  }
+]

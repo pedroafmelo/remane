@@ -1,0 +1,602 @@
+[
+  {
+    "id": "P001",
+    "name": "Quitéria Horta (sintético)",
+    "store_id": "L1",
+    "job": "Estoquista",
+    "hourly_wage": "12.40",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P002",
+    "name": "Carla Siqueira (sintético)",
+    "store_id": "L1",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P003",
+    "name": "Ana Nogueira (sintético)",
+    "store_id": "L1",
+    "job": "Repositor",
+    "hourly_wage": "11.80",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P004",
+    "name": "Sílvia Vasconcelos (sintético)",
+    "store_id": "L1",
+    "job": "Caixa",
+    "hourly_wage": "12.20",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P005",
+    "name": "Hugo Almeida (sintético)",
+    "store_id": "L1",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P006",
+    "name": "Gabriela Freitas (sintético)",
+    "store_id": "L1",
+    "job": "Repositor",
+    "hourly_wage": "11.80",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P007",
+    "name": "Fábio Pacheco (sintético)",
+    "store_id": "L1",
+    "job": "Repositor",
+    "hourly_wage": "11.80",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P008",
+    "name": "Diego Monteiro (sintético)",
+    "store_id": "L1",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P009",
+    "name": "Sílvia Siqueira (sintético)",
+    "store_id": "L1",
+    "job": "Caixa",
+    "hourly_wage": "12.20",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P010",
+    "name": "Carla Nogueira (sintético)",
+    "store_id": "L1",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P011",
+    "name": "Rafael Galvão (sintético)",
+    "store_id": "L1",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P012",
+    "name": "Wagner Rezende (sintético)",
+    "store_id": "L1",
+    "job": "Caixa",
+    "hourly_wage": "12.20",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P013",
+    "name": "Nelson Vasconcelos (sintético)",
+    "store_id": "L1",
+    "job": "Caixa",
+    "hourly_wage": "12.20",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P014",
+    "name": "Carla Esteves (sintético)",
+    "store_id": "L1",
+    "job": "Caixa",
+    "hourly_wage": "12.20",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P015",
+    "name": "Paulo Cardoso (sintético)",
+    "store_id": "L1",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P016",
+    "name": "Karina Rezende (sintético)",
+    "store_id": "L1",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P017",
+    "name": "Ana Rezende (sintético)",
+    "store_id": "L1",
+    "job": "Caixa",
+    "hourly_wage": "12.20",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P018",
+    "name": "Ana Quintela (sintético)",
+    "store_id": "L1",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P019",
+    "name": "Carla Horta (sintético)",
+    "store_id": "L1",
+    "job": "Repositor",
+    "hourly_wage": "11.80",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P020",
+    "name": "Fábio Monteiro (sintético)",
+    "store_id": "L1",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P021",
+    "name": "Fábio Vasconcelos (sintético)",
+    "store_id": "L2",
+    "job": "Estoquista",
+    "hourly_wage": "12.40",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P022",
+    "name": "Mariana Teixeira (sintético)",
+    "store_id": "L2",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P023",
+    "name": "Paulo Ivo (sintético)",
+    "store_id": "L2",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P024",
+    "name": "Ana Oliveira (sintético)",
+    "store_id": "L2",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P025",
+    "name": "Olívia Horta (sintético)",
+    "store_id": "L2",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P026",
+    "name": "Fábio Barros (sintético)",
+    "store_id": "L2",
+    "job": "Caixa",
+    "hourly_wage": "12.20",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P027",
+    "name": "Sílvia Galvão (sintético)",
+    "store_id": "L2",
+    "job": "Repositor",
+    "hourly_wage": "11.80",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P028",
+    "name": "Quitéria Nogueira (sintético)",
+    "store_id": "L2",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P029",
+    "name": "Rafael Vasconcelos (sintético)",
+    "store_id": "L2",
+    "job": "Caixa",
+    "hourly_wage": "12.20",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P030",
+    "name": "Karina Pacheco (sintético)",
+    "store_id": "L2",
+    "job": "Repositor",
+    "hourly_wage": "11.80",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P031",
+    "name": "Fábio Nogueira (sintético)",
+    "store_id": "L2",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P032",
+    "name": "Lucas Junqueira (sintético)",
+    "store_id": "L2",
+    "job": "Repositor",
+    "hourly_wage": "11.80",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P033",
+    "name": "Paulo Barros (sintético)",
+    "store_id": "L2",
+    "job": "Caixa",
+    "hourly_wage": "12.20",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P034",
+    "name": "Hugo Cardoso (sintético)",
+    "store_id": "L2",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P035",
+    "name": "Úrsula Pacheco (sintético)",
+    "store_id": "L2",
+    "job": "Caixa",
+    "hourly_wage": "12.20",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P036",
+    "name": "Wagner Freitas (sintético)",
+    "store_id": "L2",
+    "job": "Caixa",
+    "hourly_wage": "12.20",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P037",
+    "name": "Ana Dantas (sintético)",
+    "store_id": "L2",
+    "job": "Caixa",
+    "hourly_wage": "12.20",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P038",
+    "name": "Tiago Ivo (sintético)",
+    "store_id": "L2",
+    "job": "Repositor",
+    "hourly_wage": "11.80",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P039",
+    "name": "Úrsula Nogueira (sintético)",
+    "store_id": "L2",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P040",
+    "name": "Elisa Barros (sintético)",
+    "store_id": "L2",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P041",
+    "name": "Rafael Siqueira (sintético)",
+    "store_id": "L3",
+    "job": "Estoquista",
+    "hourly_wage": "12.40",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P042",
+    "name": "Iara Pacheco (sintético)",
+    "store_id": "L3",
+    "job": "Estoquista",
+    "hourly_wage": "12.40",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P043",
+    "name": "Diego Vasconcelos (sintético)",
+    "store_id": "L3",
+    "job": "Caixa",
+    "hourly_wage": "12.20",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P044",
+    "name": "Fábio Lacerda (sintético)",
+    "store_id": "L3",
+    "job": "Repositor",
+    "hourly_wage": "11.80",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P045",
+    "name": "Zé Lacerda (sintético)",
+    "store_id": "L3",
+    "job": "Repositor",
+    "hourly_wage": "11.80",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P046",
+    "name": "Tiago Lacerda (sintético)",
+    "store_id": "L3",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P047",
+    "name": "Iara Nogueira (sintético)",
+    "store_id": "L3",
+    "job": "Caixa",
+    "hourly_wage": "12.20",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P048",
+    "name": "João Pacheco (sintético)",
+    "store_id": "L3",
+    "job": "Caixa",
+    "hourly_wage": "12.20",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P049",
+    "name": "Carla Junqueira (sintético)",
+    "store_id": "L3",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P050",
+    "name": "João Dantas (sintético)",
+    "store_id": "L3",
+    "job": "Repositor",
+    "hourly_wage": "11.80",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P051",
+    "name": "Vitor Oliveira (sintético)",
+    "store_id": "L3",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P052",
+    "name": "Iara Rezende (sintético)",
+    "store_id": "L3",
+    "job": "Repositor",
+    "hourly_wage": "11.80",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P053",
+    "name": "Paulo Junqueira (sintético)",
+    "store_id": "L3",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P054",
+    "name": "Gabriela Quintela (sintético)",
+    "store_id": "L3",
+    "job": "Repositor",
+    "hourly_wage": "11.80",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P055",
+    "name": "Úrsula Oliveira (sintético)",
+    "store_id": "L3",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P056",
+    "name": "Bruno Cardoso (sintético)",
+    "store_id": "L3",
+    "job": "Estoquista",
+    "hourly_wage": "12.40",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P057",
+    "name": "Sílvia Oliveira (sintético)",
+    "store_id": "L3",
+    "job": "Atendente",
+    "hourly_wage": "11.50",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P058",
+    "name": "Lucas Quintela (sintético)",
+    "store_id": "L3",
+    "job": "Estoquista",
+    "hourly_wage": "12.40",
+    "contract_hours": 44,
+    "sex": "F",
+    "profile": "padrao"
+  },
+  {
+    "id": "P059",
+    "name": "Nelson Pacheco (sintético)",
+    "store_id": "L3",
+    "job": "Caixa",
+    "hourly_wage": "12.20",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  },
+  {
+    "id": "P060",
+    "name": "Diego Dantas (sintético)",
+    "store_id": "L3",
+    "job": "Estoquista",
+    "hourly_wage": "12.40",
+    "contract_hours": 44,
+    "sex": "M",
+    "profile": "padrao"
+  }
+]

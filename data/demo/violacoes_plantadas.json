@@ -1,0 +1,56 @@
+[
+  {
+    "rule_id": "jornada_semanal_max",
+    "kind": "jornada_semanal_max",
+    "employee_id": "P001",
+    "day": null
+  },
+  {
+    "rule_id": "repouso_semanal",
+    "kind": "repouso_semanal",
+    "employee_id": "P001",
+    "day": null
+  },
+  {
+    "rule_id": "jornada_semanal_max",
+    "kind": "jornada_semanal_max",
+    "employee_id": "P003",
+    "day": null
+  },
+  {
+    "rule_id": "repouso_semanal",
+    "kind": "repouso_semanal",
+    "employee_id": "P003",
+    "day": null
+  },
+  {
+    "rule_id": "repouso_semanal",
+    "kind": "repouso_semanal",
+    "employee_id": "P002",
+    "day": null
+  },
+  {
+    "rule_id": "jornada_diaria_max",
+    "kind": "jornada_diaria_max",
+    "employee_id": "P004",
+    "day": "2027-01-11"
+  },
+  {
+    "rule_id": "jornada_diaria_max",
+    "kind": "jornada_diaria_max",
+    "employee_id": "P005",
+    "day": "2027-01-13"
+  },
+  {
+    "rule_id": "interjornada_min",
+    "kind": "interjornada_min",
+    "employee_id": "P006",
+    "day": "2027-01-12"
+  },
+  {
+    "rule_id": "interjornada_min",
+    "kind": "interjornada_min",
+    "employee_id": "P007",
+    "day": "2027-01-14"
+  }
+]
