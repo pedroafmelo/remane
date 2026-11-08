@@ -1,7 +1,7 @@
 # Estado do projeto
 
 > **Fonte da verdade do momento.** Atualize ao fim de cada bloco de trabalho (ver "Documentação viva" no
-> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-08 03:55** (Recife), por Claude (Sonnet 5.5), mascote Pat ([DEC-045](decisoes.md)). Antes: **2026-11-08 01:23** (Recife), por Claude (Sonnet 5.5), ao integrar o remoto (landing Remane em Next.js, Railway, regras do Pedro Veloso e design system) com a C5 numa branch própria ([DEC-042](decisoes.md)). Antes: 01:03, landing Remane e `web/` em Next.js ([DEC-035](decisoes.md)); 00:45, a primeira fatia vertical no `main` local e itens 1 a 5 do G3 ([DEC-041](decisoes.md), [plano da C5](planos/camada-05-fatia-vertical.md), seção 12); 16:47, C0a e G0 ([plano da C0](planos/camada-00-fundacao.md)).
+> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-08 03:17** (Recife), por Claude (Opus 5.5), plataforma com 4 áreas (PR #15). Antes: **2026-11-08 03:55**, mascote Pat ([DEC-045](decisoes.md)). Antes: **2026-11-08 01:23** (Recife), por Claude (Sonnet 5.5), ao integrar o remoto (landing Remane em Next.js, Railway, regras do Pedro Veloso e design system) com a C5 numa branch própria ([DEC-042](decisoes.md)). Antes: 01:03, landing Remane e `web/` em Next.js ([DEC-035](decisoes.md)); 00:45, a primeira fatia vertical no `main` local e itens 1 a 5 do G3 ([DEC-041](decisoes.md), [plano da C5](planos/camada-05-fatia-vertical.md), seção 12); 16:47, C0a e G0 ([plano da C0](planos/camada-00-fundacao.md)).
 
 ## Fase atual
 
@@ -128,6 +128,7 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 
 | Data e hora | O quê | Por |
 |---|---|---|
+| 2026-11-08 03:17 | **Plataforma com 4 áreas, base (PR #15, sem merge):** papéis `gestor` e `colaborador` no código ([DEC-044](decisoes.md); valores antigos `gerente` e `dp` lidos como `gestor`); menu Escala · Exceções · Impacto · Regras; colaborador entra em `/colaborador/`; Escala mostra a escala vigente primeiro e o Pat trabalhando durante a otimização. 464 testes, `tsc`, `lint`, 26 testes do front e `build` ok; conferido no navegador local (sem chave: justificativa como RX-12). **Achado:** o solver ignora `contract_hours` e deixa pessoas com 0 h; medido na demo, R$ 9.864,80 da "economia" são horas pagas e não trabalhadas. Correção em rascunho no PR #16 (custo depois R$ 28.456,00, ninguém com 0 h, 477 testes, E1 10/10), **para o Pedro Vieira decidir** | Claude (Opus 5.5) |
 | 2026-11-08 02:51 | **G3, item 6 passou**, segundo o usuário (teste à mão com o `.env` e o modelo real, interface em Next). Sem números informados: custo e latência do `llm.justify` ficam `[PREENCHER]`. Mascote Pat: ajuste final (estados e animação do balão) e DEC do mascote renumerada de 043 para **045** (DEC-043 estava duplicada em `main`: WhatsApp e mascote) | Claude |
 | 2026-11-08 02:40 | **Mascote do agente Pat** proposto e implementado como componente (bloco do logo com dois olhos, 5 estados), ainda não ligado a tela ([DEC-045](decisoes.md)); `web/components/Pat.tsx`, `web/lib/pat.ts` + teste (22 testes do front, typecheck e lint ok), folha `pat-estados.svg` | Claude |
 | 2026-11-08 02:34 | [DEC-044](decisoes.md): dois papéis na demo, gestor (gerente + DP) e colaborador; resolve a pergunta 15; produto, arquitetura e plano anotados. Avisar o backend antes do login (C4) | Claude |
