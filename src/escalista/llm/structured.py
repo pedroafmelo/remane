@@ -57,7 +57,7 @@ def call_structured[M: BaseModel](
     parent_id: str | None = None,
     tool_name: str | None = None,
     tool_description: str | None = None,
-    size: Literal["small", "large"] = "small",
+    size: Literal["small", "large", "vision"] = "small",
     kind: str | None = None,
     validate: Callable[[M], None] | None = None,
     what: str = "saída estruturada",

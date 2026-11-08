@@ -32,7 +32,7 @@ class LLMClient(Protocol):
     def complete(
         self,
         *,
-        size: Literal["small", "large"],
+        size: Literal["small", "large", "vision"],
         messages: list[LLMMessage],
         tool_schema: dict[str, Any] | None = None,
         run_id: str,

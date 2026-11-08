@@ -1,5 +1,6 @@
 """`FeatherlessClient` com transporte HTTP falso: sem rede, sem `.env`, chaves sentinela que nunca podem vazar."""
 
+import base64
 import json
 import logging
 from datetime import datetime
@@ -12,7 +13,7 @@ from sqlalchemy import text as sql
 from escalista.audit.sink import SqlTraceSink
 from escalista.config import Settings
 from escalista.db import init_db, make_engine
-from escalista.domain.contracts import LLMMessage, LLMUnavailableError
+from escalista.domain.contracts import ImagePart, LLMMessage, LLMUnavailableError, TextPart
 from escalista.domain.ports import LLMClient
 from escalista.llm.client import COST_MEASURED, COST_MISSING, FeatherlessClient
 from tests.fakes import FixedClock, ListTraceSink
@@ -292,3 +293,85 @@ def test_events_persist_in_sql_trace_sink_without_key_values(settings):
     with engine.connect() as conn:
         dump = json.dumps([list(row) for row in conn.execute(sql("SELECT * FROM trace_event"))], default=str)
     assert "SENTINELA" not in dump
+
+
+# --- foto do atestado (C7 T2, A5): partes de imagem e modelo de visão ---------------------------------------------
+
+VISION = "modelo/visao"
+IMAGE = b"\x89PNG\r\n\x1a\n" + b"PIXELS-DA-FOTO-NAO-VAZAR" * 40
+IMAGE_B64 = base64.b64encode(IMAGE).decode("ascii")
+PHOTO = [
+    LLMMessage(role="system", content="Leia o atestado."),
+    LLMMessage(role="user", content=[TextPart(text="Colaborador: Ana"), ImagePart(media_type="image/png", data=IMAGE)]),
+]
+
+
+def test_request_converts_parts_to_openai_format_in_memory(make):
+    request = make(FakeFeatherless())._request("m", PHOTO, None)
+    assert request["messages"] == [
+        {"role": "system", "content": "Leia o atestado."},
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "Colaborador: Ana"},
+                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{IMAGE_B64}"}},
+            ],
+        },
+    ]
+
+
+def test_request_keeps_plain_text_content_as_string(make):
+    request = make(FakeFeatherless())._request("m", MESSAGES, None)
+    assert request["messages"] == [{"role": "user", "content": "Explique a troca de turno."}]
+
+
+def test_vision_model_comes_from_settings(settings, monkeypatch, make):
+    assert Settings(_env_file=None).featherless_model_vision == "Qwen/Qwen3.5-9B"  # DEC-020; nunca testado com imagem
+    monkeypatch.setenv("FEATHERLESS_MODEL_VISION", VISION)
+    server = FakeFeatherless(completion(VISION))
+    result = call(make(server, Settings(_env_file=None)), size="vision")
+    assert result.model == VISION and server.calls[0]["model"] == VISION
+
+
+def test_image_goes_only_to_the_provider_never_to_trace_or_log(make, sink, caplog, monkeypatch):
+    caplog.set_level(logging.DEBUG)
+    monkeypatch.setenv("FEATHERLESS_MODEL_VISION", VISION)
+    server = FakeFeatherless(completion(VISION, tool_args='{"texto": "ok"}'), 400)
+    client = make(server, Settings(_env_file=None))
+    client.complete(size="vision", messages=PHOTO, tool_schema=TOOL, run_id="run-1", kind="track.llm.read_atestado")
+    with pytest.raises(LLMUnavailableError) as err:
+        client.complete(size="vision", messages=PHOTO, run_id="run-1", kind="track.llm.read_atestado")
+    # controle positivo: a imagem chegou ao provedor como data URI
+    sent = server.calls[0]["body"]["messages"][1]["content"][1]["image_url"]["url"]
+    assert sent == f"data:image/png;base64,{IMAGE_B64}"
+    exposed = [
+        caplog.text,
+        repr(client),
+        str(err.value),
+        err.value.card.model_dump_json(),
+        *(e.model_dump_json() for e in sink.events),
+        repr(PHOTO),
+    ]
+    for text in exposed:
+        assert "PIXELS-DA-FOTO" not in text
+        assert IMAGE_B64[:40] not in text
+        assert "data:image" not in text
+    # o rastro registra só o tamanho em bytes e o tipo da imagem
+    ok, failed = sink.events
+    assert ok.kind == "track.llm.read_atestado" and failed.kind == "exception.raised"
+    assert ok.payload["images"] == [{"media_type": "image/png", "bytes": len(IMAGE)}]
+    assert failed.payload["images"] == [{"media_type": "image/png", "bytes": len(IMAGE)}]
+
+
+def test_text_only_calls_have_no_images_in_payload(make, sink):
+    call(make(FakeFeatherless(completion(SMALL))))
+    assert "images" not in sink.events[0].payload
+
+
+def test_redacted_messages_describe_images_without_content():
+    from escalista.llm.client import redacted_messages
+
+    assert redacted_messages(PHOTO) == [
+        {"role": "system", "content": "Leia o atestado."},
+        {"role": "user", "content": ["Colaborador: Ana", f"[imagem omitida, {len(IMAGE)} bytes]"]},
+    ]

@@ -1,7 +1,7 @@
 """`FeatherlessClient`: porta `LLMClient` sobre o SDK `openai` apontado para a Featherless (arquitetura, seção 7).
 
-- `size` escolhe o modelo (`small` ou `large`). Se o principal falhar por problema do modelo (frio, ausente, sem
-  capacidade) e houver reserva configurada, tenta o reserva com o mesmo pool.
+- `size` escolhe o modelo (`small`, `large` ou `vision`). Se o principal falhar por problema do modelo (frio, ausente,
+  sem capacidade) e houver reserva configurada, tenta o reserva com o mesmo pool.
 - `tool_schema` vira ferramenta forçada (`tools` + `tool_choice` com o nome da função); `tool_args` é o JSON dos
   argumentos. Se o modelo não chamar a ferramenta ou mandar JSON inválido, `tool_args=None` e o motivo vai ao `payload`:
   quem valida e reenvia é a saída estruturada (B3), não este cliente.
@@ -13,10 +13,16 @@
 - Chave: o SDK recebe um valor de mentira; a chave real entra só no cabeçalho `Authorization` de cada requisição, lida
   do `SecretStr` naquele momento. As novas tentativas automáticas do SDK ficam desligadas (`max_retries=0`): quem
   decide é o pool.
+- Imagem (A5, foto do atestado): `LLMMessage.content` em partes vira o formato OpenAI (`text` e `image_url` com `data:`
+  URI em base64), **só no corpo da requisição, em memória**. O rastro guarda de cada imagem apenas `media_type` e
+  tamanho em bytes (`payload.images`); nunca os bytes nem o data URI (RN-06). Nenhum log do cliente serializa as
+  mensagens; quem precisar mostrá-las usa `redacted_messages`. O modelo `vision` é opcional na construção direta e
+  `from_settings` sempre o configura.
 """
 
 from __future__ import annotations
 
+import base64
 import json
 import logging
 import math
@@ -32,13 +38,21 @@ import openai
 from pydantic import SecretStr
 
 from escalista.config import Settings
-from escalista.domain.contracts import ExceptionCard, LLMMessage, LLMResult, LLMUnavailableError, TraceEvent
+from escalista.domain.contracts import (
+    ExceptionCard,
+    ImagePart,
+    LLMMessage,
+    LLMResult,
+    LLMUnavailableError,
+    TextPart,
+    TraceEvent,
+)
 from escalista.domain.ports import Clock, TraceSink
 from escalista.llm.pool import Attempt, KeyPool, PoolExhaustedError
 
 log = logging.getLogger(__name__)
 
-Size = Literal["small", "large"]
+Size = Literal["small", "large", "vision"]
 
 DEFAULT_TIMEOUT_S = 60.0
 DEFAULT_MAX_TOKENS = 1024
@@ -121,6 +135,7 @@ class FeatherlessClient:
         models: dict[Size, ModelChoice] = {
             "small": ModelChoice(settings.featherless_model_small, settings.featherless_model_small_fallback),
             "large": ModelChoice(settings.featherless_model_large, settings.featherless_model_large_fallback),
+            "vision": ModelChoice(settings.featherless_model_vision),
         }
         return cls(
             pool=pool,
@@ -154,6 +169,7 @@ class FeatherlessClient:
             raise ValueError(f"size inválido: {size!r}")
         tool = _normalize_tool(tool_schema) if tool_schema is not None else None
         event_kind = kind or self._event_kind
+        images = _image_summary(messages)
         start = self._perf_counter()
         all_attempts: list[dict[str, Any]] = []
         failure: PoolExhaustedError | None = None
@@ -170,17 +186,17 @@ class FeatherlessClient:
                 continue
             all_attempts += _attempts_payload(model, attempts)
             return self._success(
-                response, event_kind, size, model, key_index, tool, all_attempts, run_id, parent_id, start
+                response, event_kind, size, model, key_index, tool, all_attempts, run_id, parent_id, start, images
             )
         assert failure is not None
-        self._fail(failure, size, model, all_attempts, run_id, parent_id, start, event_kind)
+        self._fail(failure, size, model, all_attempts, run_id, parent_id, start, event_kind, images)
 
     # --- requisição -----------------------------------------------------------------------------------------------
 
     def _request(self, model: str, messages: Sequence[LLMMessage], tool: dict[str, Any] | None) -> dict[str, Any]:
         request: dict[str, Any] = {
             "model": model,
-            "messages": [{"role": m.role, "content": m.content} for m in messages],
+            "messages": [{"role": m.role, "content": _wire_content(m.content)} for m in messages],
         }
         if self._max_tokens is not None:
             request["max_tokens"] = self._max_tokens
@@ -211,6 +227,7 @@ class FeatherlessClient:
         run_id: str,
         parent_id: str | None,
         start: float,
+        images: list[dict[str, Any]],
     ) -> LLMResult:
         latency_ms = self._elapsed_ms(start)
         usage = getattr(response, "usage", None)
@@ -229,6 +246,8 @@ class FeatherlessClient:
             "finish_reason": getattr(choice, "finish_reason", None),
             "attempts": attempts,
         }
+        if images:
+            payload["images"] = images
         if tool is not None:
             payload["tool"] = tool["function"]["name"]
             payload["tool_args_ok"] = tool_args is not None
@@ -269,11 +288,23 @@ class FeatherlessClient:
         parent_id: str | None,
         start: float,
         event_kind: str,
+        images: list[dict[str, Any]],
     ) -> NoReturn:
         latency_ms = self._elapsed_ms(start)
         reason = self._pool.redact(_failure_reason(failure, size, attempts))
         last_key = attempts[-1]["key_index"] if attempts else None
         event_id = self._new_id()
+        payload: dict[str, Any] = {
+            "code": RX12,
+            "reason": reason,
+            "failure": failure.kind,
+            "requested_kind": event_kind,
+            "size": size,
+            "cost_basis": COST_FAILED,
+            "attempts": attempts,
+        }
+        if images:
+            payload["images"] = images
         card = ExceptionCard(
             code=RX12,
             title="Modelo de linguagem indisponível",
@@ -294,15 +325,7 @@ class FeatherlessClient:
             tokens_out=None,
             cost_usd=None,
             latency_ms=latency_ms,
-            payload={
-                "code": RX12,
-                "reason": reason,
-                "failure": failure.kind,
-                "requested_kind": event_kind,
-                "size": size,
-                "cost_basis": COST_FAILED,
-                "attempts": attempts,
-            },
+            payload=payload,
         )
         log.warning("featherless: RX-12 em run_id=%s (%s)", run_id, failure.kind)
         raise LLMUnavailableError(card) from None
@@ -314,6 +337,42 @@ class FeatherlessClient:
 
     def _elapsed_ms(self, start: float) -> int:
         return max(0, round((self._perf_counter() - start) * 1000))
+
+
+def _wire_content(content: str | list[TextPart | ImagePart]) -> str | list[dict[str, Any]]:
+    """Conteúdo no formato da API (OpenAI). A imagem vira `data:` URI em memória; o resultado só vai ao provedor."""
+    if isinstance(content, str):
+        return content
+    parts: list[dict[str, Any]] = []
+    for part in content:
+        if isinstance(part, ImagePart):
+            url = f"data:{part.media_type};base64,{base64.b64encode(part.data).decode('ascii')}"
+            parts.append({"type": "image_url", "image_url": {"url": url}})
+        else:
+            parts.append({"type": "text", "text": part.text})
+    return parts
+
+
+def _image_summary(messages: Sequence[LLMMessage]) -> list[dict[str, Any]]:
+    """O que o rastro pode saber de cada imagem: o tipo e o tamanho em bytes (RN-06)."""
+    return [
+        {"media_type": part.media_type, "bytes": len(part.data)}
+        for m in messages
+        if not isinstance(m.content, str)
+        for part in m.content
+        if isinstance(part, ImagePart)
+    ]
+
+
+def redacted_messages(messages: Sequence[LLMMessage]) -> list[dict[str, Any]]:
+    """Mensagens seguras para mostrar (log, depuração): cada imagem vira `[imagem omitida, N bytes]` (RN-06)."""
+
+    def shown(content: str | list[TextPart | ImagePart]) -> str | list[str]:
+        if isinstance(content, str):
+            return content
+        return [f"[imagem omitida, {len(p.data)} bytes]" if isinstance(p, ImagePart) else p.text for p in content]
+
+    return [{"role": m.role, "content": shown(m.content)} for m in messages]
 
 
 def _normalize_tool(tool_schema: Mapping[str, Any]) -> dict[str, Any]:
