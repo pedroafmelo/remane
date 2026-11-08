@@ -80,6 +80,16 @@ class ExceptionStore:
             row = session.get(ExceptionItemRow, item_id)
             return None if row is None else ExceptionItem.model_validate(row.data)
 
+    def remove_by_source_kind(self, kind: str) -> int:
+        """Apaga os itens cuja origem é `kind` (o "Reiniciar" da demo apaga os cartões do acompanhamento, `track`).
+        Devolve quantos apagou."""
+        with Session(self._engine) as session, session.begin():
+            rows = session.scalars(select(ExceptionItemRow)).all()
+            doomed = [r for r in rows if (r.data.get("source") or {}).get("kind") == kind]
+            for row in doomed:
+                session.delete(row)
+            return len(doomed)
+
     def list(self) -> list[ExceptionItem]:
         """Abertas primeiro (mais antigas antes), depois as decididas (mais recentes antes)."""
         with Session(self._engine) as session:
