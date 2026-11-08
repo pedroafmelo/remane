@@ -25,7 +25,8 @@ Os slides de cada bloco seguem o desenho dela: uma frase grande, um visual e pou
 | Tempo da execução completa | **~36 s**: solver 19,6 s + justificativa 16,3 s | rastro da mesma execução, no Railway | 08/11, 03:00 |
 | Violações das regras na escala enviada → na proposta | **158 → 0** | verificador independente, mesma escala de exemplo (sintética) | 08/11 |
 | Horas extras na escala enviada → na proposta | **216,5 h → 0 h** | mesma função de custo nas duas escalas | 08/11 |
-| Cobertura da demanda | **95,2% → 100%** | idem | 08/11 |
+| Cobertura da demanda (alvo 100%, o padrão da tela) | **95,7% → 84,4%** (faixas sem cobertura: 42 → 401) | mesma função nas duas escalas, contra a demanda inferida do arquivo; **main local b6f4a01, sem modelo** (confirmar no link público depois do deploy) | 08/11, 09:40 |
+| Demanda da semana × o que o quadro aguenta | **2.774,5 × 2.400 pessoa-hora** (cabe ~80%) | painel "A demanda cabe no quadro?", mesma medição | 08/11, 09:40 |
 | Economia na semana do exemplo | **R$ 5.533** (16,3%): R$ 33.989,15 → R$ 28.456,00 | mesma função de custo nas duas escalas, **solver direto, medido localmente** (não pelo link público: confirmar depois do deploy); o PR #16 corrige a carga do contrato (ver nota) | 08/11, 08:40 |
 | Evals sem modelo (E1) | **10/10** | `uv run python -m escalista.evals --suite e1` | 08/11 |
 | Rede da demo | 3 lojas, 60 pessoas, 1 semana | dados sintéticos gerados pelo time | — |
@@ -37,6 +38,8 @@ contratadas e não trabalhadas (R$ 2.845,60): pela folha completa a economia est
 não foram medidas; (2) **na demo o custo não varia com a cobertura-alvo** (R$ 28.456 em 50%, 80%, 100% e 120%): não prometer "escolha a
 cobertura e veja o custo cair" no vídeo nem ao vivo, e sim "a cobertura-alvo ajusta cobertura e contratação"; (3) o tempo do solver caiu para ~3 s (bench local), mas
 o "~36 s" acima é do rastro do deploy antigo: **remedir depois do deploy** e trocar o número.
+
+**Nota sobre a cobertura (08/11, 09:40):** com o C6, a demanda passou a ser inferida da própria escala enviada, e a frase antiga "cobertura de 95 para 100%" deixou de valer. A escala antiga cobria 95,7% **porque usava 216,5 h de hora extra e tinha 158 violações**; dentro da regra, as 60 pessoas dão 2.400 pessoa-hora para uma demanda de 2.774,5, e a proposta cobre 84,4%. **A história honesta é: zero violação, zero hora extra, R$ 5.533 a menos, e o Remane mostra que o quadro não fecha a semana.** Não usar o alvo "Ajustar para caber (80%)" para dizer "98,5% de cobertura": é a cobertura de uma demanda reduzida de propósito, e cai numa pergunta da banca. Medição completa dos três cenários em [planos/web-camadas.md](planos/web-camadas.md).
 
 **Números de mercado com fonte** (da [ficha da IDEA-002](ideacao/ideias/IDEA-002-escalista.md)):
 
@@ -110,7 +113,8 @@ Dois slides, no formato do modelo: título claro, subtítulo de como funciona e 
 - **Fala:**
   > "O gestor envia a escala que já usa. O Pat, nosso agente, lê o arquivo e monta a melhor semana possível dentro da lei, da
   > convenção e da política da empresa, com um otimizador matemático, não com chute de IA. Um verificador independente confere
-  > regra por regra. Na escala de exemplo: 158 violações viram zero, e 216 horas extras viram zero. O gestor aprova, e só então ela
+  > regra por regra. Na escala de exemplo: 158 violações viram zero, e 216 horas extras viram zero. E o Pat mostra o que a escala
+  > antiga escondia: dentro da regra, esse quadro não fecha a semana. O gestor aprova, e só então ela
   > é publicada. Durante a semana, quando alguém avisa uma falta, o Pat acha quem cobre sem hora extra e leva a decisão ao gestor,
   > com as opções e o custo de cada uma."
 
@@ -180,7 +184,7 @@ Impacto/Regras) e, se o time decidir, o #16. Cenas que dependem de PR ainda aber
 | 2 | 0:10 – 0:20 | `/entrar` → "Entrar como gestor" | "O jurado entra sem senha, como gestor ou como colaborador." |
 | 3 | 0:20 – 0:40 | Escala → "Usar escala de exemplo" → resumo da leitura | "O gestor envia a escala que já usa. O Pat lê: 60 pessoas, 3 lojas, 360 turnos, e mostra o que entendeu antes de seguir." |
 | 4 | 0:40 – 1:00 | "Confirmar a leitura" → Pat trabalhando (cortar a espera de ~36 s na edição) | "Ele otimiza a semana dentro da lei, da convenção e da política, confere com um verificador independente e escreve a justificativa." |
-| 5 | 1:00 – 1:25 | Antes e depois + justificativa do Pat + grade proposta | "158 violações viram zero; 216 horas extras viram zero; cobertura de 95 para 100%. Custo calculado pela mesma função nas duas escalas." |
+| 5 | 1:00 – 1:25 | Antes e depois + painel "A demanda cabe no quadro?" + grade proposta | "158 violações viram zero; 216 horas extras viram zero; R$ 5.533 a menos, pela mesma função de custo nas duas escalas. E o Pat mostra o que a escala antiga escondia: ela só cobria a demanda com hora extra e violação. Dentro da regra, este quadro não fecha a semana, e o gestor vê o tamanho do buraco." |
 | 6 | 1:25 – 1:35 | "Aprovar e publicar" → escala vigente | "Nada é publicado sem o gestor. A aprovação fica gravada com quem e quando." |
 | 7 | 1:35 – 2:00 | **(PR de Exceções)** Sair → entrar como colaborador → celular simulado → "Avisar falta" | "No celular simulado, a colaboradora avisa a falta. O Pat procura quem cobre sem hora extra e respeitando o descanso." |
 | 8 | 2:00 – 2:15 | **(PR de Exceções)** Gestor → Exceções → cartão com opções e custo → escolhe | "O gestor recebe a exceção com as opções, o custo e a recomendação, e decide. A escala é atualizada." |
@@ -217,10 +221,12 @@ segundo, para não parecer truque. Sem música alta. Legenda "dados sintéticos"
 > plataforma.
 >
 > **Medido** (dados sintéticos, link público, 08/11/2026): na escala de exemplo (3 lojas, 60 pessoas), 158 violações → 0, 216,5 h
-> de hora extra → 0, cobertura de 95,2% → 100%, economia de R$ 5.533 (16,3%) na semana, medida localmente, a confirmar na versão publicada. Execução completa em ~36
+> de hora extra → 0, economia de R$ 5.533 (16,3%) na semana; a escala antiga cobria 95,7% da demanda à custa de hora extra e
+> violação, e o Pat mostra que, dentro da regra, o quadro só aguenta ~80% dela (2.400 de 2.774,5 pessoa-hora). Medido localmente, a
+> confirmar na versão publicada. Execução completa em ~36
 > s, com US$ 0,001 de modelo. Evals sem modelo: 10/10.
 >
-> **Teste:** `https://escalista-converge-production.up.railway.app` → "Testar a demo" → entrar como gestor ou como colaborador,
+> **Teste:** `https://remane.up.railway.app` → "Testar a demo" → entrar como gestor ou como colaborador,
 > sem senha.
 >
 > **Declarações.** Todos os dados são sintéticos, gerados pelo time. A convenção coletiva e a política da empresa são fictícias. O
@@ -240,4 +246,5 @@ o rastro só mostra o Qwen3.5-9B). Se não foi, tirar da lista.
 - `[DECIDIR]` A chamada para ação: piloto ou "teste agora".
 - `[DECIDIR]` Quem fala cada bloco. Sugestão: uma pessoa nos blocos 1 a 3 e outra nos blocos 4 e 5.
 - Gravar o vídeo depois do merge dos PRs da plataforma e do deploy.
+- Remedir no link público, com o modelo ligado, a economia, a cobertura e o tempo da execução (as linhas de 08/11 09:40 são da main local).
 - Imprimir ou ter à mão o QR code do link.

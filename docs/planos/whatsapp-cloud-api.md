@@ -17,7 +17,7 @@ Fonte: [Get Started da Cloud API](https://developers.facebook.com/documentation/
    Mandar a mensagem de teste para confirmar.
 5. **Token permanente:** Business Settings → System users → criar um usuário de sistema, atribuir o app ("Manage app") e a conta do
    WhatsApp, e gerar um token com `business_management`, `whatsapp_business_messaging` e `whatsapp_business_management`.
-6. **Webhook:** no app, configurar a URL `https://escalista-converge-production.up.railway.app/api/whatsapp/webhook` com um verify token
+6. **Webhook:** no app, configurar a URL `https://remane.up.railway.app/api/whatsapp/webhook` com um verify token
    escolhido pelo time, e assinar o campo **`messages`**.
 
 **A conferir na hora (a página oficial não diz):** quantos números destinatários o número de teste aceita (relatos falam em 5,
