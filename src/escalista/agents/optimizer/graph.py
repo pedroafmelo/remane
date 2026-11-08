@@ -1164,6 +1164,9 @@ class OptimizerAgent:
                 "execution_rules": [r.id for r in card.rules if r.layer == RuleLayer.EXECUCAO],
                 "preferences_met": stats.preferences_met,
                 "preferences_total": stats.preferences_total,
+                # piso da carga do contrato reduzido pelas regras da pessoa (ids, sem nome) e lojas refeitas sem piso
+                "contract_floor_reduced": sorted(stats.contract_floor_reduced),
+                "contract_floor_dropped": stats.contract_floor_dropped,
             },
         )
         return result

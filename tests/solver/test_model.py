@@ -44,9 +44,15 @@ def card(weekly: float = 42, daily: float = 8, rest_gap: float = 11, rest_days: 
     )
 
 
-def emp(id_: str, store: str = "S1", wage: str = "10.00") -> Employee:
+def emp(id_: str, store: str = "S1", wage: str = "10.00", contract_hours: int = 42) -> Employee:
     return Employee(
-        id=id_, name=id_, store_id=store, job="caixa", hourly_wage=Decimal(wage), contract_hours=42, sex="F"
+        id=id_,
+        name=id_,
+        store_id=store,
+        job="caixa",
+        hourly_wage=Decimal(wage),
+        contract_hours=contract_hours,
+        sex="F",
     )
 
 
@@ -160,7 +166,8 @@ def test_solver_tiny_instance_respects_four_primitives(rc: RuleCard):
 
 def test_solver_covers_everything_when_capacity_allows_and_prefers_cheaper():
     stores = [Store(id="S1", name="Loja teste", opens=time(8), closes=time(22))]
-    employees = [emp("E1", wage="10.00"), emp("E2", wage="20.00")]
+    # sem carga contratual (horista): o solver só escala o que a demanda pede, pelo mais barato
+    employees = [emp("E1", wage="10.00", contract_hours=0), emp("E2", wage="20.00", contract_hours=0)]
     demand = demand_block("S1", MONDAY, time(9), time(13), 1)
 
     result = solve(request(stores, employees, demand))
@@ -170,6 +177,23 @@ def test_solver_covers_everything_when_capacity_allows_and_prefers_cheaper():
     assert [(s.employee_id, s.start.time(), s.end.time()) for s in result.schedule.shifts] == [
         ("E1", time(9), time(13))
     ]
+
+
+def test_solver_schedules_each_person_up_to_the_contract_within_the_legal_cap():
+    # mensalista recebe a carga do contrato trabalhando ou não: ninguém fica com 0 h para "economizar"
+    stores = [Store(id="S1", name="Loja teste", opens=time(8), closes=time(22))]
+    employees = [emp("E1", wage="10.00", contract_hours=20), emp("E2", wage="20.00", contract_hours=44)]
+    demand = demand_block("S1", MONDAY, time(9), time(13), 1)
+
+    result = solve(request(stores, employees, demand))
+
+    assert result.status == "optimal" and result.schedule is not None
+    worked = {e.id: 0 for e in employees}
+    for s in result.schedule.shifts:
+        worked[s.employee_id] += (s.end - s.start).total_seconds() / 3600
+    assert worked["E1"] >= 20
+    assert worked["E2"] >= 40  # 44 h de contrato, limitadas por 42 h e por 5 dias × 8 h
+    assert _violations(result.schedule, card(), stores, employees) == []
 
 
 # 12 ------------------------------------------------------------------------------------------------------------
