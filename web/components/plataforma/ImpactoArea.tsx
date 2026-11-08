@@ -6,8 +6,9 @@ import { insightsApi } from "@/lib/api-insights";
 import type { Failure } from "@/lib/errors";
 import { costUsd, hours, latency, money, pct, phaseLabel, timeBr } from "@/lib/format";
 import type { TraceEvent } from "@/lib/types";
-import type { Impact, RunImpact } from "@/lib/types-insights";
+import type { EvalsResponse, Impact, RunImpact } from "@/lib/types-insights";
 import { Button } from "../Button";
+import { EvalsBlock } from "./EvalsBlock";
 import { ImpactStat } from "../ImpactStat";
 import { Pat } from "../Pat";
 import { Shell } from "./Shell";
@@ -17,6 +18,7 @@ import { Card, DataTable, Muted, Notice, cellCls } from "./ui";
 
 export function ImpactoArea() {
   const [data, setData] = useState<Impact | null>(null);
+  const [evals, setEvals] = useState<EvalsResponse | null>(null);
   const [problem, setProblem] = useState<Failure | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [trace, setTrace] = useState<TraceEvent[] | null>(null);
@@ -25,6 +27,11 @@ export function ImpactoArea() {
       setData(await insightsApi.impact());
     } catch (err) {
       setProblem(asFailure(err));
+    }
+    try {
+      setEvals(await insightsApi.evals());
+    } catch {
+      setEvals({ status: "sem_relatorio" }); // o bloco de evals nunca derruba o Impacto
     }
   });
 
@@ -58,6 +65,7 @@ export function ImpactoArea() {
           )}
         </>
       )}
+      {evals && <EvalsBlock data={evals} />}
     </Shell>
   );
 }
