@@ -1,7 +1,7 @@
-import { AreaPlaceholder } from "@/components/plataforma/AreaPlaceholder";
+import { ExcecoesArea } from "@/components/plataforma/ExcecoesArea";
 
 export const metadata = { title: "Remane · Exceções" };
 
 export default function Page() {
-  return <AreaPlaceholder area="excecoes" title="Exceções" text="A fila de exceções, com as opções e o custo de cada uma, chega aqui." />;
+  return <ExcecoesArea />;
 }
