@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import functools
 import threading
-import time
 from collections import Counter
 from collections.abc import Callable
 from datetime import date, datetime, timedelta
@@ -34,15 +33,15 @@ from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy import Engine
 
-from escalista.agents.cover import CoverCandidate, find_cover
 from escalista.agents.optimizer import errors as agent_errors
 from escalista.agents.optimizer.tools import Tracer, publicar
+from escalista.agents.tracker.flow import Tracker, TrackerError, World
 from escalista.api.accounts import Account
 from escalista.api.deps import require_role
 from escalista.api.wiring import DEFAULT_DEMO_FILES_DIR, DEFAULT_RULES_DIR, DEMO_WEEK_START, PublishRefusedError
 from escalista.config import Settings
 from escalista.domain.contracts import ExceptionCard, ExceptionOption, Role
-from escalista.domain.ports import Clock, Repository
+from escalista.domain.ports import Clock, Repository, TrackRepository
 from escalista.domain.results import Approval, ScheduleVersion
 from escalista.domain.rules import RuleCard
 from escalista.domain.schedule import Employee, Schedule, Shift, Store
@@ -157,6 +156,21 @@ def policy_card(raw: dict[str, Any], now: datetime, evidence: list[str]) -> Exce
     )
 
 
+def published_world(
+    repo: Repository, version: ScheduleVersion | None, demo: tuple[dict[str, str], list[Employee]]
+) -> tuple[dict[str, str], list[Employee]]:
+    """Lojas e pessoas de uma escala publicada. Uma escala da C6 traz os ids do quadro guardado na confirmação
+    (`n-<nome>` ou `m-<matrícula>`), não os de `data/demo`; a escala semeada de teste segue na rede de `data/demo`
+    (`demo`). Usada pela fila e pelo acompanhamento (`api/tracker_wiring.py`)."""
+    stores, employees = demo
+    roster = getattr(repo, "latest_roster", lambda: None)()
+    if version is not None and roster is not None:
+        ids = {e.id for e in roster.employees}
+        if any(s.employee_id in ids for s in version.schedule.shifts):
+            return {s.id: s.name for s in roster.stores}, list(roster.employees)
+    return dict(stores), list(employees)
+
+
 # --- a mesa de exceções ---------------------------------------------------------------------------------------------
 
 
@@ -187,23 +201,50 @@ class ExceptionDesk:
         self._card_for_week = card_for_week
         self._policy = policy
         self._new_id = new_id
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
+        self._tracker: Tracker | None = None
+        self._track_cases: TrackRepository | None = None
+        self._world_for: Callable[[ScheduleVersion], World] | None = None
+
+    def attach_tracker(
+        self, tracker: Tracker, *, cases: TrackRepository, world: Callable[[ScheduleVersion], World]
+    ) -> None:
+        """Liga o acompanhamento (C7): os cartões `source.kind == "track"` delegam a decisão ao `Tracker`, a falta pelo
+        celular vira caso do acompanhamento e a rede da escala vem da mesma função do `Tracker` (inclui o cenário)."""
+        self._tracker, self._track_cases, self._world_for = tracker, cases, world
+
+    @property
+    def tracker(self) -> Tracker:
+        if self._tracker is None:
+            raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "acompanhamento não ligado")
+        return self._tracker
 
     def _use(self, version: ScheduleVersion | None) -> None:
-        """Pessoas, lojas e cartão da escala publicada. Uma escala da C6 traz os ids do quadro guardado na confirmação
-        (`n-<nome>` ou `m-<matrícula>`), não os de `data/demo`; a escala semeada de teste segue na rede de `data/demo`.
-        O cartão é o da semana da própria escala, o mesmo que o agente usou para otimizá-la e conferi-la."""
-        card, stores, employees = self._demo_world
-        roster = getattr(self._repo, "latest_roster", lambda: None)()
-        if version is not None and roster is not None:
-            ids = {e.id for e in roster.employees}
-            if any(s.employee_id in ids for s in version.schedule.shifts):
-                stores = {s.id: s.name for s in roster.stores}
-                employees = list(roster.employees)
-        if version is not None and self._card_for_week is not None:
-            card = self._card_for_week(version.schedule.week_start)
+        """Pessoas, lojas e cartão da escala publicada (`published_world`; com o acompanhamento ligado, a função de rede
+        dele, que também conhece o cenário sintético). O cartão é o da semana da própria escala, o mesmo que o agente
+        usou para otimizá-la e conferi-la."""
+        if version is not None and self._world_for is not None:
+            world = self._world_for(version)
+            card, stores, employees = world.card, dict(world.store_names), list(world.employees)
+        else:
+            card, demo_stores, demo_employees = self._demo_world
+            stores, employees = published_world(self._repo, version, (demo_stores, demo_employees))
+            if version is not None and self._card_for_week is not None:
+                card = self._card_for_week(version.schedule.week_start)
         self._card, self._store_names = card, stores
         self._employees, self._by_id = employees, {e.id: e for e in employees}
+
+    def store_name(self, store_id: str) -> str:
+        return self._store_names.get(store_id, store_id)
+
+    def default_person(self) -> tuple[ScheduleVersion, str]:
+        """A escala publicada e a pessoa padrão do celular (a conta `demo-colaborador`). Sem escala: 409."""
+        version = self._repo.latest_published()
+        self._use(version)
+        emp_id = self.colaborador_id(version) if version else None
+        if version is None or emp_id is None:
+            raise HTTPException(status.HTTP_409_CONFLICT, "a escala da semana ainda não foi publicada")
+        return version, emp_id
 
     # --- semente ---
 
@@ -231,6 +272,9 @@ class ExceptionDesk:
         )
 
     def decide(self, item_id: str, option_index: int, account: Account) -> ExceptionItem:
+        item = self._store.get(item_id)
+        if item is not None and item.source.get("kind") == "track":
+            return self._decide_track(item, option_index, account)
         with self._lock:
             item = self._store.get(item_id)
             if item is None:
@@ -261,6 +305,53 @@ class ExceptionDesk:
                 outcome = "O turno fica descoberto; a escala publicada não muda."
             else:
                 outcome = "Decisão registrada. Nesta demo, nada além do registro é feito automaticamente."
+            decided = item.model_copy(
+                update={
+                    "status": "decided",
+                    "decision": Decision(
+                        option_index=option_index,
+                        label=item.card.options[option_index].label,
+                        by=account.id,
+                        role=account.role,
+                        at=self._clock.now(),
+                        outcome=outcome,
+                    ),
+                }
+            )
+            self._store.save(decided)
+            return decided
+
+    def _decide_track(self, item: ExceptionItem, option_index: int, account: Account) -> ExceptionItem:
+        """Cartão do acompanhamento: grava o `exception.decided` no rastro do caso e delega o efeito ao `Tracker`
+        (que valida a cobertura com a aprovação do gestor e republica pelo mesmo portão)."""
+        with self._lock:
+            item = self._store.get(item.id) or item
+            if item.status != "open":
+                raise HTTPException(status.HTTP_409_CONFLICT, "esta exceção já foi decidida")
+            if option_index >= len(item.card.options):
+                raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "opção inexistente neste cartão")
+            event = self._tracer.human(
+                item.source.get("run_id", RULES_RUN),
+                "exception.decided",
+                payload={
+                    "exception_id": item.id,
+                    "code": item.card.code,
+                    "option_index": option_index,
+                    "decided_by": account.id,
+                    "role": account.role.value,
+                },
+            )
+            try:
+                outcome = self.tracker.on_decision(
+                    case_id=item.source.get("case_id"),
+                    code=item.card.code,
+                    option_index=option_index,
+                    approver_id=account.id,
+                    role=account.role,
+                    decision_event_id=event.id,
+                )
+            except TrackerError as exc:
+                raise HTTPException(exc.status, exc.message) from exc
             decided = item.model_copy(
                 update={
                     "status": "decided",
@@ -344,6 +435,13 @@ class ExceptionDesk:
         faltas = self._faltas(version.run_id)
         if faltas:
             return faltas[0].source["employee_id"]
+        if self._track_cases is not None:  # quem avisou pelo celular segue sendo a pessoa da demo depois da cobertura
+            cases = self._track_cases.list_cases()
+            reporter = next(
+                (c.employee_id for c in cases if c.origin == "aviso" and c.employee_id in self._by_id), None
+            )
+            if reporter is not None:
+                return reporter
         counts = Counter(s.employee_id for s in version.schedule.shifts if s.employee_id in self._by_id)
         if not counts:
             return None
@@ -382,110 +480,23 @@ class ExceptionDesk:
             return view.model_copy(update={"status": "descoberta"})
         return view.model_copy(update={"status": "decidida", "decision": item.decision.label})
 
-    def report_falta(self, day: date, has_text: bool) -> MyWeek:
-        with self._lock:
-            version = self._repo.latest_published()
-            self._use(version)
-            emp_id = self.colaborador_id(version) if version else None
-            if version is None or emp_id is None:
-                raise HTTPException(status.HTTP_409_CONFLICT, "a escala da semana ainda não foi publicada")
-            shift = next(
-                (s for s in version.schedule.shifts if s.employee_id == emp_id and s.start.date() == day), None
-            )
-            if shift is None:
-                raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "você não tem turno nesse dia")
-            if any(Shift.model_validate(i.source["shift"]) == shift for i in self._faltas(version.run_id)):
-                raise HTTPException(status.HTTP_409_CONFLICT, "a falta desse dia já foi avisada")
-            run_id = version.run_id
-            self._tracer.step(
-                run_id,
-                "falta.received",
-                payload={
-                    "employee_id": emp_id,
-                    "day": day.isoformat(),
-                    "channel": "celular simulado",
-                    "has_text": has_text,
-                },
-            )
-            started = time.perf_counter()
-            evaluated, found = find_cover(version.schedule, shift, self._employees, self._card)
-            top = found[:MAX_COVER_OPTIONS]
-            self._tracer.step(
-                run_id,
-                "cover.search",
-                started=started,
-                payload={"evaluated": evaluated, "eligible": len(found), "offered": [c.employee.id for c in top]},
-            )
-            card = self._cover_card(shift, evaluated, found, top) if top else self._rx05(shift, evaluated)
-            item = ExceptionItem(
-                id=f"exc-{self._new_id()[:12]}",
-                created_at=self._clock.now(),
-                card=card,
-                source={
-                    "kind": "falta",
-                    "run_id": run_id,
-                    "version_id": version.id,
-                    "employee_id": emp_id,
-                    "shift": shift.model_dump(mode="json"),
-                    "candidates": [c.employee.id for c in top],
-                },
-            )
-            self._store.add(item)
-            self._tracer.step(run_id, EXCEPTION_KIND, payload={"exception_id": item.id, "code": card.code})
+    def report_falta(self, day: date, text: str | None) -> MyWeek:
+        """Rota antiga do celular: vira um aviso de falta da pessoa padrão no acompanhamento (C7). O texto só vira
+        `has_text` no fluxo (RN-06)."""
+        _, emp_id = self.default_person()
+        try:
+            self.tracker.report(employee_id=emp_id, day=day, kind="falta", text=text)
+        except TrackerError as exc:
+            raise HTTPException(exc.status, exc.message) from exc
         return self.my_week()
-
-    def _cover_card(
-        self, shift: Shift, evaluated: int, found: list[CoverCandidate], top: list[CoverCandidate]
-    ) -> ExceptionCard:
-        absent = self._by_id[shift.employee_id]
-        best = top[0]
-        options = [
-            ExceptionOption(
-                label=f"{c.employee.name} cobre · {_overtime(c.overtime_hours)} · +{_brl(c.added_cost)}",
-                effect=f"{c.employee.job}. A escala é republicada com o turno reatribuído, com a sua aprovação.",
-            )
-            for c in top
-        ]
-        options.append(ExceptionOption(label=UNCOVERED_LABEL, effect="A escala publicada não muda."))
-        same_job = "mesma função" if best.employee.job == absent.job else f"função {best.employee.job}"
-        overtime = _overtime(best.overtime_hours)
-        prazo = self._policy.get("RX-05", {}).get("prazo_min", FALLBACK_COVER_DEADLINE_MIN)
-        return ExceptionCard(
-            code="FALTA",
-            title=f"Falta de {absent.name} · {shift_label(shift)}",
-            reason=(
-                f"{_first_name(absent.name)} avisou pelo celular simulado que não vem. Procurei quem cubra na mesma "
-                f"loja: {evaluated} de folga nesse dia, {len(found)} sem violar nenhuma regra do cartão."
-            ),
-            decider=Role.GESTOR,
-            deadline=self._clock.now() + timedelta(minutes=prazo),
-            evidence=[
-                f"Turno: {shift_label(shift)}, {self._store_names.get(shift.store_id, shift.store_id)}",
-                f"Avaliados {evaluated} colegas de folga; o verificador aprovou {len(found)}.",
-                "Custo adicional medido pela mesma função de custo do antes e depois.",
-            ],
-            options=options,
-            recommendation=(
-                f"{best.employee.name} cobre: {overtime}, {same_job}, +{_brl(best.added_cost)}. "
-                "Ordem usada: sem hora extra, mesma função, menor custo; nenhuma violação nova no verificador."
-            ),
-            if_no_answer="Nada é publicado sem a sua decisão; o turno segue sem cobertura.",
-        )
-
-    def _rx05(self, shift: Shift, evaluated: int) -> ExceptionCard:
-        evidence = [
-            f"Turno: {shift_label(shift)}, {self._store_names.get(shift.store_id, shift.store_id)}",
-            f"Avaliados {evaluated} colegas de folga; nenhum cobre sem violar regra.",
-        ]
-        card = policy_card(self._policy["RX-05"], self._clock.now(), evidence)
-        absent = self._by_id[shift.employee_id]
-        return card.model_copy(update={"title": f"{card.title} · {absent.name} · {shift_label(shift)}"})
 
 
 # --- ligação --------------------------------------------------------------------------------------------------------
 
 
-def build_desk(settings: Settings, engine: Engine) -> ExceptionDesk:
+def build_desk(settings: Settings, engine: Engine, clock: Clock | None = None) -> ExceptionDesk:
+    """A mesa de exceções. `clock`: o relógio de demo compartilhado com o acompanhamento (prazos no tempo simulado);
+    sem ele, o relógio do sistema."""
     from escalista.audit.sink import SqlTraceSink
     from escalista.clock.system import SystemClock
     from escalista.db import init_db
@@ -495,7 +506,7 @@ def build_desk(settings: Settings, engine: Engine) -> ExceptionDesk:
 
     init_db(engine)
     sink = SqlTraceSink(engine, known_secrets=[key for _, key in settings.featherless_keys])
-    clock = SystemClock()
+    clock = clock or SystemClock()
     stores, employees, _ = load_demo_network(Path(DEFAULT_DEMO_FILES_DIR))
     desk = ExceptionDesk(
         store=ExceptionStore(engine),
@@ -545,7 +556,7 @@ def my_week(desk: ExceptionDesk = Depends(get_desk)) -> MyWeek:  # noqa: B008
 
 @colaborador_router.post("/falta", response_model=MyWeek)
 def report_falta(body: FaltaBody, desk: ExceptionDesk = Depends(get_desk)) -> MyWeek:  # noqa: B008
-    return desk.report_falta(body.day, bool(body.text and body.text.strip()))
+    return desk.report_falta(body.day, body.text)
 
 
 def install_excecoes(app: FastAPI) -> None:

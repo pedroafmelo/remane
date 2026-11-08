@@ -120,15 +120,18 @@ def test_colaborador_sees_the_week_of_a_c6_published_schedule(tmp_path):
 def test_falta_on_a_c6_schedule_finds_cover_in_the_roster_and_republishes(tmp_path):
     client = make_client(tmp_path)
     as_role(client, "colaborador")
-    week = client.post("/api/colaborador/falta", json={"day": WEDNESDAY}).json()
-    assert [f["status"] for f in week["faltas"]] == ["pendente"]
+    assert client.post("/api/colaborador/falta", json={"day": WEDNESDAY}).status_code == 200
+    case = client.get("/api/colaborador/caixa").json()["cases"][0]
+    # Bruno trabalha na terça das 14h às 22h: cobrir a quarta às 8h violaria a interjornada; a 1ª oferta vai à Carla
+    offer = case["offers"][0]
+    assert offer["candidate_id"] == "n-carla-reis"
+    accepted = client.post(f"/api/colaborador/oferta/{offer['offer_id']}", json={"as": "n-carla-reis", "accept": True})
+    assert accepted.status_code == 200
 
     as_role(client, "gestor")
-    item = next(i for i in client.get("/api/exceptions").json()["open"] if i["source"].get("kind") == "falta")
-    # Bruno trabalha na terça das 14h às 22h: cobrir a quarta às 8h violaria a interjornada, o verificador o tira
-    assert item["source"]["candidates"] == ["n-carla-reis", "n-diego-nery"]
+    item = next(i for i in client.get("/api/exceptions").json()["open"] if i["source"].get("kind") == "track")
+    assert item["card"]["code"] == "COBERTURA"
     assert "Loja Teste (fictícia)" in " ".join(item["card"]["evidence"])
-
     assert client.post(f"/api/exceptions/{item['id']}/decide", json={"option_index": 0}).status_code == 200
     published = SqlRepository(client.app.state.engine).latest_published()
     assert published is not None and published.id != VERSION_ID and published.schedule.week_start == WEEK
@@ -138,4 +141,3 @@ def test_falta_on_a_c6_schedule_finds_cover_in_the_roster_and_republishes(tmp_pa
     as_role(client, "colaborador")
     week = client.get("/api/colaborador/escala").json()
     assert week["employee"]["id"] == "n-ana-dantas"  # a identidade não muda depois da cobertura
-    assert week["faltas"][0]["status"] == "coberta" and week["faltas"][0]["covered_by"] == "Carla"

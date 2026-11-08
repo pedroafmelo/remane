@@ -30,7 +30,7 @@ def make_client(tmp_path, *, published: bool = True) -> TestClient:
         demo_mode=True,
         session_secret="segredo-de-teste",
     )
-    app = create_app(settings, agent=FakeSliceAgent())
+    app = create_app(settings, agent=FakeSliceAgent(), seed_demo=published)
     if published:
         seed_published(app.state.engine)
     return TestClient(app)
@@ -88,39 +88,38 @@ def test_colaborador_sees_own_week_without_salary_or_sex(tmp_path):
         assert forbidden not in response.text
 
 
-def test_falta_with_cover_then_gestor_picks_cover_and_schedule_is_republished(tmp_path):
+def test_falta_becomes_a_tracking_case_offered_accepted_validated_and_republished(tmp_path):
+    """C7: a rota antiga da falta vira caso do acompanhamento: oferta ao 1º candidato, aceite dele pelo celular,
+    cartão COBERTURA ao gestor e republicação com a aprovação dele."""
     client = make_client(tmp_path)
     as_role(client, "colaborador")
-    week = client.post("/api/colaborador/falta", json={"day": WEDNESDAY, "text": "não vou poder ir"}).json()
-    assert [f["status"] for f in week["faltas"]] == ["pendente"]
+    assert client.post("/api/colaborador/falta", json={"day": WEDNESDAY, "text": "não vou poder ir"}).status_code == 200
     assert client.post("/api/colaborador/falta", json={"day": WEDNESDAY}).status_code == 409  # já avisada
     assert client.post("/api/colaborador/falta", json={"day": SATURDAY}).status_code == 422  # sem turno
 
-    as_role(client, "gestor")
-    item = next(i for i in client.get("/api/exceptions").json()["open"] if i["source"].get("kind") == "falta")
-    card = item["card"]
-    assert card["title"].startswith("Falta de ") and "qua 13/01, 8–16h" in card["title"]
-    assert 2 <= len(card["options"]) <= 4 and card["options"][-1]["label"] == "Deixar o turno descoberto"
-    assert "sem hora extra" in card["options"][0]["label"] and "+R$ " in card["options"][0]["label"]
-    candidates = item["source"]["candidates"]
-    assert set(candidates) <= L1_THIRD_GROUP and candidates
+    box = client.get("/api/colaborador/caixa").json()
+    assert box["employee"]["id"] == "P001" and [c["status"] for c in box["cases"]] == ["oferta_enviada"]
+    offer = box["cases"][0]["offers"][0]
+    assert offer["candidate_id"] in L1_THIRD_GROUP
+    accepted = client.post(
+        f"/api/colaborador/oferta/{offer['offer_id']}", json={"as": offer["candidate_id"], "accept": True}
+    )
+    assert accepted.status_code == 200 and accepted.json()["status"] == "aguardando_gestor"
 
-    assert client.post(f"/api/exceptions/{item['id']}/decide", json={"option_index": 0}).status_code == 200
+    as_role(client, "gestor")
+    item = next(i for i in client.get("/api/exceptions").json()["open"] if i["source"].get("kind") == "track")
+    assert item["card"]["code"] == "COBERTURA"
+    decided = client.post(f"/api/exceptions/{item['id']}/decide", json={"option_index": 0})
+    assert decided.status_code == 200 and decided.json()["decision"]["outcome"].startswith("Escala republicada")
     published = ScheduleVersion.model_validate(SqlRepository(client.app.state.engine).latest_published())
     assert published.id != VERSION_ID and published.run_id == RUN_ID and published.status == "published"
     wednesday = [s for s in published.schedule.shifts if s.start.date().isoformat() == WEDNESDAY and s.start.hour == 8]
-    assert candidates[0] in {s.employee_id for s in wednesday}
+    assert offer["candidate_id"] in {s.employee_id for s in wednesday}
     assert "P001" not in {s.employee_id for s in wednesday}
-
-    events = kinds(client, RUN_ID)
-    for kind in ("falta.received", "cover.search", "exception.raised", "exception.decided", "approval.recorded"):
-        assert kind in events
-    assert events[-2:] == ["schedule.publish", "schedule.republished"]
 
     as_role(client, "colaborador")
     week = client.get("/api/colaborador/escala").json()
     assert week["employee"]["id"] == "P001"  # a identidade não muda depois da cobertura
-    assert week["faltas"][0]["status"] == "coberta" and week["faltas"][0]["covered_by"]
     assert WEDNESDAY not in {s["day"] for s in week["shifts"]}
 
 
@@ -129,8 +128,8 @@ def test_falta_without_eligible_cover_opens_rx05(tmp_path):
     as_role(client, "colaborador")
     client.post("/api/colaborador/falta", json={"day": MONDAY})
     as_role(client, "gestor")
-    item = next(i for i in client.get("/api/exceptions").json()["open"] if i["source"].get("kind") == "falta")
-    assert item["card"]["code"] == "RX-05" and item["source"]["candidates"] == []
+    item = next(i for i in client.get("/api/exceptions").json()["open"] if i["source"].get("kind") == "track")
+    assert item["card"]["code"] == "RX-05"
     labels = [o["label"] for o in item["card"]["options"]]
     assert "Deixar o turno descoberto" in labels
     response = client.post(
@@ -140,4 +139,4 @@ def test_falta_without_eligible_cover_opens_rx05(tmp_path):
     assert SqlRepository(client.app.state.engine).latest_published().id == VERSION_ID  # nada republicado
 
     as_role(client, "colaborador")
-    assert client.get("/api/colaborador/escala").json()["faltas"][0]["status"] == "descoberta"
+    assert client.get("/api/colaborador/caixa").json()["cases"][0]["status"] == "descoberto"
