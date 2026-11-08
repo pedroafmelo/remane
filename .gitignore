@@ -33,6 +33,7 @@ downloads/
 eggs/
 .eggs/
 lib/
+!web/lib/
 lib64/
 parts/
 sdist/
