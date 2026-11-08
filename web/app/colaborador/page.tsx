@@ -87,14 +87,14 @@ export default function ColaboradorPage() {
               </p>
             ) : !week.published || !week.employee ? (
               <>
-                <ChatBubble from="agent">
+                <ChatBubble mirrored from="agent">
                   A escala desta semana ainda não foi publicada. Quando a gestora publicar, ela aparece aqui.
                 </ChatBubble>
                 <ChatBubble from="event">Na demo: entre como gestor, envie a escala de exemplo e aprove.</ChatBubble>
               </>
             ) : (
               <>
-                <ChatBubble from="agent">
+                <ChatBubble mirrored from="agent">
                   Oi, {firstName}! Sou o Pat, assistente automático. Esta é a sua semana na {week.employee.store} ({week.employee.job}):
                   <ul className="mt-2 flex flex-col gap-0.5 tabular text-[13.5px]">
                     {week.shifts.map((s) => (
@@ -107,18 +107,18 @@ export default function ColaboradorPage() {
                 </ChatBubble>
                 {week.faltas.map((f) => (
                   <div key={f.exception_id}>
-                    <ChatBubble from="person">Vou faltar {dayLabel(f.day)}.</ChatBubble>
-                    <ChatBubble from="agent">{receiptText(f)}</ChatBubble>
+                    <ChatBubble mirrored from="person">Vou faltar {dayLabel(f.day)}.</ChatBubble>
+                    <ChatBubble mirrored from="agent">{receiptText(f)}</ChatBubble>
                     {f.status === "pendente" ? (
                       <ChatBubble from="event">aguardando a decisão da gestora</ChatBubble>
                     ) : (
-                      <ChatBubble from="agent">{faltaReply(f)}</ChatBubble>
+                      <ChatBubble mirrored from="agent">{faltaReply(f)}</ChatBubble>
                     )}
                   </div>
                 ))}
                 {sending && (
                   <>
-                    <ChatBubble from="person">Vou faltar {dayLabel(sending)}.</ChatBubble>
+                    <ChatBubble mirrored from="person">Vou faltar {dayLabel(sending)}.</ChatBubble>
                     <ChatBubble from="typing" />
                   </>
                 )}

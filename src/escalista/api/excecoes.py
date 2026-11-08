@@ -310,7 +310,7 @@ class ExceptionDesk:
                 "cover_id": cover_id,
             },
         )
-        return f"Escala republicada (versão {version.id}) com o turno reatribuído."
+        return f"Escala republicada com o turno reatribuído ({version.violations_total} violações das regras)."
 
     # --- colaborador ---
 
