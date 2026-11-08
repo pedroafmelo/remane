@@ -26,7 +26,7 @@ def create_app(settings: Settings | None = None, *, agent: SliceAgent | None = N
     app = FastAPI(title="Escalista", description="Dados sintéticos", docs_url=None, redoc_url=None)
     app.state.settings = settings
     app.state.engine = engine
-    app.state.agent = agent or build_agent(settings)
+    app.state.agent = agent or build_agent(settings, engine=engine)
     app.state.demo_files_dir = DEFAULT_DEMO_FILES_DIR
 
     @app.get("/health")

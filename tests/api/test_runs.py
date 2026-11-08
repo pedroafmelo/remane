@@ -11,6 +11,7 @@ from fastapi.testclient import TestClient
 
 from escalista.api.app import create_app
 from escalista.api.fake_agent import FakeSliceAgent
+from escalista.api.optimizer_adapter import OptimizerSliceAgent
 from escalista.api.wiring import MAX_UPLOAD_BYTES, SliceAgent, get_agent, get_demo_files_dir
 from escalista.config import Settings
 
@@ -51,7 +52,7 @@ def make_client(tmp_path, agent: SliceAgent | None = None) -> tuple[TestClient, 
         session_secret="segredo-de-teste",
     )
     agent = agent or FakeSliceAgent()
-    app = create_app(settings)
+    app = create_app(settings, agent=agent)
     demo_dir = tmp_path / "demo"
     demo_dir.mkdir(exist_ok=True)
     (demo_dir / "escala_atual.csv").write_bytes(CSV)
@@ -245,8 +246,9 @@ def test_demo_file_outside_whitelist_or_missing_is_404(tmp_path, name):
     assert b"nao pode sair" not in response.content
 
 
-def test_default_app_uses_fake_agent_and_data_demo(tmp_path):
+def test_default_app_wires_the_real_agent_and_data_demo(tmp_path):
     settings = Settings(_env_file=None, database_url=f"sqlite:///{tmp_path}/app.db", web_dist_dir=str(tmp_path / "d"))
     app = create_app(settings)
-    assert isinstance(app.state.agent, FakeSliceAgent) and isinstance(app.state.agent, SliceAgent)
+    assert isinstance(app.state.agent, OptimizerSliceAgent) and isinstance(app.state.agent, SliceAgent)
+    assert not isinstance(app.state.agent, FakeSliceAgent)
     assert app.state.demo_files_dir == "data/demo"

@@ -83,8 +83,8 @@ def make_client(tmp_path, *, demo_mode: bool = True, secret: str | None = f"{SEN
         demo_mode=demo_mode,
         session_secret=secret,
     )
-    app = create_app(settings)
     agent = FakeSliceAgent.with_seeded_runs()
+    app = create_app(settings, agent=agent)
     demo_dir = tmp_path / "demo"
     demo_dir.mkdir(exist_ok=True)
     (demo_dir / "escala_atual.csv").write_bytes(CSV_OK)
