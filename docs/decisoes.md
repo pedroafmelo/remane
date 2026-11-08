@@ -663,3 +663,10 @@ Formato:
 - 2026-11-08 02:58 · Decidido por: usuário da sessão (aprovação do plano, seção 11) · Status: aceita
 - **Decisão:** o nó 1 cai para a heurística de aliases e depois para o leitor da [DEC-039](decisoes.md); o nó 2 cai para a especificação padrão; o aviso RX-12 fica visível em `notices`.
 - **Motivo:** [motivo não informado].
+
+## DEC-053 · Campo de sexo opcional no contrato
+
+- 2026-11-08 03:17 · Decidido por: usuário da sessão (decisão 2: "Pode ser.", o campo de sexo fica fora da C6) · Status: aceita
+- **Decisão:** `Employee.sex` passa a `None` por padrão (contrato da A0, `1e9b482`); nenhuma regra o usa nesta camada. A primitiva do domingo quinzenal ([DEC-023](decisoes.md)) segue para depois.
+- **Motivo:** [motivo não informado]; consequência técnica: um quadro lido de arquivo não traz esse dado.
+- **Consequências:** RN-13 continua valendo: o campo nunca vai à tela, à API nem ao rastro.
