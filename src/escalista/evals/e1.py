@@ -1,10 +1,10 @@
-"""Evals E1: 10 cenários sem modelo, num comando (plano da C5, D5; RN-04, RX-02, RX-13).
+"""Evals E1: 11 cenários sem modelo, num comando (plano da C5, D5; RN-04, RX-02, RX-13).
 
     uv run python -m escalista.evals --suite e1
 
 Cada cenário monta a entrada, chama o código real (leitura do CSV, verificador, solver, custo) e compara com o
 esperado. Grava `var/evals/e1-<timestamp>.json` e `var/evals/e1-latest.json`, imprime a tabela e o placar **real**
-(`N/10`, sem arredondar). Código de saída diferente de zero se algum cenário falhar. Nenhum modelo é chamado: custo 0
+(`N/11`, sem arredondar). Código de saída diferente de zero se algum cenário falhar. Nenhum modelo é chamado: custo 0
 de modelo; o tempo de cada cenário é o medido.
 """
 
@@ -67,7 +67,13 @@ def _primitive_outcome(ctx: EvalContext, kind: str, bad: Schedule, control: Sche
     cites_source = bool(found) and all(v.source for v in found)
     passed = len(found) == 1 and cites_source and not ok
     obtained = f"{len(found)} violação de {kind} ({found[0].detail if found else '-'}); controle no limite: {len(ok)}"
-    return _outcome(f"1 violação de {kind} ({what}) com a fonte citada; controle no limite: 0", obtained, passed)
+    return Outcome(
+        f"1 violação de {kind} ({what}) com a fonte citada; controle no limite: 0",
+        obtained,
+        passed,
+        # RN-04: 1 plantada; o controle no limite é o falso positivo possível
+        metrics={"rn04.violacoes": {"plantadas": 1, "detectadas": min(len(found), 1), "falsos_positivos": len(ok)}},
+    )
 
 
 # Cenários 1 a 5: uma primitiva cada --------------------------------------------------------------------------------
@@ -240,11 +246,29 @@ def _s09_optimized_demo(ctx: EvalContext) -> Outcome:
         and metrics.coverage_pct == 100.0
         and result.exception is None
     )
-    return _outcome(
+    # RN-04: o "antes" é a escala enviada (escala_atual.csv), pela mesma função de custo, demanda e cartão
+    sent = read_schedule_csv(
+        "escala_atual.csv",
+        (ctx.data_dir / "escala_atual.csv").read_bytes(),
+        employees=employees, stores=stores, week_start=WEEK_START,
+    ).schedule  # fmt: skip
+    before = (
+        compute_metrics(sent, employees, demand, ctx.card, violations=verify(sent, ctx.card).total).total_cost
+        if sent is not None
+        else None
+    )
+    return Outcome(
         "solver (seed 42, 1 thread): 0 violações pelo verificador independente, 0 faixas descobertas, cobertura 100%",
         f"status {result.status}; {report.total} violações; {len(gaps)} faixas descobertas; "
         f"cobertura {metrics.coverage_pct}%; custo {metrics.total_cost}; solver {result.wall_ms} ms",
         passed,
+        metrics={
+            "rn04.cobertura": {"escala_demo_pct": metrics.coverage_pct},
+            "rn04.custo": {
+                "antes_brl": None if before is None else str(before),
+                "depois_brl": str(metrics.total_cost),
+            },
+        },
     )
 
 
@@ -273,12 +297,54 @@ def _s10_overnight(ctx: EvalContext) -> Outcome:
     found = [v for v in verify(bad, ctx.card).violations if v.kind == REST_GAP]
     ok = [v for v in verify(control, ctx.card).violations if v.kind == REST_GAP]
     passed = ends_next_day and len(found) == 1 and found[0].employee_id == person.id and not ok
-    return _outcome(
+    return Outcome(
         "turno 16:00-00:00 termina na quinta (8h); recomeço às 08:00 = 8h de descanso -> 1 violação; "
         "às 12:00 = 12h (mínimo da política) -> 0",
         f"fim do turno {night.end:%d/%m %H:%M}; {len(found)} violação ({found[0].detail if found else '-'}); "
         f"controle às 12:00: {len(ok)}",
         passed,
+        metrics={"rn04.violacoes": {"plantadas": 1, "detectadas": min(len(found), 1), "falsos_positivos": len(ok)}},
+    )
+
+
+# Cenário 11: escala com violações plantadas, nenhuma pode escapar ---------------------------------------------------
+
+
+def _pairs(items: set[tuple]) -> str:
+    return "[" + ", ".join(f"({r}, {e}, {d or '-'})" for r, e, d in sorted(items, key=str)) + "]"
+
+
+def _s11_planted_violations(ctx: EvalContext) -> Outcome:
+    stores, employees, _ = ctx.network
+    planted = json.loads((ctx.data_dir / "violacoes_plantadas.json").read_text(encoding="utf-8"))
+    expected = {(p["rule_id"], p["employee_id"], p["day"]) for p in planted}
+    read = read_schedule_csv(
+        "escala_violacoes.csv",
+        (ctx.data_dir / "escala_violacoes.csv").read_bytes(),
+        employees=employees, stores=stores, week_start=WEEK_START,
+    )  # fmt: skip
+    if read.schedule is None or read.exception is not None:
+        code = read.exception.code if read.exception else "sem escala"
+        return _outcome(f"{len(expected)} violações plantadas todas detectadas", f"leitura falhou ({code})", False)
+    found = {
+        (v.rule_id, v.employee_id, v.day.isoformat() if v.day else None)
+        for v in verify(read.schedule, ctx.card).violations
+    }
+    hit, missed, extra = expected & found, expected - found, found - expected
+    passed = not missed and not extra
+    obtained = (
+        f"{len(expected)} plantadas, {len(hit)} detectadas, {len(missed)} não detectadas, {len(extra)} falsos positivos"
+        + (f"; não detectadas {_pairs(missed)}" if missed else "")
+        + (f"; falsos positivos {_pairs(extra)}" if extra else "")
+    )
+    return Outcome(
+        f"{len(expected)} violações plantadas (regra, pessoa, dia) todas detectadas: "
+        "0 não detectadas, 0 falsos positivos",
+        obtained,
+        passed,
+        metrics={
+            "rn04.violacoes": {"plantadas": len(expected), "detectadas": len(hit), "falsos_positivos": len(extra)}
+        },
     )
 
 
@@ -293,6 +359,7 @@ SCENARIOS: tuple[Scenario, ...] = (
     Scenario("E1-08", "CSV com defeito vira RX-13 com as linhas plantadas", _s08_defective_csv),
     Scenario("E1-09", "Escala otimizada da demo: 0 violações e cobertura 100%", _s09_optimized_demo),
     Scenario("E1-10", "Turno que vira a noite e a interjornada", _s10_overnight),
+    Scenario("E1-11", "Escala com violações plantadas: nenhuma não detectada", _s11_planted_violations),
 )
 
 

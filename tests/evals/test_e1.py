@@ -8,10 +8,11 @@ from pathlib import Path
 
 import pytest
 
-from escalista.evals import e1
+from escalista.domain.results import ViolationReport
+from escalista.evals import e1, suite_all
 from escalista.evals.e1 import EvalContext, Outcome, Scenario
 
-EXPECTED_IDS = [f"E1-{n:02d}" for n in range(1, 11)]
+EXPECTED_IDS = [f"E1-{n:02d}" for n in range(1, 12)]
 FIXED_NOW = datetime(2026, 11, 8, 3, 0, 0)
 
 
@@ -24,9 +25,9 @@ def ctx() -> EvalContext:
     return EvalContext()
 
 
-def test_suite_has_ten_scenarios_with_expected_ids():
+def test_suite_has_eleven_scenarios_with_expected_ids():
     assert [s.id for s in e1.SCENARIOS] == EXPECTED_IDS
-    assert len({s.description for s in e1.SCENARIOS}) == 10
+    assert len({s.description for s in e1.SCENARIOS}) == 11
 
 
 def test_fast_scenarios_pass_on_the_demo_data(ctx):
@@ -37,13 +38,81 @@ def test_fast_scenarios_pass_on_the_demo_data(ctx):
     assert all(r.elapsed_ms >= 0 for r in results)
 
 
+def _metrics(results, key):
+    return [r.metrics[key] for r in results if r.metrics and key in r.metrics]
+
+
+def test_e1_11_catches_every_planted_violation_with_no_false_positive(ctx):
+    scenario = next(s for s in e1.SCENARIOS if s.id == "E1-11")
+    outcome = scenario.run(ctx)
+
+    assert outcome.passed, outcome.obtained
+    assert outcome.metrics == {"rn04.violacoes": {"plantadas": 9, "detectadas": 9, "falsos_positivos": 0}}
+    assert "9 plantadas" in outcome.obtained and "0 não detectadas" in outcome.obtained
+
+
+def test_e1_11_fails_and_names_the_pairs_when_the_verifier_misses_one(ctx, monkeypatch):
+    real_verify = e1.verify
+
+    def blind(schedule, card):
+        report = real_verify(schedule, card)
+        kept = [v for v in report.violations if not (v.employee_id == "P004" and v.kind == "jornada_diaria_max")]
+        return ViolationReport(violations=kept)
+
+    monkeypatch.setattr(e1, "verify", blind)
+    scenario = next(s for s in e1.SCENARIOS if s.id == "E1-11")
+    outcome = scenario.run(ctx)
+
+    assert not outcome.passed
+    assert outcome.metrics["rn04.violacoes"] == {"plantadas": 9, "detectadas": 8, "falsos_positivos": 0}
+    assert "1 não detectadas" in outcome.obtained and "P004" in outcome.obtained
+
+
+def test_primitive_scenarios_report_one_planted_and_the_control_as_false_positive(ctx):
+    results = e1.run_scenarios([s for s in e1.SCENARIOS if s.id in {"E1-01", "E1-02", "E1-03", "E1-04", "E1-10"}], ctx)
+
+    assert [r.passed for r in results] == [True] * 5
+    assert _metrics(results, "rn04.violacoes") == [{"plantadas": 1, "detectadas": 1, "falsos_positivos": 0}] * 5
+
+
+def test_e1_06_and_e1_05_do_not_report_planted_violations(ctx):
+    results = e1.run_scenarios([s for s in e1.SCENARIOS if s.id in {"E1-05", "E1-06"}], ctx)
+
+    assert _metrics(results, "rn04.violacoes") == []
+
+
+def test_fast_metrics_reach_the_rn04_block_of_the_all_report(ctx):
+    rn04 = suite_all.rn04_metrics(e1.run_scenarios(_fast(), ctx))
+
+    block = rn04["violacoes_nao_detectadas"]
+    assert block["status"] == "medido"
+    assert (block["plantadas"], block["detectadas"], block["nao_detectadas"], block["falsos_positivos"]) == (
+        14,
+        14,
+        0,
+        0,
+    )
+
+
 @pytest.mark.slow
-def test_full_suite_runs_ten_results_and_writes_the_report(tmp_path: Path, ctx):
+def test_e1_09_reports_coverage_and_cost_against_the_sent_schedule(ctx):
+    results = e1.run_scenarios([s for s in e1.SCENARIOS if s.id == "E1-09"], ctx)
+
+    assert results[0].passed, results[0].obtained
+    assert results[0].metrics["rn04.cobertura"] == {"escala_demo_pct": 100.0}
+    rn04 = suite_all.rn04_metrics(results)
+    cost = rn04["custo_contra_planilha"]
+    assert cost["status"] == "medido" and cost["antes_brl"] is not None and cost["depois_brl"] is not None
+    assert rn04["cobertura"]["escala_demo_pct"] == 100.0
+
+
+@pytest.mark.slow
+def test_full_suite_runs_eleven_results_and_writes_the_report(tmp_path: Path, ctx):
     run = e1.run_suite(tmp_path, ctx=ctx, now=lambda: FIXED_NOW)
 
     assert [r.id for r in run.results] == EXPECTED_IDS
     assert run.all_passed, run.table
-    assert run.report["placar"] == "10/10"
+    assert run.report["placar"] == "11/11"
     assert run.path == tmp_path / "e1-20261108T030000.json"
     assert (tmp_path / "e1-latest.json").read_text() == run.path.read_text()
 
