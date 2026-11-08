@@ -1,0 +1,111 @@
+# Convenção coletiva FICTÍCIA da demo (camada 2). 100% sintética: sindicato, empresa e cláusulas inventados pelo time,
+# sem base em documento real, de cliente ou de empregador (clean room). Declarar como sintética na submissão.
+# Escrita por Claude a pedido de Pedro Veloso em 2026-11-07 (G2 do plano macro, DEC-028).
+# A convenção só amplia o que a lei deixa ampliar e só restringe o resto. A política (camada 3) não pode afrouxá-la.
+# O que já está em lei/ não se repete aqui. Cálculos derivados (custo, divisor) ficam no código.
+# Campo "demo": marca o que foi plantado de propósito para a demo e para os evals; o motor não deve lê-lo como regra.
+
+instrumento: Convenção Coletiva de Trabalho 2026/2027 (FICTÍCIA)
+partes:
+  sindicato_laboral: Sindicato dos Empregados no Comércio de Cidade Exemplo (fictício)
+  sindicato_patronal: Sindicato do Comércio Varejista de Cidade Exemplo (fictício)
+sintetico: true
+vigencia: {de: 2026-09-01, ate: 2027-08-31}
+
+regras:
+  - id: cct_jornada_diaria_ampliada
+    horas: 9
+    de: 2026-12-16
+    ate: 2027-08-31
+    texto: >
+      Cláusula 5ª. Para distribuir a jornada semanal de 42 horas em 5 dias, a duração diária do trabalho normal
+      poderá ser de até 9 horas, respeitados os 2 dias de repouso semanal.
+    fonte: "Convenção fictícia, cláusula 5ª"
+    base_legal: "EC 141, art. 7º (ampliação da jornada diária por convenção, no prazo do art. 6º, II)"
+    amplia: jornada_diaria_max
+    status: interpretacao
+    nota: >
+      Valor da demo para a pergunta 17 (DEC-024: é parâmetro, não regra fixa). Termina em 2027-08-31, antes da
+      etapa de 40h (2027-12-16), que é o fim do prazo do art. 7º da EC. Sem esta cláusula, vale o limite de 8h.
+
+  - id: cct_adicional_hora_extra
+    percentual: 60
+    percentual_domingo_feriado: 100
+    texto: >
+      Cláusula 8ª. As horas extras serão pagas com adicional de 60% em dias úteis e de 100% em domingos e feriados.
+    fonte: "Convenção fictícia, cláusula 8ª"
+    restringe: adicional_hora_extra
+    status: interpretacao
+
+  - id: cct_banco_de_horas
+    periodo_compensacao_dias: 120
+    saldo_max_horas: 30
+    texto: >
+      Cláusula 9ª. Fica instituído banco de horas, com compensação em até 120 dias e saldo positivo máximo de
+      30 horas por empregado. Vencido o prazo, o saldo é pago como hora extra.
+    fonte: "Convenção fictícia, cláusula 9ª"
+    base_legal: "CLT, art. 59, § 2º (compensação por convenção)"
+    restringe: compensacao_jornada
+    status: interpretacao
+
+  - id: cct_intervalo_intrajornada
+    minimo_min: 60
+    reducao_permitida: false
+    texto: >
+      Cláusula 10. O intervalo para repouso e alimentação será de no mínimo 1 hora nas jornadas acima de 6 horas,
+      vedada a sua redução.
+    fonte: "Convenção fictícia, cláusula 10"
+    resolve: intervalo_reduzido_cct          # verificar_convencao em clt.yaml: a CCT não reduz
+    status: interpretacao
+
+  - id: cct_adicional_noturno
+    percentual: 25
+    texto: "Cláusula 11. O trabalho noturno terá adicional de 25% sobre a hora diurna."
+    fonte: "Convenção fictícia, cláusula 11"
+    restringe: trabalho_noturno
+    status: interpretacao
+
+  - id: cct_trabalho_em_feriados
+    autorizado: true
+    compensacao: "adicional de 100% (cláusula 8ª) ou folga compensatória em até 30 dias, à escolha do empregado"
+    texto: >
+      Cláusula 12. Fica autorizado o trabalho em feriados, com pagamento do adicional da cláusula 8ª ou folga
+      compensatória em até 30 dias, à escolha do empregado.
+    fonte: "Convenção fictícia, cláusula 12"
+    resolve: feriado_comercio                # verificar_convencao em clt.yaml: a CCT autoriza
+    status: interpretacao
+
+  - id: cct_repouso_semanal
+    dias_por_semana: 1
+    folga_adicional: "1 por quinzena"
+    texto: >
+      Cláusula 6ª. O empregado terá 1 dia de repouso semanal remunerado, preferencialmente aos domingos, e mais
+      1 folga a cada quinzena, em dia definido pela empresa.
+    fonte: "Convenção fictícia, cláusula 6ª"
+    status: interpretacao
+    demo:
+      plantado: RX-01
+      esperado: >
+        A partir de 2026-12-16 a cláusula conflita com a EC 141 (art. 7º, XV: 2 dias por semana; art. 3º: cláusulas
+        incompatíveis ficam sem efeito). 1 dia por semana mais 1 por quinzena dá 3 em 2 semanas, menos que 2 por
+        semana, e a CCT não prevê o regime compensatório do art. 7º, § 2º. O agente aplica a regra mais restritiva
+        (2 dias, ec141.yaml: repouso_semanal) de forma provisória e abre RX-01 ao DP.
+
+  - id: cct_folgas_dominicais
+    texto: >
+      Cláusula 7ª. As folgas dominicais serão distribuídas de forma equilibrada entre os empregados de cada
+      estabelecimento.
+    fonte: "Convenção fictícia, cláusula 7ª"
+    status: pendente
+    demo:
+      plantado: RX-11
+      esperado: >
+        "Forma equilibrada" não diz frequência nem critério. A regra fica pendente e vai ao DP (RX-11). Enquanto
+        isso, valem as regras de lei: domingo a cada 3 semanas no comércio (clt.yaml: domingo_comercio) e a cada
+        2 semanas para empregadas (clt.yaml: domingo_mulher, DEC-023).
+
+nao_preve:   # o que a convenção não trata; o motor usa a lei e a exceção correspondente
+  - id: regime_compensatorio_cct      # ec141.yaml, verificar_convencao: sem previsão, 2 repousos semanais
+    nota: "A CCT não prevê a média de 2 repousos no mês (art. 7º, § 2º, CF)."
+  - id: regime_12x36                  # clt.yaml, escalar
+    nota: "A CCT não prevê 12x36."
