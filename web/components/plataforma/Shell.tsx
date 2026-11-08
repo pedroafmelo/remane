@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Button } from "../Button";
 import { Logo } from "../Logo";
+import { DemoClockBar } from "./DemoClockBar";
 import { SyntheticBadge } from "./ui";
 
 /** As quatro áreas do gestor (design system: Regras, Escala, Exceções, Impacto), na ordem do trabalho. */
@@ -22,11 +23,14 @@ type ShellProps = {
   badges?: Partial<Record<Area, number>>;
   onLogout?: () => void;
   onReset?: () => void;
+  /** barra do relógio de demo: `gestor` também reinicia a demo; sem a prop, só as áreas do gestor (com `area`) a mostram */
+  clock?: "gestor" | "colaborador";
   busy?: boolean;
   children: ReactNode;
 };
 
-export function Shell({ who, area, badges, onLogout, onReset, busy, children }: ShellProps) {
+export function Shell({ who, area, badges, onLogout, onReset, clock, busy, children }: ShellProps) {
+  const clockRole = clock ?? (area ? "gestor" : undefined);
   return (
     <div className="flex min-h-svh flex-col">
       <header className="border-b border-line bg-surface">
@@ -81,6 +85,7 @@ export function Shell({ who, area, badges, onLogout, onReset, busy, children }: 
           </nav>
         )}
       </header>
+      {clockRole && <DemoClockBar canReset={clockRole === "gestor"} />}
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 px-4 py-6 sm:px-6 sm:py-8">{children}</main>
       <footer className="px-4 pb-8 pt-2 text-center text-xs text-ink-muted">
         Todos os dados desta demonstração são sintéticos e o tempo é simulado. Nada é publicado fora daqui.

@@ -12,6 +12,7 @@ import type { ExceptionItem, ExceptionQueue } from "@/lib/types-excecoes";
 import { Button } from "../Button";
 import { ExceptionCard } from "../ExceptionCard";
 import { Pat } from "../Pat";
+import { useClockChange } from "./DemoClockBar";
 import { Shell } from "./Shell";
 import { SessionGate, useSession } from "./session";
 import { Card, Muted, Notice } from "./ui";
@@ -34,6 +35,11 @@ export function ExcecoesArea() {
     }
   }, []);
   const session = useSession("gestor", load);
+  // o relógio avançou ou a demo reiniciou: os cartões novos (cobertura, ponto) chegam sem recarregar a página
+  useClockChange(() => {
+    setDone(null);
+    void load();
+  });
 
   async function decide(c: Choice) {
     setBusy(true);
