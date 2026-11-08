@@ -85,3 +85,6 @@ section[id] { scroll-margin-top: 80px; }
 /* Pat concentrado: o olhar varre da esquerda para a direita, como quem lê. */
 @keyframes pat-scan { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(0); } }
 .pat-scan { animation: pat-scan 2.4s ease-in-out infinite; }
+/* Logo animado: o olhar confere um lado, depois o outro, e volta ao centro (dentro das lentes). */
+@keyframes logo-look { 0%, 30% { transform: translateX(0); } 38%, 52% { transform: translateX(-2.5px); } 60%, 74% { transform: translateX(2.5px); } 82%, 100% { transform: translateX(0); } }
+.logo-look { animation: logo-look 6s ease-in-out infinite; }

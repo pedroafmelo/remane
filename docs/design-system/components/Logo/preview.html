@@ -1,4 +1,4 @@
-<!-- @dsCard group="Marca" height=200 subtitle="Símbolo animado, estático e negativo" -->
+<!-- @dsCard group="Marca" height=200 subtitle="Símbolo animado e estático, em fundo claro e escuro" -->
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -12,30 +12,39 @@
   .tile { background: var(--surface); border-radius: var(--radius-lg); padding: 24px 28px; display: flex; align-items: center; gap: 14px; }
   .tile.dark { background: var(--ink); color: var(--surface); }
   .word { font-size: 44px; font-weight: 500; letter-spacing: -0.06em; line-height: 0.9; }
-  .ink { fill: var(--ink); } .white { fill: var(--surface); } .acc { fill: var(--accent); }
-  .move { animation: slide 4s ease-in-out infinite; }
-  @keyframes slide { 0%, 15% { transform: translate(0, 0); } 35%, 85% { transform: translate(6px, -6px); } 100% { transform: translate(0, 0); } }
-  @media (prefers-reduced-motion: reduce) { .move { animation: none; transform: translate(6px, -6px); } }
+  .look { animation: look 6s ease-in-out infinite; }
+  .blink { transform-box: fill-box; transform-origin: center; animation: blink 5s ease-in-out infinite; }
+  @keyframes look { 0%, 30% { transform: translateX(0); } 38%, 52% { transform: translateX(-2.5px); } 60%, 74% { transform: translateX(2.5px); } 82%, 100% { transform: translateX(0); } }
+  @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
+  @media (prefers-reduced-motion: reduce) { .look, .blink { animation: none; } }
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="glasses" fill="none" stroke="#17181A" stroke-width="1.75" stroke-linecap="round">
+      <circle cx="19.5" cy="29.3" r="9.1"/><circle cx="44.5" cy="29.3" r="9.1"/>
+      <path d="M6.9 27.9 H10.5 M53.5 27.9 H57.1"/><path d="M28.6 29.6 C28.9 26.6 35.1 26.6 35.4 29.6"/>
+    </g>
+    <path id="mustache" fill="#17181A" d="M32 40.8 C30 39.2 28.2 39 26.6 39.6 C24.8 40.2 23.4 41.8 22 41.6 C21.1 41.5 20.9 42.3 21.4 43 C22.6 44.8 24.6 45.6 26.8 45.6 C29 45.6 30.6 44.2 32 43.2 C33.4 44.2 35 45.6 37.2 45.6 C39.4 45.6 41.4 44.8 42.6 43 C43.1 42.3 42.9 41.5 42 41.6 C40.6 41.8 39.2 40.2 37.4 39.6 C35.8 39 34 39.2 32 40.8 Z"/>
+  </defs>
+</svg>
 <div class="row">
   <div class="tile">
-    <svg width="52" height="48" viewBox="0 0 70 64" aria-hidden="true">
-      <rect class="ink" x="4" y="4" width="16" height="16" rx="5"/><rect class="ink" x="24" y="4" width="16" height="16" rx="5"/><rect class="ink" x="44" y="4" width="16" height="16" rx="5"/>
-      <rect class="ink" x="4" y="24" width="16" height="16" rx="5"/><rect class="ink" x="24" y="24" width="16" height="16" rx="5"/>
-      <rect x="44.5" y="24.5" width="15" height="15" rx="5" fill="none" stroke="var(--line-strong)" stroke-width="1"/>
-      <rect class="acc move" x="44" y="24" width="16" height="16" rx="5"/>
-      <rect class="ink" x="4" y="44" width="16" height="16" rx="5"/><rect class="ink" x="24" y="44" width="16" height="16" rx="5"/><rect class="ink" x="44" y="44" width="16" height="16" rx="5"/>
+    <svg width="52" height="52" viewBox="0 0 64 64" aria-hidden="true">
+      <rect width="64" height="64" rx="19" fill="var(--accent)"/>
+      <use href="#glasses"/>
+      <g class="blink"><g class="look" fill="#17181A"><circle cx="19.5" cy="29.4" r="3.4"/><circle cx="44.5" cy="29.4" r="3.4"/></g></g>
+      <use href="#mustache"/>
     </svg>
     <span class="word">remane</span>
   </div>
   <div class="tile dark">
-    <svg width="52" height="48" viewBox="0 0 70 64" aria-hidden="true">
-      <rect class="white" x="4" y="4" width="16" height="16" rx="5"/><rect class="white" x="24" y="4" width="16" height="16" rx="5"/><rect class="white" x="44" y="4" width="16" height="16" rx="5"/>
-      <rect class="white" x="4" y="24" width="16" height="16" rx="5"/><rect class="white" x="24" y="24" width="16" height="16" rx="5"/>
-      <rect class="acc" x="50" y="18" width="16" height="16" rx="5"/>
-      <rect class="white" x="4" y="44" width="16" height="16" rx="5"/><rect class="white" x="24" y="44" width="16" height="16" rx="5"/><rect class="white" x="44" y="44" width="16" height="16" rx="5"/>
+    <svg width="52" height="52" viewBox="0 0 64 64" aria-hidden="true">
+      <rect width="64" height="64" rx="19" fill="var(--accent)"/>
+      <use href="#glasses"/>
+      <g fill="#17181A"><circle cx="19.5" cy="29.4" r="3.4"/><circle cx="44.5" cy="29.4" r="3.4"/></g>
+      <use href="#mustache"/>
     </svg>
     <span class="word">remane</span>
   </div>
