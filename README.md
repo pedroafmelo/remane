@@ -42,6 +42,8 @@ npm --prefix web run dev                   # opcional: front com recarga em http
 
 `GET /health` confirma que o app e o banco (SQLite em `var/`, ignorado pelo git) estão de pé. Docker é opcional: `docker build .`.
 
+**Deploy:** Railway ([DEC-037](docs/decisoes.md)), a partir do `Dockerfile` e do `railway.json`; cada merge na `main` publica.
+
 ## Comandos do Claude Code (`.claude/commands/`)
 
 | Comando | Para quê |

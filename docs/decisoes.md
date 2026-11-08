@@ -496,3 +496,23 @@ Formato:
 - **Consequências:** `[PREENCHER]` com o backend: o número do jurado não está no quadro e a regra atual (DEC-017) recusa número de fora; o
   teste pelo WhatsApp precisa de um modo demo que trate número desconhecido como um funcionário de demonstração. [landing.md](landing.md)
   guarda a copy antiga; vale a da `web/app/page.tsx`.
+
+## DEC-037 · Hospedagem no Railway (substitui o Fly.io em suspenso)
+
+- 2026-11-08 00:52 · Decidido por: usuário da sessão · Status: aceita
+- **Contexto:** a hospedagem estava em `[PREENCHER]` desde a [DEC-034](#dec-034--tudo-do-deploy-fica-para-depois-por-enquanto-testar-e-rodar-localmente).
+  O usuário decidiu publicar já, com só a landing no ar, para testar o caminho do deploy enquanto o risco é baixo.
+- **Decisão (o que o usuário disse):** o Fly.io "foi uma decisão meio que sem querer"; o usuário já tem conta no **Railway**, no plano
+  Hobby de US$ 5, e topou usar "caso dê certo".
+- **Fatos conferidos ([FATO], docs do Railway, 08/11/2026):** o Hobby é uma assinatura de US$ 5 por mês que inclui US$ 5 de uso; o uso
+  acima disso é cobrado; o plano admite até 50 projetos (logo a assinatura é da conta, não do projeto); volume de até 5 GB no Hobby.
+  Fontes: [railway.com/pricing](https://railway.com/pricing), [Understanding your bill](https://docs.railway.com/pricing/understanding-your-bill).
+  **[INFERÊNCIA]** um app pequeno ligado o mês todo deve caber no uso incluído; conferir no painel de uso depois do primeiro dia.
+- **Como fica (`[PROPOSTA]` do agente):** o mesmo `Dockerfile` (imagem testada localmente em 08/11: `/`, `/entrar/` e `/health` com
+  200, SQLite criado no volume), `railway.json` com health check em `/health`, um volume montado em `/data` e domínio gerado apontando
+  para a porta 8080. Deploy automático a cada merge na `main`, pela integração com o GitHub. O `fly.toml` fica no repositório, sem uso.
+- **Motivo:** o usuário já tem conta e plano pagos no Railway.
+- **Alternativas consideradas (as oferecidas):** Fly.io (configurado, precisa de cartão), Render grátis (dorme e não tem disco), Vercel
+  (só a landing, não roda o backend).
+- **Consequências:** a hospedagem sai de `[PREENCHER]`; G1 pode acontecer. Quem faz o primeiro passo no painel é o dono da conta
+  (ligar o GitHub, criar o volume e o domínio). Segredos (chaves da Featherless, `DEMO_MODE`) entram como variáveis do serviço, nunca no repositório.

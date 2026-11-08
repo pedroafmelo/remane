@@ -1,7 +1,7 @@
 # Estado do projeto
 
 > **Fonte da verdade do momento.** Atualize ao fim de cada bloco de trabalho (ver "Documentação viva" no
-> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-08 00:36** (Recife), por Claude (Opus 5.5), ao trazer a landing Remane e trocar o `web/` para Next.js ([DEC-035](decisoes.md)). Antes: 16:47, por Claude (Sonnet 5.5), ao planejar e executar a C0a e auditar as docs ([plano da C0](planos/camada-00-fundacao.md), [DEC-030](decisoes.md) a [DEC-032](decisoes.md)): **G0 atingido às 16h41**. Antes: plano macro ([plano-implementacao.md](plano-implementacao.md), [DEC-027](decisoes.md) a [DEC-029](decisoes.md)).
+> [CLAUDE.md](../CLAUDE.md)). Última atualização: **2026-11-08 00:52** (Recife), por Claude (Opus 5.5), ao trazer a landing Remane e trocar o `web/` para Next.js ([DEC-035](decisoes.md)). Antes: 16:47, por Claude (Sonnet 5.5), ao planejar e executar a C0a e auditar as docs ([plano da C0](planos/camada-00-fundacao.md), [DEC-030](decisoes.md) a [DEC-032](decisoes.md)): **G0 atingido às 16h41**. Antes: plano macro ([plano-implementacao.md](plano-implementacao.md), [DEC-027](decisoes.md) a [DEC-029](decisoes.md)).
 
 ## Fase atual
 
@@ -44,7 +44,7 @@ Mínimo 2, máximo 4 pessoas (guia, seção 5). Recomenda-se ao menos um perfil 
 - [ ] **Featherless:** 3 das 4 pessoas resgataram e criaram chaves (palavra do usuário, 15h46; **nenhuma chave foi testada**). **A chave 1 do `.env` apareceu vazia ou ausente (conferir; o `APIs.yaml` já foi apagado, e se a chave se perdeu é preciso criar outra em API Keys).** Falta a 4ª pessoa resgatar hoje (o código vence em 08/11), mover as chaves do `APIs.yaml` para o `.env` e apagar o arquivo, e testar cada chave ([DEC-025](decisoes.md)).
 - [x] **Plano macro de implementação: aprovado** ([DEC-029](decisoes.md)) ([plano-implementacao.md](plano-implementacao.md)). Depois dele, planejar a
       **Camada 0** em detalhe (`docs/planos/camada-00-fundacao.md`), com o Opus 5.5 ([DEC-028](decisoes.md)).
-- [ ] **Hospedagem e deploy: tudo adiado; por enquanto, testar e rodar localmente** ([DEC-033](decisoes.md), [DEC-034](decisoes.md)). A hospedagem volta a `[PREENCHER]` (o Fly.io da [DEC-030](decisoes.md) fica em suspenso); G1 pendente sem data. **Decidir antes do G6 (dom 11h30)**, porque sem link público RE-07 e RN-10 não se cumprem.
+- [ ] **Hospedagem decidida: Railway ([DEC-037](decisoes.md)); falta o primeiro deploy pelo painel (GitHub, volume em `/data`, domínio na porta 8080).** Histórico: tudo adiado, por enquanto, testar e rodar localmente ([DEC-033](decisoes.md), [DEC-034](decisoes.md)). A hospedagem volta a `[PREENCHER]` (o Fly.io da [DEC-030](decisoes.md) fica em suspenso); G1 pendente sem data. **Decidir antes do G6 (dom 11h30)**, porque sem link público RE-07 e RN-10 não se cumprem.
 - [x] **C0a concluída, G0 às 16h41** ([plano da C0](planos/camada-00-fundacao.md)): 84 testes verdes, ruff limpo, teste de fronteiras provado. `web/` (T9, T10), `Dockerfile` e `fly.toml` também prontos (90 testes; imagem testada localmente). **Falta:** o deploy e o G1 (adiados, [DEC-033](decisoes.md)) e avisar as frentes A, B e C de que o G0 passou. Commitado a pedido do usuário às 16h51.
 - [ ] **Landing Remane pronta em `web/` (branch `feat/landing`, [DEC-035](decisoes.md), copy da [DEC-036](decisoes.md)).** Falta a frente C ligar o login e os botões de demo por papel em `/entrar`; o backend tratar no modo demo o número de WhatsApp de quem não está no quadro (a ponte real do WhatsApp agora tem que sair, DEC-036); definir `NEXT_PUBLIC_WHATSAPP_NUMBER` quando o número existir (sem ela, a seção WhatsApp mostra "Testar a demo").
 - [ ] **Pedro Veloso: política e convenção fictícias até 19h** ([DEC-028](decisoes.md)); gate G2 do plano macro.
@@ -116,6 +116,7 @@ Mais recente primeiro. Uma linha por mudança relevante (docs, decisão, código
 
 | Data e hora | O quê | Por |
 |---|---|---|
+| 2026-11-08 00:52 | [DEC-037](decisoes.md): hospedagem no Railway; `railway.json` (Dockerfile, health check em `/health`); imagem Docker com o Next testada localmente (`/`, `/entrar/`, `/health` com 200 e SQLite no volume) | Claude |
 | 2026-11-08 00:36 | Landing com a copy da [DEC-036](decisoes.md): "engenheiro de escala", sem a seção da 6x1, Patrick no lugar de Joana, história do hero com metade da rolagem; WhatsApp mantido | Claude |
 | 2026-11-07 23:55 | Landing Remane trazida para `web/`, que troca o Vite por Next.js com export estático em `web/dist` ([DEC-035](decisoes.md)); `_serve_spa` serve `rota/index.html` do export (teste novo em `tests/api/test_spa.py`); [landing.md](landing.md) com o handoff; declaração, arquitetura, README e CLAUDE.md atualizados. 91 testes Python, 3 testes do `web/`, lint e build ok | Claude |
 | 2026-11-07 16:53 | [DEC-034](decisoes.md): "tudo do deploy" fica para depois e tudo roda localmente; a hospedagem volta a `[PREENCHER]` (Fly.io em suspenso). README ganha a seção de execução local. Sem commit desta alteração | Claude |
