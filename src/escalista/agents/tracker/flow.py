@@ -289,6 +289,7 @@ class Tracker:
             return "Tratado como falta; a busca de cobertura começou."
         if option_index == 1:
             case.asked_at = self._clock.now()
+            case.status = "aguardando_colaborador"
             self._send(case, case.employee_id, "pergunta", ref)
             self._save(case)
             return "Perguntei de novo ao colaborador; espero mais um prazo de resposta."
@@ -358,9 +359,11 @@ class Tracker:
 
     def advance_offer(self, case: Case | str, *, outcome: Literal["vencida", "recusada"] = "vencida") -> CaseView:
         """Fecha a oferta em aberto (`vencida` por padrão, como na varredura) e oferece ao próximo da ordem, até
-        `policy.max_candidates`; sem próximo, RX-06 ao gestor."""
+        `policy.max_candidates`; sem próximo, RX-06 ao gestor. Caso fora de `oferta_enviada`: nada muda."""
         with self._lock:
             loaded = self._load(case) if isinstance(case, str) else case
+            if loaded.status != "oferta_enviada":  # aceita, decidida ou encerrada: não há oferta a vencer
+                return CaseView.of(loaded)
             current = loaded.offers[-1] if loaded.offers else None
             if current is not None and current.status == "enviada":
                 current.status = outcome

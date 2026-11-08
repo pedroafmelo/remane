@@ -321,6 +321,12 @@ def test_advance_offer_expires_and_ends_in_rx06_when_list_runs_out(env: Env):
     assert env.tracker.case(view.case_id).status == "descoberto"
 
 
+def test_advance_offer_does_nothing_after_accept(env: Env):
+    view = _accept_first(env)
+    after = env.tracker.advance_offer(view.case_id)
+    assert after == view and "track.offer.expired" not in env.kinds()
+
+
 def test_advance_offer_recomputes_search_after_restart(env: Env):
     view = _report(env)
     env.tracker._searches.clear()  # processo reiniciado: só as tabelas
