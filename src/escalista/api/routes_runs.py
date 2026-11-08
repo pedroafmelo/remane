@@ -43,7 +43,14 @@ from escalista.domain.reading import ConfirmInput, DemandPattern
 from escalista.domain.results import Approval, RunState, ScheduleVersion
 from escalista.domain.schedule import EmployeePublic, Schedule, Store
 
-DEMO_FILES = frozenset({"escala_atual.csv", "escala_defeito.csv"})
+CSV_MEDIA_TYPE = "text/csv; charset=utf-8"
+XLSX_MEDIA_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+# Lista branca dos exemplos da demo: nome -> (tipo do conteúdo, rótulo). O XLSX é binário e segue sem decodificar.
+DEMO_FILES: dict[str, tuple[str, str]] = {
+    "escala_exemplo_grade.xlsx": (XLSX_MEDIA_TYPE, "Escala de exemplo em planilha (XLSX, grade)"),
+    "escala_atual.csv": (CSV_MEDIA_TYPE, "Escala de exemplo em CSV (formato padrão)"),
+    "escala_defeito.csv": (CSV_MEDIA_TYPE, "Exemplo com defeitos (mostra o RX-13)"),
+}
 TEXT_EXTENSIONS = frozenset({".csv", ".txt"})
 XLSX_MAGIC = b"PK\x03\x04"
 PDF_MAGIC = b"%PDF"
@@ -280,4 +287,4 @@ def demo_file(name: str, demo_dir: Path = Depends(get_demo_files_dir)) -> FileRe
     path = demo_dir / name
     if not path.is_file():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return FileResponse(path, media_type="text/csv; charset=utf-8", filename=name)
+    return FileResponse(path, media_type=DEMO_FILES[name][0], filename=name)

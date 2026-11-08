@@ -126,6 +126,17 @@ def test_allowed_role_succeeds(tmp_path, route, role):
     assert call(client, route, **route.request).status_code == route.ok_status
 
 
+@pytest.mark.parametrize("role", list(Role), ids=str)
+def test_demo_xlsx_follows_the_same_gestor_only_gate(tmp_path, role):
+    """O XLSX de exemplo passa pela mesma rota e pela mesma regra: só o gestor baixa (o resto: 403; sem sessão: 401)."""
+    client = make_client(tmp_path)
+    (tmp_path / "demo" / "escala_exemplo_grade.xlsx").write_bytes(b"PK\x03\x04 demo")
+    url = "/api/demo/files/escala_exemplo_grade.xlsx"
+    assert client.get(url).status_code == 401
+    login(client, role)
+    assert client.get(url).status_code == (200 if role == Role.GESTOR else 403)
+
+
 def test_every_api_route_is_in_the_matrix(tmp_path):
     """Rota nova em `/api` sem linha na matriz reprova: ninguém esquece de declarar quem pode chamá-la."""
     app = make_client(tmp_path).app
