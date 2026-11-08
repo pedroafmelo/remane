@@ -94,8 +94,8 @@ def version(vid="v1", status="draft"):
 
 
 def test_rule_enums_values():
-    assert {s.value for s in RuleStatus} == {"conferida", "interpretacao", "pendente", "ficticia"}
-    assert {lay.value for lay in RuleLayer} == {"lei", "convencao", "politica"}
+    assert {s.value for s in RuleStatus} == {"conferida", "interpretacao", "pendente", "ficticia", "pedido"}  # C6
+    assert {lay.value for lay in RuleLayer} == {"lei", "convencao", "politica", "execucao"}  # C6
 
 
 def test_rule_fields_and_frozen():
@@ -174,9 +174,10 @@ def test_schedule_fields_and_week_starts_on_monday():
 
 
 def test_csv_issue_and_read_summary_fields():
-    assert fields(CsvIssue) == {"line", "field", "reason"}
+    assert fields(CsvIssue) == {"line", "field", "reason", "table", "col"}  # `table` e `col`: C6
     assert fields(ReadSummary) == {
         "file_name", "rows", "employees", "stores", "week_start", "total_hours", "issues", "ok",
+        "format", "mapping", "mapping_source", "assumptions", "identity", "capacity", "planned_week_start",  # C6
     }  # fmt: skip
     summary = ReadSummary(
         file_name="escala.csv",
@@ -197,6 +198,7 @@ def test_csv_issue_and_read_summary_fields():
 def test_solve_request_and_result_fields():
     assert fields(SolveRequest) == {
         "card", "stores", "employees", "demand", "week_start", "seed", "time_limit_s", "num_workers", "hint",
+        "spec",  # C6
     }  # fmt: skip
     assert fields(SolveResult) == {"status", "schedule", "uncovered", "wall_ms", "seed", "input_hash", "exception"}
     result = SolveResult(status="infeasible", wall_ms=10, seed=42, input_hash="h")
@@ -256,6 +258,7 @@ def test_schedule_version_and_approval_fields():
 def test_run_state_fields():
     assert fields(RunState) == {
         "run_id", "phase", "summary", "comparison", "report", "justification", "version_id", "exception",
+        "mode", "before", "week_start", "spec", "notices", "roster_version", "attempts",  # C6
     }  # fmt: skip
     state = RunState(run_id="r1", phase="read")
     assert state.summary is None and state.exception is None

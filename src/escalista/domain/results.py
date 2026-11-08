@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field, computed_field
 from escalista.domain.contracts import ExceptionCard, Role
 from escalista.domain.rules import RuleCard
 from escalista.domain.schedule import DemandSlot, Employee, ReadSummary, Schedule, Store
+from escalista.domain.spec import SolveSpec
 
 
 class SolveRequest(BaseModel):
@@ -25,6 +26,7 @@ class SolveRequest(BaseModel):
     time_limit_s: float
     num_workers: int
     hint: Schedule | None = None
+    spec: SolveSpec | None = None  # `None` = comportamento da C5 (E1 não muda)
 
 
 class SolveResult(BaseModel):
@@ -117,3 +119,11 @@ class RunState(BaseModel):
     justification: Justification | None = None
     version_id: str | None = None
     exception: ExceptionCard | None = None
+    # C6: todos com padrão, para o estado da C5 (só `run_id` e `phase`) seguir válido
+    mode: Literal["upload", "continuidade"] = "upload"
+    before: Schedule | None = None  # a escala "antes", persistida
+    week_start: date | None = None
+    spec: SolveSpec | None = None
+    notices: list[ExceptionCard] = Field(default_factory=list)  # avisos que não bloqueiam (RX-02, RX-12)
+    roster_version: int | None = None
+    attempts: int = Field(default=0, ge=0)

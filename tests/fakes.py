@@ -1,9 +1,18 @@
 """Implementações falsas das portas de `escalista.domain.ports`, para as 3 frentes."""
 
+from collections.abc import Iterable, Mapping, Sequence
 from datetime import datetime
+from typing import Any
 
 from escalista.domain.contracts import ExceptionCard, LLMMessage, LLMResult, LLMUnavailableError, TraceEvent
 from escalista.domain.results import Approval, RunState, ScheduleVersion
+from escalista.domain.roster import Roster
+
+# Nomes das ferramentas forçadas de cada nó (plano da C6, seção 5.4). Ficam aqui, e não em `domain/`, porque são da
+# borda `llm/`; os prompts da frente B usam os mesmos textos (`llm/prompts/justify.py:TOOL_NAME` já é o último).
+TOOL_MAPPING = "registrar_mapeamento"  # nó 1: ColumnMapping
+TOOL_SPEC = "registrar_especificacao"  # nó 2: SolveSpec
+TOOL_JUSTIFY = "registrar_justificativa"  # justificativa
 
 
 class FixedClock:
@@ -26,11 +35,27 @@ class ListTraceSink:
 
 
 class FakeLLMClient:
-    """Devolve resultados em fila (ou um padrão); `fail=True` levanta RX-12. Registra as chamadas."""
+    """Falso do `LLMClient`, que responde por nome de ferramenta (C6) ou em fila (C5). Registra as chamadas.
 
-    def __init__(self, results: list[LLMResult] | None = None, *, fail: bool = False) -> None:
+    - `by_tool`: fila por nome de ferramenta (`tool_schema["function"]["name"]`); cada item é um `LLMResult` ou um
+      dicionário, que vira `LLMResult(tool_args=item)`.
+    - `results`: fila geral, usada quando a fila da ferramenta acaba (ou a chamada não tem ferramenta).
+    - Sem nada nas filas, devolve só texto, sem ferramenta (o `call_structured` trata como recusa).
+    - `fail=True` levanta RX-12 em toda chamada; `fail_tools` só nas ferramentas citadas (falha por nó).
+    """
+
+    def __init__(
+        self,
+        results: list[LLMResult] | None = None,
+        *,
+        fail: bool = False,
+        by_tool: Mapping[str, Sequence[LLMResult | dict[str, Any]]] | None = None,
+        fail_tools: Iterable[str] = (),
+    ) -> None:
         self._results = list(results or [])
         self._fail = fail
+        self._by_tool = {name: [_as_result(item) for item in items] for name, items in (by_tool or {}).items()}
+        self._fail_tools = frozenset(fail_tools)
         self.calls: list[dict] = []
 
     def complete(
@@ -42,26 +67,43 @@ class FakeLLMClient:
         run_id: str,
         parent_id: str | None = None,
     ) -> LLMResult:
+        name = (tool_schema or {}).get("function", {}).get("name")
         self.calls.append(
-            {"size": size, "messages": messages, "tool_schema": tool_schema, "run_id": run_id, "parent_id": parent_id}
+            {
+                "size": size,
+                "messages": messages,
+                "tool_schema": tool_schema,
+                "tool_name": name,
+                "run_id": run_id,
+                "parent_id": parent_id,
+            }
         )
-        if self._fail:
+        if self._fail or name in self._fail_tools:
             raise LLMUnavailableError(
                 ExceptionCard(code="RX-12", title="Modelo indisponível", reason="falha simulada", trace_id=parent_id)
             )
+        queue = self._by_tool.get(name) if name else None
+        if queue:
+            return queue.pop(0)
         if self._results:
             return self._results.pop(0)
         return LLMResult(content="resposta falsa", model="fake", key_index=1)
 
 
+def _as_result(item: LLMResult | dict[str, Any]) -> LLMResult:
+    return item if isinstance(item, LLMResult) else LLMResult(tool_args=item, model="fake", key_index=1)
+
+
 class InMemoryRepository:
-    """`Repository` em dicionários. Guarda cópias, para o chamador não alterar o que já foi salvo."""
+    """`Repository` e `RosterRepository` em dicionários. Guarda cópias, para o chamador não alterar o que já foi
+    salvo."""
 
     def __init__(self) -> None:
         self.runs: dict[str, RunState] = {}
         self.versions: dict[str, ScheduleVersion] = {}
         self.approvals: dict[str, Approval] = {}
         self.published_at: dict[str, datetime] = {}
+        self.rosters: dict[int, Roster] = {}
 
     def save_run(self, state: RunState) -> None:
         self.runs[state.run_id] = state.model_copy(deep=True)
@@ -89,3 +131,14 @@ class InMemoryRepository:
         if not self.published_at:
             return None
         return self.versions[max(self.published_at, key=self.published_at.__getitem__)]
+
+    def save_roster(self, r: Roster) -> None:
+        if r.version in self.rosters:
+            raise ValueError(f"o quadro versão {r.version} já existe; cada confirmação acrescenta uma versão")
+        self.rosters[r.version] = r.model_copy(deep=True)
+
+    def latest_roster(self) -> Roster | None:
+        return self.rosters[max(self.rosters)] if self.rosters else None
+
+    def get_roster(self, version: int) -> Roster | None:
+        return self.rosters.get(version)

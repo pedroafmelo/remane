@@ -18,12 +18,17 @@ class RuleStatus(StrEnum):
     INTERPRETACAO = "interpretacao"
     PENDENTE = "pendente"
     FICTICIA = "ficticia"
+    PEDIDO = "pedido"  # restrição dura pedida pelo gestor (camada `execucao`, C6)
 
 
 class RuleLayer(StrEnum):
+    """`execucao` (C6) guarda as restrições duras da `SolveSpec` de uma execução: só acrescenta, nunca afrouxa as
+    outras camadas, e não vem de YAML."""
+
     LEI = "lei"
     CONVENCAO = "convencao"
     POLITICA = "politica"
+    EXECUCAO = "execucao"
 
 
 class Rule(BaseModel):
