@@ -174,10 +174,10 @@ export default function PlataformaPage() {
     return (
       <Shell who={who} onLogout={logout} busy={busy !== null}>
         {problem && <Notice>{problem.message}</Notice>}
-        <Card title="Esta área é do gerente" id="sem-acesso">
+        <Card title="Esta área é do gestor" id="sem-acesso">
           <p className="mb-4 text-[15px] leading-relaxed text-ink-muted">
-            Você entrou como {roleLabel(me.papel).toLowerCase()}. Nesta versão, só o gerente envia a escala, confere o antes e o depois e
-            aprova a publicação; o servidor recusa essas ações para os demais papéis.
+            Você entrou como {roleLabel(me.papel).toLowerCase()}. Nesta versão, só o gestor envia a escala, confere o antes e o depois e
+            aprova a publicação; o servidor recusa essas ações para quem não é gestor.
           </p>
           <Button variant="secondary" onClick={logout} disabled={busy !== null}>
             Entrar com outro papel
@@ -248,13 +248,13 @@ export default function PlataformaPage() {
                 title="Grade semanal proposta"
                 schedule={proposed.schedule}
                 employees={proposed.employees}
-                note="Proposta do Pat. Só vale depois da aprovação do gerente."
+                note="Proposta do Pat. Só vale depois da aprovação do gestor."
               />
               <div className="flex flex-wrap items-center gap-3">
                 <Button onClick={() => approve(run)} disabled={working} aria-busy={busy === "approve"}>
                   {busy === "approve" ? "Publicando…" : "Aprovar e publicar"}
                 </Button>
-                <Muted>Ato do gerente: fica gravado com quem aprovou e quando.</Muted>
+                <Muted>Ato do gestor: fica gravado com quem aprovou e quando.</Muted>
               </div>
             </>
           )}

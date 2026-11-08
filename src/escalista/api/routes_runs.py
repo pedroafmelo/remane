@@ -1,7 +1,7 @@
 """Rotas da fatia (plano da C5, seção 4, C2): enviar a escala, confirmar o resumo, ver antes e depois e a grade,
 aprovar e publicar, ver o rastro e baixar os arquivos de exemplo.
 
-Todas exigem o papel `gerente` (RF-30): na fatia só o gerente tem tela, e a grade leva o valor da hora de cada pessoa,
+Todas exigem o papel `gestor` (RF-30): na fatia só o gestor tem tela, e a grade leva o valor da hora de cada pessoa,
 que o colaborador não deve ver. Cada rota tem linha na matriz de `tests/api/test_access.py`.
 
 O CSV vem no corpo bruto (`Content-Type: text/csv`), não em multipart. Acima de `MAX_UPLOAD_BYTES`: 413. Fora de
@@ -37,7 +37,7 @@ from escalista.domain.schedule import EmployeePublic, Schedule
 
 DEMO_FILES = frozenset({"escala_atual.csv", "escala_defeito.csv"})
 
-gerente = require_role(Role.GERENTE)
+gestor = require_role(Role.GESTOR)
 
 
 class ProposedSchedule(BaseModel):
@@ -91,7 +91,7 @@ def _rx13(file_name: str, reason: str) -> ExceptionCard:
         code="RX-13",
         title="Arquivo de escala ilegível",
         reason=reason,
-        decider=Role.GERENTE,
+        decider=Role.GESTOR,
         evidence=[f"arquivo: {file_name}"],
         recommendation="Salvar a planilha como CSV em UTF-8, com até 1 MB, e enviar de novo.",
     )
@@ -121,7 +121,7 @@ def _run_or_404(agent: SliceAgent, run_id: str) -> RunState:
     return state
 
 
-router = APIRouter(prefix="/api", dependencies=[Depends(gerente)])
+router = APIRouter(prefix="/api", dependencies=[Depends(gestor)])
 
 
 @router.post(
@@ -155,7 +155,7 @@ def get_run(run_id: str, agent: SliceAgent = Depends(get_agent)) -> RunState:  #
 
 @router.post("/runs/{run_id}/confirm", response_model=RunState)
 def confirm(run_id: str, agent: SliceAgent = Depends(get_agent)) -> RunState:  # noqa: B008
-    """O gerente confirmou o resumo: otimiza, verifica, compara e justifica."""
+    """O gestor confirmou o resumo: otimiza, verifica, compara e justifica."""
     _run_or_404(agent, run_id)
     return agent.confirm(run_id)
 
@@ -173,7 +173,7 @@ def proposed_schedule(run_id: str, agent: SliceAgent = Depends(get_agent)) -> Pr
 def approve(
     run_id: str,
     agent: SliceAgent = Depends(get_agent),  # noqa: B008
-    account: Account = Depends(gerente),  # noqa: B008
+    account: Account = Depends(gestor),  # noqa: B008
 ) -> RunState:
     """Ato humano: grava quem aprovou, com qual papel e quando; o agente só publica com essa aprovação."""
     state = _run_or_404(agent, run_id)

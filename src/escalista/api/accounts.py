@@ -17,8 +17,7 @@ class Account:
 
 
 SEEDED_ACCOUNTS: tuple[Account, ...] = (
-    Account(id="demo-gerente", name="Gerente Fictícia (demo)", role=Role.GERENTE),
-    Account(id="demo-dp", name="Analista de DP Fictício (demo)", role=Role.DP),
+    Account(id="demo-gestor", name="Gestora Fictícia (demo)", role=Role.GESTOR),
     Account(id="demo-colaborador", name="Colaboradora Fictícia (demo)", role=Role.COLABORADOR),
 )
 

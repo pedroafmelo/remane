@@ -22,7 +22,7 @@ def current_account(request: Request) -> Account:
 
 
 def require_role(*roles: Role) -> Callable[[Request], Account]:
-    """Dependência que exige sessão (401) com um dos `roles` (403). Uso: `Depends(require_role(Role.GERENTE))`."""
+    """Dependência que exige sessão (401) com um dos `roles` (403). Uso: `Depends(require_role(Role.GESTOR))`."""
     if not roles:
         raise ValueError("require_role precisa de ao menos um papel")
     allowed = frozenset(roles)

@@ -10,10 +10,10 @@ por estes arquivos YAML.
 |---|---|---|---|
 | [lei/](lei/) | Normas públicas: EC 141 ([ec141.yaml](lei/ec141.yaml)); CLT, Lei 10.101/2000 e incisos do art. 7º da CF ([clt.yaml](lei/clt.yaml)) | Texto oficial (Planalto) | Os dois conferidos por Claude contra o Planalto em 07/11; falta leitura do time |
 | [convencao/](convencao/) | Convenção coletiva **fictícia** da demo ([cct_comercio_ficticia.yaml](convencao/cct_comercio_ficticia.yaml)) | Escrita por Claude a pedido de Pedro Veloso | 8 cláusulas, 1 conflito com a EC (RX-01) e 1 cláusula ambígua (RX-11) plantados |
-| [politica/](politica/) | Política **fictícia** da empresa da demo: o que a lei e a convenção deixam em aberto ([politica_ficticia.yaml](politica/politica_ficticia.yaml)); autorização prévia do DP para hora extra ([autorizacao_hora_extra.yaml](politica/autorizacao_hora_extra.yaml)) | Escrita por Claude a pedido de Pedro Veloso; a autorização veio da D1 do time | 11 parâmetros (2 `[PROPOSTA]`) e as 3 exceções da demo (RX-01, RX-05, RX-08); 1 exceção `ficticia` (`hora_extra_autorizacao_dp`) |
+| [politica/](politica/) | Política **fictícia** da empresa da demo: o que a lei e a convenção deixam em aberto ([politica_ficticia.yaml](politica/politica_ficticia.yaml)); autorização prévia do gestor para hora extra ([autorizacao_hora_extra.yaml](politica/autorizacao_hora_extra.yaml)) | Escrita por Claude a pedido de Pedro Veloso; a autorização veio da D1 do time | 11 parâmetros (2 `[PROPOSTA]`) e as 3 exceções da demo (RX-01, RX-05, RX-08); 1 exceção `ficticia` (`hora_extra_autorizacao_dp`) |
 
 Ordem entre as camadas: a política só restringe a lei e a convenção, nunca afrouxa. **Quando duas camadas conflitam, o
-agente aplica a mais restritiva de forma provisória e abre exceção ao DP** (P1 de [produto.md](../../docs/produto.md);
+agente aplica a mais restritiva de forma provisória e abre exceção ao gestor** (P1 de [produto.md](../../docs/produto.md);
 conflito 2 de [requisitos.md](../../docs/requisitos.md)).
 
 ## O que o motor lê

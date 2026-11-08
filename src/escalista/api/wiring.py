@@ -60,7 +60,7 @@ class SliceAgent(Protocol):
         ...
 
     def confirm(self, run_id: str) -> RunState:
-        """O gerente confirmou o resumo: otimiza, verifica, compara e justifica. Fase `awaiting_approval` (com
+        """O gestor confirmou o resumo: otimiza, verifica, compara e justifica. Fase `awaiting_approval` (com
         `comparison`, `report`, `justification` e `version_id`) ou `failed` com o cartão (RX-02, RX-12).
         Exige a fase `awaiting_confirm`."""
         ...

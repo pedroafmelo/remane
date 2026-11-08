@@ -19,7 +19,7 @@ Modelo, por loja (as lojas são independentes, porque a pessoa só trabalha na p
   aceite é a escala gravada e reverificada (DEC-020).
 - **Status:** todas as lojas com ótimo provado → `optimal`; alguma parada no limite de tempo com solução →
   `feasible`; alguma loja sem solução no tempo → `timeout`; modelo inviável → `infeasible`.
-- **RX-02:** se sobrar faixa descoberta, a escala parcial é devolvida com um `ExceptionCard` ao DP com o cálculo
+- **RX-02:** se sobrar faixa descoberta, a escala parcial é devolvida com um `ExceptionCard` ao gestor com o cálculo
   de contratação por loja (ver `_rx02`).
 """
 
@@ -318,15 +318,15 @@ def _br(value: float, digits: int = 1) -> str:
 
 
 def _rx02(uncovered: list[DemandSlot], stores: list[Store], limits: Limits, status: str) -> ExceptionCard:
-    """Demanda acima da capacidade: cálculo de contratação por loja, ao DP.
+    """Demanda acima da capacidade: cálculo de contratação por loja, ao gestor.
 
     Por loja: pessoa-horas faltando ÷ horas que uma pessoa pode dar na semana (mín. entre o limite semanal e
     dias de trabalho × limite diário) → pessoas a contratar, arredondado para cima. É um **piso**: a falta se
     concentra em picos, e uma pessoa cobre no máximo um turno contínuo por dia.
 
-    Decide o **DP**: contratar mexe em quadro e orçamento, e a alternativa de curto prazo (hora extra) só sai
-    com autorização prévia do DP pela política fictícia `hora_extra_autorizacao_dp`. O gerente é quem vê a escala
-    parcial e pode aceitá-la para a semana, mas não decide sobre quadro.
+    Decide o **gestor** (DEC-044): contratar mexe em quadro e orçamento, e a alternativa de curto prazo (hora
+    extra) só sai com a autorização prévia dele pela política fictícia `hora_extra_autorizacao_dp`. É ele também quem
+    vê a escala parcial e pode aceitá-la para a semana.
     """
     names = {s.id: s.name for s in stores}
     per_person_h = limits.per_person_week_min / 60
@@ -366,7 +366,7 @@ def _rx02(uncovered: list[DemandSlot], stores: list[Store], limits: Limits, stat
             f"Mesmo com as regras respeitadas, faltam {_br(total_h)} pessoa-horas na semana em "
             f"{len(missing)} loja(s). A escala parcial foi gerada sem hora extra."
         ),
-        decider=Role.DP,
+        decider=Role.GESTOR,
         evidence=evidence,
         options=[
             ExceptionOption(
@@ -375,7 +375,7 @@ def _rx02(uncovered: list[DemandSlot], stores: list[Store], limits: Limits, stat
             ),
             ExceptionOption(
                 label="Autorizar hora extra nas faixas descobertas",
-                effect="Cobre a semana atual com custo de hora extra; exige autorização prévia do DP.",
+                effect="Cobre a semana atual com custo de hora extra; exige autorização prévia do gestor.",
             ),
             ExceptionOption(
                 label="Aceitar a escala parcial",
@@ -383,5 +383,5 @@ def _rx02(uncovered: list[DemandSlot], stores: list[Store], limits: Limits, stat
             ),
         ],
         recommendation=f"Aprovar a escala parcial desta semana e abrir a contratação de {total_hires} pessoa(s).",
-        if_no_answer="A escala parcial segue para aprovação do gerente com as faixas descobertas marcadas.",
+        if_no_answer="A escala parcial segue para aprovação do gestor com as faixas descobertas marcadas.",
     )

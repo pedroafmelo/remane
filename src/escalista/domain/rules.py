@@ -44,7 +44,7 @@ class Rule(BaseModel):
 
 
 class RuleCard(BaseModel):
-    """Regras já fundidas e vigentes na data de referência, com o que ficou provisório e os conflitos ao DP."""
+    """Regras já fundidas e vigentes na data de referência, com o que ficou provisório e os conflitos ao gestor."""
 
     reference_date: date
     rules: list[Rule]

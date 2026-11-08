@@ -23,7 +23,7 @@ Profile = Literal["padrao", "aprendiz", "menor"]
 
 
 class Employee(BaseModel):
-    """`sex` existe só para as regras que dependem dele. RN-13: nunca vai à tela, à API do gerente nem ao trace;
+    """`sex` existe só para as regras que dependem dele. RN-13: nunca vai à tela, à API do gestor nem ao trace;
     para sair do núcleo, use `EmployeePublic.from_employee`."""
 
     id: str
@@ -93,7 +93,7 @@ class CsvIssue(BaseModel):
 
 
 class ReadSummary(BaseModel):
-    """Resumo da leitura do CSV (RF-23), mostrado ao gerente antes de otimizar."""
+    """Resumo da leitura do CSV (RF-23), mostrado ao gestor antes de otimizar."""
 
     file_name: str
     rows: int

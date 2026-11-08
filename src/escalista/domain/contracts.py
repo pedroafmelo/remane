@@ -16,10 +16,10 @@ from pydantic import BaseModel, ConfigDict, Field, StrictInt
 
 
 class Role(StrEnum):
-    """Papéis de acesso. O "gestor de RH" é `[PREENCHER]` (pergunta 15 do estado)."""
+    """Papéis de acesso (DEC-044). `gestor` aprova e publica a escala, valida coberturas, decide exceções e aprova o
+    cartão de regras; `colaborador` avisa falta, manda atestado e aceita ou recusa turno."""
 
-    GERENTE = "gerente"
-    DP = "dp"
+    GESTOR = "gestor"
     COLABORADOR = "colaborador"
 
 

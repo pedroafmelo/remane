@@ -145,7 +145,7 @@ def test_employee_fields_and_profile_default():
 
 
 def test_employee_public_never_carries_sex():
-    """RN-13: o sexo não vai à tela, à resposta da API do gerente nem ao trace."""
+    """RN-13: o sexo não vai à tela, à resposta da API do gestor nem ao trace."""
     assert fields(EmployeePublic) == fields(Employee) - {"sex"}
     public = EmployeePublic.from_employee(employee())
     assert "sex" not in public.model_dump() and public.id == "e1"
@@ -249,8 +249,8 @@ def test_schedule_version_and_approval_fields():
     assert fields(Approval) == {"id", "version_id", "approved_by", "role", "at"}
     with pytest.raises(ValidationError):
         version(status="rascunho")
-    approval = Approval(id="a1", version_id="v1", approved_by="u1", role="gerente", at=NOW)
-    assert approval.role is Role.GERENTE
+    approval = Approval(id="a1", version_id="v1", approved_by="u1", role="gestor", at=NOW)
+    assert approval.role is Role.GESTOR
 
 
 def test_run_state_fields():
@@ -293,7 +293,7 @@ def test_in_memory_repository_round_trips():
     assert repo.get_run("r1").phase == "read"
     repo.save_version(version("v1"))
     repo.save_version(version("v2"))
-    approval = Approval(id="a1", version_id="v1", approved_by="u1", role=Role.GERENTE, at=NOW)
+    approval = Approval(id="a1", version_id="v1", approved_by="u1", role=Role.GESTOR, at=NOW)
     repo.record_approval(approval)
     assert repo.get_approval("v1") == approval
     repo.mark_published("v1", NOW)

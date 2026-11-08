@@ -85,7 +85,7 @@ def _rx13(file_name: str, reason: str, evidence: list[str]) -> ExceptionCard:
         code="RX-13",
         title="Arquivo de escala com defeito",
         reason=reason,
-        decider=Role.GERENTE,
+        decider=Role.GESTOR,
         evidence=evidence,
         recommendation=f"Corrigir {file_name} e enviar de novo.",
     )
@@ -239,7 +239,7 @@ class FakeSliceAgent:
             return "aprovação humana não encontrada"
         if approval.version_id != version.id:
             return "a aprovação é de outra versão"
-        if approval.role != Role.GERENTE:
+        if approval.role != Role.GESTOR:
             return "papel sem permissão para publicar"
         return None
 

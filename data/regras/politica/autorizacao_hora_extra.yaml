@@ -1,14 +1,14 @@
 # FICTICIO - dados de demonstracao, nao e politica real.
 # Politica FICTICIA da empresa da demo, escrita pelo time (clean room). Nao e politica de empresa real nem de cliente.
 # Veio da D1 (politica/demo.yaml, removida quando o motor passou a ler a politica de Pedro Veloso): e a unica regra da
-# D1 sem equivalente em politica_ficticia.yaml (pol_hora_extra traz limites, nao a autorizacao previa do DP).
+# D1 sem equivalente em politica_ficticia.yaml (pol_hora_extra traz limites, nao a autorizacao previa do gestor).
 # Toda regra tem status: ficticia (ver data/regras/README.md). Deve aparecer como sintetico na submissao.
 
 norma: "Politica FICTICIA da empresa da demo (dados de demonstracao)"
 
 excecoes:   # o agente nao decide sozinho; valores de acao em data/regras/README.md
   - id: hora_extra_autorizacao_dp
-    descricao: "hora extra so com autorizacao previa do DP; o agente nao escala hora extra sozinho"
+    descricao: "hora extra so com autorizacao previa do gestor; o agente nao escala hora extra sozinho"
     fonte: "FICTICIO - politica da empresa da demo"
     acao: escalar
     nota: "Na fatia, a escala enviada pode ter hora extra; ela entra como custo e violacao, nunca como escala feita pelo solver."

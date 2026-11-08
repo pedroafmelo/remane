@@ -3,7 +3,7 @@
 Desenho: **um grafo por trecho entre paradas humanas**, invocado pela classe `OptimizerAgent`:
 
 - `start_run` → grafo de leitura: `ler_escala` (CSV → validação → resumo; RX-13 se o arquivo tem defeito).
-- `confirm` (o gerente confirmou o resumo) → grafo de otimização: `otimizar → verificar → comparar → justificar`, com
+- `confirm` (o gestor confirmou o resumo) → grafo de otimização: `otimizar → verificar → comparar → justificar`, com
   saída antecipada se o solver não devolver escala (RX-12).
 - `approve` grava a aprovação humana e chama a ferramenta `publicar` (`tools.py`), que relê a aprovação no
   `Repository` e recusa sem ela.
@@ -230,7 +230,7 @@ class OptimizerAgent:
                 code="RX-12",
                 title="Falha inesperada no agente",
                 reason=f"Um passo do fluxo falhou ({type(exc).__name__}). Nada foi publicado.",
-                decider=Role.GERENTE,
+                decider=Role.GESTOR,
                 recommendation="Tentar de novo com o mesmo arquivo; se persistir, abrir o rastro desta execução.",
                 if_no_answer="A escala atual continua valendo; nenhuma versão nova é publicada.",
             )
@@ -319,7 +319,7 @@ class OptimizerAgent:
                 code="RX-12",
                 title="O solver não encontrou uma escala",
                 reason=f"O solver terminou com status {result.status} sem escala em {self._time_limit_s:g} s.",
-                decider=Role.GERENTE,
+                decider=Role.GESTOR,
                 recommendation="Conferir a demanda e o quadro de pessoal; tentar de novo com mais tempo de solver.",
                 if_no_answer="A escala atual continua valendo; nenhuma versão nova é publicada.",
             )
@@ -352,7 +352,7 @@ class OptimizerAgent:
                 code="RX-12",
                 title="O verificador achou violações na escala otimizada",
                 reason=f"{after.total} violações na escala proposta; ela não pode ser publicada.",
-                decider=Role.GERENTE,
+                decider=Role.GESTOR,
                 evidence=[f"{rule}: {n}" for rule, n in sorted(Counter(v.rule_id for v in after.violations).items())],
                 recommendation="Não publicar; abrir o rastro e tentar de novo.",
                 if_no_answer="A escala atual continua valendo; nenhuma versão nova é publicada.",
@@ -456,8 +456,8 @@ def _rx13(file_name: str, reason: str, evidence: list[str]) -> ExceptionCard:
         code="RX-13",
         title="A escala não pode ser usada",
         reason=f"{file_name}: {reason}.",
-        decider=Role.GERENTE,
+        decider=Role.GESTOR,
         evidence=evidence,
         recommendation="Corrija o arquivo e envie de novo.",
-        if_no_answer="A otimização não começa sem uma escala lida e confirmada pelo gerente.",
+        if_no_answer="A otimização não começa sem uma escala lida e confirmada pelo gestor.",
     )

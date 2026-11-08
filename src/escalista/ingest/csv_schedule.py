@@ -18,12 +18,12 @@ from escalista.domain.schedule import CsvIssue, Employee, ReadSummary, Schedule,
 from escalista.rules.validation import COLUMNS, RawRow, validate_schedule_rows
 
 MAX_BYTES = 1024 * 1024  # 1 MB
-_IF_NO_ANSWER = "A otimização não começa sem uma escala lida e confirmada pelo gerente."
+_IF_NO_ANSWER = "A otimização não começa sem uma escala lida e confirmada pelo gestor."
 
 
 @dataclass(frozen=True)
 class CsvReadResult:
-    """`exception` não nulo pede ação do gerente (RX-13). `schedule` é `None` quando o arquivo é ilegível."""
+    """`exception` não nulo pede ação do gestor (RX-13). `schedule` é `None` quando o arquivo é ilegível."""
 
     schedule: Schedule | None
     summary: ReadSummary
@@ -96,7 +96,7 @@ def _unreadable(file_name: str, reason: str, week_start: date | None) -> CsvRead
         code="RX-13",
         title="Não consegui ler a escala",
         reason=f"{file_name}: {reason}.",
-        decider=Role.GERENTE,
+        decider=Role.GESTOR,
         evidence=[file_name],
         recommendation=f"Exporte a escala de novo como CSV em UTF-8, com o cabeçalho {','.join(COLUMNS)}, e envie.",
         if_no_answer=_IF_NO_ANSWER,
@@ -110,7 +110,7 @@ def _inconsistent(file_name: str, summary: ReadSummary) -> ExceptionCard:
         code="RX-13",
         title="A escala tem dados inconsistentes",
         reason=f"{file_name}: {n} {'linha com problema' if n == 1 else 'problemas encontrados'} na leitura.",
-        decider=Role.GERENTE,
+        decider=Role.GESTOR,
         evidence=[_describe(i) for i in summary.issues],
         recommendation="Corrija as linhas indicadas e envie o arquivo de novo.",
         if_no_answer=_IF_NO_ANSWER,

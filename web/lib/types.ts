@@ -1,6 +1,6 @@
 // Espelho dos contratos da API (src/escalista/domain). Decimal chega como string no JSON.
 
-export type Role = 'gerente' | 'dp' | 'colaborador'
+export type Role = 'gestor' | 'colaborador'
 
 export interface Me {
   id: string

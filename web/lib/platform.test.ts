@@ -55,8 +55,9 @@ test("rótulos de status, fase e papel", () => {
   assert.equal(ruleStatusLabel("outro"), "outro");
   assert.equal(phaseLabel("published"), "Publicada");
   assert.equal(phaseLabel("nova"), "nova");
-  assert.equal(roleLabel("dp"), "DP (departamento pessoal)");
-  assert.equal(canOperateSchedule("gerente"), true);
+  assert.equal(roleLabel("gestor"), "Gestor");
+  assert.equal(roleLabel("gerente"), "gerente"); // DEC-044: papel antigo sem alias
+  assert.equal(canOperateSchedule("gestor"), true);
   assert.equal(canOperateSchedule("colaborador"), false);
 });
 
@@ -100,7 +101,7 @@ test("cartão de exceção vira o formato do componente", () => {
     code: "RX-12",
     title: "Sem solução dentro das regras",
     reason: "Não há combinação válida.",
-    decider: "gerente",
+    decider: "gestor",
     deadline: "2027-01-11T10:00:00",
     evidence: ["loja L1"],
     options: [
@@ -114,7 +115,7 @@ test("cartão de exceção vira o formato do componente", () => {
   const view = toExceptionView(card);
   assert.equal(view.chip, "RX-12 · precisa de você");
   assert.equal(view.time, "prazo 11/01/2027 10:00:00");
-  assert.equal(view.decider, "Gerente");
+  assert.equal(view.decider, "Gestor");
   assert.deepEqual(view.options, [
     { label: "Cobrir com hora extra", value: "+2 h extras" },
     { label: "Deixar descoberto", value: null },

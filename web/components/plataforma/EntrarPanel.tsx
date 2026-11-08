@@ -40,7 +40,7 @@ export function EntrarPanel() {
         <h1 className="text-[32px] font-semibold leading-[1.1] tracking-[-0.035em]">Entre na demonstração do Remane</h1>
         <p className="text-lg leading-normal text-ink-muted">
           O Pat, o agente do Remane, lê a escala da semana, confere as regras, mostra o antes e o depois com custo medido e só publica
-          depois que o gerente aprova.
+          depois que o gestor aprova.
         </p>
         <p className="text-[15px] leading-relaxed text-ink-muted">
           Tudo aqui usa dados sintéticos, gerados pelo time, e regras fictícias onde a convenção e a política da empresa seriam aplicadas.
@@ -58,7 +58,7 @@ export function EntrarPanel() {
               <p className="text-sm text-ink-muted">{blurb}</p>
             </div>
             <Button
-              variant={role === "gerente" ? "primary" : "secondary"}
+              variant={role === "gestor" ? "primary" : "secondary"}
               className="shrink-0"
               disabled={busy !== null}
               aria-busy={busy === role}

@@ -26,8 +26,8 @@ def _version(*, run_id: str = RUN, violations: int = 0, status: str = "draft") -
                            input_hash="abc", seed=42, violations_total=violations, created_at=NOW)  # fmt: skip
 
 
-def _approval(*, version_id: str = VERSION, role: Role = Role.GERENTE) -> Approval:
-    return Approval(id="apr-1", version_id=version_id, approved_by="demo-gerente", role=role, at=NOW)
+def _approval(*, version_id: str = VERSION, role: Role = Role.GESTOR) -> Approval:
+    return Approval(id="apr-1", version_id=version_id, approved_by="demo-gestor", role=role, at=NOW)
 
 
 @pytest.fixture
@@ -92,13 +92,12 @@ def test_publish_reads_the_approval_in_the_tool_not_from_the_caller(repo: InMemo
 @pytest.mark.parametrize(
     ("setup", "fragment"),
     [
-        (lambda r: r.record_approval(_approval(role=Role.DP)), "papel"),
         (lambda r: r.record_approval(_approval(role=Role.COLABORADOR)), "papel"),
         (lambda r: (r.save_version(_version(run_id="outra")), r.record_approval(_approval())), "outra execução"),
         (lambda r: (r.save_version(_version(violations=3)), r.record_approval(_approval())), "violaç"),
         (lambda r: (r.save_version(_version(status="published")), r.record_approval(_approval())), "já publicada"),
     ],
-    ids=["dp", "colaborador", "outra-execucao", "com-violacoes", "ja-publicada"],
+    ids=["colaborador", "outra-execucao", "com-violacoes", "ja-publicada"],
 )
 def test_publish_refusals(repo, tracer, sink, setup, fragment) -> None:
     setup(repo)

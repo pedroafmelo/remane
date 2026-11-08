@@ -60,7 +60,7 @@ def make_client(tmp_path, agent: SliceAgent | None = None) -> tuple[TestClient, 
     app.dependency_overrides[get_agent] = lambda: agent
     app.dependency_overrides[get_demo_files_dir] = lambda: demo_dir
     client = TestClient(app)
-    assert client.post("/auth/demo/gerente").status_code == 200
+    assert client.post("/auth/demo/gestor").status_code == 200
     return client, agent
 
 
@@ -137,7 +137,7 @@ def test_approval_records_session_account_and_role(tmp_path):
     client.post(f"/api/runs/{run_id}/confirm")
     client.post(f"/api/runs/{run_id}/approve")
     approval = next(iter(agent._approvals.values()))
-    assert approval.approved_by == "demo-gerente" and approval.role == "gerente"
+    assert approval.approved_by == "demo-gestor" and approval.role == "gestor"
     assert approval.version_id == agent.get_run(run_id).version_id
 
 

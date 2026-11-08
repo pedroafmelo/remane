@@ -1,4 +1,4 @@
-"""Fusão das camadas: "a política só restringe"; conflito → mais restritiva provisória + exceção ao DP (RX-01)."""
+"""Fusão das camadas: "a política só restringe"; conflito → mais restritiva provisória + exceção ao gestor (RX-01)."""
 
 from datetime import date
 
@@ -77,7 +77,7 @@ regras:
     assert sorted(card.provisional) == ["adicional_hora_extra", "interjornada_min", "jornada_semanal_max"]
 
     assert len(card.exceptions) == 3
-    assert all(e.decider is Role.DP and e.code == "RX-01" for e in card.exceptions)
+    assert all(e.decider is Role.GESTOR and e.code == "RX-01" for e in card.exceptions)
     weekly_exc = next(e for e in card.exceptions if "jornada_semanal_max" in e.title)
     evidence = " | ".join(weekly_exc.evidence)
     assert "POL-semana" in evidence and "LEI-semana" in evidence

@@ -24,7 +24,7 @@ from sqlalchemy.pool import StaticPool
 from escalista.agents.optimizer.tools import PUBLISHER_ROLES, publicar
 from escalista.api.accounts import SEEDED_ACCOUNTS
 from escalista.api.app import create_app
-from escalista.api.routes_runs import gerente
+from escalista.api.routes_runs import gestor
 from escalista.api.wiring import build_agent
 from escalista.config import Settings
 from escalista.domain.contracts import Role
@@ -107,7 +107,7 @@ def make_stack(*, llm_fail: bool = False) -> Stack:
     )
     app = create_app(settings, agent=agent)
     stack = Stack(TestClient(app), engine, app)
-    assert stack.call("POST", "/auth/demo/gerente").status_code == 200
+    assert stack.call("POST", "/auth/demo/gestor").status_code == 200
     return stack
 
 
@@ -201,11 +201,11 @@ def test_publish_refused_for_wrong_role_returns_403_and_traces_the_refusal(rx12:
     dependência de acesso; `publicar` relê a aprovação gravada no SQL e recusa."""
     stack = rx12.stack
     colaborador = next(a for a in SEEDED_ACCOUNTS if a.role is Role.COLABORADOR)
-    stack.app.dependency_overrides[gerente] = lambda: colaborador
+    stack.app.dependency_overrides[gestor] = lambda: colaborador
     try:
         response = stack.call("POST", f"/api/runs/{rx12.run_id}/approve")
     finally:
-        del stack.app.dependency_overrides[gerente]
+        del stack.app.dependency_overrides[gestor]
 
     assert response.status_code == 403, response.text
     assert "colaborador" in response.json()["detail"]
@@ -287,7 +287,7 @@ def test_defect_csv_raises_rx13_with_the_lines(clean_env) -> None:
 
 def test_llm_failure_shows_rx12_and_no_justification_text(rx12: Flow) -> None:
     confirmed = rx12.confirmed
-    assert confirmed["phase"] == "awaiting_approval"  # a escala é válida e o gerente ainda decide
+    assert confirmed["phase"] == "awaiting_approval"  # a escala é válida e o gestor ainda decide
     assert confirmed["exception"]["code"] == "RX-12"
     assert confirmed["justification"] is None
     assert confirmed["report"]["total"] == 0

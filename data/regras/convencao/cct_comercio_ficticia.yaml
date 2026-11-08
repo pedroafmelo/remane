@@ -89,7 +89,7 @@ regras:
         A partir de 2026-12-16 a cláusula conflita com a EC 141 (art. 7º, XV: 2 dias por semana; art. 3º: cláusulas
         incompatíveis ficam sem efeito). 1 dia por semana mais 1 por quinzena dá 3 em 2 semanas, menos que 2 por
         semana, e a CCT não prevê o regime compensatório do art. 7º, § 2º. O agente aplica a regra mais restritiva
-        (2 dias, ec141.yaml: repouso_semanal) de forma provisória e abre RX-01 ao DP.
+        (2 dias, ec141.yaml: repouso_semanal) de forma provisória e abre RX-01 ao gestor.
 
   - id: cct_folgas_dominicais
     texto: >
@@ -100,7 +100,7 @@ regras:
     demo:
       plantado: RX-11
       esperado: >
-        "Forma equilibrada" não diz frequência nem critério. A regra fica pendente e vai ao DP (RX-11). Enquanto
+        "Forma equilibrada" não diz frequência nem critério. A regra fica pendente e vai ao gestor (RX-11). Enquanto
         isso, valem as regras de lei: domingo a cada 3 semanas no comércio (clt.yaml: domingo_comercio) e a cada
         2 semanas para empregadas (clt.yaml: domingo_mulher, DEC-023).
 

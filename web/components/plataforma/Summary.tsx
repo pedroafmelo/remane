@@ -4,7 +4,7 @@ import { Button } from "../Button";
 import { ImpactStat } from "../ImpactStat";
 import { Card, DataTable, Muted, cellCls } from "./ui";
 
-/** Resumo da leitura (RF-23): o gerente confere antes de confirmar. */
+/** Resumo da leitura (RF-23): o gestor confere antes de confirmar. */
 export function SummaryPanel({ summary, canConfirm, busy, onConfirm }: { summary: ReadSummary; canConfirm: boolean; busy: boolean; onConfirm: () => void }) {
   return (
     <Card title="Resumo da leitura" id="resumo" aside={summary.file_name}>

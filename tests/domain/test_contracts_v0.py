@@ -30,7 +30,11 @@ def fields(model):
 
 
 def test_role_values():
-    assert {r.value for r in Role} == {"gerente", "dp", "colaborador"}
+    """DEC-044: só dois papéis, sem alias dos antigos (`gerente`, `dp`)."""
+    assert [r.value for r in Role] == ["gestor", "colaborador"]
+    for old in ("gerente", "dp"):
+        with pytest.raises(ValueError):
+            Role(old)
 
 
 def test_trace_event_fields():

@@ -3,7 +3,7 @@
 Regra de fusão ("a política só restringe", data/regras/README.md): a ordem é lei > convenção > política. Para
 cada primitiva da fatia, entre as regras vigentes na data de referência, vale a mais restritiva (ver `PRIMITIVES`);
 no empate, fica a camada mais alta. Se uma camada mais baixa for **mais frouxa** que uma mais alta, a regra mais
-restritiva entra **provisoriamente**: o id vai para `RuleCard.provisional` e abre-se um `ExceptionCard` RX-01 ao DP,
+restritiva entra **provisoriamente**: o id vai para `RuleCard.provisional` e abre-se um `ExceptionCard` RX-01 ao gestor,
 com as duas fontes na evidência. Regras `info` não se fundem: todas as vigentes seguem no cartão.
 """
 
@@ -108,9 +108,9 @@ def _conflict_card(applied: Rule, looser: Rule, stricter: Rule) -> ExceptionCard
         title=f"Conflito entre camadas em {applied.id}",
         reason=(
             f"A camada {looser.layer.value} é mais frouxa que a {stricter.layer.value} em {applied.id}. "
-            "A regra mais restritiva foi aplicada de forma provisória até o DP decidir."
+            "A regra mais restritiva foi aplicada de forma provisória até o gestor decidir."
         ),
-        decider=Role.DP,
+        decider=Role.GESTOR,
         evidence=[_describe(looser), _describe(stricter), f"aplicada (provisória): {_describe(applied)}"],
         recommendation=f"Manter a mais restritiva ({_describe(applied)}) e corrigir a camada {looser.layer.value}.",
         if_no_answer="A regra mais restritiva segue aplicada como provisória.",
