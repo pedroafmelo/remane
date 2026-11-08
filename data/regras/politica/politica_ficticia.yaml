@@ -104,7 +104,8 @@ regras:
     nota: "Prazo de cada exceção em excecoes_demo. Vencido o prazo, escala ao próximo da cadeia (hoje só o gestor: vencido, vale sem_decisor)."
     status: interpretacao
 
-# As 3 exceções da demo (Q6 de requisitos.md). Campos espelham ExceptionCard (src/escalista/domain/contracts.py):
+# As exceções da demo (as 3 de Q6 de requisitos.md, mais RX-06 e RX-09 da C7).
+# Campos espelham ExceptionCard (src/escalista/domain/contracts.py):
 #   code, titulo -> title, motivo -> reason, decisor -> decider, prazo_min -> deadline, opcoes -> options
 #   (rotulo -> label, efeito -> effect, custo_base -> como o código calcula cost_usd), recomendacao -> recommendation,
 #   sem_resposta -> if_no_answer.
@@ -171,4 +172,52 @@ excecoes_demo:
     sem_resposta: "O abono segue provisório, e o agente lembra o gestor no dia seguinte. Nunca há recusa automática."
     acao: escalar
     fonte: "Política fictícia, item 14"
+    status: interpretacao
+
+  # RX-06 e RX-09: FICTÍCIAS, proposta do agente (C7), a confirmar com o autor da política (Pedro Veloso).
+  # Escritas por Claude em 2026-11-08 (plano da C7, seção 8). Mesmo formato das anteriores.
+  - code: RX-06
+    proposta: true
+    titulo: "Ninguém aceitou o turno no prazo"
+    motivo: "Os colegas elegíveis não aceitaram a oferta do turno dentro do prazo da política."
+    gatilho: pol_oferta_turno
+    decisor: gestor
+    prazo_min: 30
+    opcoes:
+      - rotulo: "Hora extra de um colega da mesma loja"
+        efeito: "O colega com menor saldo de banco de horas e dentro de pol_hora_extra cobre o turno."
+        custo_base: hora_extra               # horas x valor-hora x (1 + cct_adicional_hora_extra)
+      - rotulo: "Remanejar de outra loja"
+        efeito: "Um colega de outra loja, sem hora extra, cobre o turno."
+        custo_base: remanejamento            # pol_prazos_e_escalada.remanejamento_ajuda_deslocamento_brl
+      - rotulo: "Deixar o turno descoberto"
+        efeito: "A cobertura cai na faixa do turno; fica registrado no painel."
+        custo_base: nenhum
+    recomendacao: "A opção de menor custo que mantém a cobertura; empate: remanejar, para não gerar hora extra."
+    sem_resposta: "O turno fica descoberto e registrado no painel."
+    acao: escalar
+    fonte: "Política fictícia, proposta do agente (C7), a confirmar com o autor da política"
+    status: interpretacao
+
+  - code: RX-09
+    proposta: true
+    titulo: "Colaborador não respondeu sobre a falta ou o atraso"
+    motivo: "O ponto não registrou a entrada e o colaborador não respondeu à pergunta do agente no prazo."
+    gatilho: pol_atraso
+    decisor: gestor
+    prazo_min: 30
+    opcoes:
+      - rotulo: "Tratar como falta e buscar cobertura"
+        efeito: "O agente abre o replanejamento e oferece o turno ao próximo colega elegível."
+        custo_base: nenhum
+      - rotulo: "Aguardar mais 15 min"
+        efeito: "O agente pergunta de novo e espera mais 15 min."
+        custo_base: nenhum
+      - rotulo: "Registrar o atraso sem cobertura"
+        efeito: "Fica registrado; a escala não muda."
+        custo_base: nenhum
+    recomendacao: "Tratar como falta e buscar cobertura."
+    sem_resposta: "O turno fica descoberto e registrado."
+    acao: escalar
+    fonte: "Política fictícia, proposta do agente (C7), a confirmar com o autor da política"
     status: interpretacao
