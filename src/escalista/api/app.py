@@ -9,6 +9,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy import text
 
 from escalista.api.auth import install_auth
+from escalista.api.excecoes import ExceptionDesk, build_desk, install_excecoes
 from escalista.api.routes_insights import install_insights
 from escalista.api.routes_runs import install_runs
 from escalista.api.wiring import DEFAULT_DEMO_FILES_DIR, SliceAgent, build_agent
@@ -18,7 +19,9 @@ from escalista.db import init_db, make_engine
 log = logging.getLogger("escalista")
 
 
-def create_app(settings: Settings | None = None, *, agent: SliceAgent | None = None) -> FastAPI:
+def create_app(
+    settings: Settings | None = None, *, agent: SliceAgent | None = None, desk: ExceptionDesk | None = None
+) -> FastAPI:
     settings = settings or Settings()
     engine = make_engine(settings.database_url)
     init_db(engine)
@@ -29,6 +32,7 @@ def create_app(settings: Settings | None = None, *, agent: SliceAgent | None = N
     app.state.engine = engine
     app.state.agent = agent or build_agent(settings, engine=engine)
     app.state.demo_files_dir = DEFAULT_DEMO_FILES_DIR
+    app.state.desk = desk or build_desk(settings, engine)
 
     @app.get("/health")
     def health() -> dict:
@@ -38,6 +42,7 @@ def create_app(settings: Settings | None = None, *, agent: SliceAgent | None = N
 
     install_auth(app, settings)  # antes da SPA: o fallback `/{path}` não pode engolir `/api/me`
     install_runs(app)
+    install_excecoes(app)
     install_insights(app, settings)
     _serve_spa(app, Path(settings.web_dist_dir))
     return app

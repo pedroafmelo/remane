@@ -26,6 +26,7 @@ from escalista.api.routes_insights import get_simulator
 from escalista.api.wiring import get_agent, get_demo_files_dir
 from escalista.config import Settings
 from escalista.domain.contracts import Role
+from tests.api.published_seed import seed_published
 from tests.api.test_insights import tiny_simulator
 
 SENTINEL = "rc_SENTINELA_NAO_VAZAR"
@@ -47,6 +48,7 @@ class Route:
 
 
 GESTOR = frozenset({Role.GESTOR})
+COLABORADOR = frozenset({Role.COLABORADOR})
 CSV_OK = b"# SINTETICO - dados ficticios\nfuncionario,loja,dia,inicio,fim\nE01,L01,2027-01-11,08:00,16:00\n"
 CONFIRM, APPROVE = SEEDED_AWAITING_CONFIRM, SEEDED_AWAITING_APPROVAL
 
@@ -66,6 +68,16 @@ ROUTES: list[Route] = [
     Route("GET", "/api/runs/{run_id}/trace", GESTOR, url=f"/api/runs/{APPROVE}/trace"),
     Route("GET", "/api/schedules/published", GESTOR),
     Route("GET", "/api/demo/files/{name}", GESTOR, url="/api/demo/files/escala_atual.csv"),
+    Route("GET", "/api/exceptions", GESTOR),
+    Route(
+        "POST",
+        "/api/exceptions/{item_id}/decide",
+        GESTOR,
+        url="/api/exceptions/rx01-1/decide",
+        request={"json": {"option_index": 0}},
+    ),
+    Route("GET", "/api/colaborador/escala", COLABORADOR),
+    Route("POST", "/api/colaborador/falta", COLABORADOR, request={"json": {"day": "2027-01-13"}}),
     Route("GET", "/api/rules", GESTOR),
     Route("POST", "/api/simulate/vigencia", GESTOR),
     Route("GET", "/api/impact", GESTOR),
@@ -91,6 +103,7 @@ def make_client(tmp_path, *, demo_mode: bool = True, secret: str | None = f"{SEN
     )
     agent = FakeSliceAgent.with_seeded_runs()
     app = create_app(settings, agent=agent)
+    seed_published(app.state.engine)  # escala publicada sintética, para as rotas do colaborador
     demo_dir = tmp_path / "demo"
     demo_dir.mkdir(exist_ok=True)
     (demo_dir / "escala_atual.csv").write_bytes(CSV_OK)
