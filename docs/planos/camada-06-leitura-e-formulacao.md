@@ -673,7 +673,7 @@ reconciliada **não foi aberta**); (2) o teste à mão com a chave e o modelo re
 `llm.formulate` **seguem não medidos**; é do usuário); (3) o deploy no Railway (volume com linhas antigas, `/health` e login na URL pública), que só existe depois do merge;
 (4) o G3 da C6 à mão; (5) o efeito do PR #16.
 
-**Segundo merge: PR #20 do time (`29fcbfd`, "textos das regras sem referências internas"), commit `eec0d53`, 08:15 a ~08:25.** O `main` mudou depois do primeiro merge e o PR passou a
+**Segundo merge: PR #20 do time (`29fcbfd`, "textos das regras sem referências internas"), commit `eec0d53`, 08:13 a 08:17.** O `main` mudou depois do primeiro merge e o PR passou a
 conflitar em 5 arquivos. Resolução: `data/regras/politica/autorizacao_hora_extra.yaml` e `politica_ficticia.yaml`, os textos do time (inclusive o id novo
 `hora_extra_autorizacao_previa`, que a tela de Regras mostra); `data/regras/README.md` e o docstring de `solver/model.py`, a redação da DEC-044 (gestor; o lado do time ainda dizia "DP")
 com o id novo; `docs/estado-do-projeto.md`, união em ordem de hora. Os gates rodaram de novo com o merge no índice: pytest **1.313 passados** (107 s), E1 10/10, E2 16/16
