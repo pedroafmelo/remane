@@ -29,7 +29,14 @@ from escalista.domain.spec import (
 )
 from escalista.rules.spec import card_with_spec, default_spec
 from escalista.solver.model import ModelStats, input_hash, solve
-from tests.solver.test_model import DEMO, MONDAY, _violations, card, demand_block, emp, request
+from tests.solver.test_model import DEMO, MONDAY, _violations, card, demand_block, request
+from tests.solver.test_model import emp as _emp
+
+
+def emp(id_: str, store: str = "S1", wage: str = "10.00") -> Employee:
+    """Horista (sem carga de contrato): estes testes medem a spec, não o piso do contrato (ver test_contract_floor)."""
+    return _emp(id_, store, wage, contract_hours=0)
+
 
 STORE = Store(id="S1", name="Loja teste", opens=time(8), closes=time(22))
 EV = "pedido do gestor"
@@ -76,8 +83,12 @@ def _person_violations(sched: Schedule, rc: RuleCard) -> list[str]:
 # spec=None: nada muda --------------------------------------------------------------------------------------------
 
 
-def _pinned_request() -> SolveRequest:
-    employees = [emp("E1"), emp("E2", wage="11.00"), emp("E3", wage="12.00")]
+def _pinned_request(contract_hours: int = 0) -> SolveRequest:
+    employees = [
+        _emp("E1", contract_hours=contract_hours),
+        _emp("E2", wage="11.00", contract_hours=contract_hours),
+        _emp("E3", wage="12.00", contract_hours=contract_hours),
+    ]
     demand = demand_block("S1", MONDAY, time(8), time(20), 2) + demand_block(
         "S1", MONDAY + timedelta(days=2), time(10), time(22), 1
     )
@@ -86,9 +97,10 @@ def _pinned_request() -> SolveRequest:
 
 def test_spec_none_keeps_hash_and_schedule_of_c5():
     # Hash e escala gravados com o solver da C5 (antes da A5), mesma fixture, seed 3, 1 thread.
+    # O hash é o da fixture da C5 (contrato de 42 h); a escala, a de horistas: com contrato, o piso a muda por desenho.
+    assert input_hash(_pinned_request(42)) == "3a6a7c90990c48c0f8c544ca5e74313dcc46414886b8a1293df204609f83cce0"
     result = solve(_pinned_request())
 
-    assert result.input_hash == "3a6a7c90990c48c0f8c544ca5e74313dcc46414886b8a1293df204609f83cce0"
     d0, d2 = MONDAY, MONDAY + timedelta(days=2)
     at = datetime.combine
     assert trio(result.schedule.shifts) == [

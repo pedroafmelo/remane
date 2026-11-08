@@ -201,7 +201,10 @@ def test_regression_before_cost_of_the_example(cadastro, example):
 
 @pytest.mark.slow
 def test_regression_after_cost_of_the_example(cadastro, example):
-    """O "depois" (solver, seed 42, 1 thread, como no E1) com o quadro casado repete R$ 20.014,00.
+    """O "depois" (solver, seed 42, 1 thread, como no E1) com o quadro casado repete R$ 28.456,00.
+
+    Com o piso da carga do contrato (PR #16), as 60 pessoas de 44 h de contrato trabalham mín(44 h, 5 dias × 8 h) =
+    40 h: custo = Σ salário-hora × 40 h = R$ 28.456,00 (antes do piso, R$ 20.014,00, com 2 pessoas em 0 h).
 
     Ótimo provado: custo exato e 0 violações. Se a máquina carregada estourar o limite de tempo (status `feasible` ou
     `timeout`), a solução viável ainda precisa ter 0 violações e custo até 0,5% acima do ótimo.
@@ -222,7 +225,7 @@ def test_regression_after_cost_of_the_example(cadastro, example):
     )
     assert solved.schedule is not None
     after = compute_metrics(solved.schedule, result.employees, demand, card, verify(solved.schedule, card).total)
-    optimal_cost = Decimal("20014.00")
+    optimal_cost = Decimal("28456.00")  # Σ salário-hora × 40 h; ver docstring
     detail = f"status={solved.status}, custo={after.total_cost}, violações={after.violations}"
     assert after.violations == 0, detail
     if solved.status == "optimal":

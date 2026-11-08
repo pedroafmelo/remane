@@ -7,6 +7,9 @@ Modelo, por loja (as lojas são independentes, porque a pessoa só trabalha na p
 - **Restrições duras (4 primitivas do cartão):** horas na semana ≤ `jornada_semanal_max`; horas no dia ≤
   `jornada_diaria_max` (o catálogo já respeita, e a restrição explícita fica de garantia); entre turnos de dias
   consecutivos, descanso ≥ `interjornada_min`; dias sem turno ≥ `repouso_semanal`. O solver **não escala hora extra**.
+- **Carga do contrato:** horas na semana ≥ mín(`contract_hours`, o que a lei permite com o repouso e a jornada
+  diária), porque o mensalista recebe a carga contratada trabalhando ou não; sem isso, a "economia" contava salário
+  que continua sendo pago.
 - **Cobertura com penalidade** (não é restrição dura): `falta[faixa] ≥ pedidas − cobertas`. Objetivo, em inteiros
   (centavos × minutos): Σ turno × minutos × salário-hora em centavos + `PENALTY_WAGE_HOURS` × 60 × maior salário em
   centavos × Σ falta. Uma faixa a menos sem gente vale mais que 100 horas de salário: cobrir vem antes de economizar.
@@ -123,6 +126,9 @@ class ModelStats:
     solver_wall_s: dict[str, float] = field(default_factory=dict)  # só o CP-SAT, sem montar o modelo
     preferences_met: int = 0  # preferências suaves da spec atendidas na escala devolvida
     preferences_total: int = 0
+    # pessoa → piso de minutos aplicado, quando ficou abaixo da carga do contrato (regras da pessoa ou do cartão)
+    contract_floor_reduced: dict[str, int] = field(default_factory=dict)
+    contract_floor_dropped: list[str] = field(default_factory=list)  # lojas refeitas sem piso (piso deu inviável)
 
 
 @dataclass(frozen=True)
@@ -155,6 +161,22 @@ class PersonRules:
 
     def has(self, eid: str) -> bool:
         return eid in self.blocked or eid in self.weekly_cap_min
+
+
+def _contract_floor(e: Employee, catalog: list[CatalogShift], limits: Limits, person: PersonRules) -> int:
+    """Piso de minutos na semana: mín(carga do contrato, cartão, teto da pessoa, o que os dias livres comportam).
+
+    Os dias livres: em cada dia, o turno mais longo do catálogo que não cruza indisponibilidade; somam-se os
+    `7 − repouso` melhores dias. A interjornada não entra nesta conta: o piso fica a no máximo um turno por dia, e o
+    laço do solver ainda tem a garantia de `solve` (loja inviável com piso é refeita sem piso).
+    """
+    best = sorted(
+        (max((k.duration_min for k in catalog if not person.is_blocked(e.id, d, k)), default=0) for d in range(DAYS)),
+        reverse=True,
+    )
+    by_days = sum(min(m, limits.daily_min) for m in best[: max(DAYS - limits.rest_days, 0)])
+    cap = person.weekly_cap_min.get(e.id, limits.weekly_min)
+    return max(min(e.contract_hours * 60, limits.per_person_week_min, cap, by_days), 0)
 
 
 def _hhmm_min(value: object, default: int) -> int:
@@ -217,6 +239,7 @@ def _solve_store(
     hint: list[Shift],
     stats: ModelStats,
     person: PersonRules,
+    floors: bool = True,
 ) -> StoreOutcome:
     catalog = build_catalog(store.opens, store.closes, limits.daily_min)
     stats.catalog_size[store.id] = len(catalog)
@@ -244,6 +267,13 @@ def _solve_store(
         model.add(week_minutes[e.id] <= limits.weekly_min)
         if e.id in person.weekly_cap_min:
             model.add(week_minutes[e.id] <= person.weekly_cap_min[e.id])
+        # Carga do contrato: o mensalista recebe por ela trabalhando ou não, então a escala a cumpre, até o que o
+        # cartão e as regras da pessoa (indisponível, teto semanal) permitem. O piso nunca torna o modelo inviável.
+        floor = _contract_floor(e, catalog, limits, person) if floors else 0
+        if floors and floor < e.contract_hours * 60:
+            stats.contract_floor_reduced[e.id] = floor
+        if floor > 0:
+            model.add(week_minutes[e.id] >= floor)
         # Interjornada: turno do dia d que termina em `end` conflita com o do dia d+1 que começa antes de
         # end + descanso − 24h. Para cada fim possível, "termina em ≥ end" + "começa cedo demais" ≤ 1.
         for d in range(DAYS - 1):
@@ -260,10 +290,11 @@ def _solve_store(
     # Quem tem algo próprio deixa de ser intercambiável: fica fora da quebra de simetria.
     own = {e.id for e in employees if person.has(e.id)} | {eid for eid, _, _ in prefs} | {eid for eid, _ in stable}
 
-    by_wage: dict[Decimal, list[str]] = defaultdict(list)
+    # Mesmo salário e mesma carga de contrato: só aí trocar as semanas de duas pessoas não muda custo nem regras.
+    by_wage: dict[tuple[Decimal, int], list[str]] = defaultdict(list)
     for e in employees:
         if e.id not in own:
-            by_wage[e.hourly_wage].append(e.id)
+            by_wage[e.hourly_wage, e.contract_hours].append(e.id)
     for ids in by_wage.values():
         for a, b in zip(ids, ids[1:], strict=False):
             model.add(week_minutes[a] >= week_minutes[b])
@@ -436,7 +467,7 @@ def solve(req: SolveRequest, stats: ModelStats | None = None) -> SolveResult:
     shifts: list[Shift] = []
     for i, store in enumerate(stores):
         budget = max(deadline - wallclock.perf_counter(), 0.0) / (len(stores) - i)
-        outcome = _solve_store(
+        args = (
             store,
             [e for e in employees if e.store_id == store.id],
             [d for d in demand if d.store_id == store.id],
@@ -447,6 +478,10 @@ def solve(req: SolveRequest, stats: ModelStats | None = None) -> SolveResult:
             stats,
             person,
         )
+        outcome = _solve_store(*args)
+        if outcome.status == "infeasible":  # o piso do contrato nunca derruba a execução: refaz a loja sem ele
+            stats.contract_floor_dropped.append(store.id)
+            outcome = _solve_store(*args, floors=False)
         statuses.append(outcome.status)
         shifts += outcome.shifts
 
