@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -80,6 +81,26 @@ def justify(
         validate=check_refs,
         what="justificativa",
     )
+
+
+def make_justifier(client: LLMClient) -> Callable[..., Justification]:
+    """Liga `justify` a um cliente com a assinatura que o agente de otimização recebe injetada (`Justifier` em
+    `agents/optimizer/tools.py`): só tipos do domínio, sem `JustifyFacts`, que é desta borda."""
+
+    def run(
+        *,
+        card: RuleCard,
+        comparison: Comparison,
+        report: ViolationReport,
+        status: str,
+        uncovered: list[DemandSlot],
+        run_id: str,
+        parent_id: str | None = None,
+    ) -> Justification:
+        facts = JustifyFacts(comparison=comparison, report=report, status=status, uncovered=list(uncovered))
+        return justify(client, card=card, facts=facts, run_id=run_id, parent_id=parent_id)
+
+    return run
 
 
 def build_messages(card: RuleCard, facts: JustifyFacts) -> list[LLMMessage]:

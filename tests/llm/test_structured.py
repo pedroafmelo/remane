@@ -10,7 +10,7 @@ from escalista.domain.contracts import LLMResult, LLMUnavailableError
 from escalista.domain.results import Comparison, Justification, ScheduleMetrics, Violation, ViolationReport
 from escalista.domain.rules import Rule, RuleCard, RuleLayer, RuleStatus
 from escalista.domain.schedule import DemandSlot
-from escalista.llm.prompts.justify import KIND, TOOL_NAME, JustifyFacts, justify
+from escalista.llm.prompts.justify import KIND, TOOL_NAME, JustifyFacts, build_messages, justify, make_justifier
 from escalista.llm.structured import MAX_RESENDS, call_structured, tool_schema_for
 from tests.fakes import FakeLLMClient
 
@@ -211,3 +211,22 @@ def test_call_structured_is_generic() -> None:
     client = FakeLLMClient([result({"n": "abc"}), result({"n": 3})])
     assert call_structured(client, Answer, messages=[], run_id="r").n == 3
     assert len(client.calls) == 2
+
+
+def test_make_justifier_takes_domain_types_and_builds_the_same_prompt() -> None:
+    client = FakeLLMClient([result(GOOD)])
+    run_justify = make_justifier(client)
+
+    out = run_justify(
+        card=CARD,
+        comparison=FACTS.comparison,
+        report=FACTS.report,
+        status=FACTS.status,
+        uncovered=FACTS.uncovered,
+        run_id="r1",
+        parent_id="p1",
+    )
+
+    assert out == Justification.model_validate(GOOD)
+    assert client.calls[0]["messages"] == build_messages(CARD, FACTS)
+    assert (client.calls[0]["run_id"], client.calls[0]["parent_id"]) == ("r1", "p1")
