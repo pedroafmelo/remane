@@ -96,6 +96,9 @@ export function attestationLabel(c: CaseView): string | null {
       const dias = days === 1 ? "1 dia" : `${days} dias`;
       return `atestado lido: válido, ${dias}; abono provisório até o gestor confirmar`;
     }
+    if (r.verdict === "ilegivel") {
+      return "não reconheci um atestado neste arquivo (outro tipo de documento ou ilegível); o gestor vai conferir";
+    }
     return "atestado com pendência; o gestor vai conferir";
   }
   if (c.abono === "provisorio") return "anexo recebido; leitura indisponível; abono provisório";
