@@ -1,6 +1,6 @@
 # Plano da C7 · Acompanhamento de escala (FT-03): passivo, oferta ao colega e gatilhos ativos
 
-Última atualização: 2026-11-08 09:31 (Recife) · Situação: **aprovado pelo usuário às 09:22 (pedido de execução); em execução** (DECs gravadas como [DEC-057](../decisoes.md) a [DEC-066](../decisoes.md)). Antes: 09:24, contrato v1.1 incorporado · Planejado por Claude (Opus 5.5)
+Última atualização: 2026-11-08 09:31 (Recife) · Situação: **aprovado pelo usuário às 09:22; M1 (10:10, `c7/m1`) e M2 (10:16, `c7/integra`) prontos para o merge do usuário; T2 não começou** (DECs gravadas como [DEC-057](../decisoes.md) a [DEC-066](../decisoes.md)). Antes: 09:24, contrato v1.1 incorporado · Planejado por Claude (Opus 5.5)
 numa sessão só de planejamento (worktree `cc61-plan-acomp`, branch `plan/acompanhamento`, a partir de `origin/main` `b6f4a01`): sem
 código, sem `uv add`, sem commit. As DECs propostas (seção 16) **não foram gravadas** em [decisoes.md](../decisoes.md) nem no
 [estado](../estado-do-projeto.md): outras sessões editam esses arquivos ao mesmo tempo.
@@ -579,3 +579,7 @@ diff, donos, testes e ruff de cada entrega, fez o rebase e integrou em `c7/integ
 
 - **10:01 a 10:04:** merge de `origin/main` (`e17996b`, logo novo da DEC-056) → `527d001`; 1 conflito em `decisoes.md` (número da DEC-056), DECs da C7 renumeradas para 057 a 066, DEC-067 nova.
 - **M1 (10:10), gates em `c7/integra`:** `uv run pytest -q` 1664 passed (1min58; 1665 com a D4); ruff check e format 0; E2E fatia + C6 20 passed; E1 10/10; E2 16/16 sem modelo; `synth acompanhamento` sem diff; web typecheck, lint, test (60) e build 0; `docker build` 0 e `/health` ok na imagem (`demo_mode: true`). **Não verificado:** navegador, link público, modelo real.
+- **10:09 · D3** (`f77b8d9`, com `9877f1c`): teste de vazamento RN-06, 40 superfícies por rodada (9 tabelas, bytes do arquivo SQLite, eventos `track.*`, log em DEBUG, stdout/stderr, 25 respostas HTTP, mensagens ao modelo), 0 achados; o teste falha se o `strip_cid` sair. **Correção na origem:** o motivo de reenvio do `call_structured` repetia ao modelo um nome de campo extra com cara de CID; agora mostra "(campo fora do schema)".
+- **10:12 · C3b** (`6516264`): `GET /api/runs/track-<case_id>/trace` (só gestor) e "Ver rastro do caso" na fila, com "tempo simulado", tokens e "não medido" quando não há custo.
+- **10:12 a 10:15 · merge de `origin/main` `a2f6536`** (só docs: link novo e pitch) → `4815b31`. **M2, gates:** `uv run pytest -q` 1674 passed (1min37, antes do merge só de docs); ruff 0/0; `tests/privacy` + `tests/e2e` 25 passed; E1 10/10; E2 16/16; `synth` sem diff; web typecheck, lint, test (61), build 0; `docker build` 0, `/health` ok, login de gestor 200 e `/api/demo/clock` = 13:55 simulado na imagem. **Não verificado:** navegador, link público, modelo real (custo e latência de `track.llm.read_atestado` não medidos).
+- **Cortado / não feito:** T2 inteiro (foto, RF-27, conversa livre, confirmar abono) e T3; `/sync-docs` não rodou (audita o checkout principal, defasado e intocável nesta execução).
