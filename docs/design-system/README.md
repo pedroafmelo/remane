@@ -72,7 +72,7 @@ O fundo do hero e das seções de destaque é um degradê de três manchas radia
 |---|---|
 | Painel em degradê | `background-position` em 14s, `ease-in-out`, alternado, infinito |
 | Turno remanejado | entra com escala .86 → 1.04 → 1 em 400ms, depois fica parado |
-| Bloco do símbolo | desliza 6px para cima e para a direita, 4s em loop (só no logo animado) |
+| Olhar do símbolo | pupilas vão 2,5px para a esquerda e para a direita, 6s em loop, e piscam a cada 5s (só no logo animado) |
 | Mensagens | sobem 10px com fade em 500ms, uma depois da outra (~0,9s de intervalo) |
 | Hover de botão | 160ms, `cubic-bezier(0.2, 0.8, 0.2, 1)` |
 
@@ -80,5 +80,5 @@ Sempre dentro de `@media (prefers-reduced-motion: no-preference)`.
 
 ## Logo
 
-O símbolo é a grade da semana com um bloco sendo remanejado: oito quadrados em `ink` e um em `accent`, deslocado para fora do lugar. Arquivos em Assets › Logos. Ao lado do símbolo, o nome "remane" no estilo `wordmark`. Espaço livre mínimo em volta: a largura de um quadrado.
+O símbolo é o rosto do Pat, o agente: quadrado `accent` com cantos arredondados, óculos redondos, olhos e bigode em `ink` ([DEC-056](../decisoes.md); até então era a grade da semana com um bloco remanejado). Arquivos em Assets › Logos. Ao lado do símbolo, o nome "remane" no estilo `wordmark`. Espaço livre mínimo em volta: um quarto da largura do símbolo.
 

@@ -1,6 +1,6 @@
 # Registro de decisões
 
-Última atualização: 2026-11-08 08:50. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
+Última atualização: 2026-11-08 12:38. Uma entrada por decisão, mais recente embaixo. **Nunca apague nem reescreva uma
 entrada:** se a decisão mudar, crie outra e marque a antiga como `substituída por DEC-NNN`. Use `/decisao` para registrar e
 propagar o efeito para as outras docs.
 
@@ -684,3 +684,12 @@ Formato:
 - **Decisão:** o PR #16 entra no `main` (`a45a98b`) com a revisão `review/solver-contract-hours` (`7110122` e `e95f833`). Cada pessoa trabalha **pelo menos** mín(`contract_hours`, limites do cartão, teto semanal da pessoa, dias sem indisponibilidade que comportam turno). Se uma loja ficar inviável por causa do piso, ela é resolvida de novo **sem** o piso. A quebra de simetria agrupa por (salário, contrato).
 - **Motivo:** o mensalista recebe a carga contratada trabalhando ou não, e o solver deixava pessoas em 0 h e contava o salário delas como economia. [motivo do usuário não informado além do merge]
 - **Consequências:** (1) o custo da demo passa de R$ 20.014,00 para **R$ 28.456,00** e **não varia mais com a cobertura-alvo** (todas as 60 pessoas têm 44 h de contrato); (2) a economia do exemplo cai de R$ 13.975,15 (41,1%) para R$ 5.533,15 (16,3%), e o pitch ([pitch.md](pitch.md)) usa o número menor; (3) com 1 thread, o solver da demo leva ~3,4 s (medido; referência do `main` anterior: ~9,3 s), mas num quadro misto pode chegar a ~18 s e parar em `feasible`; (4) quem não está no cadastro continua com contrato igual ao limite semanal do cartão (42 h) e é levado a 40 h: **a decisão sobre esse padrão segue em aberto** (recomendação da revisão: mín(horas no "antes", teto legal), registrado como suposição); (5) `solver/cost.py` e o verificador não mudaram, então o "depois" não conta as 240 h pagas e não trabalhadas.
+
+## DEC-056 · Logo novo: o rosto do Pat, com óculos redondos e bigode
+
+- 2026-11-08 12:38 · Decidido por: usuário da sessão ("vamos mudar a logo do projeto", depois "deixei a logo nova no repositório solta, faça a integração") · Status: aceita
+- **Contexto:** o símbolo era a grade da semana com um bloco remanejado, e o Pat ([DEC-045](#dec-045--mascote-do-agente-pat-o-bloco-remanejado-do-logo-com-dois-olhos-e-cinco-estados)) era esse bloco com dois olhos. O usuário deixou na raiz do repositório um PNG ("Ícone de Rosto com Óculos e Bigode.png"): quadrado verde com óculos redondos, olhos e bigode.
+- **Decisão (o que o usuário disse):** trocar o logo por essa arte e integrá-la ao front.
+- **Motivo: [motivo não informado].**
+- **Assumido pelo agente (o usuário não respondeu se o Pat mudava junto):** como a arte nova é o próprio Pat com óculos e bigode, o Pat passa a usar o mesmo rosto, com os cinco estados de antes (o olhar muda; "trabalhando" ganha sobrancelhas acima dos óculos e mantém o deslize com contorno tracejado; "digitando" põe os pontinhos abaixo do bigode). Isso substitui, nesse ponto, a regra da DEC-045 de não pôr rosto no Pat. A animação do logo deixa de ser o bloco deslizando (`slide`) e passa a ser o olhar indo de um lado ao outro (`logo-look`, 6 s) e piscando; `slide` continua só no Pat "trabalhando". O verde usado é o token `accent` #2BD48A, não o #21E491 do PNG.
+- **Consequências:** PNG movido para `docs/design-system/assets/logos/remane-logo-original.png` e vetorizado em `web/components/Logo.tsx` (`FACE`, `Glasses`, `Mustache`, reaproveitados por `web/components/Pat.tsx`). `web/app/icon.svg`, os SVGs de `design-system/assets/logos/` (símbolo, negativo, ícone de app, avatar do WhatsApp, folha de estados do Pat), o preview do Logo, os READMEs do design system e a seção Logo do [landing.md](landing.md) foram atualizados. Typecheck, lint, 48 testes do front e build passam; landing e `/entrar` conferidas no navegador headless. **`[PREENCHER]`:** quem fez a arte e com qual ferramenta; se foi gerada por IA, a ferramenta entra em [declaracao-ferramentas.md](declaracao-ferramentas.md).
