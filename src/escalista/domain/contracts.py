@@ -16,11 +16,15 @@ from pydantic import BaseModel, ConfigDict, Field, StrictInt
 
 
 class Role(StrEnum):
-    """Papéis de acesso. O "gestor de RH" é `[PREENCHER]` (pergunta 15 do estado)."""
+    """Papéis de acesso (DEC-044): o gestor reúne gerente e DP; o colaborador é quem trabalha na escala."""
 
-    GERENTE = "gerente"
-    DP = "dp"
+    GESTOR = "gestor"
     COLABORADOR = "colaborador"
+
+    @classmethod
+    def _missing_(cls, value: object) -> Role | None:
+        # linhas gravadas antes da DEC-044 (volume do Railway) ainda dizem "gerente" ou "dp"
+        return cls.GESTOR if value in ("gerente", "dp") else None
 
 
 class TraceEvent(BaseModel):

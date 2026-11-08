@@ -213,7 +213,7 @@ def test_demand_above_capacity_returns_rx02_with_hiring_math():
 
     exc = result.exception
     assert exc is not None and exc.code == "RX-02"
-    assert exc.decider == Role.DP
+    assert exc.decider == Role.GESTOR
     evidence = " | ".join(exc.evidence)
     assert "S1" in evidence
     assert "88,0 pessoa-horas" in evidence

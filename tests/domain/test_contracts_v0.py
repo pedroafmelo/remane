@@ -30,7 +30,7 @@ def fields(model):
 
 
 def test_role_values():
-    assert {r.value for r in Role} == {"gerente", "dp", "colaborador"}
+    assert {r.value for r in Role} == {"gestor", "colaborador"}
 
 
 def test_trace_event_fields():
@@ -101,3 +101,8 @@ def test_fakes_behave():
     assert llm.calls[0]["size"] == "small"
     with pytest.raises(LLMUnavailableError):
         FakeLLMClient(fail=True).complete(size="large", messages=[], run_id="r1")
+
+
+def test_legacy_role_values_read_as_gestor() -> None:
+    # DEC-044: rows saved before the rename still carry "gerente" or "dp"
+    assert Role("gerente") is Role.GESTOR and Role("dp") is Role.GESTOR

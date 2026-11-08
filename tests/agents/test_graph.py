@@ -176,7 +176,7 @@ def test_approve_records_approval_and_publishes() -> None:
     done = h.agent.approve(state.run_id, h.approval(state.version_id))
 
     assert done.phase == "published"
-    assert h.repo.get_approval(state.version_id).approved_by == "demo-gerente"
+    assert h.repo.get_approval(state.version_id).approved_by == "demo-gestor"
     assert h.agent.published().id == state.version_id
     assert h.agent.published().status == "published"
     assert h.kinds(state.run_id)[-2:] == ["approval.recorded", "schedule.publish"]
@@ -202,7 +202,7 @@ def test_publish_refused_for_role_without_permission_then_manager_publishes() ->
     state = _confirmed(h)
 
     with pytest.raises(PublishRefusedError) as err:
-        h.agent.approve(state.run_id, h.approval(state.version_id, role=Role.DP))
+        h.agent.approve(state.run_id, h.approval(state.version_id, role=Role.COLABORADOR))
 
     assert "papel" in err.value.reason
     assert h.kinds(state.run_id)[-2:] == ["approval.recorded", "schedule.publish_refused"]
