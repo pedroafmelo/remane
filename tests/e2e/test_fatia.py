@@ -283,6 +283,10 @@ def test_defect_csv_lists_the_issues_with_their_lines(clean_env) -> None:
     issues = body["summary"]["issues"]
     assert issues and all(i["line"] > 0 for i in issues)
     assert {i["line"] for i in issues} >= {48, 59, 69}  # hora ilegível, turno sobreposto, fim vazio
+    rx13 = [n for n in body["notices"] if n["code"] == "RX-13"]  # RX-13 com as linhas, como aviso (não bloqueia)
+    assert len(rx13) == 1
+    evidence_lines = {int(e.split(":")[0].split(",")[0].removeprefix("linha ")) for e in rx13[0]["evidence"]}
+    assert evidence_lines >= {48, 59, 69}
     run_id = body["run_id"]
     kinds = [e["kind"] for e in stack.trace(run_id)]
     assert kinds[0] == "ingest.parse" and kinds[-1] == "read.summary" and "solver.run" not in kinds

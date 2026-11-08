@@ -32,6 +32,7 @@ Fronteira: só núcleo (`domain`, `rules`, `solver`, `verifier`), portas e `lang
 from __future__ import annotations
 
 import logging
+import re
 import threading
 import time
 from collections import Counter
@@ -99,6 +100,7 @@ SOURCE_HEURISTIC = "heuristica"
 CONFIRMED_BY = "gestor"  # a assinatura de `confirm` não traz a conta de quem confirmou (B4a: relatado)
 MAX_EVIDENCE = 5
 MAX_CARD_ISSUES = 10
+MAX_LINE_EVIDENCE = 20  # linhas com problema listadas no cartão RX-13 da leitura parcial
 _HOURS = Decimal("0.01")
 _FORMATS = frozenset({"csv", "xlsx", "pdf"})
 _IF_NO_CONFIRM = "Nada é otimizado sem a confirmação do gestor."
@@ -700,6 +702,11 @@ class OptimizerAgent:
                 f"O arquivo só traz o dia da semana: assumi a semana de {file_week:%d/%m/%Y}; confirme a semana."
             )
         assumptions += asm.assumptions + _provisional_notes(asm.card, file_week)
+        issues = [*mapped.issues, *identity.issues]
+        if issues:  # RX-13 com as linhas, como aviso: o gestor pode confirmar só com as linhas válidas
+            names = {s.person_name.strip() for s in mapped.shifts if s.person_name.strip()}
+            card = _rx13_lines(name, issues, names)
+            notices.append(self._raise_card(run_id, card, step="ler_e_padronizar"))
         summary = ReadSummary(
             file_name=name,
             rows=len(identity.shifts),
@@ -707,7 +714,7 @@ class OptimizerAgent:
             stores=len(asm.stores),
             week_start=file_week,
             total_hours=_total_hours(asm.before),
-            issues=[*mapped.issues, *identity.issues],
+            issues=issues,
             ok=True,
             format=_format(read.format),
             mapping=mapped.mapping,
@@ -1160,6 +1167,42 @@ def _issue_text(issue: CsvIssue) -> str:
     if issue.table:
         where += f" ({issue.table})"
     return f"{where}: {issue.reason}"
+
+
+# Motivos que citam a pessoa (rules/identity.py e rules/mapping.py): o cartão diz a linha, sem nome nem id derivado.
+_NAMED_OVERLAP = re.compile(r" de '[^']*' \([^)]*\)")
+_TOO_MANY = re.compile(r"^(mais de \d+ turnos) de .+ (em \d{2}/\d{2}/\d{4})$")
+
+
+def _line_text(issue: CsvIssue, names: Iterable[str]) -> str:
+    """Formata `linha N[, campo]: motivo`, sem nome de pessoa."""
+    reason = _TOO_MANY.sub(r"\1 da mesma pessoa \2", _NAMED_OVERLAP.sub("", issue.reason))
+    for person in sorted(names, key=len, reverse=True):  # defesa: nenhum nome lido do arquivo vai ao cartão
+        reason = reason.replace(person, "a pessoa")
+    where = f"linha {issue.line}" + (f", {issue.field}" if issue.field else "")
+    return f"{where}: {reason}"
+
+
+def _rx13_lines(file_name: str, issues: Sequence[CsvIssue], names: Iterable[str]) -> ExceptionCard:
+    """RX-13 da leitura parcial (dado inconsistente vira exceção com o motivo): vai em `notices`, não bloqueia."""
+    lines = {i.line for i in issues}
+    shown = sorted(issues, key=lambda i: (i.line, i.col if i.col is not None else -1))[:MAX_LINE_EVIDENCE]
+    more = f" (as primeiras {MAX_LINE_EVIDENCE} na evidência)" if len(issues) > MAX_LINE_EVIDENCE else ""
+    return ExceptionCard(
+        code="RX-13",
+        title="A escala tem linhas com problema",
+        reason=(
+            f"{file_name}: {len(issues)} problema(s) em {len(lines)} linha(s) do arquivo{more}. "
+            "Os turnos válidos estão no resumo."
+        ),
+        decider=Role.GESTOR,
+        evidence=[_line_text(i, names) for i in shown],
+        recommendation="Corrija as linhas indicadas e envie de novo, ou confirme para seguir só com as linhas válidas.",
+        if_no_answer=(
+            "Nada é otimizado sem a confirmação do gestor; a escala atual continua valendo e nenhuma versão nova é "
+            "publicada."
+        ),
+    )
 
 
 def _rx13(file_name: str, reason: str, evidence: list[str]) -> ExceptionCard:

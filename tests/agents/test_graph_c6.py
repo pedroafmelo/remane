@@ -17,13 +17,13 @@ from pathlib import Path
 import pytest
 
 from escalista.agents.optimizer.errors import RunPhaseError
-from escalista.agents.optimizer.graph import OptimizerAgent
+from escalista.agents.optimizer.graph import OptimizerAgent, _line_text
 from escalista.agents.optimizer.tools import NO_MODEL
 from escalista.api.wiring import SliceAgent, SliceAgentC6
 from escalista.domain.contracts import Role
 from escalista.domain.reading import ConfirmInput, IdentityAnswer
 from escalista.domain.results import Approval, RunState
-from escalista.domain.schedule import EmployeePublic
+from escalista.domain.schedule import CsvIssue, EmployeePublic
 from escalista.ingest.cadastro import enrich, load_cadastro
 from escalista.ingest.tables import read_tables
 from escalista.llm.prompts.justify import make_justifier
@@ -40,6 +40,8 @@ EXAMPLE = DEMO_DIR / "escala_exemplo_grade.xlsx"
 GRID = E2_DIR / "e2-02-grade-horario.xlsx"  # 8 pessoas, 1 loja, 48 turnos
 LONG = E2_DIR / "e2-01-csv-cp1252.csv"  # 8 pessoas, 2 lojas, 48 turnos
 IDENTITY = E2_DIR / "e2-08-identidade.csv"  # homônimo em duas lojas e grafia parecida
+DUPLICATES = E2_DIR / "e2-07-duplicatas.csv"  # 36 turnos e 6 linhas duplicadas
+DEFECT = DEMO_DIR / "escala_defeito.csv"  # hora ilegível (48), turno sobreposto (59), fim vazio (69)
 FILE_WEEK = date(2027, 1, 11)
 NOTE = "a Ana Souza está de férias na quarta"
 
@@ -219,6 +221,58 @@ def test_restart_between_read_and_confirm_asks_for_the_file_again() -> None:
     assert restarted.repo.get_run(state.run_id).before is not None  # persistido mesmo assim
     with pytest.raises(RunPhaseError, match="envie o arquivo de novo"):
         restarted.agent.confirm(state.run_id)
+
+
+def test_problem_lines_raise_rx13_notice_and_the_read_still_waits_for_confirmation() -> None:
+    """RX-13 (requisitos): dado inconsistente vira exceção ao gestor com o motivo. Com turnos válidos, o cartão vai em
+    `notices` (não bloqueia) e o resumo fica `ok=False`; o gestor corrige o arquivo ou confirma só as linhas boas."""
+    h = C6Harness(mappings=[model_mapping(DEFECT)])
+
+    state = _read_ok(h, DEFECT)
+
+    assert state.exception is None
+    assert {i.line for i in state.summary.issues} >= {48, 59, 69}
+    [notice] = state.notices
+    assert notice.code == "RX-13" and notice.decider == Role.GESTOR
+    assert notice.title == "A escala tem linhas com problema"
+    assert f"{len(state.summary.issues)} problema(s)" in notice.reason
+    assert "confirme para seguir só com as linhas válidas" in notice.recommendation and notice.if_no_answer
+    assert [e.split(":")[0] for e in notice.evidence] == ["linha 48, inicio", "linha 59, turno", "linha 69, fim"]
+    names = {p.name for p in h.agent.employees(state.run_id)}
+    assert names and not any(name in e or "sintético" in e for e in notice.evidence for name in names)
+    kinds = h.kinds(state.run_id)
+    assert kinds[-2:] == ["exception.raised", "read.summary"]
+    assert notice.trace_id == h.event(state.run_id, "exception.raised").id
+    assert h.event(state.run_id, "read.summary").payload["notices"] == ["RX-13"]
+
+
+def test_confirm_after_the_rx13_notice_follows_with_the_valid_lines() -> None:
+    h = C6Harness(mappings=[model_mapping(DUPLICATES)])
+    read = _read_ok(h, DUPLICATES)
+    [notice] = read.notices
+    assert notice.code == "RX-13" and len(notice.evidence) == 6
+    assert all(e.startswith("linha ") and "duplicada da linha" in e for e in notice.evidence)
+
+    state = h.agent.confirm(read.run_id)
+
+    assert state.phase == "awaiting_approval", state.exception
+    assert len(state.before.shifts) == read.summary.rows == 36
+    assert "RX-13" in [n.code for n in state.notices]  # o aviso da leitura segue visível
+
+
+def test_rx13_evidence_never_names_the_person() -> None:
+    reason = "turno de 'Ana Souza' (n-ana-souza) sobreposto a outro da mesma pessoa (linha 9)"
+    overlap = CsvIssue(line=12, field="pessoa", col=1, reason=reason)
+    too_many = CsvIssue(line=20, field="turno", reason="mais de 2 turnos de Ana Souza em 12/01/2027")
+    plain = CsvIssue(line=5, reason="Ana Souza sem loja")
+
+    texts = [_line_text(i, {"Ana Souza"}) for i in (overlap, too_many, plain)]
+
+    assert texts == [
+        "linha 12, pessoa: turno sobreposto a outro da mesma pessoa (linha 9)",
+        "linha 20, turno: mais de 2 turnos da mesma pessoa em 12/01/2027",
+        "linha 5: a pessoa sem loja",
+    ]
 
 
 # --- identidade ---------------------------------------------------------------------------------------------------
