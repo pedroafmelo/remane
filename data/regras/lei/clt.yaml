@@ -61,7 +61,7 @@ regras:
     nota: >
       Na compensação, não há adicional de hora extra. Pelo art. 59-B, a compensação irregular não obriga a pagar
       de novo as horas se não passar da duração máxima semanal: é devido só o adicional. Como isso convive com
-      as 42h e o art. 7º da EC é a pergunta 17 de docs/estado-do-projeto.md.
+      as 42h e o art. 7º da EC ainda é uma leitura em aberto.
     status: interpretacao
     verificacao: >
       CLT, art. 59, §§ 2º, 5º e 6º, e art. 59-B, lidos no Planalto em 2026-11-07 por Claude: confere.
@@ -73,7 +73,7 @@ regras:
     fonte: "CLT, art. 67 e parágrafo único"
     nota: >
       A CLT ainda fala em 24h, mas a EC 141 passa a exigir 2 dias de repouso a partir dos marcos
-      (ver repouso_semanal em ec141.yaml). O que fica valendo daqui é a escala de revezamento mensal para o domingo.
+      (regra de repouso semanal da EC 141). O que fica valendo daqui é a escala de revezamento mensal para o domingo.
     status: interpretacao
     verificacao: >
       CLT, art. 67 e parágrafo único, lidos no Planalto em 2026-11-07 por Claude: confere. Que a EC prevalece
@@ -84,7 +84,7 @@ regras:
     aplica_a: "atividades do comércio em geral"
     condicao: "observada a legislação municipal"
     fonte: "Lei 10.101/2000, art. 6º e parágrafo único"
-    nota: "Para empregadas, vale a regra mais restritiva de domingo_mulher (DEC-023)."
+    nota: "Para empregadas, vale a regra mais restritiva do domingo da mulher (1 a cada 2 semanas)."
     status: interpretacao
     verificacao: >
       Lei 10.101/2000, art. 6º e parágrafo único (redação da Lei 11.603/2007), lidos no Planalto em 2026-11-07

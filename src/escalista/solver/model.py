@@ -325,7 +325,7 @@ def _rx02(uncovered: list[DemandSlot], stores: list[Store], limits: Limits, stat
     concentra em picos, e uma pessoa cobre no máximo um turno contínuo por dia.
 
     Decide o **DP**: contratar mexe em quadro e orçamento, e a alternativa de curto prazo (hora extra) só sai
-    com autorização prévia do DP pela política fictícia `hora_extra_autorizacao_dp`. O gerente é quem vê a escala
+    com autorização prévia do DP pela política fictícia `hora_extra_autorizacao_previa`. O gerente é quem vê a escala
     parcial e pode aceitá-la para a semana, mas não decide sobre quadro.
     """
     names = {s.id: s.name for s in stores}

@@ -206,7 +206,7 @@ def test_smoke_real_rule_files():
     assert card.provisional == [] and card.exceptions == []  # a ampliação diária da CCT é `info`: sem RX-01
     assert by_id(card.rules, "cct_jornada_diaria_ampliada").kind == "info"
 
-    policy_exc = by_id(card.rules, "hora_extra_autorizacao_dp")
+    policy_exc = by_id(card.rules, "hora_extra_autorizacao_previa")
     assert policy_exc.action == "escalar" and policy_exc.layer is RuleLayer.POLITICA
     assert by_id(card.rules, "regime_12x36").kind == "info"
 
