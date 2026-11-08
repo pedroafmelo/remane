@@ -6,6 +6,8 @@ export const ROLE_LABELS: Record<Role, string> = {
   colaborador: "Colaborador",
 };
 
+export const ROLE_SHORT: Record<Role, string> = { gerente: "gerente", dp: "DP", colaborador: "colaborador" };
+
 export const DEMO_ROLES: { role: Role; blurb: string }[] = [
   { role: "gerente", blurb: "Envia a escala, confere o antes e o depois e aprova a publicação." },
   { role: "dp", blurb: "Entra como o departamento pessoal. Nesta versão, o acesso ainda é só de leitura da conta." },
